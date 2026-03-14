@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"upcycleconnect/backend/internal/models"
-	"upcycleconnect/backend/internal/services"
+	"upcycleconnect/backend/models"
+	"upcycleconnect/backend/services"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gosimple/slug"

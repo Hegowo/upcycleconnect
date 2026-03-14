@@ -70,8 +70,8 @@ import { ref, reactive, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { userService } from '@/services/userService'
 import { useToast } from '@/composables/useToast'
-import AppBadge from '@/components/common/AppBadge.vue'
-import AppConfirmDialog from '@/components/common/AppConfirmDialog.vue'
+import AppBadge from '@/components/AppBadge.vue'
+import AppConfirmDialog from '@/components/AppConfirmDialog.vue'
 
 const route  = useRoute()
 const router = useRouter()

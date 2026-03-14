@@ -3,7 +3,7 @@ package handlers
 import (
 	"net/http"
 
-	"upcycleconnect/backend/internal/models"
+	"upcycleconnect/backend/models"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"

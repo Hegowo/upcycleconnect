@@ -104,9 +104,9 @@ import { ref, reactive, onMounted } from 'vue'
 import { prestationService } from '@/services/prestationService'
 import { categoryService } from '@/services/categoryService'
 import { useToast } from '@/composables/useToast'
-import AppBadge from '@/components/common/AppBadge.vue'
-import AppPagination from '@/components/common/AppPagination.vue'
-import AppConfirmDialog from '@/components/common/AppConfirmDialog.vue'
+import AppBadge from '@/components/AppBadge.vue'
+import AppPagination from '@/components/AppPagination.vue'
+import AppConfirmDialog from '@/components/AppConfirmDialog.vue'
 
 const toast       = useToast()
 const prestations = ref([])

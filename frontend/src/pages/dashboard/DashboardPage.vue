@@ -74,7 +74,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import api from '@/services/api'
-import AppBadge from '@/components/common/AppBadge.vue'
+import AppBadge from '@/components/AppBadge.vue'
 import StatCard from './StatCard.vue'
 
 const stats   = ref(null)

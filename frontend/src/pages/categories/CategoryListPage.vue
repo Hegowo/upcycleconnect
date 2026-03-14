@@ -75,7 +75,7 @@
 import { ref, reactive, onMounted } from 'vue'
 import { categoryService } from '@/services/categoryService'
 import { useToast } from '@/composables/useToast'
-import AppConfirmDialog from '@/components/common/AppConfirmDialog.vue'
+import AppConfirmDialog from '@/components/AppConfirmDialog.vue'
 
 const toast      = useToast()
 const categories = ref([])

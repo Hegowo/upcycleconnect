@@ -95,9 +95,9 @@
 import { ref, reactive, onMounted } from 'vue'
 import { eventService } from '@/services/eventService'
 import { useToast } from '@/composables/useToast'
-import AppBadge from '@/components/common/AppBadge.vue'
-import AppPagination from '@/components/common/AppPagination.vue'
-import AppConfirmDialog from '@/components/common/AppConfirmDialog.vue'
+import AppBadge from '@/components/AppBadge.vue'
+import AppPagination from '@/components/AppPagination.vue'
+import AppConfirmDialog from '@/components/AppConfirmDialog.vue'
 
 const toast   = useToast()
 const events  = ref([])

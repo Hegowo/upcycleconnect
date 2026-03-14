@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"upcycleconnect/backend/internal/config"
+	"upcycleconnect/backend/config"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"

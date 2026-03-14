@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"strings"
 
-	"upcycleconnect/backend/internal/config"
-	"upcycleconnect/backend/internal/models"
+	"upcycleconnect/backend/config"
+	"upcycleconnect/backend/models"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"

@@ -4,5 +4,5 @@
 </template>
 
 <script setup>
-import AppToast from '@/components/common/AppToast.vue'
+import AppToast from '@/components/AppToast.vue'
 </script>

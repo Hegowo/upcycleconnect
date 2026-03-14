@@ -7,9 +7,9 @@ import (
 	"strconv"
 	"time"
 
-	"upcycleconnect/backend/internal/middleware"
-	"upcycleconnect/backend/internal/models"
-	"upcycleconnect/backend/internal/services"
+	"upcycleconnect/backend/middleware"
+	"upcycleconnect/backend/models"
+	"upcycleconnect/backend/services"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"

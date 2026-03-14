@@ -5,9 +5,9 @@ import (
 	"log"
 	"os"
 
-	"upcycleconnect/backend/internal/config"
-	"upcycleconnect/backend/internal/database"
-	"upcycleconnect/backend/internal/router"
+	"upcycleconnect/backend/config"
+	"upcycleconnect/backend/database"
+	"upcycleconnect/backend/router"
 )
 
 func main() {

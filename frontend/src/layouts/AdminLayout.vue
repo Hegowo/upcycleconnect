@@ -12,8 +12,8 @@
 
 <script setup>
 import { useRoute } from 'vue-router'
-import TheSidebar from '@/components/layout/TheSidebar.vue'
-import TheHeader from '@/components/layout/TheHeader.vue'
+import TheSidebar from '@/components/Sidebar.vue'
+import TheHeader from '@/components/Header.vue'
 
 const route = useRoute()
 </script>

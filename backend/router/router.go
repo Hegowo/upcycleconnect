@@ -3,10 +3,10 @@ package router
 import (
 	"net/http"
 
-	"upcycleconnect/backend/internal/config"
-	"upcycleconnect/backend/internal/handlers"
-	"upcycleconnect/backend/internal/middleware"
-	"upcycleconnect/backend/internal/services"
+	"upcycleconnect/backend/config"
+	"upcycleconnect/backend/handlers"
+	"upcycleconnect/backend/middleware"
+	"upcycleconnect/backend/services"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
