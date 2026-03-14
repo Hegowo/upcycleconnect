@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"time"
 
-	"upcycleconnect/backend/internal/config"
-	"upcycleconnect/backend/internal/middleware"
-	"upcycleconnect/backend/internal/models"
+	"upcycleconnect/backend/config"
+	"upcycleconnect/backend/middleware"
+	"upcycleconnect/backend/models"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"

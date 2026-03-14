@@ -1,8 +1,5 @@
 version: '3.9'
 
-# Override de développement : hot-reload frontend + code backend monté en volume
-# Usage : docker compose -f docker-compose.yml -f docker-compose.dev.yml up
-
 services:
   mysql:
     ports:
@@ -15,7 +12,7 @@ services:
       LOG_LEVEL: debug
     volumes:
       - ./backend:/var/www/html
-      - /var/www/html/vendor  # conserver le vendor interne au conteneur
+      - /var/www/html/vendor
 
   frontend:
     build:
@@ -25,6 +22,6 @@ services:
       - "5173:5173"
     volumes:
       - ./frontend:/app
-      - /app/node_modules  # conserver node_modules interne
+      - /app/node_modules
     environment:
       VITE_API_BASE_URL: http://localhost:8080/api/admin/v1

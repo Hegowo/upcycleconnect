@@ -102,9 +102,9 @@ import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { userService } from '@/services/userService'
 import { useToast } from '@/composables/useToast'
-import AppBadge from '@/components/common/AppBadge.vue'
-import AppPagination from '@/components/common/AppPagination.vue'
-import AppConfirmDialog from '@/components/common/AppConfirmDialog.vue'
+import AppBadge from '@/components/AppBadge.vue'
+import AppPagination from '@/components/AppPagination.vue'
+import AppConfirmDialog from '@/components/AppConfirmDialog.vue'
 
 const router = useRouter()
 const toast  = useToast()

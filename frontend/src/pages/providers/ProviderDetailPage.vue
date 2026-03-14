@@ -62,7 +62,7 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { providerService } from '@/services/userService'
 import { useToast } from '@/composables/useToast'
-import AppBadge from '@/components/common/AppBadge.vue'
+import AppBadge from '@/components/AppBadge.vue'
 
 const route    = useRoute()
 const router   = useRouter()
