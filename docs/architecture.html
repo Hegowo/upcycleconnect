@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>UpcycleConnect Admin — Architecture</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0f1117; color: #e2e8f0; min-height: 100vh; padding: 32px; }
+    h1 { font-size: 1.5rem; font-weight: 700; color: #fff; margin-bottom: 4px; }
+    .subtitle { color: #64748b; font-size: 0.875rem; margin-bottom: 32px; }
+
+    .grid   { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; max-width: 1400px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; max-width: 1400px; margin-top: 24px; }
+
+    .card { background: #1e2433; border: 1px solid #2d3748; border-radius: 12px; overflow: hidden; }
+    .card-header {
+      padding: 14px 18px; font-weight: 700; font-size: 0.85rem;
+      letter-spacing: 0.05em; text-transform: uppercase;
+      display: flex; align-items: center; gap: 8px;
+      border-bottom: 1px solid #2d3748;
+    }
+    .card-body { padding: 16px 18px; }
+
+    .vue     .card-header { background: #1a2e1a; color: #4ade80; border-color: #166534; }
+    .laravel .card-header { background: #2e1a1a; color: #f87171; border-color: #991b1b; }
+    .mysql   .card-header { background: #1a2533; color: #60a5fa; border-color: #1e3a5f; }
+    .docker  .card-header { background: #1a2533; color: #93c5fd; border-color: #1e3a5f; }
+    .nginx   .card-header { background: #1e2420; color: #86efac; border-color: #14532d; }
+    .arch    .card-header { background: #2a2418; color: #fbbf24; border-color: #78350f; }
+
+    /* Arborescence */
+    .tree { font-family: 'Fira Code', 'Courier New', monospace; font-size: 0.78rem; line-height: 1.9; }
+    .tree-item { display: flex; align-items: center; gap: 6px; position: relative; }
+    .indent-1 { padding-left: 16px; }
+    .indent-2 { padding-left: 32px; }
+    .indent-3 { padding-left: 48px; }
+    .indent-4 { padding-left: 64px; }
+
+    .icon { width: 16px; text-align: center; flex-shrink: 0; }
+    .name        { color: #e2e8f0; white-space: nowrap; }
+    .name.folder { color: #93c5fd; font-weight: 600; }
+    .name.file-php    { color: #f87171; }
+    .name.file-vue    { color: #4ade80; }
+    .name.file-js     { color: #fbbf24; }
+    .name.file-conf   { color: #a78bfa; }
+    .name.file-env    { color: #f97316; }
+    .name.file-docker { color: #38bdf8; }
+
+    .badge { margin-left: auto; font-size: .65rem; padding: 1px 7px; border-radius: 99px; font-weight: 600; white-space: nowrap; }
+    .badge-green  { background: #14532d; color: #4ade80; }
+    .badge-red    { background: #7f1d1d; color: #fca5a5; }
+    .badge-blue   { background: #1e3a5f; color: #93c5fd; }
+    .badge-yellow { background: #78350f; color: #fcd34d; }
+    .badge-purple { background: #3b0764; color: #c4b5fd; }
+
+    /* ── Icône info + tooltip ── */
+    .info-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      margin-left: 5px;
+      flex-shrink: 0;
+    }
+    .info-btn {
+      width: 14px; height: 14px;
+      background: #334155;
+      border: 1px solid #475569;
+      border-radius: 50%;
+      color: #94a3b8;
+      font-size: 9px;
+      font-weight: 800;
+      line-height: 12px;
+      text-align: center;
+      cursor: default;
+      user-select: none;
+      font-family: Georgia, serif;
+      font-style: italic;
+      transition: background .15s, color .15s;
+      flex-shrink: 0;
+    }
+    .info-btn:hover { background: #3b82f6; color: #fff; border-color: #3b82f6; }
+    .tooltip {
+      display: none;
+      position: absolute;
+      left: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #0f172a;
+      border: 1px solid #3b82f6;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 0.72rem;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      color: #cbd5e1;
+      white-space: normal;
+      width: 230px;
+      z-index: 999;
+      line-height: 1.5;
+      box-shadow: 0 8px 24px rgba(0,0,0,.6);
+      pointer-events: none;
+    }
+    .tooltip strong { color: #60a5fa; display: block; margin-bottom: 3px; }
+    .info-wrap:hover .tooltip { display: block; }
+
+    /* Schéma flux */
+    .flow { display: flex; align-items: center; gap: 0; flex-wrap: wrap; margin: 12px 0; }
+    .flow-box { padding: 10px 16px; border-radius: 8px; font-size: .8rem; font-weight: 600; text-align: center; min-width: 120px; }
+    .flow-arrow { color: #4b5563; font-size: 1.2rem; margin: 0 4px; }
+    .box-browser  { background: #1e3a5f; color: #93c5fd; border: 1px solid #2563eb; }
+    .box-nginx    { background: #14532d; color: #4ade80; border: 1px solid #16a34a; }
+    .box-vue      { background: #1a2e1a; color: #86efac; border: 1px solid #166534; }
+    .box-laravel  { background: #7f1d1d; color: #fca5a5; border: 1px solid #dc2626; }
+    .box-mysql    { background: #1e3a5f; color: #60a5fa; border: 1px solid #2563eb; }
+
+    .section-title { font-size: .7rem; color: #4b5563; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 10px; font-weight: 700; }
+    .legend { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 6px; }
+    .legend-item { display: flex; align-items: center; gap: 6px; font-size: .75rem; color: #94a3b8; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+    table { width: 100%; border-collapse: collapse; font-size: .78rem; }
+    th { text-align: left; padding: 8px 10px; color: #64748b; font-weight: 600; border-bottom: 1px solid #2d3748; text-transform: uppercase; font-size: .7rem; letter-spacing: .05em; }
+    td { padding: 8px 10px; border-bottom: 1px solid #1e2433; color: #cbd5e1; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #252d3d; }
+    .chip { display: inline-block; padding: 2px 8px; border-radius: 99px; font-size: .65rem; font-weight: 700; }
+    .chip-green { background: #14532d; color: #4ade80; }
+    .chip-blue  { background: #1e3a5f; color: #93c5fd; }
+    .chip-red   { background: #7f1d1d; color: #fca5a5; }
+
+    hr.sep { border: none; border-top: 1px solid #2d3748; margin: 14px 0; }
+  </style>
+</head>
+<body>
+
+<h1>UpcycleConnect Admin — Architecture technique</h1>
+<p class="subtitle">Passe la souris sur le <span style="display:inline-flex;align-items:center;gap:4px;"><span style="background:#334155;border:1px solid #475569;border-radius:50%;width:14px;height:14px;font-size:9px;color:#94a3b8;text-align:center;line-height:12px;font-style:italic;font-family:Georgia">i</span></span> pour voir à quoi sert chaque fichier</p>
+
+<!-- FLUX -->
+<div class="card arch" style="max-width:1400px; margin-bottom: 24px;">
+  <div class="card-header">🔄 Flux d'une requête HTTP</div>
+  <div class="card-body">
+    <p class="section-title">Exemple : connexion admin POST /api/admin/v1/auth/login</p>
+    <div class="flow">
+      <div class="flow-box box-browser">🖥️ Navigateur<br/><small>localhost:8080</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box box-nginx">⚙️ Nginx<br/><small>reverse proxy :80</small></div>
+      <div class="flow-arrow">→ /api/* →</div>
+      <div class="flow-box box-laravel">🐘 Laravel (Apache)<br/><small>backend:80</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box box-mysql">🗄️ MySQL<br/><small>mysql:3306</small></div>
+    </div>
+    <div class="flow" style="margin-top:8px;">
+      <div class="flow-box box-nginx">⚙️ Nginx<br/><small>reverse proxy :80</small></div>
+      <div class="flow-arrow">→ /* →</div>
+      <div class="flow-box box-vue">💚 Vue 3 (Nginx)<br/><small>frontend:80</small></div>
+    </div>
+    <div class="legend" style="margin-top:14px;">
+      <div class="legend-item"><div class="legend-dot" style="background:#38bdf8"></div>Port exposé public : 8080</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#4ade80"></div>Réseau interne Docker : upcycleconnect_net</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#fbbf24"></div>Données persistées : volume mysql_data</div>
+    </div>
+  </div>
+</div>
+
+<!-- helper macro : génère un item d'arbre avec tooltip -->
+<!-- On utilise directement le HTML inline ci-dessous -->
+
+<div class="grid">
+
+  <!-- ═══════════════════ FRONTEND ═══════════════════ -->
+  <div class="card vue">
+    <div class="card-header">💚 Frontend — Vue 3 <span style="margin-left:auto;opacity:.5;font-size:.75rem;font-weight:400">frontend/src/</span></div>
+    <div class="card-body"><div class="tree">
+
+      <div class="tree-item"><span class="icon">📁</span><span class="name folder">src/</span></div>
+
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-js">main.js</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>main.js</strong>Point d'entrée de l'application. Monte Vue, branche Pinia et Vue Router, puis attache tout au #app du HTML.</span></span>
+        <span class="badge badge-blue">entrypoint</span></div>
+
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">App.vue</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>App.vue</strong>Composant racine. Affiche la vue courante via &lt;RouterView&gt; et le système de toasts globaux (AppToast).</span></span>
+        <span class="badge badge-blue">root</span></div>
+
+      <hr class="sep">
+
+      <div class="tree-item indent-1"><span class="icon">📁</span><span class="name folder">router/</span></div>
+      <div class="tree-item indent-2"><span class="icon">📄</span><span class="name file-js">index.js</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>router/index.js</strong>Déclare toutes les routes de l'admin (/login, /dashboard, /users…). Contient les guards : redirige vers /login si non connecté, bloque /admins si pas super_admin.</span></span>
+        <span class="badge badge-purple">guards auth</span></div>
+
+      <hr class="sep">
+
+      <div class="tree-item indent-1"><span class="icon">📁</span><span class="name folder">stores/</span><span class="badge badge-yellow">Pinia</span></div>
+      <div class="tree-item indent-2"><span class="icon">📄</span><span class="name file-js">auth.js</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>stores/auth.js</strong>Gère l'état de connexion global : token Bearer, données de l'utilisateur connecté, actions login/logout/initAuth. Persiste le token dans localStorage.</span></span></div>
+
+      <hr class="sep">
+
+      <div class="tree-item indent-1"><span class="icon">📁</span><span class="name folder">services/</span><span class="badge badge-blue">Axios</span></div>
+      <div class="tree-item indent-2"><span class="icon">📄</span><span class="name file-js">api.js</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>services/api.js</strong>Instance Axios partagée. Injecte automatiquement le header Authorization: Bearer sur chaque requête. Intercepte les 401 → redirige vers /login.</span></span>
+        <span class="badge badge-purple">interceptors</span></div>
+      <div class="tree-item indent-2"><span class="icon">📄</span><span class="name file-js">authService.js</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>authService.js</strong>Fonctions login(), logout(), me(). Appelle les endpoints /auth/* du backend.</span></span></div>
+      <div class="tree-item indent-2"><span class="icon">📄</span><span class="name file-js">userService.js</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>userService.js</strong>Regroupe les appels API pour les utilisateurs particuliers, les prestataires et les comptes admin : list, get, ban, activate, updateStatus…</span></span></div>
+      <div class="tree-item indent-2"><span class="icon">📄</span><span class="name file-js">categoryService.js</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>categoryService.js</strong>CRUD des catégories de prestations + appel /toggle pour activer/désactiver sans recharger la page.</span></span></div>
+      <div class="tree-item indent-2"><span class="icon">📄</span><span class="name file-js">prestationService.js</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>prestationService.js</strong>CRUD des prestations + updateStatus pour changer le statut (draft→published→suspended…) sans tout recharger.</span></span></div>
+      <div class="tree-item indent-2"><span class="icon">📄</span><span class="name file-js">eventService.js</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>eventService.js</strong>CRUD des événements + updateStatus. Gère les filtres date et statut.</span></span></div>
+
+      <hr class="sep">
+
+      <div class="tree-item indent-1"><span class="icon">📁</span><span class="name folder">layouts/</span></div>
+      <div class="tree-item indent-2"><span class="icon">📄</span><span class="name file-vue">AuthLayout.vue</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>AuthLayout.vue</strong>Mise en page pour les pages non connectées (fond gris, carte centrée, logo UpcycleConnect). Utilisé uniquement par LoginPage.</span></span>
+        <span class="badge badge-blue">login</span></div>
+      <div class="tree-item indent-2"><span class="icon">📄</span><span class="name file-vue">AdminLayout.vue</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>AdminLayout.vue</strong>Mise en page principale du back-office : sidebar à gauche + header en haut + zone de contenu à droite. Toutes les pages admin s'affichent à l'intérieur.</span></span>
+        <span class="badge badge-green">sidebar + header</span></div>
+
+      <hr class="sep">
+
+      <div class="tree-item indent-1"><span class="icon">📁</span><span class="name folder">components/layout/</span></div>
+      <div class="tree-item indent-2"><span class="icon">📄</span><span class="name file-vue">TheSidebar.vue</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>TheSidebar.vue</strong>Menu de navigation vertical (fond sombre). Contient les liens Dashboard, Utilisateurs, Prestataires, Catégories, Prestations, Événements. Le lien Administrateurs n'apparaît que pour les super_admin.</span></span></div>
+      <div class="tree-item indent-2"><span class="icon">📄</span><span class="name file-vue">TheHeader.vue</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>TheHeader.vue</strong>Barre du haut : affiche le titre de la page courante et le bouton "Se déconnecter" avec le nom de l'admin connecté.</span></span></div>
+      <div class="tree-item indent-2"><span class="icon">📄</span><span class="name file-vue">NavItem.vue</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>NavItem.vue</strong>Lien de navigation réutilisable dans la sidebar. Met en surbrillance automatiquement le lien actif selon la route courante.</span></span></div>
+
+      <div class="tree-item indent-1"><span class="icon">📁</span><span class="name folder">components/common/</span></div>
+      <div class="tree-item indent-2"><span class="icon">📄</span><span class="name file-vue">AppBadge.vue</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>AppBadge.vue</strong>Étiquette colorée pour les statuts. Mappe automatiquement les valeurs : active/approved/published → vert, pending/draft → orange, banned/suspended → rouge.</span></span></div>
+      <div class="tree-item indent-2"><span class="icon">📄</span><span class="name file-vue">AppButton.vue</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>AppButton.vue</strong>Bouton réutilisable avec 4 variantes (primary, secondary, danger, ghost), gestion du loading (spinner) et état disabled.</span></span></div>
+      <div class="tree-item indent-2"><span class="icon">📄</span><span class="name file-vue">AppPagination.vue</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>AppPagination.vue</strong>Composant de pagination générique. Affiche Précédent / numéros / Suivant. Émet un événement page-change que les pages écoutent pour recharger les données.</span></span></div>
+      <div class="tree-item indent-2"><span class="icon">📄</span><span class="name file-vue">AppConfirmDialog.vue</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>AppConfirmDialog.vue</strong>Boîte de dialogue de confirmation (overlay sombre + modale). Utilisée avant toute action destructive : bannir, supprimer, désactiver.</span></span></div>
+      <div class="tree-item indent-2"><span class="icon">📄</span><span class="name file-vue">AppToast.vue</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>AppToast.vue</strong>Notifications temporaires en bas à droite de l'écran (succès vert, erreur rouge, info bleu). Disparaissent automatiquement après 3-5 secondes.</span></span></div>
+
+      <hr class="sep">
+
+      <div class="tree-item indent-1"><span class="icon">📁</span><span class="name folder">pages/</span></div>
+      <div class="tree-item indent-2"><span class="icon">📄</span><span class="name file-vue">auth/LoginPage.vue</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>LoginPage.vue</strong>Page de connexion admin. Formulaire email + mot de passe. Appelle authStore.login() → redirige vers /admin/dashboard si succès. Affiche les erreurs 401/403.</span></span></div>
+      <div class="tree-item indent-2"><span class="icon">📄</span><span class="name file-vue">dashboard/DashboardPage.vue</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>DashboardPage.vue</strong>Tableau de bord principal. Charge GET /dashboard/stats et affiche 5 cartes (utilisateurs, prestataires, en attente, prestations, événements). Alerte si prestataires en attente.</span></span></div>
+      <div class="tree-item indent-2"><span class="icon">📄</span><span class="name file-vue">users/UserListPage.vue</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>UserListPage.vue</strong>Liste paginée des utilisateurs particuliers. Recherche par nom/email, filtre par statut. Actions rapides : bannir ou activer directement depuis le tableau.</span></span></div>
+      <div class="tree-item indent-2"><span class="icon">📄</span><span class="name file-vue">users/UserDetailPage.vue</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>UserDetailPage.vue</strong>Fiche complète d'un utilisateur. Affiche ses informations et permet de le bannir ou l'activer avec confirmation.</span></span></div>
+      <div class="tree-item indent-2"><span class="icon">📄</span><span class="name file-vue">providers/ProviderListPage.vue</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>ProviderListPage.vue</strong>Liste des prestataires filtrée par statut (en attente / approuvé / suspendu). Actions rapides inline pour approuver ou suspendre sans quitter la liste.</span></span></div>
+      <div class="tree-item indent-2"><span class="icon">📄</span><span class="name file-vue">providers/ProviderDetailPage.vue</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>ProviderDetailPage.vue</strong>Fiche prestataire avec profil entreprise (SIRET, description, site web). Boutons Approuver / Suspendre avec mise à jour immédiate du badge statut.</span></span></div>
+      <div class="tree-item indent-2"><span class="icon">📄</span><span class="name file-vue">admins/AdminListPage.vue</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>AdminListPage.vue</strong>Liste des comptes administrateurs. Visible seulement pour les super_admin. Protège l'admin courant (pas de bouton supprimer sur son propre compte).</span></span></div>
+      <div class="tree-item indent-2"><span class="icon">📄</span><span class="name file-vue">admins/AdminFormPage.vue</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>AdminFormPage.vue</strong>Formulaire création/édition d'un admin. Champs : prénom, nom, email, mot de passe, rôle (admin ou super_admin). En mode édition, l'email est désactivé.</span></span></div>
+      <div class="tree-item indent-2"><span class="icon">📄</span><span class="name file-vue">categories/CategoryListPage.vue</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>CategoryListPage.vue</strong>Liste toutes les catégories (actives et inactives). Toggle actif/inactif directement dans le tableau sans rechargement. Boutons Modifier et Supprimer.</span></span></div>
+      <div class="tree-item indent-2"><span class="icon">📄</span><span class="name file-vue">categories/CategoryFormPage.vue</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>CategoryFormPage.vue</strong>Formulaire création/édition catégorie. Le slug est auto-généré depuis le nom (espaces → tirets, minuscules) mais reste modifiable manuellement.</span></span></div>
+      <div class="tree-item indent-2"><span class="icon">📄</span><span class="name file-vue">prestations/PrestationListPage.vue</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>PrestationListPage.vue</strong>Liste paginée des prestations avec filtres statut et catégorie. Changement de statut rapide (Publier / Suspendre) inline. Affiche le prestataire associé.</span></span></div>
+      <div class="tree-item indent-2"><span class="icon">📄</span><span class="name file-vue">prestations/PrestationFormPage.vue</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>PrestationFormPage.vue</strong>Formulaire création/édition prestation. Sélecteurs dynamiques : catégorie (toutes) et prestataire (uniquement les approuvés). Prix optionnel selon le type de tarif.</span></span></div>
+      <div class="tree-item indent-2"><span class="icon">📄</span><span class="name file-vue">events/EventListPage.vue</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>EventListPage.vue</strong>Liste paginée des événements avec filtre statut. Changement de statut rapide (Publier / Annuler). Affiche lieu, date de début, nombre de places.</span></span></div>
+      <div class="tree-item indent-2"><span class="icon">📄</span><span class="name file-vue">events/EventFormPage.vue</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>EventFormPage.vue</strong>Formulaire événement avec date pickers natifs (datetime-local). Validation front : la date de fin doit être après la date de début. Catégorie optionnelle.</span></span></div>
+
+    </div></div>
+  </div>
+
+  <!-- ═══════════════════ BACKEND ═══════════════════ -->
+  <div class="card laravel">
+    <div class="card-header">🐘 Backend — Laravel 11 <span style="margin-left:auto;opacity:.5;font-size:.75rem;font-weight:400">backend/</span></div>
+    <div class="card-body"><div class="tree">
+
+      <div class="tree-item"><span class="icon">📁</span><span class="name folder">routes/</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-php">api.php</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>routes/api.php</strong>Déclare toutes les routes de l'API admin sous /api/admin/v1. Groupe les routes protégées derrière auth:sanctum + middleware admin. Groupe /admins derrière super_admin.</span></span>
+        <span class="badge badge-red">toutes les routes</span></div>
+
+      <div class="tree-item"><span class="icon">📁</span><span class="name folder">bootstrap/</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-php">app.php</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>bootstrap/app.php</strong>Point de démarrage de Laravel 11. Configure le routing API, enregistre les middlewares personnalisés (admin, super_admin), et personnalise les réponses d'erreur en JSON.</span></span></div>
+
+      <hr class="sep">
+
+      <div class="tree-item"><span class="icon">📁</span><span class="name folder">app/Http/Controllers/Admin/</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-php">AuthController.php</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>AuthController.php</strong>Gère login (vérifie email+password, vérifie le rôle admin, crée un token Sanctum 8h), logout (révoque le token), et me (retourne l'utilisateur connecté).</span></span>
+        <span class="badge badge-blue">login/logout/me</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-php">DashboardController.php</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>DashboardController.php</strong>Calcule et retourne les statistiques globales : nombre d'utilisateurs, de prestataires (total + en attente), de prestations par statut, et d'événements actifs.</span></span>
+        <span class="badge badge-blue">stats</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-php">UserController.php</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>UserController.php</strong>Gestion des utilisateurs particuliers : liste paginée avec filtres, fiche, modification, bannissement, activation, suppression (soft delete). Enregistre les actions dans audit_logs.</span></span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-php">ProviderController.php</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>ProviderController.php</strong>Gestion des prestataires : liste filtrée par statut, fiche avec profil entreprise, changement de statut (pending/approved/suspended) avec enregistrement de approved_by et approved_at.</span></span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-php">AdminUserController.php</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>AdminUserController.php</strong>Réservé aux super_admin. Crée, modifie et supprime les comptes administrateurs. Protège contre la suppression de son propre compte.</span></span>
+        <span class="badge badge-purple">super_admin</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-php">CategoryController.php</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>CategoryController.php</strong>CRUD complet des catégories + action toggle pour basculer is_active. Auto-génère le slug depuis le nom si absent. Audit log sur chaque action.</span></span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-php">PrestationController.php</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>PrestationController.php</strong>CRUD prestations avec filtres (statut, catégorie, prestataire). Action updateStatus séparée pour changer le statut seul sans tout revalider.</span></span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-php">EventController.php</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>EventController.php</strong>CRUD événements. Enregistre automatiquement created_by = admin connecté. Filtres par statut et plage de dates. Action updateStatus séparée.</span></span></div>
+
+      <hr class="sep">
+
+      <div class="tree-item"><span class="icon">📁</span><span class="name folder">app/Http/Middleware/</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-php">EnsureIsAdmin.php</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>EnsureIsAdmin.php</strong>Middleware RBAC. Vérifie que l'utilisateur authentifié a le rôle "admin" ou "super_admin". Retourne 403 JSON sinon. Appliqué à toutes les routes protégées.</span></span>
+        <span class="badge badge-yellow">RBAC</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-php">EnsureIsSuperAdmin.php</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>EnsureIsSuperAdmin.php</strong>Middleware RBAC strict. Vérifie uniquement le rôle "super_admin". Appliqué aux routes /admins (création/suppression de comptes admin).</span></span>
+        <span class="badge badge-yellow">RBAC</span></div>
+
+      <hr class="sep">
+
+      <div class="tree-item"><span class="icon">📁</span><span class="name folder">app/Http/Requests/Admin/</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-php">LoginRequest.php</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>LoginRequest.php</strong>Valide les données de connexion côté serveur : email requis et valide, mot de passe requis minimum 8 caractères. Retourne 422 si invalide.</span></span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-php">StoreCategoryRequest.php</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>StoreCategoryRequest.php</strong>Valide la création et la modification de catégories. Vérifie l'unicité du slug en base (sauf pour la catégorie en cours de modification).</span></span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-php">StorePrestationRequest.php</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>StorePrestationRequest.php</strong>Valide les prestations : provider_id doit exister en base, prix numérique positif, statut parmi les valeurs autorisées, type de tarif valide.</span></span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-php">StoreEventRequest.php</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>StoreEventRequest.php</strong>Valide les événements côté serveur. Règle clé : end_date doit être après start_date (règle "after:start_date" Laravel).</span></span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-php">StoreAdminRequest.php</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>StoreAdminRequest.php</strong>Valide la création d'un admin : email unique en base, mot de passe 8 caractères minimum, rôle obligatoirement "admin" ou "super_admin".</span></span></div>
+
+      <hr class="sep">
+
+      <div class="tree-item"><span class="icon">📁</span><span class="name folder">app/Http/Resources/Admin/</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-php">UserResource.php</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>UserResource.php</strong>Transforme un modèle User en JSON propre pour l'API. Expose uniquement les champs utiles (pas le mot de passe). Ajoute le "primary_role" de l'utilisateur.</span></span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-php">ProviderResource.php</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>ProviderResource.php</strong>Étend UserResource avec les données du profil prestataire : company_name, siret, description, website, statut de validation.</span></span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-php">CategoryResource.php</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>CategoryResource.php</strong>Sérialise une catégorie. Inclut prestations_count (nombre de prestations liées) quand il est chargé via withCount().</span></span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-php">PrestationResource.php</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>PrestationResource.php</strong>Sérialise une prestation avec ses relations category et provider imbriquées (chargées avec whenLoaded pour éviter les N+1).</span></span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-php">EventResource.php</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>EventResource.php</strong>Sérialise un événement avec category et creator imbriqués. Les dates sont en format ISO 8601.</span></span></div>
+
+      <hr class="sep">
+
+      <div class="tree-item"><span class="icon">📁</span><span class="name folder">app/Models/</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-php">User.php</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>User.php</strong>Modèle central. Gère tous les types d'utilisateurs (particuliers, prestataires, admins). Relations : roles (BelongsToMany), providerProfile (HasOne), prestations (HasMany). Helpers isAdmin(), isSuperAdmin().</span></span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-php">Role.php</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>Role.php</strong>Modèle simple pour les rôles. Valeurs possibles : "admin" et "super_admin". Relation inverse vers les users via la table pivot user_roles.</span></span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-php">ProviderProfile.php</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>ProviderProfile.php</strong>Extension du User pour les prestataires. Stocke company_name, siret, description, website et le statut de validation (pending/approved/suspended).</span></span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-php">PrestationCategory.php</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>PrestationCategory.php</strong>Catégorie de prestation avec auto-génération du slug dans le boot(). SoftDeletes activé. Relations vers prestations et events.</span></span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-php">Prestation.php</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>Prestation.php</strong>Prestation de service liée à un prestataire (provider_id) et optionnellement à une catégorie. SoftDeletes. Statuts : draft, published, suspended, archived.</span></span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-php">Event.php</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>Event.php</strong>Événement de la plateforme. Utilise la table "platform_events" (nom choisi pour éviter le conflit avec le mot réservé SQL "events"). SoftDeletes. Dates castées en datetime.</span></span>
+        <span class="badge badge-yellow">table: platform_events</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-php">AuditLog.php</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>AuditLog.php</strong>Enregistrement immuable des actions sensibles. Stocke action (ex: "user.banned"), resource_type, resource_id, et les valeurs avant/après en JSON pour traçabilité.</span></span></div>
+
+      <div class="tree-item"><span class="icon">📁</span><span class="name folder">app/Services/Admin/</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-php">AuditService.php</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>AuditService.php</strong>Service injecté dans les controllers. Méthode log() : récupère automatiquement l'admin connecté et son IP, puis crée un enregistrement dans audit_logs. Appelé sur : ban, approve, delete, createAdmin.</span></span>
+        <span class="badge badge-purple">logs actions</span></div>
+
+      <hr class="sep">
+
+      <div class="tree-item"><span class="icon">📁</span><span class="name folder">database/migrations/</span><span class="badge badge-blue">9 fichiers</span></div>
+      <div class="tree-item indent-1" style="color:#64748b;font-size:.72rem;">001 users → 002 roles → 003 user_roles → 004 provider_profiles</div>
+      <div class="tree-item indent-1" style="color:#64748b;font-size:.72rem;">005 prestation_categories → 006 prestations → 007 platform_events</div>
+      <div class="tree-item indent-1" style="color:#64748b;font-size:.72rem;">008 audit_logs → 009 personal_access_tokens</div>
+
+      <div class="tree-item" style="margin-top:8px;"><span class="icon">📁</span><span class="name folder">database/seeders/</span><span class="badge badge-green">données démo</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-php">RoleSeeder.php</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>RoleSeeder.php</strong>Crée les 2 rôles : "admin" et "super_admin" dans la table roles.</span></span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-php">AdminUserSeeder.php</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>AdminUserSeeder.php</strong>Crée les comptes de démo : superadmin@upcycleconnect.fr (super_admin) et admin@upcycleconnect.fr (admin). Mots de passe hashés avec bcrypt.</span></span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-php">DemoDataSeeder.php</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>DemoDataSeeder.php</strong>Génère toutes les données de démonstration : 4 catégories, 10 utilisateurs, 5 prestataires (3 approuvés + 2 en attente), 8 prestations, 4 événements.</span></span></div>
+
+    </div></div>
+  </div>
+
+</div>
+
+<!-- LIGNE 2 -->
+<div class="grid-3">
+
+  <!-- MySQL -->
+  <div class="card mysql">
+    <div class="card-header">🗄️ Base de données MySQL 8</div>
+    <div class="card-body"><div class="tree">
+      <div class="tree-item"><span class="icon">📋</span><span class="name">users</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>Table users</strong>Table centrale pour TOUS les types d'utilisateurs (particuliers, prestataires, admins). Le rôle est déterminé par la table user_roles. SoftDelete avec deleted_at.</span></span>
+        <span class="badge badge-blue">softdelete</span></div>
+      <div class="tree-item indent-1" style="font-size:.7rem;color:#64748b;">id, email, password (bcrypt), first_name, last_name, phone, status</div>
+
+      <div class="tree-item"><span class="icon">📋</span><span class="name">roles</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>Table roles</strong>Contient uniquement 2 lignes : "admin" et "super_admin". Liée à users via la table pivot user_roles.</span></span></div>
+
+      <div class="tree-item"><span class="icon">📋</span><span class="name">user_roles</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>Table user_roles</strong>Table pivot Many-to-Many entre users et roles. Clé primaire composite (user_id, role_id). Un user sans entrée ici est un utilisateur particulier.</span></span>
+        <span class="badge badge-blue">pivot</span></div>
+
+      <div class="tree-item"><span class="icon">📋</span><span class="name">provider_profiles</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>Table provider_profiles</strong>Extension de users pour les prestataires. user_id est UNIQUE (1 profil par user). Stocke company_name, siret, description, website et le statut de validation avec qui a approuvé et quand.</span></span></div>
+      <div class="tree-item indent-1" style="font-size:.7rem;color:#64748b;">company_name, siret, status: pending/approved/suspended</div>
+
+      <div class="tree-item"><span class="icon">📋</span><span class="name">prestation_categories</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>Table prestation_categories</strong>Catégories (Mobilier, Textile…). Slug unique auto-généré. is_active pour activer/désactiver. sort_order pour l'ordre d'affichage. SoftDelete.</span></span>
+        <span class="badge badge-blue">softdelete</span></div>
+      <div class="tree-item indent-1" style="font-size:.7rem;color:#64748b;">name, slug (UNIQUE), is_active, sort_order</div>
+
+      <div class="tree-item"><span class="icon">📋</span><span class="name">prestations</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>Table prestations</strong>Services proposés par les prestataires. Liée à users (provider_id) et prestation_categories. SoftDelete. Statuts : draft, published, suspended, archived.</span></span>
+        <span class="badge badge-blue">softdelete</span></div>
+      <div class="tree-item indent-1" style="font-size:.7rem;color:#64748b;">title, price (decimal), price_type, status</div>
+
+      <div class="tree-item"><span class="icon">📋</span><span class="name">platform_events</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>Table platform_events</strong>Nommée "platform_events" et non "events" pour éviter le conflit avec le mot réservé SQL. Stocke start_date et end_date en DATETIME. created_by pointe vers l'admin qui a créé l'événement.</span></span>
+        <span class="badge badge-blue">softdelete</span></div>
+      <div class="tree-item indent-1" style="font-size:.7rem;color:#64748b;">start_date, end_date, location, max_participants</div>
+
+      <div class="tree-item"><span class="icon">📋</span><span class="name">audit_logs</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>Table audit_logs</strong>Journal immuable des actions sensibles. Enregistre qui a fait quoi, sur quelle ressource, avec les valeurs avant et après en JSON. Pas de updated_at, pas de softdelete : ces logs ne se modifient jamais.</span></span>
+        <span class="badge badge-yellow">traçabilité</span></div>
+      <div class="tree-item indent-1" style="font-size:.7rem;color:#64748b;">action, resource_type, old/new_values (JSON)</div>
+
+      <div class="tree-item"><span class="icon">📋</span><span class="name">personal_access_tokens</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>Table personal_access_tokens</strong>Tokens Bearer gérés par Laravel Sanctum. Chaque connexion admin crée un token (expires_at = +8h). Révoqué à la déconnexion. Le hash du token est stocké, jamais le token en clair.</span></span>
+        <span class="badge badge-purple">Sanctum</span></div>
+    </div></div>
+  </div>
+
+  <!-- Docker -->
+  <div class="card docker">
+    <div class="card-header">🐳 Docker — Services</div>
+    <div class="card-body"><div class="tree">
+      <p class="section-title">docker-compose.yml</p>
+
+      <div class="tree-item"><span class="icon">📦</span><span class="name folder">nginx</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>Service nginx</strong>Seul service exposé sur le port 8080. Agit comme reverse proxy : redirige /api/admin/ vers le backend Laravel, et tout le reste vers le frontend Vue. Config dans nginx/default.conf.</span></span>
+        <span class="badge badge-green">port 8080:80</span></div>
+      <div class="tree-item indent-1" style="font-size:.7rem;color:#64748b;">image: nginx:1.25-alpine</div>
+      <div class="tree-item indent-1" style="font-size:.7rem;color:#64748b;">→ /api/admin/ → backend:80</div>
+      <div class="tree-item indent-1" style="font-size:.7rem;color:#64748b;">→ /          → frontend:80</div>
+
+      <hr class="sep">
+
+      <div class="tree-item"><span class="icon">📦</span><span class="name folder">frontend</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>Service frontend</strong>Build multi-stage : Node 20 compile le code Vue avec Vite (npm run build), puis Nginx Alpine sert les fichiers statiques générés. Non accessible directement depuis l'extérieur.</span></span>
+        <span class="badge badge-green">interne :80</span></div>
+      <div class="tree-item indent-1" style="font-size:.7rem;color:#64748b;">Node 20 → npm build → Nginx static</div>
+
+      <hr class="sep">
+
+      <div class="tree-item"><span class="icon">📦</span><span class="name folder">backend</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>Service backend</strong>PHP 8.3 avec Apache. Reçoit les requêtes /api/* de Nginx. Les variables d'environnement (DB_HOST=mysql, APP_KEY…) sont injectées depuis le .env. Volumes pour storage et logs persistants.</span></span>
+        <span class="badge badge-red">interne :80</span></div>
+      <div class="tree-item indent-1" style="font-size:.7rem;color:#64748b;">PHP 8.3 + Apache + mod_rewrite</div>
+      <div class="tree-item indent-1" style="font-size:.7rem;color:#64748b;">volumes: storage/ + logs/ (persistants)</div>
+
+      <hr class="sep">
+
+      <div class="tree-item"><span class="icon">📦</span><span class="name folder">mysql</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>Service mysql</strong>MySQL 8. Non exposé à l'extérieur. Accessible uniquement depuis le réseau interne Docker sous le nom d'hôte "mysql". Volume mysql_data pour que les données survivent aux redémarrages.</span></span>
+        <span class="badge badge-blue">interne :3306</span></div>
+      <div class="tree-item indent-1" style="font-size:.7rem;color:#64748b;">volume mysql_data (données persistantes)</div>
+      <div class="tree-item indent-1" style="font-size:.7rem;color:#64748b;">healthcheck → backend démarre après MySQL</div>
+
+      <hr class="sep">
+      <p class="section-title" style="margin-top:8px;">Fichiers de config</p>
+
+      <div class="tree-item"><span class="icon">📄</span><span class="name file-env">.env</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>.env (racine)</strong>Variables d'environnement injectées dans tous les conteneurs au démarrage. Contient APP_KEY, mots de passe BDD, domaines CORS. Ne jamais committer ce fichier en git.</span></span>
+        <span class="badge badge-yellow">variables runtime</span></div>
+      <div class="tree-item"><span class="icon">📄</span><span class="name file-conf">nginx/default.conf</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>nginx/default.conf</strong>Configuration du reverse proxy. Définit 2 upstreams (backend et frontend) et les règles de routage : /api/admin/ → backend, / → frontend. Monté en lecture seule dans le conteneur nginx.</span></span>
+        <span class="badge badge-green">proxy rules</span></div>
+      <div class="tree-item"><span class="icon">📄</span><span class="name file-docker">backend/Dockerfile</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>backend/Dockerfile</strong>Image PHP 8.3 Apache. Installe les extensions MySQL/mbstring/gd. Copie le code, crée les dossiers storage, lance composer install + dump-autoload. Configure Apache pour pointer sur /public.</span></span></div>
+      <div class="tree-item"><span class="icon">📄</span><span class="name file-docker">frontend/Dockerfile</span>
+        <span class="info-wrap"><span class="info-btn">i</span><span class="tooltip"><strong>frontend/Dockerfile</strong>Build multi-stage. Stage 1 (builder) : Node 20 installe les dépendances et compile avec Vite. Stage 2 (prod) : Nginx Alpine sert uniquement le dossier /dist généré. Image finale très légère.</span></span></div>
+
+    </div></div>
+  </div>
+
+  <!-- RBAC -->
+  <div class="card arch">
+    <div class="card-header">🔐 Sécurité & RBAC</div>
+    <div class="card-body">
+      <p class="section-title">Rôles disponibles</p>
+      <table>
+        <thead><tr><th>Module</th><th>admin</th><th>super_admin</th></tr></thead>
+        <tbody>
+          <tr><td>Dashboard</td><td><span class="chip chip-green">✓</span></td><td><span class="chip chip-green">✓</span></td></tr>
+          <tr><td>Utilisateurs</td><td><span class="chip chip-green">✓</span></td><td><span class="chip chip-green">✓</span></td></tr>
+          <tr><td>Prestataires</td><td><span class="chip chip-green">✓</span></td><td><span class="chip chip-green">✓</span></td></tr>
+          <tr><td>Catégories</td><td><span class="chip chip-green">✓</span></td><td><span class="chip chip-green">✓</span></td></tr>
+          <tr><td>Prestations</td><td><span class="chip chip-green">✓</span></td><td><span class="chip chip-green">✓</span></td></tr>
+          <tr><td>Événements</td><td><span class="chip chip-green">✓</span></td><td><span class="chip chip-green">✓</span></td></tr>
+          <tr><td>Admins</td><td><span class="chip chip-red">✗</span></td><td><span class="chip chip-blue">✓ seulement</span></td></tr>
+        </tbody>
+      </table>
+      <hr class="sep">
+      <p class="section-title">Auth flow (Bearer token)</p>
+      <div class="tree" style="font-size:.76rem;">
+        <div class="tree-item"><span class="icon">1.</span><span class="name">POST /auth/login → token Bearer</span></div>
+        <div class="tree-item"><span class="icon">2.</span><span class="name">Token stocké localStorage</span></div>
+        <div class="tree-item"><span class="icon">3.</span><span class="name">Header Authorization sur chaque req</span></div>
+        <div class="tree-item"><span class="icon">4.</span><span class="name">Middleware EnsureIsAdmin vérifie</span></div>
+        <div class="tree-item"><span class="icon">5.</span><span class="name">Expiration : 8 heures</span></div>
+        <div class="tree-item"><span class="icon">6.</span><span class="name">401 → logout auto + redirect /login</span></div>
+      </div>
+      <hr class="sep">
+      <p class="section-title">Comptes de démo</p>
+      <div class="tree" style="font-size:.76rem;">
+        <div class="tree-item"><span class="icon">👑</span><span class="name">superadmin@upcycleconnect.fr</span></div>
+        <div class="tree-item indent-1" style="color:#64748b;">Admin1234! — super_admin</div>
+        <div class="tree-item"><span class="icon">🔧</span><span class="name">admin@upcycleconnect.fr</span></div>
+        <div class="tree-item indent-1" style="color:#64748b;">Admin1234! — admin</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<p style="text-align:center;color:#334155;font-size:.75rem;margin-top:32px;">UpcycleConnect Admin — Architecture v1.0</p>
+</body>
+</html>
