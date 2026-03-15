@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { authService } from '@/services/authService'
-import { useToast } from '@/composables/useToast'
+import { useToast } from '@/utils/useToast'
 
 export const useAuthStore = defineStore('auth', () => {
   const user  = ref(null)
@@ -25,7 +25,6 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       await authService.logout()
     } catch {
-      // ignorer l'erreur si le token est déjà expiré
     } finally {
       token.value = null
       user.value  = null

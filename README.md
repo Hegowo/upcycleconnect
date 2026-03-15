@@ -9,7 +9,7 @@ Interface d'administration de la plateforme UpcycleConnect.
 | Frontend | Vue 3 + Vite + Tailwind CSS + Pinia |
 | Backend | PHP 8.3 + Laravel 11 + Sanctum |
 | Base de données | MySQL 8.0 |
-| Reverse proxy | Nginx |
+| Reverse proxy | Apache 2.4 |
 | Conteneurisation | Docker + Docker Compose |
 
 ---
@@ -117,8 +117,8 @@ upcycleconnect-admin/
 │   │   ├── migrations/
 │   │   └── seeders/
 │   └── Dockerfile
-├── nginx/
-│   └── default.conf       # Reverse proxy config
+├── apache/
+│   └── httpd.conf         # Reverse proxy config
 ├── database/init/         # Scripts SQL optionnels
 ├── docker-compose.yml
 └── .env.example

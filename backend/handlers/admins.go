@@ -59,7 +59,6 @@ func (h *AdminHandler) Store(c *gin.Context) {
 		return
 	}
 
-	// Check email uniqueness
 	var existing models.User
 	if err := h.DB.Where("email = ?", req.Email).First(&existing).Error; err == nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"message": "Cet email est déjà utilisé."})
@@ -87,7 +86,6 @@ func (h *AdminHandler) Store(c *gin.Context) {
 		return
 	}
 
-	// Find role and attach
 	var role models.Role
 	if err := h.DB.Where("name = ?", req.Role).First(&role).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Rôle introuvable."})

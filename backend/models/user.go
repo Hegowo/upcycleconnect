@@ -27,7 +27,6 @@ func (User) TableName() string {
 	return "users"
 }
 
-// PrimaryRole returns the highest-priority role: super_admin > admin.
 func (u *User) PrimaryRole() *string {
 	if len(u.Roles) == 0 {
 		return nil
@@ -65,7 +64,6 @@ func (u *User) IsSuperAdmin() bool {
 	return false
 }
 
-// UserResponse is the JSON response shape for a user.
 type UserResponse struct {
 	ID              uint    `json:"id"`
 	Email           string  `json:"email"`

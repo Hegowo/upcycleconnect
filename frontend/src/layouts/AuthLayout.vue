@@ -9,7 +9,7 @@
           @error="onLogoError"
           ref="logoImg"
         />
-        <p class="text-gray-500 text-sm mt-2">Interface d'administration</p>
+        <p class="text-gray-500 text-sm mt-2">{{ t('nav.administration') }}</p>
       </div>
       <slot />
     </div>
@@ -18,7 +18,9 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const logoImg = ref(null)
 
 function onLogoError() {
