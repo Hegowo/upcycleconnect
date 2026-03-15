@@ -101,7 +101,7 @@
     <div class="flow" style="margin-top:8px;">
       <div class="flow-box box-apache">⚙️ Apache<br/><small>reverse proxy :80</small></div>
       <div class="flow-arrow">→ /* →</div>
-      <div class="flow-box box-vue">💚 Vue 3 (Nginx)<br/><small>frontend:80</small></div>
+      <div class="flow-box box-vue">💚 Vue 3 (Apache)<br/><small>frontend:80</small></div>
     </div>
     <div class="flow" style="margin-top:8px;">
       <div class="flow-box box-apache">⚙️ Apache<br/><small>reverse proxy :80</small></div>
@@ -124,75 +124,130 @@
     <div class="card-body"><div class="tree">
 
       <div class="tree-item"><span class="icon">📄</span><span class="name file-js">main.js</span>
-        <span class="badge badge-blue">entrypoint</span></div>
+        <span class="badge badge-blue">Point d'entrée : monte l'app Vue</span></div>
       <div class="tree-item"><span class="icon">📄</span><span class="name file-vue">App.vue</span>
-        <span class="badge badge-blue">root</span></div>
+        <span class="badge badge-blue">Composant racine, RouterView global</span></div>
+      <div class="tree-item"><span class="icon">📄</span><span class="name file-js">router.js</span>
+        <span class="badge badge-purple">Toutes les routes (admin + public + guards)</span></div>
 
       <hr class="sep">
 
-      <div class="tree-item"><span class="icon">📁</span><span class="name folder">router/</span></div>
-      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-js">index.js</span>
-        <span class="badge badge-purple">guards auth</span></div>
+      <div class="tree-item"><span class="icon">📁</span><span class="name folder">assets/</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-conf">main.css</span>
+        <span style="font-size:.7rem;color:#64748b;">CSS global + variables Tailwind</span></div>
+
+      <div class="tree-item"><span class="icon">📁</span><span class="name folder">locales/</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-conf">fr.json</span>
+        <span style="font-size:.7rem;color:#64748b;">Traductions françaises (200+ clés)</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-conf">en.json</span>
+        <span style="font-size:.7rem;color:#64748b;">Traductions anglaises (200+ clés)</span></div>
+
+      <hr class="sep">
+
+      <div class="tree-item"><span class="icon">📁</span><span class="name folder">utils/</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-js">i18n.js</span>
+        <span style="font-size:.7rem;color:#64748b;">Configuration vue-i18n, locale depuis localStorage</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-js">useToast.js</span>
+        <span style="font-size:.7rem;color:#64748b;">Composable : affiche les notifications toast</span></div>
 
       <hr class="sep">
 
       <div class="tree-item"><span class="icon">📁</span><span class="name folder">stores/</span><span class="badge badge-yellow">Pinia</span></div>
-      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-js">auth.js</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-js">auth.js</span>
+        <span style="font-size:.7rem;color:#64748b;">Token JWT, infos admin, isAdmin/isSuperAdmin</span></div>
 
       <hr class="sep">
 
       <div class="tree-item"><span class="icon">📁</span><span class="name folder">services/</span><span class="badge badge-blue">Axios</span></div>
       <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-js">api.js</span>
-        <span class="badge badge-purple">interceptors</span></div>
-      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-js">authService.js</span></div>
-      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-js">userService.js</span></div>
-      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-js">categoryService.js</span></div>
-      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-js">prestationService.js</span></div>
-      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-js">eventService.js</span></div>
-
-      <hr class="sep">
-
-      <div class="tree-item"><span class="icon">📁</span><span class="name folder">composables/</span></div>
-      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-js">useToast.js</span></div>
+        <span style="font-size:.7rem;color:#64748b;">Instance Axios configurée (baseURL, JWT, intercepteur 401)</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-js">authService.js</span>
+        <span style="font-size:.7rem;color:#64748b;">login(), logout(), me()</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-js">userService.js</span>
+        <span style="font-size:.7rem;color:#64748b;">list(), show(), ban(), activate(), providerService</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-js">categoryService.js</span>
+        <span style="font-size:.7rem;color:#64748b;">list(), show(), create(), update(), remove(), toggle()</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-js">eventService.js</span>
+        <span style="font-size:.7rem;color:#64748b;">list(), show(), create(), update(), remove(), updateStatus()</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-js">prestationService.js</span>
+        <span style="font-size:.7rem;color:#64748b;">list(), show(), create(), update(), remove(), updateStatus()</span></div>
 
       <hr class="sep">
 
       <div class="tree-item"><span class="icon">📁</span><span class="name folder">layouts/</span></div>
-      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">AuthLayout.vue</span></div>
       <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">AdminLayout.vue</span>
-        <span class="badge badge-green">sidebar + header</span></div>
+        <span style="font-size:.7rem;color:#64748b;">Gabarit admin : Sidebar + Header + RouterView</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">AuthLayout.vue</span>
+        <span style="font-size:.7rem;color:#64748b;">Gabarit connexion : centré, fond dégradé</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">PublicLayout.vue</span>
+        <span style="font-size:.7rem;color:#64748b;">Gabarit site public : navbar + footer</span></div>
 
       <hr class="sep">
 
       <div class="tree-item"><span class="icon">📁</span><span class="name folder">components/</span></div>
-      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">Sidebar.vue</span></div>
-      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">Header.vue</span></div>
-      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">NavItem.vue</span></div>
-      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">AppBadge.vue</span></div>
-      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">AppButton.vue</span></div>
-      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">AppPagination.vue</span></div>
-      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">AppConfirmDialog.vue</span></div>
-      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">AppToast.vue</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">AppBadge.vue</span>
+        <span style="font-size:.7rem;color:#64748b;">Badge coloré selon le statut (pending/approved/etc.)</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">AppButton.vue</span>
+        <span style="font-size:.7rem;color:#64748b;">Bouton réutilisable avec variantes</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">AppConfirmDialog.vue</span>
+        <span style="font-size:.7rem;color:#64748b;">Modale de confirmation avant action destructive</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">AppPagination.vue</span>
+        <span style="font-size:.7rem;color:#64748b;">Pagination (précédent/suivant/numéros)</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">AppToast.vue</span>
+        <span style="font-size:.7rem;color:#64748b;">Notification toast (succès/erreur)</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">StatCard.vue</span>
+        <span style="font-size:.7rem;color:#64748b;">Carte statistique du dashboard (valeur + icône + couleur)</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">Header.vue</span>
+        <span style="font-size:.7rem;color:#64748b;">Barre du haut : avatar admin, nom, déconnexion</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">NavItem.vue</span>
+        <span style="font-size:.7rem;color:#64748b;">Élément de menu de la sidebar (icône + label + active)</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">Sidebar.vue</span>
+        <span style="font-size:.7rem;color:#64748b;">Navigation latérale complète</span></div>
 
       <hr class="sep">
 
-      <div class="tree-item"><span class="icon">📁</span><span class="name folder">pages/</span></div>
-      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">auth/LoginPage.vue</span></div>
-      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">dashboard/DashboardPage.vue</span></div>
-      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">users/UserListPage.vue</span></div>
-      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">users/UserDetailPage.vue</span></div>
-      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">providers/ProviderListPage.vue</span></div>
-      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">providers/ProviderDetailPage.vue</span></div>
-      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">admins/AdminListPage.vue</span></div>
-      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">admins/AdminFormPage.vue</span></div>
-      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">categories/CategoryListPage.vue</span></div>
-      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">categories/CategoryFormPage.vue</span></div>
-      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">prestations/PrestationListPage.vue</span></div>
-      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">prestations/PrestationFormPage.vue</span></div>
-      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">events/EventListPage.vue</span></div>
-      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">events/EventFormPage.vue</span></div>
-      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">database/DatabasePage.vue</span>
-        <span class="badge badge-purple">super_admin</span></div>
+      <div class="tree-item"><span class="icon">📁</span><span class="name folder">pages/</span>
+        <span class="badge badge-green">tout à plat</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">AdminLoginPage.vue</span>
+        <span style="font-size:.7rem;color:#64748b;">Page de connexion administrateur</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">DashboardPage.vue</span>
+        <span style="font-size:.7rem;color:#64748b;">Tableau de bord : stats, logs, graphiques</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">LogsPage.vue</span>
+        <span style="font-size:.7rem;color:#64748b;">Journaux : actions admin + activité plateforme</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">SettingsPage.vue</span>
+        <span style="font-size:.7rem;color:#64748b;">Paramètres : langue, profil</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">DatabasePage.vue</span>
+        <span style="font-size:.7rem;color:#64748b;">Lien vers DbGate (interface BDD)</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">UserListPage.vue</span>
+        <span style="font-size:.7rem;color:#64748b;">Liste paginée des utilisateurs avec filtres</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">UserDetailPage.vue</span>
+        <span style="font-size:.7rem;color:#64748b;">Fiche détaillée d'un utilisateur</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">ProviderListPage.vue</span>
+        <span style="font-size:.7rem;color:#64748b;">Liste des prestataires avec filtres de statut</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">ProviderDetailPage.vue</span>
+        <span style="font-size:.7rem;color:#64748b;">Fiche prestataire + actions approve/suspend</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">CategoryListPage.vue</span>
+        <span style="font-size:.7rem;color:#64748b;">Liste des catégories avec toggle actif/inactif</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">CategoryFormPage.vue</span>
+        <span style="font-size:.7rem;color:#64748b;">Formulaire création/édition d'une catégorie</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">PrestationListPage.vue</span>
+        <span style="font-size:.7rem;color:#64748b;">Liste des prestations avec filtres</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">PrestationFormPage.vue</span>
+        <span style="font-size:.7rem;color:#64748b;">Formulaire création/édition d'une prestation</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">EventListPage.vue</span>
+        <span style="font-size:.7rem;color:#64748b;">Liste des événements avec filtres</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">EventFormPage.vue</span>
+        <span style="font-size:.7rem;color:#64748b;">Formulaire création/édition d'un événement</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">AdminListPage.vue</span>
+        <span style="font-size:.7rem;color:#64748b;">Liste des administrateurs (super_admin seulement)</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">AdminFormPage.vue</span>
+        <span style="font-size:.7rem;color:#64748b;">Formulaire création/édition d'un admin</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">PublicHomePage.vue</span>
+        <span style="font-size:.7rem;color:#64748b;">Page d'accueil publique : hero, catégories, CTA</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">PublicLoginPage.vue</span>
+        <span style="font-size:.7rem;color:#64748b;">Connexion utilisateur (site public)</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-vue">PublicRegisterPage.vue</span>
+        <span style="font-size:.7rem;color:#64748b;">Inscription utilisateur/prestataire (public)</span></div>
 
     </div></div>
   </div>
@@ -203,60 +258,83 @@
     <div class="card-body"><div class="tree">
 
       <div class="tree-item"><span class="icon">📄</span><span class="name file-go">main.go</span>
-        <span class="badge badge-blue">entrypoint</span></div>
-      <div class="tree-item"><span class="icon">📄</span><span class="name file-go">go.mod</span></div>
+        <span class="badge badge-blue">Point d'entrée : charge config, DB, lance le serveur Gin</span></div>
+      <div class="tree-item"><span class="icon">📄</span><span class="name file-go">go.mod</span>
+        <span style="font-size:.7rem;color:#64748b;">Déclaration du module Go et ses dépendances</span></div>
+      <div class="tree-item"><span class="icon">📄</span><span class="name file-go">go.sum</span>
+        <span style="font-size:.7rem;color:#64748b;">Checksums des dépendances</span></div>
+      <div class="tree-item"><span class="icon">📄</span><span class="name file-docker">Dockerfile</span>
+        <span style="font-size:.7rem;color:#64748b;">Build multi-stage : builder Go + image Alpine finale</span></div>
 
       <hr class="sep">
 
       <div class="tree-item"><span class="icon">📁</span><span class="name folder">config/</span></div>
-      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-go">config.go</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-go">config.go</span>
+        <span style="font-size:.7rem;color:#64748b;">Charge les variables d'environnement (.env)</span></div>
 
       <div class="tree-item"><span class="icon">📁</span><span class="name folder">database/</span></div>
-      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-go">database.go</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-go">database.go</span>
+        <span style="font-size:.7rem;color:#64748b;">Connexion GORM + MySQL, auto-migration des modèles</span></div>
 
       <hr class="sep">
 
       <div class="tree-item"><span class="icon">📁</span><span class="name folder">models/</span></div>
-      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-go">user.go</span></div>
-      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-go">role.go</span></div>
-      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-go">provider_profile.go</span></div>
-      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-go">prestation_category.go</span></div>
-      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-go">prestation.go</span></div>
-      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-go">event.go</span></div>
-      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-go">audit_log.go</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-go">user.go</span>
+        <span style="font-size:.7rem;color:#64748b;">Modèle User (id, email, nom, statut, soft delete)</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-go">role.go</span>
+        <span style="font-size:.7rem;color:#64748b;">Modèle Role + UserRole (admin, super_admin)</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-go">provider_profile.go</span>
+        <span style="font-size:.7rem;color:#64748b;">Profil prestataire (SIRET, entreprise, statut)</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-go">prestation.go</span>
+        <span style="font-size:.7rem;color:#64748b;">Modèle Prestation (titre, prix, type, statut)</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-go">prestation_category.go</span>
+        <span style="font-size:.7rem;color:#64748b;">Modèle Catégorie de prestation</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-go">event.go</span>
+        <span style="font-size:.7rem;color:#64748b;">Modèle Événement (dates, lieu, participants)</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-go">audit_log.go</span>
+        <span style="font-size:.7rem;color:#64748b;">Log d'audit (action, resource, user, IP, date)</span></div>
 
       <hr class="sep">
 
       <div class="tree-item"><span class="icon">📁</span><span class="name folder">handlers/</span></div>
       <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-go">auth.go</span>
-        <span class="badge badge-blue">login/logout/me</span></div>
-      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-go">dashboard.go</span></div>
-      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-go">users.go</span></div>
-      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-go">providers.go</span></div>
+        <span style="font-size:.7rem;color:#64748b;">Login (JWT), Logout (blacklist), Me (profil)</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-go">dashboard.go</span>
+        <span style="font-size:.7rem;color:#64748b;">Stats agrégées : users, providers, prestations, events</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-go">users.go</span>
+        <span style="font-size:.7rem;color:#64748b;">CRUD users + ban/activate</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-go">providers.go</span>
+        <span style="font-size:.7rem;color:#64748b;">Liste prestataires + updateStatus (approve/suspend)</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-go">categories.go</span>
+        <span style="font-size:.7rem;color:#64748b;">CRUD catégories + toggle actif/inactif</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-go">prestations.go</span>
+        <span style="font-size:.7rem;color:#64748b;">CRUD prestations + updateStatus</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-go">events.go</span>
+        <span style="font-size:.7rem;color:#64748b;">CRUD événements + updateStatus</span></div>
       <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-go">admins.go</span>
-        <span class="badge badge-purple">super_admin</span></div>
-      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-go">categories.go</span></div>
-      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-go">prestations.go</span></div>
-      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-go">events.go</span></div>
+        <span style="font-size:.7rem;color:#64748b;">CRUD admins (super_admin uniquement)</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-go">logs.go</span>
+        <span style="font-size:.7rem;color:#64748b;">Journaux : audit_logs + activité plateforme</span></div>
 
       <hr class="sep">
 
       <div class="tree-item"><span class="icon">📁</span><span class="name folder">middleware/</span></div>
       <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-go">auth.go</span>
-        <span class="badge badge-yellow">JWT</span></div>
+        <span style="font-size:.7rem;color:#64748b;">Vérifie le JWT Bearer dans Authorization header</span></div>
       <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-go">rbac.go</span>
-        <span class="badge badge-yellow">RBAC</span></div>
-      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-go">cors.go</span></div>
+        <span style="font-size:.7rem;color:#64748b;">IsAdmin() et IsSuperAdmin() : contrôle des rôles</span></div>
+      <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-go">cors.go</span>
+        <span style="font-size:.7rem;color:#64748b;">Headers CORS pour les requêtes cross-origin</span></div>
 
       <hr class="sep">
 
       <div class="tree-item"><span class="icon">📁</span><span class="name folder">router/</span></div>
       <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-go">router.go</span>
-        <span class="badge badge-blue">toutes les routes</span></div>
+        <span style="font-size:.7rem;color:#64748b;">Déclare toutes les routes Gin, applique les middlewares</span></div>
 
       <div class="tree-item"><span class="icon">📁</span><span class="name folder">services/</span></div>
       <div class="tree-item indent-1"><span class="icon">📄</span><span class="name file-go">audit.go</span>
-        <span class="badge badge-purple">logs actions</span></div>
+        <span style="font-size:.7rem;color:#64748b;">AuditService : enregistre chaque action admin en BDD</span></div>
 
     </div></div>
   </div>
@@ -320,7 +398,7 @@
 
       <div class="tree-item"><span class="icon">📦</span><span class="name folder">frontend</span>
         <span class="badge badge-green">interne :80</span></div>
-      <div class="tree-item indent-1" style="font-size:.7rem;color:#64748b;">Node 20 → npm build → Nginx static</div>
+      <div class="tree-item indent-1" style="font-size:.7rem;color:#64748b;">Node 20 → npm build → Apache httpd static</div>
 
       <hr class="sep">
 

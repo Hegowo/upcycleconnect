@@ -1,7 +1,7 @@
 <template>
   <AuthLayout>
     <div class="card p-8">
-      <h2 class="text-xl font-bold text-gray-900 mb-6 text-center">Connexion</h2>
+      <h2 class="text-xl font-bold text-gray-900 mb-6 text-center">{{ t('login.title') }}</h2>
 
       <div v-if="error" class="mb-4 p-3 bg-red-50 border border-red-200 rounded-md text-sm text-red-700">
         {{ error }}
@@ -9,23 +9,23 @@
 
       <form @submit.prevent="handleLogin" class="space-y-4">
         <div>
-          <label class="label">Adresse email</label>
+          <label class="label">{{ t('login.emailLabel') }}</label>
           <input
             v-model="form.email"
             type="email"
             class="input"
-            placeholder="admin@upcycleconnect.fr"
+            :placeholder="t('login.emailPlaceholder')"
             autocomplete="email"
             required
           />
         </div>
         <div>
-          <label class="label">Mot de passe</label>
+          <label class="label">{{ t('login.passwordLabel') }}</label>
           <input
             v-model="form.password"
             type="password"
             class="input"
-            placeholder="••••••••"
+            :placeholder="t('login.passwordPlaceholder')"
             autocomplete="current-password"
             required
           />
@@ -35,12 +35,12 @@
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
           </svg>
-          {{ loading ? 'Connexion...' : 'Se connecter' }}
+          {{ loading ? t('login.submitting') : t('login.submit') }}
         </button>
       </form>
 
       <p class="mt-4 text-center text-xs text-gray-400">
-        Accès réservé aux administrateurs UpcycleConnect
+        {{ t('login.subtitle') }}
       </p>
     </div>
   </AuthLayout>
@@ -50,8 +50,10 @@
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useI18n } from 'vue-i18n'
 import AuthLayout from '@/layouts/AuthLayout.vue'
 
+const { t } = useI18n()
 const router  = useRouter()
 const auth    = useAuthStore()
 const loading = ref(false)
@@ -67,10 +69,10 @@ async function handleLogin() {
     router.push('/admin/dashboard')
   } catch (err) {
     const status = err.response?.status
-    if (status === 401) error.value = 'Identifiants invalides.'
-    else if (status === 403) error.value = err.response?.data?.message || 'Accès refusé.'
+    if (status === 401) error.value = t('login.errorInvalid')
+    else if (status === 403) error.value = err.response?.data?.message || t('login.errorForbidden')
     else if (status === 422) error.value = Object.values(err.response?.data?.errors || {}).flat().join(' ')
-    else error.value = 'Une erreur est survenue. Veuillez réessayer.'
+    else error.value = t('login.errorGeneric')
   } finally {
     loading.value = false
   }

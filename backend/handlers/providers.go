@@ -58,7 +58,6 @@ func (h *ProviderHandler) Index(c *gin.Context) {
 		Where("id IN (SELECT user_id FROM provider_profiles)").
 		Order("created_at DESC")
 
-	// Rebuild query with preloads for actual fetch
 	fetchQuery := h.DB.Preload("ProviderProfile").
 		Where("deleted_at IS NULL").
 		Where("id IN (SELECT user_id FROM provider_profiles)")
@@ -152,7 +151,6 @@ func (h *ProviderHandler) UpdateStatus(c *gin.Context) {
 
 	h.Audit.Log(c, "provider.status_changed", "ProviderProfile", &profile.ID, old, map[string]string{"status": req.Status})
 
-	// Reload
 	h.DB.Preload("ProviderProfile").First(&user, user.ID)
 
 	c.JSON(http.StatusOK, models.ToProviderResponse(&user))

@@ -150,7 +150,6 @@ func (h *CategoryHandler) Update(c *gin.Context) {
 		"name": category.Name, "slug": category.Slug,
 	})
 
-	// Get prestations count
 	var count int64
 	h.DB.Model(&models.Prestation{}).Where("category_id = ? AND deleted_at IS NULL", category.ID).Count(&count)
 

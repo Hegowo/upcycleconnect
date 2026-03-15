@@ -114,7 +114,6 @@ func (h *EventHandler) Store(c *gin.Context) {
 		event.Status = "draft"
 	}
 
-	// Parse dates
 	startDate, err := parseDateTime(req.StartDate)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"message": "Format de date de début invalide."})

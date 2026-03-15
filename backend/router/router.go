@@ -29,30 +29,28 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 	prestationHandler := &handlers.PrestationHandler{DB: db, Audit: audit}
 	eventHandler := &handlers.EventHandler{DB: db, Audit: audit}
 	adminHandler := &handlers.AdminHandler{DB: db, Audit: audit}
+	logsHandler := &handlers.LogsHandler{DB: db}
 
-	// Health check
 	r.GET("/up", func(c *gin.Context) {
 		c.String(http.StatusOK, "OK")
 	})
 
 	api := r.Group("/api/admin/v1")
 	{
-		// Public auth
 		api.POST("/auth/login", authHandler.Login)
 
-		// Protected routes
 		protected := api.Group("")
 		protected.Use(middleware.AuthMiddleware(db, cfg))
 		protected.Use(middleware.IsAdmin())
 		{
-			// Auth
 			protected.POST("/auth/logout", authHandler.Logout)
 			protected.GET("/auth/me", authHandler.Me)
 
-			// Dashboard
 			protected.GET("/dashboard/stats", dashHandler.Stats)
 
-			// Users
+			protected.GET("/logs", logsHandler.Index)
+			protected.GET("/logs/activity", logsHandler.Activity)
+
 			protected.GET("/users", userHandler.Index)
 			protected.GET("/users/:id", userHandler.Show)
 			protected.PUT("/users/:id", userHandler.Update)
@@ -60,12 +58,10 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 			protected.POST("/users/:id/activate", userHandler.Activate)
 			protected.DELETE("/users/:id", userHandler.Destroy)
 
-			// Providers
 			protected.GET("/providers", providerHandler.Index)
 			protected.GET("/providers/:id", providerHandler.Show)
 			protected.PUT("/providers/:id/status", providerHandler.UpdateStatus)
 
-			// Categories
 			protected.GET("/categories", categoryHandler.Index)
 			protected.POST("/categories", categoryHandler.Store)
 			protected.GET("/categories/:id", categoryHandler.Show)
@@ -73,7 +69,6 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 			protected.DELETE("/categories/:id", categoryHandler.Destroy)
 			protected.POST("/categories/:id/toggle", categoryHandler.Toggle)
 
-			// Prestations
 			protected.GET("/prestations", prestationHandler.Index)
 			protected.POST("/prestations", prestationHandler.Store)
 			protected.GET("/prestations/:id", prestationHandler.Show)
@@ -81,7 +76,6 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 			protected.DELETE("/prestations/:id", prestationHandler.Destroy)
 			protected.PUT("/prestations/:id/status", prestationHandler.UpdateStatus)
 
-			// Events
 			protected.GET("/events", eventHandler.Index)
 			protected.POST("/events", eventHandler.Store)
 			protected.GET("/events/:id", eventHandler.Show)
@@ -89,7 +83,6 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 			protected.DELETE("/events/:id", eventHandler.Destroy)
 			protected.PUT("/events/:id/status", eventHandler.UpdateStatus)
 
-			// Admins (super_admin only)
 			superAdmin := protected.Group("")
 			superAdmin.Use(middleware.IsSuperAdmin())
 			{
