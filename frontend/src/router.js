@@ -86,4 +86,10 @@ router.beforeEach(async (to, from, next) => {
   next()
 })
 
+router.afterEach((to) => {
+  const base = 'UpcycleConnect'
+  const title = to.meta?.title
+  document.title = title ? `${title} — ${base}` : base
+})
+
 export default router

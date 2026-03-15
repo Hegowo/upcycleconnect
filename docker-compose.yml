@@ -25,6 +25,7 @@ services:
       - upcycleconnect_net
 
   backend:
+    image: docker.upcycleconnect.xyz/upcycleconnect/backend:latest
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -58,6 +59,7 @@ services:
       - upcycleconnect_net
 
   frontend:
+    image: docker.upcycleconnect.xyz/upcycleconnect/frontend:latest
     build:
       context: ./frontend
       dockerfile: Dockerfile
@@ -88,6 +90,7 @@ services:
       - upcycleconnect_net
 
   apache:
+    image: docker.upcycleconnect.xyz/upcycleconnect/apache:latest
     build:
       context: ./apache
       dockerfile: Dockerfile

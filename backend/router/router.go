@@ -30,10 +30,16 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 	eventHandler := &handlers.EventHandler{DB: db, Audit: audit}
 	adminHandler := &handlers.AdminHandler{DB: db, Audit: audit}
 	logsHandler := &handlers.LogsHandler{DB: db}
+	siretHandler := &handlers.SiretHandler{Cfg: cfg}
 
 	r.GET("/up", func(c *gin.Context) {
 		c.String(http.StatusOK, "OK")
 	})
+
+	public := r.Group("/api/public/v1")
+	{
+		public.GET("/siret/:siret", siretHandler.Lookup)
+	}
 
 	api := r.Group("/api/admin/v1")
 	{

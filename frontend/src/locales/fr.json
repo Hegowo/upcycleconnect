@@ -45,7 +45,7 @@
   "login": {
     "title": "Connexion",
     "emailLabel": "Adresse email",
-    "emailPlaceholder": "admin@upcycleconnect.fr",
+    "emailPlaceholder": "admin{'@'}upcycleconnect.fr",
     "passwordLabel": "Mot de passe",
     "passwordPlaceholder": "••••••••",
     "submit": "Se connecter",
