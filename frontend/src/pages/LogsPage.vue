@@ -10,22 +10,16 @@
       </div>
     </div>
 
-    <!-- 2-column main layout -->
-    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
-
-      <!-- Left col (2/3): Activity feed -->
-      <div class="xl:col-span-2">
+    <!-- Activity feed -->
+    <div>
+      <div>
         <div class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm overflow-hidden">
           <div class="flex items-center justify-between px-6 py-4 border-b border-[#f1f5f9]">
             <h3 class="font-semibold text-[#001d32]">Flux d'Activité</h3>
             <div class="flex items-center gap-2">
-              <button class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-[#e5e7eb] text-[#374151] hover:bg-gray-50 transition flex items-center gap-1.5">
+              <button @click="exportLogs" class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-[#e5e7eb] text-[#374151] hover:bg-gray-50 transition flex items-center gap-1.5">
                 <ArrowDownTrayIcon class="w-3.5 h-3.5" />
                 Exporter CSV
-              </button>
-              <button class="px-3 py-1.5 text-xs font-semibold rounded-lg text-white transition hover:opacity-90 flex items-center gap-1.5" style="background-color:#006d35;">
-                <div class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></div>
-                Flux Live
               </button>
             </div>
           </div>
@@ -125,92 +119,6 @@
                   {{ entry.type === 'provider' ? 'Prestataire' : 'Utilisateur' }}
                 </span>
               </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Right col (1/3) -->
-      <div class="space-y-4">
-        <!-- Localisation card -->
-        <div class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm p-5">
-          <h3 class="font-semibold text-[#001d32] mb-4">Localisation</h3>
-          <div class="space-y-3">
-            <div class="flex items-center justify-between py-2 border-b border-[#f8fafc]">
-              <span class="text-sm text-gray-600">Default Language</span>
-              <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-[#dcfce7] text-[#166534]">FR</span>
-            </div>
-            <div class="flex items-center justify-between py-2">
-              <span class="text-sm text-gray-600">Active Locales</span>
-              <div class="flex items-center gap-1">
-                <span class="text-xs font-medium px-1.5 py-0.5 rounded bg-[#f1f5f9] text-[#475569]">FR</span>
-                <span class="text-xs font-medium px-1.5 py-0.5 rounded bg-[#f1f5f9] text-[#475569]">EN</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Terminal DB dark card -->
-        <div class="rounded-2xl p-5" style="background: linear-gradient(135deg, #001d32, #0a2e4a);">
-          <div class="flex items-center gap-2 mb-3">
-            <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-white/10">
-              <CircleStackIcon class="w-4 h-4 text-white" />
-            </div>
-            <div>
-              <p class="text-sm font-bold text-white">Terminal Base de Données</p>
-              <div class="flex items-center gap-1.5 mt-0.5">
-                <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
-                <span class="text-[10px] font-semibold text-green-400 uppercase tracking-wider">LIVE</span>
-              </div>
-            </div>
-          </div>
-          <p class="text-xs text-white/60 mb-4">
-            Accédez directement à l'interface de gestion de base de données pour des opérations avancées.
-          </p>
-          <RouterLink
-            v-if="auth.isSuperAdmin"
-            to="/admin/database"
-            class="w-full flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-semibold bg-white/10 hover:bg-white/20 text-white transition"
-          >
-            Ouvrir Instance #DB-P01
-            <ArrowTopRightOnSquareIcon class="w-4 h-4" />
-          </RouterLink>
-          <div v-else class="text-xs text-white/40 text-center py-2">
-            Accès réservé aux super-administrateurs
-          </div>
-        </div>
-
-        <!-- System capacities -->
-        <div class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm p-5">
-          <h3 class="font-semibold text-[#001d32] mb-4">Capacités Système</h3>
-          <div class="space-y-4">
-            <div>
-              <div class="flex justify-between text-xs text-gray-500 mb-1.5">
-                <span class="font-medium uppercase tracking-wider">ECO-BOX STANDARD</span>
-                <span class="font-bold text-[#001d32]">68%</span>
-              </div>
-              <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
-                <div class="h-full rounded-full" style="width:68%; background:#006d35;"></div>
-              </div>
-            </div>
-            <div>
-              <div class="flex justify-between text-xs text-gray-500 mb-1.5">
-                <span class="font-medium uppercase tracking-wider">NOTIFICATION QUEUE</span>
-                <span class="font-bold text-[#001d32]">23%</span>
-              </div>
-              <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
-                <div class="h-full rounded-full" style="width:23%; background:#40617f;"></div>
-              </div>
-            </div>
-          </div>
-          <div class="grid grid-cols-2 gap-3 mt-4">
-            <div class="p-3 rounded-xl bg-[#f8fafc] text-center">
-              <p class="text-xs text-gray-400 mb-1">Email Templates</p>
-              <p class="text-sm font-bold text-[#001d32]">12 actifs</p>
-            </div>
-            <div class="p-3 rounded-xl bg-[#f8fafc] text-center">
-              <p class="text-xs text-gray-400 mb-1">SMS Gateways</p>
-              <p class="text-sm font-bold text-[#001d32]">2 actifs</p>
             </div>
           </div>
         </div>
@@ -335,8 +243,7 @@ import { useAuthStore } from '@/stores/auth'
 import api from '@/services/api'
 import {
   ClockIcon, UsersIcon, ShieldCheckIcon,
-  ArrowDownTrayIcon, CircleStackIcon,
-  ArrowTopRightOnSquareIcon,
+  ArrowDownTrayIcon,
 } from '@heroicons/vue/24/outline'
 
 const auth = useAuthStore()
@@ -392,6 +299,30 @@ onMounted(() => {
   loadPlatformLogs()
   fetchAdmins()
 })
+
+function exportLogs() {
+  const source = tab.value === 'admin' ? adminLogs.value : platformLogs.value
+  if (!source.length) return
+  let rows
+  if (tab.value === 'admin') {
+    rows = [
+      ['ID', 'Timestamp', 'Admin', 'Action', 'Ressource', 'Ressource ID', 'IP'],
+      ...source.map(l => [l.id, l.created_at, l.admin_name || 'Système', l.action, l.resource_type || '', l.resource_id || '', l.ip_address || '']),
+    ]
+  } else {
+    rows = [
+      ['ID', 'Type', 'Nom', 'Email', 'Date'],
+      ...source.map(l => [l.id, l.type, l.name, l.email, l.created_at]),
+    ]
+  }
+  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n')
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' })
+  const a = document.createElement('a')
+  a.href = URL.createObjectURL(blob)
+  a.download = `logs_${tab.value}_${new Date().toISOString().slice(0,10)}.csv`
+  a.click()
+  URL.revokeObjectURL(a.href)
+}
 
 const avatarColors = ['#006d35', '#1b8848', '#40617f', '#001d32', '#7c3aed', '#0891b2', '#b45309']
 function avatarColor(name) {

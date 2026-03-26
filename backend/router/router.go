@@ -30,7 +30,13 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 	eventHandler := &handlers.EventHandler{DB: db, Audit: audit}
 	adminHandler := &handlers.AdminHandler{DB: db, Audit: audit}
 	logsHandler := &handlers.LogsHandler{DB: db}
-	siretHandler := &handlers.SiretHandler{Cfg: cfg}
+	siretHandler    := &handlers.SiretHandler{Cfg: cfg}
+	depositHandler  := &handlers.DepositHandler{DB: db, Audit: audit}
+	mailer          := services.NewMailer(cfg)
+	userAuthHandler := &handlers.UserAuthHandler{DB: db, Cfg: cfg, Mailer: mailer}
+	profileHandler  := &handlers.ProfileHandler{DB: db, Mailer: mailer}
+
+	r.Static("/uploads", "/uploads")
 
 	r.GET("/up", func(c *gin.Context) {
 		c.String(http.StatusOK, "OK")
@@ -39,6 +45,32 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 	public := r.Group("/api/public/v1")
 	{
 		public.GET("/siret/:siret", siretHandler.Lookup)
+	}
+
+	userAPI := r.Group("/api/v1")
+	{
+		userAPI.POST("/auth/register", userAuthHandler.Register)
+		userAPI.POST("/auth/login", userAuthHandler.Login)
+		userAPI.GET("/auth/verify-email", userAuthHandler.VerifyEmail)
+		userAPI.GET("/auth/verify-login", userAuthHandler.VerifyLogin)
+
+		userProtected := userAPI.Group("")
+		userProtected.Use(middleware.AuthMiddleware(db, cfg))
+		{
+			userProtected.POST("/auth/logout", userAuthHandler.Logout)
+			userProtected.GET("/auth/me", userAuthHandler.Me)
+
+			userProtected.GET("/profile", profileHandler.Stats)
+			userProtected.PUT("/profile/info", profileHandler.UpdateInfo)
+			userProtected.POST("/profile/avatar", profileHandler.UploadAvatar)
+			userProtected.POST("/profile/change-password", profileHandler.ChangePassword)
+			userProtected.POST("/profile/email/start", profileHandler.EmailChangeStart)
+			userProtected.POST("/profile/email/verify-current", profileHandler.EmailVerifyCurrent)
+			userProtected.POST("/profile/email/verify-new", profileHandler.EmailVerifyNew)
+
+			userProtected.POST("/events/:id/register", profileHandler.RegisterForEvent)
+			userProtected.DELETE("/events/:id/register", profileHandler.UnregisterFromEvent)
+		}
 	}
 
 	api := r.Group("/api/admin/v1")
@@ -88,6 +120,10 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 			protected.PUT("/events/:id", eventHandler.Update)
 			protected.DELETE("/events/:id", eventHandler.Destroy)
 			protected.PUT("/events/:id/status", eventHandler.UpdateStatus)
+
+			protected.GET("/deposits", depositHandler.Index)
+			protected.GET("/deposits/:id", depositHandler.Show)
+			protected.PUT("/deposits/:id/status", depositHandler.UpdateStatus)
 
 			superAdmin := protected.Group("")
 			superAdmin.Use(middleware.IsSuperAdmin())

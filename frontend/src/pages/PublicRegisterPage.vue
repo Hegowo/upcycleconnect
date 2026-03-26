@@ -432,6 +432,28 @@
             </p>
           </div>
 
+          <!-- ── Étape finale : Email envoyé ── -->
+          <div v-else-if="step === 'done'" key="done" class="max-w-lg mx-auto w-full text-center">
+            <div class="bg-white rounded-[24px] shadow-[0px_12px_40px_0px_rgba(0,29,50,0.06)] p-10 space-y-6">
+              <div class="w-20 h-20 rounded-full flex items-center justify-center mx-auto" style="background:#dcfce7;">
+                <EnvelopeIcon class="w-10 h-10 text-[#006d35]" />
+              </div>
+              <div>
+                <h2 class="font-jakarta font-extrabold text-[#001d32] text-2xl mb-2">Vérifiez votre email</h2>
+                <p class="text-[#40617f] text-base leading-relaxed">
+                  Un lien d'activation a été envoyé à <strong class="text-[#001d32]">{{ form.email }}</strong>.
+                </p>
+                <p class="text-[#40617f] text-sm mt-2">
+                  Cliquez sur le lien dans l'email pour activer votre compte. Le lien est valable 24 heures.
+                </p>
+              </div>
+              <p class="text-xs text-gray-400">Vous ne trouvez pas l'email ? Vérifiez vos courriers indésirables.</p>
+              <RouterLink to="/connexion" class="inline-flex items-center gap-2 text-sm font-semibold text-[#40617f] hover:text-[#006d35] transition">
+                Retour à la connexion
+              </RouterLink>
+            </div>
+          </div>
+
         </Transition>
       </div>
     </main>
@@ -456,7 +478,8 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { RouterLink } from 'vue-router'
+import { RouterLink, useRouter } from 'vue-router'
+import { useUserAuthStore } from '@/stores/userAuth'
 import {
   UserIcon,
   WrenchScrewdriverIcon,
@@ -473,7 +496,11 @@ import {
   ArrowLeftIcon,
   ChevronRightIcon,
   LockClosedIcon,
+  EnvelopeIcon,
 } from '@heroicons/vue/24/outline'
+
+const router   = useRouter()
+const userAuth = useUserAuthStore()
 
 const step = ref('type')
 const accountType = ref('')
@@ -582,7 +609,26 @@ const strengthLabel = computed(() => ['','Très faible','Faible','Moyen','Fort']
 async function handleRegister() {
   loading.value = true
   error.value = ''
-  loading.value = false
+  try {
+    await userAuth.register({
+      first_name:   form.value.firstName,
+      last_name:    form.value.lastName,
+      email:        form.value.email,
+      password:     form.value.password,
+      phone:        form.value.phone || null,
+      account_type: accountType.value,
+      company_name: form.value.companyName || null,
+      siret:        form.value.siret || null,
+      activity:     form.value.activity || null,
+      address:      form.value.address || null,
+    })
+    // Compte créé en "pending" — rediriger vers page "vérifiez votre email"
+    step.value = 'done'
+  } catch (e) {
+    error.value = e.message || 'Une erreur est survenue. Veuillez réessayer.'
+  } finally {
+    loading.value = false
+  }
 }
 </script>
 

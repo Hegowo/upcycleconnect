@@ -20,8 +20,15 @@ docker run -d \
   --restart unless-stopped \
   --network "$NETWORK" \
   -p 127.0.0.1:8081:80 \
+  -v /var/www/uc-uploads:/uploads \
   -e DB_HOST=uc-mysql \
   -e DB_PASSWORD=ucpassword \
+  -e SMTP_HOST=ssl0.ovh.net \
+  -e SMTP_PORT=587 \
+  -e SMTP_USER=noreply@upcycleconnect.xyz \
+  -e SMTP_PASSWORD="SD?ymhRZkf?k631k" \
+  -e MAIL_FROM=noreply@upcycleconnect.xyz \
+  -e APP_URL=https://upcycleconnect.xyz \
   "$REGISTRY/$PROJECT/backend:latest"
 
 echo ">>> Redémarrage uc-frontend"
@@ -39,6 +46,6 @@ sleep 2
 docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" | grep -E "NAME|uc-"
 echo ""
 curl -sf http://127.0.0.1:8081/up && echo "backend  OK" || echo "backend  KO"
-curl -sf -o /dev/null http://127.0.0.1:4000  && echo "frontend OK" || echo "frontend KO"
+curl -sf -o /dev/null http://127.0.0.1:4000 && echo "frontend OK" || echo "frontend KO"
 echo ""
 echo "Déploiement terminé."

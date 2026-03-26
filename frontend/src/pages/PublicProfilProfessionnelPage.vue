@@ -188,21 +188,6 @@
       </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="bg-[#edf4ff] border-t border-[rgba(226,232,240,0.5)] mt-4">
-      <div class="max-w-[1280px] mx-auto px-10 py-12 flex items-center justify-between">
-        <div>
-          <p class="font-jakarta font-bold text-[#40617f] text-lg uppercase tracking-wide">UpcycleConnect</p>
-          <p class="text-[#40617f] text-xs mt-1">© 2024 UpcycleConnect. L'écosystème durable.</p>
-        </div>
-        <div class="flex gap-8">
-          <span v-for="link in footerLinks" :key="link" class="text-[#40617f] text-xs uppercase tracking-wide opacity-80 cursor-pointer hover:opacity-100">
-            {{ link }}
-          </span>
-        </div>
-      </div>
-    </footer>
-
   </div>
 </template>
 

@@ -51,6 +51,9 @@ func (h *DashboardHandler) Stats(c *gin.Context) {
 		prestationsByStatus[sc.Status] = sc.Count
 	}
 
+	var depositsPending int64
+	h.DB.Model(&models.DepositRequest{}).Where("status = ?", "pending").Count(&depositsPending)
+
 	c.JSON(http.StatusOK, gin.H{
 		"users_count":           usersCount,
 		"providers_count":       providersCount,
@@ -58,5 +61,6 @@ func (h *DashboardHandler) Stats(c *gin.Context) {
 		"prestations_count":     prestationsCount,
 		"events_count":          eventsCount,
 		"prestations_by_status": prestationsByStatus,
+		"deposits_pending":      depositsPending,
 	})
 }
