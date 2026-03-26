@@ -11,6 +11,13 @@ type Config struct {
 	DBPassword    string
 	LogLevel      string
 	SocieteApiKey string
+	// Email
+	SMTPHost     string
+	SMTPPort     string
+	SMTPUser     string
+	SMTPPassword string
+	MailFrom     string
+	AppURL       string
 }
 
 func Load() *Config {
@@ -23,6 +30,12 @@ func Load() *Config {
 		DBPassword:    getEnv("DB_PASSWORD", "ucpassword"),
 		LogLevel:      getEnv("LOG_LEVEL", "error"),
 		SocieteApiKey: getEnv("SOCIETE_API_KEY", "50567e30ca8931ff0defa56a5c5d7b61"),
+		SMTPHost:      getEnv("SMTP_HOST", "ssl0.ovh.net"),
+		SMTPPort:      getEnv("SMTP_PORT", "587"),
+		SMTPUser:      getEnv("SMTP_USER", "noreply@upcycleconnect.xyz"),
+		SMTPPassword:  getEnv("SMTP_PASSWORD", ""),
+		MailFrom:      getEnv("MAIL_FROM", "noreply@upcycleconnect.xyz"),
+		AppURL:        getEnv("APP_URL", "https://upcycleconnect.xyz"),
 	}
 }
 

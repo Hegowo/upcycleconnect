@@ -1,17 +1,9 @@
 <template>
   <aside class="w-64 bg-white border-r border-[#e5e7eb] flex flex-col shrink-0 h-screen sticky top-0">
     <!-- Logo -->
-    <div class="flex items-center gap-3 px-5 py-5 border-b border-[#e5e7eb]">
-      <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background-color:#006d35;">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 2C10.5 2 9.2 2.6 8.2 3.6L5.4 6.4C4.5 7.3 4 8.6 4 10c0 2.8 2.2 5 5 5h.5l-2 3.5H9l2-3.5h2l2 3.5h1.5l-2-3.5H15c2.8 0 5-2.2 5-5 0-1.4-.5-2.7-1.4-3.6L15.8 3.6C14.8 2.6 13.5 2 12 2z" fill="white" opacity="0.9"/>
-          <path d="M7 16.5C7 18.4 8.6 20 10.5 20h3c1.9 0 3.5-1.6 3.5-3.5" stroke="white" stroke-width="1.5" stroke-linecap="round" fill="none"/>
-        </svg>
-      </div>
-      <div>
-        <p class="text-sm font-bold leading-none" style="color:#006d35;">UpcycleConnect</p>
-        <p class="text-[10px] font-medium tracking-widest uppercase mt-0.5 text-gray-400">Admin Terminal</p>
-      </div>
+    <div class="flex items-center gap-3 px-4 py-4 border-b border-[#e5e7eb]">
+      <img src="/logoentier.png" alt="UpcycleConnect" class="h-9 w-auto object-contain" />
+      <p class="text-[10px] font-semibold tracking-widest uppercase text-gray-400 whitespace-nowrap">Admin Terminal</p>
     </div>
 
     <!-- Navigation -->

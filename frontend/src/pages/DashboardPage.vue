@@ -7,8 +7,8 @@
         <p class="text-sm text-[#40617f] mt-0.5">Terminal Overview — {{ todayFormatted }}</p>
       </div>
       <div class="flex items-center gap-2">
-        <button class="px-4 py-2 text-sm font-semibold rounded-lg border border-[#e5e7eb] text-[#374151] hover:bg-gray-50 transition">
-          Exporter
+        <button @click="exportDashboard" class="px-4 py-2 text-sm font-semibold rounded-lg border border-[#e5e7eb] text-[#374151] hover:bg-gray-50 transition">
+          Exporter CSV
         </button>
         <button @click="refresh" class="px-4 py-2 text-sm font-semibold rounded-lg text-white transition hover:opacity-90" style="background-color:#006d35;">
           <span v-if="loading" class="flex items-center gap-1.5">
@@ -18,30 +18,6 @@
           <span v-else>Actualiser</span>
         </button>
       </div>
-    </div>
-
-    <!-- Alert providers pending -->
-    <div v-if="(stats?.providers_pending ?? 0) > 0"
-      class="flex items-center justify-between rounded-xl p-4 border"
-      style="background:#FFF7ED; border-color:#fed7aa;"
-    >
-      <div class="flex items-center gap-3">
-        <div class="w-8 h-8 rounded-full flex items-center justify-center" style="background:#fed7aa;">
-          <svg class="w-4 h-4 text-orange-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
-          </svg>
-        </div>
-        <div>
-          <p class="text-sm font-semibold text-orange-800">{{ stats.providers_pending }} prestataire(s) en attente de validation</p>
-          <p class="text-xs text-orange-600">Action requise — cliquez pour traiter</p>
-        </div>
-      </div>
-      <RouterLink to="/admin/providers?status=pending"
-        class="text-sm font-semibold px-4 py-2 rounded-lg text-white shrink-0"
-        style="background-color:#c2410c;"
-      >
-        Traiter maintenant
-      </RouterLink>
     </div>
 
     <!-- Stat cards -->
@@ -339,6 +315,30 @@ async function loadData() {
 }
 
 function refresh() { loadData() }
+
+function exportDashboard() {
+  if (!stats.value) return
+  const rows = [
+    ['Indicateur', 'Valeur'],
+    ['Total utilisateurs', stats.value.users_count ?? 0],
+    ['Prestataires approuvés', stats.value.providers_count ?? 0],
+    ['Prestataires en attente', stats.value.providers_pending ?? 0],
+    ['Total prestations', stats.value.prestations_count ?? 0],
+    ['Total événements', stats.value.events_count ?? 0],
+    ...Object.entries(stats.value.prestations_by_status || {}).map(([s, c]) => [`Prestations ${s}`, c]),
+  ]
+  downloadCsv(rows, `dashboard_${new Date().toISOString().slice(0,10)}.csv`)
+}
+
+function downloadCsv(rows, filename) {
+  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n')
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' })
+  const a = document.createElement('a')
+  a.href = URL.createObjectURL(blob)
+  a.download = filename
+  a.click()
+  URL.revokeObjectURL(a.href)
+}
 
 onMounted(loadData)
 

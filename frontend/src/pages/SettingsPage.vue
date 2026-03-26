@@ -24,31 +24,6 @@
         </button>
       </div>
 
-      <!-- Slider: Eco-Box threshold -->
-      <div class="py-3 border-b border-[#f8fafc]">
-        <div class="flex items-center justify-between mb-2">
-          <div>
-            <p class="text-sm font-medium text-[#001d32]">Seuil d'occupation Eco-Box</p>
-            <p class="text-xs text-gray-400 mt-0.5">Déclencher une alerte lorsque l'occupation dépasse ce seuil</p>
-          </div>
-          <span class="text-sm font-bold text-[#006d35]">{{ ecoBoxThreshold }}%</span>
-        </div>
-        <input
-          type="range"
-          v-model="ecoBoxThreshold"
-          min="50"
-          max="100"
-          step="5"
-          class="w-full h-2 rounded-lg appearance-none cursor-pointer accent-green-700"
-          style="background: linear-gradient(to right, #006d35 0%, #006d35 var(--progress, 70%), #e5e7eb var(--progress, 70%), #e5e7eb 100%);"
-        />
-        <div class="flex justify-between text-xs text-gray-400 mt-1">
-          <span>50%</span>
-          <span>75%</span>
-          <span>100%</span>
-        </div>
-      </div>
-
       <!-- Languages -->
       <div class="py-3 border-b border-[#f8fafc]">
         <p class="text-sm font-medium text-[#001d32] mb-1">Gestion des langues</p>
@@ -184,7 +159,6 @@ const toast = useToast()
 const currentLang = computed(() => locale.value)
 const autoValidation   = ref(false)
 const emailNotifications = ref(true)
-const ecoBoxThreshold  = ref(75)
 
 function toggleAutoValidation() {
   autoValidation.value = !autoValidation.value
@@ -200,3 +174,8 @@ function saveSettings() {
   toast.showSuccess('Configuration sauvegardée')
 }
 </script>
+
+<style scoped>
+.fade-enter-active, .fade-leave-active { transition: opacity 0.2s ease; }
+.fade-enter-from, .fade-leave-to { opacity: 0; }
+</style>
