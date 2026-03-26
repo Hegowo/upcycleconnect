@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+
+<html class="light" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "tertiary-container": "#468357",
+              "surface-dim": "#bdddff",
+              "background": "#f7f9ff",
+              "on-primary-fixed": "#00210c",
+              "inverse-on-surface": "#e8f2ff",
+              "primary-container": "#1b8848",
+              "on-error": "#ffffff",
+              "on-secondary-fixed-variant": "#274a66",
+              "surface-container-highest": "#cee5ff",
+              "secondary-fixed-dim": "#a8caed",
+              "tertiary-fixed-dim": "#94d5a2",
+              "surface-container": "#e3efff",
+              "primary-fixed-dim": "#77db91",
+              "on-background": "#001d32",
+              "surface-container-low": "#edf4ff",
+              "outline-variant": "#becabc",
+              "outline": "#6f7a6e",
+              "on-primary-fixed-variant": "#005227",
+              "inverse-primary": "#77db91",
+              "on-primary-container": "#ffffff",
+              "primary-fixed": "#92f8ab",
+              "surface": "#f7f9ff",
+              "on-secondary-container": "#3f607e",
+              "on-tertiary-fixed": "#00210c",
+              "secondary-fixed": "#cee5ff",
+              "on-tertiary-container": "#ffffff",
+              "secondary": "#40617f",
+              "tertiary": "#2c6a40",
+              "on-surface-variant": "#3f4a3f",
+              "error-container": "#ffdad6",
+              "error": "#ba1a1a",
+              "surface-bright": "#f7f9ff",
+              "surface-tint": "#006d36",
+              "surface-container-high": "#d8eaff",
+              "primary": "#006d35",
+              "surface-variant": "#cee5ff",
+              "tertiary-fixed": "#b0f2bd",
+              "secondary-container": "#b9dbfe",
+              "inverse-surface": "#0b334f",
+              "on-surface": "#001d32",
+              "on-secondary": "#ffffff",
+              "on-primary": "#ffffff",
+              "on-error-container": "#93000a",
+              "on-tertiary": "#ffffff",
+              "on-secondary-fixed": "#001d32",
+              "on-tertiary-fixed-variant": "#0f522b",
+              "surface-container-lowest": "#ffffff"
+            },
+            fontFamily: {
+              "headline": ["Plus Jakarta Sans"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1.5rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-effect {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .shimmer-bar {
+            position: relative;
+            overflow: hidden;
+        }
+        .shimmer-bar::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: shimmer 2s infinite;
+        }
+        @keyframes shimmer {
+            100% { left: 100%; }
+        }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface antialiased">
+<!-- Top Navigation Bar -->
+<nav class="fixed top-0 w-full z-50 bg-[#f7f9ff] dark:bg-slate-900 opacity-70 backdrop-blur-md">
+<div class="flex justify-between items-center px-6 py-4 max-w-screen-2xl mx-auto">
+<div class="flex items-center gap-8">
+<span class="text-2xl font-bold text-[#006d35] dark:text-green-500 tracking-tight font-headline">UpcycleConnect</span>
+<div class="hidden md:flex gap-6 items-center">
+<a class="font-['Plus_Jakarta_Sans'] font-semibold text-sm text-[#40617f] dark:text-slate-400 hover:text-[#006d35] transition-colors duration-200" href="#">Explorer</a>
+<a class="font-['Plus_Jakarta_Sans'] font-semibold text-sm text-[#40617f] dark:text-slate-400 hover:text-[#006d35] transition-colors duration-200" href="#">Projets</a>
+<a class="font-['Plus_Jakarta_Sans'] font-semibold text-sm text-[#40617f] dark:text-slate-400 hover:text-[#006d35] transition-colors duration-200" href="#">Communauté</a>
+<a class="font-['Plus_Jakarta_Sans'] font-semibold text-sm text-[#40617f] dark:text-slate-400 hover:text-[#006d35] transition-colors duration-200" href="#">Messages</a>
+<a class="font-['Plus_Jakarta_Sans'] font-semibold text-sm text-[#006d35] dark:text-green-400 border-b-2 border-[#006d35] pb-1" href="#">Profil</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 rounded-full hover:bg-[#edf4ff] dark:hover:bg-slate-800 transition-colors duration-200 active:scale-95">
+<span class="material-symbols-outlined text-secondary" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 rounded-full hover:bg-[#edf4ff] dark:hover:bg-slate-800 transition-colors duration-200 active:scale-95">
+<span class="material-symbols-outlined text-secondary" data-icon="settings">settings</span>
+</button>
+<div class="h-10 w-10 rounded-full bg-surface-container-high overflow-hidden border-2 border-primary">
+<img alt="Photo de profil utilisateur" class="w-full h-full object-cover" data-alt="professional portrait of a creative woman with a friendly expression, natural lighting, soft blurred park background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDu8dlzM12AsmMIGFlIVh0PeemnvW58LxuwYdguOYRILytyEg3WVN4-8dIPGbmt3XJeJnEDMC_MiqJlKSIzTO89V-bavcNUwB1N-JAksXUn8n-KnO52jTsae0GgA5-mIZxOh1lplGHZYoBuOxWqTGYjSas69VgMG21CEYvnZx0vkqOQac63QAcgvICQo-jnudyHbKKDQX6-gU5D10b61NsL1e6JPMbxePfQzSRAI_lGcDDQh7qGgsdyCcio1CdktNrHmHZ2iI-H3t8"/>
+</div>
+</div>
+</div>
+<div class="bg-[#edf4ff] dark:bg-slate-800 h-[1px] w-full absolute bottom-0"></div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="pt-28 pb-20 px-6 max-w-7xl mx-auto">
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+<!-- Profile Header (Large Bento Card) -->
+<section class="md:col-span-8 bg-surface-container-lowest rounded-2xl p-8 flex flex-col md:flex-row items-center md:items-start gap-8 border-none relative overflow-hidden">
+<div class="absolute -right-10 -top-10 opacity-5 pointer-events-none">
+<span class="material-symbols-outlined text-[12rem]" data-icon="eco">eco</span>
+</div>
+<div class="relative">
+<div class="w-32 h-32 rounded-2xl overflow-hidden shadow-sm">
+<img alt="Clara Durand" class="w-full h-full object-cover" data-alt="close up headshot of a smiling woman with glasses and sustainable fashion accessories, clean aesthetic background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3WDbW8KR0koCXynevPuIB-KpNTgmBmMnxwP8TpqPgIoflNN4el8ye9EBvzcR6uK2rBaMnCNkAySCRE5loIzR8RPoMt-6L_D-gAV8Wq9YvzT14JrGpG-qv0iQw82G7FzmeiaaYf8m-rLWoxOc-3Fj40MM2-lO30c75_kZtpLdfv8g064GLy5agXUjXN2cPb2MaZ07WJ21TPMOtYJh0Q4ndJUg60N3ndQQXQiW4ZxODeskWSLwjR4zTWJTlPYhQ1woMljrvJSMvSU4"/>
+</div>
+<div class="absolute -bottom-2 -right-2 bg-primary text-white p-1.5 rounded-lg shadow-lg">
+<span class="material-symbols-outlined text-sm" data-icon="verified" data-weight="fill">verified</span>
+</div>
+</div>
+<div class="flex-1 text-center md:text-left">
+<div class="flex flex-col md:flex-row md:items-center gap-3 mb-2">
+<h1 class="text-3xl font-extrabold font-headline tracking-tight text-on-surface">Clara Durand</h1>
+<span class="inline-flex items-center px-3 py-1 rounded-full bg-primary-container/10 text-primary text-xs font-bold font-label tracking-wider uppercase">
+                            Membre Éco-Actif
+                        </span>
+</div>
+<div class="flex items-center justify-center md:justify-start gap-2 text-secondary mb-4">
+<span class="material-symbols-outlined text-sm" data-icon="location_on">location_on</span>
+<span class="text-sm font-medium">Lyon, France</span>
+</div>
+<p class="text-on-surface-variant max-w-md leading-relaxed">Passionnée par l'upcycling textile et la restauration de mobilier vintage. Je crois en une économie circulaire et créative.</p>
+</div>
+</section>
+<!-- Upcycling Score (Medium Bento Card) -->
+<section class="md:col-span-4 bg-surface-container-low rounded-2xl p-8 flex flex-col justify-between">
+<div class="flex justify-between items-start mb-6">
+<h2 class="text-lg font-bold font-headline text-on-surface">Upcycling Score</h2>
+<span class="material-symbols-outlined text-primary" data-icon="trending_up">trending_up</span>
+</div>
+<div class="flex items-baseline gap-2 mb-2">
+<span class="text-5xl font-extrabold font-headline text-primary">75</span>
+<span class="text-secondary font-medium">/100</span>
+</div>
+<div class="w-full h-3 bg-surface-container-highest rounded-full mb-8 overflow-hidden">
+<div class="h-full w-[75%] bg-gradient-to-r from-primary to-primary-container rounded-full shimmer-bar"></div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-surface-container-lowest p-3 rounded-xl">
+<span class="block text-xs font-label text-secondary uppercase tracking-wider mb-1">CO2 Économisé</span>
+<span class="text-lg font-bold text-on-surface">12.4 kg</span>
+</div>
+<div class="bg-surface-container-lowest p-3 rounded-xl">
+<span class="block text-xs font-label text-secondary uppercase tracking-wider mb-1">Objets Sauvés</span>
+<span class="text-lg font-bold text-on-surface">24</span>
+</div>
+</div>
+</section>
+<!-- Mes Annonces (Full Width Horizontal Scroll or Grid) -->
+<section class="md:col-span-12 bg-surface-container-lowest rounded-2xl p-8">
+<div class="flex justify-between items-center mb-6">
+<h2 class="text-2xl font-bold font-headline text-on-surface">Mes Annonces</h2>
+<button class="text-primary font-semibold text-sm flex items-center gap-1 hover:underline">
+                        Tout voir <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- Card 1 -->
+<div class="group cursor-pointer">
+<div class="aspect-video rounded-xl overflow-hidden mb-3 relative">
+<img alt="Chaise vintage" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="stylish mid-century modern wooden chair in a bright minimalist room with plants, architectural photography style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAoqgiK0KzDtOmPtYrnYcpAA-dY2N-xZno3L7wbkzZgVHY0WYhFzuCsbSzbwC9-qhT6beiubTdeH4oWixOp1DjiHtPcof3IILpSUMJoryiVyjjvDrTnUQJJgJGDXOvwuxCF1FrvsIhDLqCtTyBzAMLKKMw8ylAYFiMxCHMKrRUG60diUNJ-OOIDhePGz1a-UdjJAs4aHjL_pp5Vrmhn09djd9m2ShwYe57eNhzt_gD_N7VqAPHGs1DK29t8yiO8HQ1vV-aqob1KE-I"/>
+<div class="absolute top-3 left-3 bg-white/90 glass-effect px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-tighter text-primary">Donné</div>
+</div>
+<h3 class="font-bold text-on-surface group-hover:text-primary transition-colors">Chaise vintage scandinave</h3>
+<p class="text-xs text-secondary">Donné le 12 Mars 2024</p>
+</div>
+<!-- Card 2 -->
+<div class="group cursor-pointer">
+<div class="aspect-video rounded-xl overflow-hidden mb-3 relative">
+<img alt="Bocaux en verre" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="collection of assorted clear glass jars on a kitchen shelf, zero waste lifestyle concept, clean aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfqiyoyW1ouBXpiQ2iNxrTioakieM6V9Q7l3oj5d248WYJngHQ-l8Je9Rc6i7QV7TNU6vCXBBkKLAoNcZ_pjARWIxeWMjbPfBYCSmuL2vJpCQxvMBCPdej8BLZ8drzreKyS_4hhrDDBirey2tr-8za0wpz70LuQS0J3diVLsLLlvjxuNEjFFFcF9JOpGNJ7nNvHqrbnaOya7PY1WvfEVF2UBBYI297U7fg_8rv1gCDgrfAWdTYzvM2VPEJZrDlQf15KEk4AM0VKAs"/>
+<div class="absolute top-3 left-3 bg-white/90 glass-effect px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-tighter text-on-secondary-container">Vendu</div>
+</div>
+<h3 class="font-bold text-on-surface group-hover:text-primary transition-colors">Lot de 12 bocaux en verre</h3>
+<p class="text-xs text-secondary">Vendu le 05 Mars 2024</p>
+</div>
+<!-- Card 3 -->
+<div class="group cursor-pointer">
+<div class="aspect-video rounded-xl overflow-hidden mb-3 relative">
+<img alt="Miroir doré" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="ornate vintage gold leaf mirror leaning against a white wall in a sunlit apartment, elegant interior decor" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC9lP9B6EatB7QQVi9zw3M7X4gxarQXO3yDuXkGCnpJWHX_UfG9oyY8CjDu9_aTBoqLq5vtxt14Q0Ky3Q3VrzGPSz4gJfNPPOhm45tLNhzPgPf90wtsVaWutyYcZyi5uaI5coRuyawP5a-TiORDWFsEocVJJxsMXKchq4qSPYcD74bQm-Xv1GsoTX_q4lnUTXXC6qUWjV2FlltsKe7F2CJcVQjlkKyYcvrm42xsi9uE1NBUdkAzXrOefQ-QXwH1v1zM2p_fmDtuzOU"/>
+<div class="absolute top-3 left-3 bg-white/90 glass-effect px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-tighter text-primary">Disponible</div>
+</div>
+<h3 class="font-bold text-on-surface group-hover:text-primary transition-colors">Miroir biseauté doré</h3>
+<p class="text-xs text-secondary">Ajouté il y a 2 jours</p>
+</div>
+</div>
+</section>
+<!-- Mes Réservations (Medium Bento Card) -->
+<section class="md:col-span-7 bg-surface-container-low rounded-2xl p-8">
+<h2 class="text-xl font-bold font-headline text-on-surface mb-6">Mes Réservations</h2>
+<div class="space-y-4">
+<div class="flex items-center gap-4 bg-surface-container-lowest p-4 rounded-xl hover:bg-surface-container-high transition-colors cursor-pointer">
+<div class="w-14 h-14 rounded-lg bg-primary-container/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-3xl" data-icon="styler">styler</span>
+</div>
+<div class="flex-1">
+<h4 class="font-bold text-on-surface">Atelier Couture Denim</h4>
+<p class="text-sm text-secondary">Samedi 24 Avril • 14h30</p>
+</div>
+<span class="material-symbols-outlined text-outline-variant" data-icon="chevron_right">chevron_right</span>
+</div>
+<div class="flex items-center gap-4 bg-surface-container-lowest p-4 rounded-xl hover:bg-surface-container-high transition-colors cursor-pointer opacity-70">
+<div class="w-14 h-14 rounded-lg bg-secondary-container/20 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-3xl" data-icon="event_available">event_available</span>
+</div>
+<div class="flex-1">
+<h4 class="font-bold text-on-surface">Conférence Zero Déchet</h4>
+<p class="text-sm text-secondary">Passé le 15 Mars</p>
+</div>
+<span class="material-symbols-outlined text-outline-variant" data-icon="done">done</span>
+</div>
+</div>
+</section>
+<!-- Mes Badges (Medium Bento Card) -->
+<section class="md:col-span-5 bg-surface-container-lowest rounded-2xl p-8 flex flex-col">
+<h2 class="text-xl font-bold font-headline text-on-surface mb-6">Mes Badges</h2>
+<div class="flex flex-wrap gap-4">
+<div class="group relative">
+<div class="w-16 h-16 rounded-full bg-primary-fixed flex items-center justify-center shadow-sm border-2 border-primary/20 transition-transform group-hover:scale-110">
+<span class="material-symbols-outlined text-primary text-2xl" data-icon="forest" data-weight="fill">forest</span>
+</div>
+<div class="absolute -bottom-10 left-1/2 -translate-x-1/2 w-max opacity-0 group-hover:opacity-100 transition-opacity bg-on-surface text-surface text-[10px] px-2 py-1 rounded pointer-events-none">Reboiseur</div>
+</div>
+<div class="group relative">
+<div class="w-16 h-16 rounded-full bg-secondary-container flex items-center justify-center shadow-sm border-2 border-secondary/20 transition-transform group-hover:scale-110">
+<span class="material-symbols-outlined text-secondary text-2xl" data-icon="handshake" data-weight="fill">handshake</span>
+</div>
+<div class="absolute -bottom-10 left-1/2 -translate-x-1/2 w-max opacity-0 group-hover:opacity-100 transition-opacity bg-on-surface text-surface text-[10px] px-2 py-1 rounded pointer-events-none">Donneur Or</div>
+</div>
+<div class="group relative">
+<div class="w-16 h-16 rounded-full bg-tertiary-fixed flex items-center justify-center shadow-sm border-2 border-tertiary/20 transition-transform group-hover:scale-110">
+<span class="material-symbols-outlined text-tertiary text-2xl" data-icon="electric_bolt" data-weight="fill">electric_bolt</span>
+</div>
+<div class="absolute -bottom-10 left-1/2 -translate-x-1/2 w-max opacity-0 group-hover:opacity-100 transition-opacity bg-on-surface text-surface text-[10px] px-2 py-1 rounded pointer-events-none">Activateur</div>
+</div>
+<div class="w-16 h-16 rounded-full border-2 border-dashed border-outline-variant flex items-center justify-center opacity-40">
+<span class="material-symbols-outlined text-outline" data-icon="lock">lock</span>
+</div>
+</div>
+<div class="mt-auto pt-6 border-t border-surface-container-low flex items-center justify-between">
+<span class="text-xs font-bold text-secondary uppercase tracking-widest">3 / 12 Badges</span>
+<button class="bg-surface-container-low p-2 rounded-lg text-primary">
+<span class="material-symbols-outlined text-lg" data-icon="add">add</span>
+</button>
+</div>
+</section>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full border-t-0 bg-[#edf4ff] dark:bg-slate-900">
+<div class="flex flex-col md:flex-row justify-between items-center px-10 py-12">
+<div class="flex flex-col items-center md:items-start mb-8 md:mb-0">
+<span class="text-lg font-bold text-[#40617f] dark:text-slate-300 mb-2 font-headline">UpcycleConnect</span>
+<p class="font-['Inter'] text-xs tracking-wide uppercase text-[#40617f] dark:text-slate-500">© 2024 UpcycleConnect. L'écosystème durable.</p>
+</div>
+<div class="flex gap-8">
+<a class="font-['Inter'] text-xs tracking-wide uppercase text-[#40617f] dark:text-slate-500 hover:text-[#006d35] dark:hover:text-green-400 transition-all opacity-80 hover:opacity-100" href="#">À propos</a>
+<a class="font-['Inter'] text-xs tracking-wide uppercase text-[#40617f] dark:text-slate-500 hover:text-[#006d35] dark:hover:text-green-400 transition-all opacity-80 hover:opacity-100" href="#">Confidentialité</a>
+<a class="font-['Inter'] text-xs tracking-wide uppercase text-[#40617f] dark:text-slate-500 hover:text-[#006d35] dark:hover:text-green-400 transition-all opacity-80 hover:opacity-100" href="#">Aide</a>
+<a class="font-['Inter'] text-xs tracking-wide uppercase text-[#40617f] dark:text-slate-500 hover:text-[#006d35] dark:hover:text-green-400 transition-all opacity-80 hover:opacity-100" href="#">Partenaires</a>
+</div>
+</div>
+</footer>
+</body></html>

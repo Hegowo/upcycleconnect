@@ -1,0 +1,6 @@
+vendor/
+*.md
+.git
+.gitignore
+storage/logs/*
+storage/app/*

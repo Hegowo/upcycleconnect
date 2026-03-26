@@ -1,43 +1,64 @@
 <template>
-  <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 shrink-0">
+  <header class="h-16 bg-white border-b border-[#e5e7eb] flex items-center justify-between px-6 shrink-0">
+    <!-- Page title -->
     <div class="flex items-center gap-3">
       <h1 class="text-base font-semibold text-gray-900">{{ title }}</h1>
     </div>
 
-    <div class="flex items-center gap-4">
+    <!-- Center search bar -->
+    <div class="hidden md:flex items-center flex-1 max-w-md mx-8">
+      <div class="relative w-full">
+        <MagnifyingGlassIcon class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+        <input
+          type="text"
+          placeholder="Rechercher..."
+          class="w-full pl-9 pr-4 py-2 text-sm bg-[#f8fafc] border border-[#e5e7eb] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#006d35]/30 focus:border-[#006d35] transition"
+        />
+      </div>
+    </div>
+
+    <!-- Right actions -->
+    <div class="flex items-center gap-3">
+      <!-- Notification bell -->
       <RouterLink
-        v-if="auth.isSuperAdmin"
         to="/admin/providers?status=pending"
-        class="relative text-gray-400 hover:text-gray-600 transition"
-        :title="t('providers.statusPending')"
+        class="relative p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition"
+        title="Prestataires en attente"
       >
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-        </svg>
+        <BellIcon class="w-5 h-5" />
+        <span
+          v-if="pendingCount > 0"
+          class="absolute top-1 right-1 w-2 h-2 rounded-full bg-red-500"
+        ></span>
       </RouterLink>
 
-      <div class="flex items-center gap-2">
-        <div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold" style="background-color: #1B5B88;">
+      <!-- Help -->
+      <button class="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition">
+        <QuestionMarkCircleIcon class="w-5 h-5" />
+      </button>
+
+      <!-- Separator -->
+      <div class="h-6 w-px bg-[#e5e7eb]"></div>
+
+      <!-- User info -->
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0" style="background-color:#001d32;">
           {{ initials }}
         </div>
-        <div class="hidden md:block text-right">
-          <p class="text-sm font-medium text-gray-800 leading-none">{{ auth.fullName }}</p>
-          <p class="text-xs capitalize mt-0.5" style="color: #1B8848;">{{ auth.role?.replace('_', ' ') }}</p>
+        <div class="hidden md:block">
+          <p class="text-sm font-semibold text-gray-800 leading-none">{{ auth.fullName }}</p>
+          <p class="text-xs capitalize mt-0.5 font-medium" style="color:#006d35;">{{ auth.role?.replace('_', ' ') }}</p>
         </div>
       </div>
 
+      <!-- Logout -->
       <button
         @click="handleLogout"
         :disabled="loading"
-        class="flex items-center gap-1.5 text-sm text-gray-400 hover:text-red-500 transition-colors px-2 py-1 rounded-lg hover:bg-red-50"
-        :title="t('nav.logout')"
+        class="p-2 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition"
+        title="Se déconnecter"
       >
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-        </svg>
-        <span class="hidden md:inline">{{ loading ? t('nav.loggingOut') : t('nav.logout') }}</span>
+        <ArrowRightOnRectangleIcon class="w-5 h-5" />
       </button>
     </div>
   </header>
@@ -47,15 +68,21 @@
 import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { useI18n } from 'vue-i18n'
+import {
+  BellIcon,
+  MagnifyingGlassIcon,
+  QuestionMarkCircleIcon,
+  ArrowRightOnRectangleIcon,
+} from '@heroicons/vue/24/outline'
 
-const { t } = useI18n()
 const route  = useRoute()
 const router = useRouter()
 const auth   = useAuthStore()
 const loading = ref(false)
+const pendingCount = ref(0)
 
-const title    = computed(() => route.meta.title || t('nav.administration'))
+const title = computed(() => route.meta.title || 'Administration')
+
 const initials = computed(() => {
   if (!auth.user) return '?'
   return ((auth.user.first_name?.[0] || '') + (auth.user.last_name?.[0] || '')).toUpperCase()

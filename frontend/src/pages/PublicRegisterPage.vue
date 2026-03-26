@@ -1,316 +1,468 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center py-12 px-4" style="background: linear-gradient(135deg, #f0fdf4 0%, #f8fafc 55%, #eff6ff 100%);">
-    <div class="w-full max-w-lg">
+  <div class="min-h-screen flex flex-col bg-[#f7f9ff]">
 
-      <div class="text-center mb-8">
-        <img src="/logoentier.png" class="h-14 mx-auto mb-3" alt="UpcycleConnect" />
-        <h1 class="text-2xl font-bold tracking-tight" style="color: #103652;">Créer un compte</h1>
-        <p class="text-gray-400 text-sm mt-1">Rejoignez la communauté UpcycleConnect</p>
-      </div>
+    <!-- Header minimal standalone -->
+    <header class="px-6 py-4 flex items-center justify-between max-w-[1280px] mx-auto w-full">
+      <RouterLink to="/" class="flex items-center gap-2">
+        <img src="/logoentier.png" class="h-10 w-auto" alt="UpcycleConnect" />
+        <span class="font-jakarta font-extrabold text-[#006d35] text-2xl tracking-[-0.025em]">UpcycleConnect</span>
+      </RouterLink>
+      <button class="text-[#40617f] text-base font-medium px-4 py-2 rounded-xl hover:bg-[#edf4ff] transition">
+        Aide
+      </button>
+    </header>
 
-      <div v-if="accountType === 'provider'" class="flex items-center justify-center gap-2 mb-6">
-        <div v-for="(label, idx) in ['Type', 'Entreprise', 'Compte']" :key="idx" class="flex items-center gap-2">
-          <div class="flex items-center gap-1.5">
-            <div class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300"
-              :style="stepIndex > idx ? 'background:#1B8848;color:white;' : stepIndex === idx ? 'background:#103652;color:white;' : 'background:#e5e7eb;color:#9ca3af;'">
-              <CheckIcon v-if="stepIndex > idx" class="w-3.5 h-3.5" />
-              <span v-else>{{ idx + 1 }}</span>
-            </div>
-            <span class="text-xs hidden sm:block transition-all duration-300" :style="stepIndex === idx ? 'color:#103652;font-weight:600;' : 'color:#9ca3af;'">{{ label }}</span>
-          </div>
-          <div v-if="idx < 2" class="w-8 h-px transition-all duration-500" :style="stepIndex > idx ? 'background:#1B8848;' : 'background:#e5e7eb;'"></div>
+    <!-- Contenu principal -->
+    <main class="flex-1 flex items-center justify-center px-4 py-12">
+      <div class="w-full max-w-[896px] flex flex-col gap-12">
+
+        <!-- Indicateur d'étapes -->
+        <div class="flex items-center justify-center gap-3">
+          <div
+            v-for="i in (accountType === 'provider' ? 3 : 2)"
+            :key="i"
+            class="h-2 w-12 rounded-full transition-all duration-300"
+            :style="i - 1 < stepIndex
+              ? 'background:#006d35'
+              : i - 1 === stepIndex
+                ? 'background:#006d35'
+                : 'background:#d8eaff'"
+          />
         </div>
-      </div>
 
-      <div class="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
+        <!-- Transitions entre étapes -->
         <Transition name="step" mode="out-in">
 
-          <div v-if="step === 'type'" key="type" class="p-8">
-            <h2 class="text-lg font-bold text-gray-900 mb-1">Quel type de compte ?</h2>
-            <p class="text-sm text-gray-400 mb-6">Sélectionnez le profil qui vous correspond</p>
-            <div class="grid grid-cols-2 gap-4">
+          <!-- ── Étape 1 : Choix du profil ── -->
+          <div v-if="step === 'type'" key="type" class="flex flex-col gap-12">
+            <div class="flex flex-col items-center gap-4 text-center">
+              <h1 class="font-jakarta font-extrabold text-[#001d32] text-[30px] md:text-[48px] leading-[1.1] tracking-[-0.025em]">
+                Rejoignez l'écosystème
+              </h1>
+              <p class="text-[#40617f] text-lg leading-[28px] max-w-[512px]">
+                Choisissez le profil qui correspond le mieux à votre activité pour commencer votre aventure durable.
+              </p>
+            </div>
+
+            <!-- Cartes de sélection -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
+              <!-- Particulier -->
               <button
                 @click="accountType = 'user'"
-                class="group relative flex flex-col items-center gap-3 p-6 rounded-2xl border-2 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
-                :style="accountType === 'user' ? 'border-color:#1B8848;background:#f0fdf4;' : 'border-color:#e5e7eb;background:white;'"
+                class="relative flex flex-col justify-between items-start p-10 rounded-[24px] border-2 text-left transition-all duration-200 hover:shadow-xl bg-white shadow-[0px_12px_40px_0px_rgba(0,29,50,0.06)]"
+                :style="accountType === 'user'
+                  ? 'border-color: rgba(0,109,53,0.4);'
+                  : 'border-color: transparent;'"
               >
-                <div class="w-14 h-14 rounded-2xl flex items-center justify-center transition-transform duration-200 group-hover:scale-110"
-                  :style="accountType === 'user' ? 'background:#dcfce7;' : 'background:#f9fafb;'">
-                  <UserIcon class="w-7 h-7" :style="accountType === 'user' ? 'color:#1B8848;' : 'color:#9ca3af;'" />
-                </div>
-                <div>
-                  <p class="font-semibold text-gray-900 text-sm">Particulier</p>
-                  <p class="text-xs text-gray-400 mt-0.5">Je cherche des services</p>
-                </div>
                 <Transition name="badge">
-                  <div v-if="accountType === 'user'" class="absolute top-2.5 right-2.5 w-5 h-5 rounded-full flex items-center justify-center text-white" style="background:#1B8848;">
-                    <CheckIcon class="w-3 h-3" />
+                  <div v-if="accountType === 'user'" class="absolute top-6 right-6 w-8 h-8 bg-[#006d35] rounded-full flex items-center justify-center">
+                    <CheckIcon class="w-3.5 h-3.5 text-white" />
                   </div>
                 </Transition>
+
+                <div class="w-16 h-16 rounded-[24px] bg-[#d8eaff] flex items-center justify-center mb-6">
+                  <UserIcon class="w-5 h-5 text-[#40617f]" />
+                </div>
+
+                <h3 class="font-jakarta font-bold text-[#001d32] text-2xl mb-3">Particulier</h3>
+
+                <p class="text-[#40617f] text-base leading-[26px] mb-8">
+                  Vous souhaitez proposer des services ponctuels, partager vos surplus ou aider votre communauté locale de manière informelle.
+                </p>
+
+                <div class="flex items-center gap-2 text-[#006d35] font-semibold text-base">
+                  Sélectionner
+                  <ChevronRightIcon class="w-3 h-3" />
+                </div>
               </button>
 
+              <!-- Prestataire -->
               <button
                 @click="accountType = 'provider'"
-                class="group relative flex flex-col items-center gap-3 p-6 rounded-2xl border-2 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
-                :style="accountType === 'provider' ? 'border-color:#1B5B88;background:#eff6ff;' : 'border-color:#e5e7eb;background:white;'"
+                class="relative flex flex-col justify-between items-start p-10 rounded-[24px] border-2 text-left transition-all duration-200 hover:shadow-xl bg-white shadow-[0px_12px_40px_0px_rgba(0,29,50,0.06)]"
+                :style="accountType === 'provider'
+                  ? 'border-color: rgba(0,109,53,0.4);'
+                  : 'border-color: transparent;'"
               >
-                <div class="w-14 h-14 rounded-2xl flex items-center justify-center transition-transform duration-200 group-hover:scale-110"
-                  :style="accountType === 'provider' ? 'background:#dbeafe;' : 'background:#f9fafb;'">
-                  <WrenchScrewdriverIcon class="w-7 h-7" :style="accountType === 'provider' ? 'color:#1B5B88;' : 'color:#9ca3af;'" />
-                </div>
-                <div>
-                  <p class="font-semibold text-gray-900 text-sm">Prestataire</p>
-                  <p class="text-xs text-gray-400 mt-0.5">Je propose des services</p>
-                </div>
                 <Transition name="badge">
-                  <div v-if="accountType === 'provider'" class="absolute top-2.5 right-2.5 w-5 h-5 rounded-full flex items-center justify-center text-white" style="background:#1B5B88;">
-                    <CheckIcon class="w-3 h-3" />
+                  <div v-if="accountType === 'provider'" class="absolute top-6 right-6 w-8 h-8 bg-[#006d35] rounded-full flex items-center justify-center">
+                    <CheckIcon class="w-3.5 h-3.5 text-white" />
                   </div>
                 </Transition>
+
+                <div class="w-16 h-16 rounded-[24px] bg-[#1b8848] flex items-center justify-center mb-6">
+                  <WrenchScrewdriverIcon class="w-6 h-6 text-white" />
+                </div>
+
+                <h3 class="font-jakarta font-bold text-[#001d32] text-2xl mb-3">Prestataire</h3>
+
+                <p class="text-[#40617f] text-base leading-[26px] mb-8">
+                  Vous êtes un professionnel, une association ou une entreprise dédiée à l'économie circulaire et au surcyclage.
+                </p>
+
+                <div class="flex items-center gap-2 text-[#006d35] font-semibold text-base">
+                  {{ accountType === 'provider' ? 'Sélectionné' : 'Sélectionner' }}
+                  <ChevronRightIcon v-if="accountType !== 'provider'" class="w-3 h-3" />
+                </div>
               </button>
             </div>
 
-            <button
-              @click="goToNext"
-              :disabled="!accountType"
-              class="mt-6 w-full py-3 rounded-xl text-white font-semibold transition-all duration-200 hover:opacity-90 active:scale-[0.99] disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-              style="background: linear-gradient(135deg, #1B8848, #10522b);"
-            >
-              Continuer
-              <ArrowRightIcon class="w-4 h-4" />
-            </button>
+            <!-- Action -->
+            <div class="flex flex-col items-center gap-6 pt-4">
+              <button
+                @click="goToNext"
+                :disabled="!accountType"
+                class="w-80 py-5 rounded-xl font-jakarta font-bold text-lg transition-all duration-200"
+                :style="accountType
+                  ? 'background:#006d35;color:white;cursor:pointer;'
+                  : 'background:#e2e8f0;color:#94a3b8;cursor:not-allowed;'"
+              >
+                Continuer
+              </button>
+              <div class="flex items-center gap-2 text-[#40617f] text-sm">
+                <LockClosedIcon class="w-3.5 h-3.5" />
+                Vos données sont protégées par notre engagement éco-responsable.
+              </div>
+            </div>
           </div>
 
-          <div v-else-if="step === 'siret'" key="siret" class="p-8">
-            <button @click="step = 'type'" class="inline-flex items-center gap-1 text-sm text-gray-400 hover:text-gray-600 transition mb-5">
+          <!-- ── Étape 2 : SIRET (prestataires) ── -->
+          <div v-else-if="step === 'siret'" key="siret" class="max-w-lg mx-auto w-full">
+            <button @click="step = 'type'" class="inline-flex items-center gap-1 text-sm text-[#40617f] hover:text-[#001d32] transition mb-6">
               <ArrowLeftIcon class="w-4 h-4" /> Retour
             </button>
 
-            <div class="flex items-center gap-3 mb-6">
-              <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:#dbeafe;">
-                <MagnifyingGlassIcon class="w-5 h-5" style="color:#1B5B88;" />
-              </div>
-              <div>
-                <h2 class="text-lg font-bold text-gray-900">Recherche par SIRET</h2>
-                <p class="text-xs text-gray-400">Pré-remplissage automatique de votre entreprise</p>
-              </div>
-            </div>
-
-            <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700 mb-1.5">Numéro SIRET <span class="text-xs font-normal text-gray-400">(14 chiffres)</span></label>
-              <div class="relative">
-                <input
-                  v-model="siretInput"
-                  @input="onSiretInput"
-                  type="text"
-                  maxlength="14"
-                  placeholder="ex : 12345678901234"
-                  class="w-full px-4 py-3 border-2 rounded-xl text-sm transition-all duration-300 outline-none font-mono tracking-widest pr-12"
-                  :class="{
-                    'border-green-400 bg-green-50/60': siretStatus === 'found',
-                    'border-red-300 bg-red-50/60': siretStatus === 'error',
-                    'border-gray-200 focus:border-blue-400': !siretStatus
-                  }"
-                />
-                <div class="absolute right-4 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center">
-                  <div v-if="siretLoading" class="w-5 h-5 border-2 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
-                  <CheckCircleIcon v-else-if="siretStatus === 'found'" class="w-5 h-5 text-green-500" />
-                  <XCircleIcon v-else-if="siretStatus === 'error'" class="w-5 h-5 text-red-400" />
-                  <span v-else class="text-xs text-gray-300 font-mono tabular-nums">{{ siretInput.length }}/14</span>
+            <div class="bg-white rounded-[24px] shadow-[0px_12px_40px_0px_rgba(0,29,50,0.06)] p-10">
+              <div class="flex items-center gap-4 mb-8">
+                <div class="w-12 h-12 rounded-xl bg-[#edf4ff] flex items-center justify-center">
+                  <MagnifyingGlassIcon class="w-5 h-5 text-[#40617f]" />
+                </div>
+                <div>
+                  <h2 class="font-jakarta font-bold text-[#001d32] text-xl">Recherche par SIRET</h2>
+                  <p class="text-[#40617f] text-sm">Pré-remplissage automatique de votre entreprise</p>
                 </div>
               </div>
-            </div>
 
-            <Transition name="card-pop">
-              <div v-if="companyData" class="mb-4 rounded-2xl border-2 border-green-200 overflow-hidden" style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);">
-                <div class="p-4">
-                  <div class="flex items-start gap-3">
-                    <div class="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 bg-white shadow-sm">
-                      <BuildingOfficeIcon class="w-6 h-6 text-gray-400" />
-                    </div>
-                    <div class="flex-1 min-w-0">
-                      <p class="font-bold text-gray-900 text-base leading-tight">{{ companyData.infolegales.nomcommercialrne || companyData.infolegales.nomcommercialinsee || companyData.infolegales.denorne || companyData.infolegales.denoinsee }}</p>
-                      <p class="text-xs text-gray-500 mt-0.5 truncate">
-                        {{ [companyData.infolegales.voieadressageinsee, companyData.infolegales.codepostalinsee, companyData.infolegales.villeinsee].filter(Boolean).join(', ') || 'Adresse non renseignée' }}
-                      </p>
-                      <div class="flex flex-wrap gap-1.5 mt-2">
-                        <span v-if="companyData.infolegales.naflibinsee || companyData.infolegales.nafinsee" class="text-xs px-2 py-0.5 rounded-full bg-white/80 border border-green-200 text-green-700 font-medium">
-                          {{ companyData.infolegales.naflibinsee || companyData.infolegales.nafinsee }}
-                        </span>
-                        <span v-if="companyData.infolegales.catjurlibinsee" class="text-xs px-2 py-0.5 rounded-full bg-white/80 border border-gray-200 text-gray-500">
-                          {{ companyData.infolegales.catjurlibinsee }}
-                        </span>
-                        <span class="text-xs px-2 py-0.5 rounded-full bg-white/80 border border-gray-200 text-gray-500 font-mono">
-                          SIRET {{ siretInput }}
-                        </span>
+              <div class="mb-4">
+                <label class="block text-sm font-medium text-[#001d32] mb-2">
+                  Numéro SIRET <span class="text-xs font-normal text-[#40617f]">(14 chiffres)</span>
+                </label>
+                <div class="relative">
+                  <input
+                    v-model="siretInput"
+                    @input="onSiretInput"
+                    type="text"
+                    maxlength="14"
+                    placeholder="ex : 12345678901234"
+                    class="w-full px-4 py-3.5 border-2 rounded-xl text-sm transition-all duration-300 outline-none font-mono tracking-widest pr-12"
+                    :class="{
+                      'border-green-400 bg-green-50/60': siretStatus === 'found',
+                      'border-red-300 bg-red-50/60': siretStatus === 'error',
+                      'border-[#e2e8f0] focus:border-[#006d35]': !siretStatus
+                    }"
+                  />
+                  <div class="absolute right-4 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center">
+                    <div v-if="siretLoading" class="w-5 h-5 border-2 border-[#006d35] border-t-transparent rounded-full animate-spin"></div>
+                    <CheckCircleIcon v-else-if="siretStatus === 'found'" class="w-5 h-5 text-green-500" />
+                    <XCircleIcon v-else-if="siretStatus === 'error'" class="w-5 h-5 text-red-400" />
+                    <span v-else class="text-xs text-gray-300 font-mono tabular-nums">{{ siretInput.length }}/14</span>
+                  </div>
+                </div>
+              </div>
+
+              <Transition name="card-pop">
+                <div v-if="companyData" class="mb-4 rounded-2xl border-2 border-green-200 overflow-hidden" style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);">
+                  <div class="p-4">
+                    <div class="flex items-start gap-3">
+                      <div class="w-11 h-11 rounded-xl bg-white shadow-sm flex items-center justify-center shrink-0">
+                        <BuildingOfficeIcon class="w-6 h-6 text-gray-400" />
+                      </div>
+                      <div class="flex-1 min-w-0">
+                        <p class="font-bold text-[#001d32] text-base leading-tight">
+                          {{ companyData.infolegales.nomcommercialrne || companyData.infolegales.nomcommercialinsee || companyData.infolegales.denorne || companyData.infolegales.denoinsee }}
+                        </p>
+                        <p class="text-xs text-gray-500 mt-0.5 truncate">
+                          {{ [companyData.infolegales.voieadressageinsee, companyData.infolegales.codepostalinsee, companyData.infolegales.villeinsee].filter(Boolean).join(', ') || 'Adresse non renseignée' }}
+                        </p>
+                        <div class="flex flex-wrap gap-1.5 mt-2">
+                          <span v-if="companyData.infolegales.naflibinsee || companyData.infolegales.nafinsee" class="text-xs px-2 py-0.5 rounded-full bg-white/80 border border-green-200 text-green-700 font-medium">
+                            {{ companyData.infolegales.naflibinsee || companyData.infolegales.nafinsee }}
+                          </span>
+                          <span v-if="companyData.infolegales.catjurlibinsee" class="text-xs px-2 py-0.5 rounded-full bg-white/80 border border-gray-200 text-gray-500">
+                            {{ companyData.infolegales.catjurlibinsee }}
+                          </span>
+                          <span class="text-xs px-2 py-0.5 rounded-full bg-white/80 border border-gray-200 text-gray-500 font-mono">
+                            SIRET {{ siretInput }}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>
+                  <button
+                    @click="useCompanyData"
+                    class="w-full py-3 text-white text-sm font-semibold transition hover:opacity-90 flex items-center justify-center gap-2"
+                    style="background:#006d35;"
+                  >
+                    <SparklesIcon class="w-4 h-4" />
+                    Utiliser ces informations
+                  </button>
                 </div>
-                <button
-                  @click="useCompanyData"
-                  class="w-full py-2.5 text-white text-sm font-semibold transition hover:opacity-90 active:opacity-80 flex items-center justify-center gap-2"
-                  style="background:#1B8848;"
-                >
-                  <SparklesIcon class="w-4 h-4" />
-                  Utiliser ces informations
+              </Transition>
+
+              <Transition name="fade">
+                <div v-if="siretStatus === 'error'" class="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 flex items-start gap-2 text-sm text-red-600">
+                  <ExclamationTriangleIcon class="w-4 h-4 shrink-0 mt-0.5" />
+                  <span>Aucune entreprise trouvée pour ce SIRET. Vérifiez le numéro ou remplissez votre formulaire manuellement.</span>
+                </div>
+              </Transition>
+
+              <div class="pt-4 border-t border-[#e2e8f0] text-center">
+                <button @click="skipSiret" class="text-sm text-[#40617f] hover:text-[#001d32] transition hover:underline underline-offset-2">
+                  Je n'ai pas mon SIRET — remplir manuellement
                 </button>
               </div>
-            </Transition>
-
-            <Transition name="fade">
-              <div v-if="siretStatus === 'error'" class="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 flex items-start gap-2 text-sm text-red-600">
-                <ExclamationTriangleIcon class="w-4 h-4 shrink-0 mt-0.5" />
-                <span>Aucune entreprise trouvée pour ce SIRET. Vérifiez le numéro ou remplissez votre formulaire manuellement.</span>
-              </div>
-            </Transition>
-
-            <div class="pt-4 border-t border-gray-100 text-center">
-              <button @click="skipSiret" class="text-sm text-gray-400 hover:text-gray-600 transition hover:underline underline-offset-2">
-                Je n'ai pas mon SIRET — remplir manuellement
-              </button>
             </div>
           </div>
 
-          <div v-else-if="step === 'form'" key="form" class="p-8">
-            <button @click="goBack" class="inline-flex items-center gap-1 text-sm text-gray-400 hover:text-gray-600 transition mb-5">
+          <!-- ── Étape 2b : Confirmation Entreprise ── -->
+          <div v-else-if="step === 'siret-confirm'" key="siret-confirm" class="max-w-[640px] mx-auto w-full">
+            <button @click="step = 'siret'" class="inline-flex items-center gap-1 text-sm text-[#40617f] hover:text-[#001d32] transition mb-6">
               <ArrowLeftIcon class="w-4 h-4" /> Retour
             </button>
 
-            <div class="flex items-center gap-3 mb-5">
-              <div class="w-10 h-10 rounded-xl flex items-center justify-center" :style="accountType === 'provider' ? 'background:#dbeafe;' : 'background:#dcfce7;'">
-                <WrenchScrewdriverIcon v-if="accountType === 'provider'" class="w-5 h-5" style="color:#1B5B88;" />
-                <UserIcon v-else class="w-5 h-5" style="color:#1B8848;" />
-              </div>
-              <div>
-                <h2 class="text-lg font-bold text-gray-900">{{ accountType === 'provider' ? 'Compte prestataire' : 'Vos informations' }}</h2>
-                <p v-if="companyData" class="text-xs font-medium flex items-center gap-1" style="color:#1B8848;">
-                  <SparklesIcon class="w-3.5 h-3.5" /> Pré-rempli depuis votre SIRET
-                </p>
-                <p v-else class="text-xs text-gray-400">Remplissez les champs ci-dessous</p>
-              </div>
+            <div class="flex flex-col items-center text-center mb-8">
+              <p class="text-[#006d35] text-xs font-bold uppercase tracking-widest mb-3">Étape 2 sur 4</p>
+              <h2 class="font-jakarta font-extrabold text-[#001d32] text-4xl tracking-tight">Est-ce bien votre entreprise ?</h2>
+              <p class="text-[#40617f] text-base mt-3 max-w-md">Vérifiez les informations récupérées depuis le registre officiel avant de continuer.</p>
             </div>
 
-            <form @submit.prevent="handleRegister" class="space-y-4">
-
-              <template v-if="accountType === 'provider'">
-                <div class="rounded-2xl border border-gray-100 p-4 space-y-3" style="background:#f8fafc;">
-                  <p class="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
-                    <BuildingOfficeIcon class="w-3.5 h-3.5" /> Entreprise
+            <div v-if="companyData" class="bg-white rounded-[24px] shadow-[0px_12px_40px_0px_rgba(0,29,50,0.06)] overflow-hidden">
+              <!-- Company header -->
+              <div class="p-8 flex items-start gap-6 border-b border-[#edf4ff]">
+                <div class="w-20 h-20 rounded-[20px] bg-[#edf4ff] flex items-center justify-center shrink-0">
+                  <BuildingOfficeIcon class="w-10 h-10 text-[#40617f]" />
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-3 flex-wrap">
+                    <h3 class="font-jakarta font-bold text-[#001d32] text-2xl">
+                      {{ companyData.infolegales.nomcommercialrne || companyData.infolegales.nomcommercialinsee || companyData.infolegales.denorne || companyData.infolegales.denoinsee }}
+                    </h3>
+                    <span class="bg-[#d1fae5] text-[#006d35] font-bold text-xs uppercase tracking-widest px-3 py-1 rounded-full flex items-center gap-1">
+                      <CheckBadgeIcon class="w-3.5 h-3.5" /> ACTIF
+                    </span>
+                  </div>
+                  <p class="text-[#40617f] text-sm mt-1">
+                    {{ [companyData.infolegales.voieadressageinsee, companyData.infolegales.codepostalinsee, companyData.infolegales.villeinsee].filter(Boolean).join(', ') || 'Adresse non renseignée' }}
                   </p>
-                  <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Nom de l'entreprise <span class="text-red-400">*</span></label>
-                    <input v-model="form.companyName" type="text" required
-                      class="w-full px-3 py-2.5 border rounded-xl text-sm focus:outline-none focus:border-blue-400 transition-colors"
-                      :class="companyData ? 'border-green-300 bg-green-50/40' : 'border-gray-200 bg-white'"
-                    />
-                  </div>
-                  <div class="grid grid-cols-2 gap-3">
-                    <div>
-                      <label class="block text-xs font-medium text-gray-600 mb-1">SIRET</label>
-                      <input v-model="form.siret" type="text" maxlength="14"
-                        class="w-full px-3 py-2.5 border rounded-xl text-xs focus:outline-none focus:border-blue-400 transition-colors font-mono"
-                        :class="companyData ? 'border-green-300 bg-green-50/40' : 'border-gray-200 bg-white'"
-                        placeholder="14 chiffres"
-                      />
-                    </div>
-                    <div>
-                      <label class="block text-xs font-medium text-gray-600 mb-1">Activité</label>
-                      <input v-model="form.activity" type="text"
-                        class="w-full px-3 py-2.5 border rounded-xl text-sm focus:outline-none focus:border-blue-400 transition-colors"
-                        :class="companyData ? 'border-green-300 bg-green-50/40' : 'border-gray-200 bg-white'"
-                        placeholder="ex: Plomberie"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Adresse</label>
-                    <input v-model="form.address" type="text"
-                      class="w-full px-3 py-2.5 border rounded-xl text-sm focus:outline-none focus:border-blue-400 transition-colors"
-                      :class="companyData ? 'border-green-300 bg-green-50/40' : 'border-gray-200 bg-white'"
-                      placeholder="Rue, code postal, ville"
-                    />
-                  </div>
-                </div>
-              </template>
-
-              <div class="space-y-3">
-                <p v-if="accountType === 'provider'" class="text-xs font-bold text-gray-400 uppercase tracking-wider pt-1 flex items-center gap-1.5">
-                  <UserIcon class="w-3.5 h-3.5" /> Contact
-                </p>
-                <div class="grid grid-cols-2 gap-3">
-                  <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Prénom <span class="text-red-400">*</span></label>
-                    <input v-model="form.firstName" type="text" required class="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-400 transition-colors bg-white" />
-                  </div>
-                  <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Nom <span class="text-red-400">*</span></label>
-                    <input v-model="form.lastName" type="text" required class="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-400 transition-colors bg-white" />
-                  </div>
-                </div>
-                <div>
-                  <label class="block text-xs font-medium text-gray-600 mb-1">Email <span class="text-red-400">*</span></label>
-                  <input v-model="form.email" type="email" required class="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-400 transition-colors bg-white" />
-                </div>
-                <div>
-                  <label class="block text-xs font-medium text-gray-600 mb-1">Téléphone</label>
-                  <input v-model="form.phone" type="tel" class="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-400 transition-colors bg-white" placeholder="06 12 34 56 78" />
-                </div>
-                <div>
-                  <label class="block text-xs font-medium text-gray-600 mb-1">Mot de passe <span class="text-red-400">*</span></label>
-                  <div class="relative">
-                    <input v-model="form.password" :type="showPassword ? 'text' : 'password'" required minlength="8"
-                      class="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-400 transition-colors bg-white pr-10" />
-                    <button type="button" @click="showPassword = !showPassword" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition">
-                      <EyeSlashIcon v-if="showPassword" class="w-5 h-5" />
-                      <EyeIcon v-else class="w-5 h-5" />
-                    </button>
-                  </div>
-                  <div v-if="form.password" class="mt-2 flex gap-1">
-                    <div v-for="i in 4" :key="i" class="h-1.5 flex-1 rounded-full transition-all duration-300"
-                      :style="passwordStrength >= i ? `background:${strengthColor}` : 'background:#e5e7eb'"></div>
-                  </div>
-                  <p v-if="form.password" class="text-xs mt-1 transition-all" :style="`color:${strengthColor}`">{{ strengthLabel }}</p>
                 </div>
               </div>
 
-              <Transition name="fade">
-                <p v-if="error" class="text-red-600 text-sm bg-red-50 p-3 rounded-xl border border-red-200 flex items-start gap-2">
-                  <ExclamationTriangleIcon class="w-4 h-4 shrink-0 mt-0.5" /><span>{{ error }}</span>
-                </p>
-              </Transition>
+              <!-- Company details grid -->
+              <div class="p-8 grid grid-cols-2 gap-4">
+                <div class="bg-[#f7f9ff] rounded-xl p-4">
+                  <p class="text-[#40617f] text-xs uppercase tracking-wide mb-1">SIRET</p>
+                  <p class="font-mono font-bold text-[#001d32] text-sm">{{ siretInput }}</p>
+                </div>
+                <div class="bg-[#f7f9ff] rounded-xl p-4">
+                  <p class="text-[#40617f] text-xs uppercase tracking-wide mb-1">Code APE / NAF</p>
+                  <p class="font-bold text-[#001d32] text-sm">{{ companyData.infolegales.nafinsee || '—' }}</p>
+                </div>
+                <div class="bg-[#f7f9ff] rounded-xl p-4 col-span-2">
+                  <p class="text-[#40617f] text-xs uppercase tracking-wide mb-1">Activité</p>
+                  <p class="font-bold text-[#001d32] text-sm">{{ companyData.infolegales.naflibinsee || companyData.infolegales.nafinsee || '—' }}</p>
+                </div>
+                <div v-if="companyData.infolegales.catjurlibinsee" class="bg-[#f7f9ff] rounded-xl p-4 col-span-2">
+                  <p class="text-[#40617f] text-xs uppercase tracking-wide mb-1">Forme juridique</p>
+                  <p class="font-bold text-[#001d32] text-sm">{{ companyData.infolegales.catjurlibinsee }}</p>
+                </div>
+              </div>
 
-              <button type="submit" :disabled="loading"
-                class="w-full py-3 rounded-xl text-white font-semibold transition-all duration-200 hover:opacity-90 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                style="background: linear-gradient(135deg, #1B8848, #10522b);"
-              >
-                <div v-if="loading" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                <CheckCircleIcon v-else class="w-4 h-4" />
-                <span>{{ loading ? 'Création en cours...' : 'Créer mon compte' }}</span>
-              </button>
-            </form>
+              <!-- Actions -->
+              <div class="px-8 pb-8 flex flex-col gap-3">
+                <button
+                  @click="useCompanyData"
+                  class="w-full py-4 rounded-xl text-white font-jakarta font-bold text-base transition hover:opacity-90 flex items-center justify-center gap-2"
+                  style="background: linear-gradient(135deg, #006d35 0%, #1b8848 100%);"
+                >
+                  <CheckIcon class="w-5 h-5" />
+                  Confirmer et continuer
+                </button>
+                <button
+                  @click="step = 'siret'"
+                  class="w-full py-3 rounded-xl text-[#40617f] font-medium text-sm hover:text-[#001d32] transition"
+                >
+                  Ce n'est pas mon entreprise
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── Étape 3 : Formulaire ── -->
+          <div v-else-if="step === 'form'" key="form" class="max-w-lg mx-auto w-full">
+            <button @click="goBack" class="inline-flex items-center gap-1 text-sm text-[#40617f] hover:text-[#001d32] transition mb-6">
+              <ArrowLeftIcon class="w-4 h-4" /> Retour
+            </button>
+
+            <div class="bg-white rounded-[24px] shadow-[0px_12px_40px_0px_rgba(0,29,50,0.06)] p-10">
+              <div class="flex items-center gap-4 mb-6">
+                <div class="w-12 h-12 rounded-xl flex items-center justify-center"
+                  :style="accountType === 'provider' ? 'background:#edf4ff;' : 'background:#d8eaff;'">
+                  <WrenchScrewdriverIcon v-if="accountType === 'provider'" class="w-5 h-5 text-[#40617f]" />
+                  <UserIcon v-else class="w-5 h-5 text-[#40617f]" />
+                </div>
+                <div>
+                  <h2 class="font-jakarta font-bold text-[#001d32] text-xl">
+                    {{ accountType === 'provider' ? 'Compte prestataire' : 'Vos informations' }}
+                  </h2>
+                  <p v-if="companyData" class="text-sm font-medium text-[#006d35] flex items-center gap-1">
+                    <SparklesIcon class="w-3.5 h-3.5" /> Pré-rempli depuis votre SIRET
+                  </p>
+                  <p v-else class="text-sm text-[#40617f]">Remplissez les champs ci-dessous</p>
+                </div>
+              </div>
+
+              <form @submit.prevent="handleRegister" class="space-y-4">
+
+                <template v-if="accountType === 'provider'">
+                  <div class="rounded-2xl border border-[#e2e8f0] p-4 space-y-3 bg-[#f7f9ff]">
+                    <p class="text-xs font-bold text-[#40617f] uppercase tracking-wider flex items-center gap-1.5">
+                      <BuildingOfficeIcon class="w-3.5 h-3.5" /> Entreprise
+                    </p>
+                    <div>
+                      <label class="block text-xs font-medium text-[#001d32] mb-1">Nom de l'entreprise <span class="text-red-400">*</span></label>
+                      <input v-model="form.companyName" type="text" required
+                        class="w-full px-3 py-2.5 border rounded-xl text-sm focus:outline-none transition-colors"
+                        :class="companyData ? 'border-green-300 bg-green-50/40' : 'border-[#e2e8f0] bg-white focus:border-[#006d35]'"
+                      />
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                      <div>
+                        <label class="block text-xs font-medium text-[#001d32] mb-1">SIRET</label>
+                        <input v-model="form.siret" type="text" maxlength="14"
+                          class="w-full px-3 py-2.5 border rounded-xl text-xs focus:outline-none transition-colors font-mono"
+                          :class="companyData ? 'border-green-300 bg-green-50/40' : 'border-[#e2e8f0] bg-white focus:border-[#006d35]'"
+                          placeholder="14 chiffres"
+                        />
+                      </div>
+                      <div>
+                        <label class="block text-xs font-medium text-[#001d32] mb-1">Activité</label>
+                        <input v-model="form.activity" type="text"
+                          class="w-full px-3 py-2.5 border rounded-xl text-sm focus:outline-none transition-colors"
+                          :class="companyData ? 'border-green-300 bg-green-50/40' : 'border-[#e2e8f0] bg-white focus:border-[#006d35]'"
+                          placeholder="ex: Plomberie"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label class="block text-xs font-medium text-[#001d32] mb-1">Adresse</label>
+                      <input v-model="form.address" type="text"
+                        class="w-full px-3 py-2.5 border rounded-xl text-sm focus:outline-none transition-colors"
+                        :class="companyData ? 'border-green-300 bg-green-50/40' : 'border-[#e2e8f0] bg-white focus:border-[#006d35]'"
+                        placeholder="Rue, code postal, ville"
+                      />
+                    </div>
+                  </div>
+                </template>
+
+                <div class="space-y-3">
+                  <p v-if="accountType === 'provider'" class="text-xs font-bold text-[#40617f] uppercase tracking-wider pt-1 flex items-center gap-1.5">
+                    <UserIcon class="w-3.5 h-3.5" /> Contact
+                  </p>
+                  <div class="grid grid-cols-2 gap-3">
+                    <div>
+                      <label class="block text-xs font-medium text-[#001d32] mb-1">Prénom <span class="text-red-400">*</span></label>
+                      <input v-model="form.firstName" type="text" required
+                        class="w-full px-3 py-2.5 border border-[#e2e8f0] rounded-xl text-sm focus:outline-none focus:border-[#006d35] transition-colors bg-white" />
+                    </div>
+                    <div>
+                      <label class="block text-xs font-medium text-[#001d32] mb-1">Nom <span class="text-red-400">*</span></label>
+                      <input v-model="form.lastName" type="text" required
+                        class="w-full px-3 py-2.5 border border-[#e2e8f0] rounded-xl text-sm focus:outline-none focus:border-[#006d35] transition-colors bg-white" />
+                    </div>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-medium text-[#001d32] mb-1">Email <span class="text-red-400">*</span></label>
+                    <input v-model="form.email" type="email" required
+                      class="w-full px-3 py-2.5 border border-[#e2e8f0] rounded-xl text-sm focus:outline-none focus:border-[#006d35] transition-colors bg-white" />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-medium text-[#001d32] mb-1">Téléphone</label>
+                    <input v-model="form.phone" type="tel"
+                      class="w-full px-3 py-2.5 border border-[#e2e8f0] rounded-xl text-sm focus:outline-none focus:border-[#006d35] transition-colors bg-white"
+                      placeholder="06 12 34 56 78" />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-medium text-[#001d32] mb-1">Mot de passe <span class="text-red-400">*</span></label>
+                    <div class="relative">
+                      <input v-model="form.password" :type="showPassword ? 'text' : 'password'" required minlength="8"
+                        class="w-full px-3 py-2.5 border border-[#e2e8f0] rounded-xl text-sm focus:outline-none focus:border-[#006d35] transition-colors bg-white pr-10" />
+                      <button type="button" @click="showPassword = !showPassword" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition">
+                        <EyeSlashIcon v-if="showPassword" class="w-5 h-5" />
+                        <EyeIcon v-else class="w-5 h-5" />
+                      </button>
+                    </div>
+                    <div v-if="form.password" class="mt-2 flex gap-1">
+                      <div v-for="i in 4" :key="i" class="h-1.5 flex-1 rounded-full transition-all duration-300"
+                        :style="passwordStrength >= i ? `background:${strengthColor}` : 'background:#e2e8f0'"></div>
+                    </div>
+                    <p v-if="form.password" class="text-xs mt-1 transition-all" :style="`color:${strengthColor}`">{{ strengthLabel }}</p>
+                  </div>
+                </div>
+
+                <Transition name="fade">
+                  <p v-if="error" class="text-red-600 text-sm bg-red-50 p-3 rounded-xl border border-red-200 flex items-start gap-2">
+                    <ExclamationTriangleIcon class="w-4 h-4 shrink-0 mt-0.5" /><span>{{ error }}</span>
+                  </p>
+                </Transition>
+
+                <button type="submit" :disabled="loading"
+                  class="w-full py-4 rounded-xl font-jakarta font-bold text-white text-base transition-all duration-200 hover:opacity-90 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  style="background: linear-gradient(135deg, #006d35, #1b8848);"
+                >
+                  <div v-if="loading" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <CheckCircleIcon v-else class="w-4 h-4" />
+                  <span>{{ loading ? 'Création en cours...' : 'Créer mon compte' }}</span>
+                </button>
+              </form>
+            </div>
+
+            <p class="text-center text-sm text-[#40617f] mt-6">
+              Déjà inscrit ?
+              <RouterLink to="/connexion" class="font-semibold hover:underline underline-offset-2 text-[#006d35]">Se connecter</RouterLink>
+            </p>
           </div>
 
         </Transition>
       </div>
+    </main>
 
-      <p class="text-center text-sm text-gray-400 mt-6">
-        Déjà inscrit ?
-        <RouterLink to="/connexion" class="font-medium hover:underline underline-offset-2" style="color: #1B8848;">Se connecter</RouterLink>
-      </p>
-    </div>
+    <!-- Footer minimal -->
+    <footer class="border-t border-[#edf4ff]">
+      <div class="max-w-[1280px] mx-auto px-8 py-12 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div>
+          <p class="font-jakarta font-bold text-[#006d35] text-xl">UpcycleConnect</p>
+          <p class="text-[#40617f] text-sm mt-1">© 2024 UpcycleConnect. The Curated Ecosystem.</p>
+        </div>
+        <div class="flex gap-8 text-sm text-[#40617f]">
+          <a href="#" class="hover:text-[#006d35] transition">Privacy Policy</a>
+          <a href="#" class="hover:text-[#006d35] transition">Terms of Service</a>
+          <a href="#" class="hover:text-[#006d35] transition">Eco-Commitment</a>
+        </div>
+      </div>
+    </footer>
 
-    <span class="fixed bottom-3 left-3 text-xs text-gray-300 font-mono select-none">v1.3.0</span>
   </div>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
+import { RouterLink } from 'vue-router'
 import {
   UserIcon,
   WrenchScrewdriverIcon,
   CheckIcon,
   CheckCircleIcon,
+  CheckBadgeIcon,
   XCircleIcon,
   MagnifyingGlassIcon,
   BuildingOfficeIcon,
@@ -318,8 +470,9 @@ import {
   EyeSlashIcon,
   SparklesIcon,
   ExclamationTriangleIcon,
-  ArrowRightIcon,
   ArrowLeftIcon,
+  ChevronRightIcon,
+  LockClosedIcon,
 } from '@heroicons/vue/24/outline'
 
 const step = ref('type')
@@ -344,7 +497,7 @@ const form = ref({
   address: '',
 })
 
-const stepIndex = computed(() => ({ type: 0, siret: 1, form: 2 }[step.value] ?? 0))
+const stepIndex = computed(() => ({ type: 0, siret: 1, 'siret-confirm': 1, form: accountType.value === 'provider' ? 2 : 1 }[step.value] ?? 0))
 
 function goToNext() {
   if (accountType.value === 'provider') {
@@ -399,11 +552,17 @@ async function fetchSiret(siret) {
 function useCompanyData() {
   const d = companyData.value?.infolegales
   if (!d) return
-  form.value.companyName = d.nomcommercialrne || d.nomcommercialinsee || d.denorne || d.denoinsee || ''
-  form.value.siret       = siretInput.value
-  form.value.activity    = d.naflibinsee || d.nafinsee || ''
-  form.value.address     = [d.voieadressageinsee, d.codepostalinsee, d.villeinsee].filter(Boolean).join(', ')
-  step.value = 'form'
+  // If coming from confirm screen, go straight to form
+  if (step.value === 'siret-confirm') {
+    form.value.companyName = d.nomcommercialrne || d.nomcommercialinsee || d.denorne || d.denoinsee || ''
+    form.value.siret       = siretInput.value
+    form.value.activity    = d.naflibinsee || d.nafinsee || ''
+    form.value.address     = [d.voieadressageinsee, d.codepostalinsee, d.villeinsee].filter(Boolean).join(', ')
+    step.value = 'form'
+  } else {
+    // From siret search card — show confirm screen
+    step.value = 'siret-confirm'
+  }
 }
 
 const passwordStrength = computed(() => {
@@ -417,7 +576,7 @@ const passwordStrength = computed(() => {
   return s
 })
 
-const strengthColor = computed(() => ['#e5e7eb','#ef4444','#f97316','#eab308','#22c55e'][passwordStrength.value])
+const strengthColor = computed(() => ['#e2e8f0','#ef4444','#f97316','#eab308','#22c55e'][passwordStrength.value])
 const strengthLabel = computed(() => ['','Très faible','Faible','Moyen','Fort'][passwordStrength.value])
 
 async function handleRegister() {
@@ -432,48 +591,17 @@ async function handleRegister() {
 .step-leave-active {
   transition: opacity 0.2s ease, transform 0.25s ease;
 }
-.step-enter-from {
-  opacity: 0;
-  transform: translateX(20px);
-}
-.step-leave-to {
-  opacity: 0;
-  transform: translateX(-20px);
-}
+.step-enter-from { opacity: 0; transform: translateX(20px); }
+.step-leave-to   { opacity: 0; transform: translateX(-20px); }
 
-.card-pop-enter-active {
-  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-.card-pop-leave-active {
-  transition: all 0.2s ease;
-}
-.card-pop-enter-from {
-  opacity: 0;
-  transform: translateY(-8px) scale(0.96);
-}
-.card-pop-leave-to {
-  opacity: 0;
-  transform: scale(0.96);
-}
+.card-pop-enter-active { transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.card-pop-leave-active { transition: all 0.2s ease; }
+.card-pop-enter-from, .card-pop-leave-to { opacity: 0; transform: scale(0.95) translateY(-4px); }
 
-.badge-enter-active {
-  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-.badge-leave-active {
-  transition: all 0.15s ease;
-}
-.badge-enter-from,
-.badge-leave-to {
-  opacity: 0;
-  transform: scale(0);
-}
+.badge-enter-active { transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.badge-leave-active { transition: all 0.15s ease; }
+.badge-enter-from, .badge-leave-to { opacity: 0; transform: scale(0.5); }
 
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.2s ease;
-}
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
+.fade-enter-active, .fade-leave-active { transition: opacity 0.2s ease; }
+.fade-enter-from, .fade-leave-to       { opacity: 0; }
 </style>

@@ -1,96 +1,360 @@
 <template>
   <div class="space-y-6">
+    <!-- Header -->
     <div class="flex items-center justify-between">
       <div>
-        <h2 class="text-xl font-bold text-gray-900">{{ t('logs.title') }}</h2>
-        <p class="text-sm text-gray-500 mt-0.5">{{ tab === 'admin' ? t('logs.adminSubtitle') : t('logs.platformSubtitle') }}</p>
+        <h2 class="text-2xl font-bold text-[#001d32]">
+          Architecture Système &amp; <span style="color:#006d35;">Journaux Opérationnels</span>
+        </h2>
+        <p class="text-sm text-[#40617f] mt-0.5">Suivi des actions administratives et santé de la plateforme</p>
       </div>
     </div>
 
-    <div class="flex gap-1 p-1 bg-gray-100 rounded-xl w-fit">
-      <button @click="tab='admin'" :class="tab==='admin' ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-700'" class="px-4 py-2 rounded-lg text-sm font-medium transition">
-        🔐 {{ t('logs.tabAdmin') }}
-      </button>
-      <button @click="tab='platform'" :class="tab==='platform' ? 'bg-white shadow text-gray-900' : 'text-gray-500 hover:text-gray-700'" class="px-4 py-2 rounded-lg text-sm font-medium transition">
-        👥 {{ t('logs.tabPlatform') }}
-      </button>
-    </div>
+    <!-- 2-column main layout -->
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
 
-    <div v-if="tab === 'admin'" class="card overflow-hidden">
-      <div class="px-4 py-3 border-b border-gray-100">
-        <span class="text-sm font-medium text-gray-700">{{ t('logs.adminSubtitle') }}</span>
-      </div>
-      <div v-if="adminLoading" class="p-6 space-y-3">
-        <div v-for="n in 8" :key="n" class="h-10 bg-gray-100 rounded-lg animate-pulse"></div>
-      </div>
-      <div v-else-if="!adminLogs.length" class="py-16 text-center text-gray-400">
-        <div class="text-4xl mb-2">📋</div>
-        <p>{{ t('logs.adminEmpty') }}</p>
-      </div>
-      <div v-else class="divide-y divide-gray-50">
-        <div v-for="log in adminLogs" :key="log.id" class="flex items-start gap-4 px-4 py-3 hover:bg-gray-50 transition-colors">
-          <div class="w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-lg" :class="actionBgClass(log.action)">
-            {{ actionIcon(log.action) }}
+      <!-- Left col (2/3): Activity feed -->
+      <div class="xl:col-span-2">
+        <div class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm overflow-hidden">
+          <div class="flex items-center justify-between px-6 py-4 border-b border-[#f1f5f9]">
+            <h3 class="font-semibold text-[#001d32]">Flux d'Activité</h3>
+            <div class="flex items-center gap-2">
+              <button class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-[#e5e7eb] text-[#374151] hover:bg-gray-50 transition flex items-center gap-1.5">
+                <ArrowDownTrayIcon class="w-3.5 h-3.5" />
+                Exporter CSV
+              </button>
+              <button class="px-3 py-1.5 text-xs font-semibold rounded-lg text-white transition hover:opacity-90 flex items-center gap-1.5" style="background-color:#006d35;">
+                <div class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></div>
+                Flux Live
+              </button>
+            </div>
           </div>
-          <div class="flex-1 min-w-0">
-            <p class="text-sm text-gray-800">
-              <span class="font-semibold">{{ log.admin_name?.trim() || t('logs.system') }}</span>
-              — {{ actionLabel(log.action) }}
-              <span v-if="log.resource_id" class="text-gray-400 text-xs"> ({{ t('logs.resourceId', { id: log.resource_id }) }})</span>
-            </p>
-            <p class="text-xs text-gray-400 mt-0.5">{{ log.ip_address }} · {{ formatDate(log.created_at) }}</p>
+
+          <!-- Tabs -->
+          <div class="flex gap-1 p-3 bg-[#f8fafc] border-b border-[#f1f5f9]">
+            <button @click="tab='admin'" :class="tab==='admin' ? 'bg-white shadow text-[#001d32] font-semibold' : 'text-gray-500 hover:text-gray-700'" class="px-4 py-2 rounded-lg text-sm transition">
+              Journaux Admin
+            </button>
+            <button @click="tab='platform'" :class="tab==='platform' ? 'bg-white shadow text-[#001d32] font-semibold' : 'text-gray-500 hover:text-gray-700'" class="px-4 py-2 rounded-lg text-sm transition">
+              Activité Plateforme
+            </button>
           </div>
-          <span class="shrink-0 text-xs px-2 py-0.5 rounded-full font-medium" :class="actionBadgeClass(log.action)">
-            {{ log.resource_type }}
-          </span>
+
+          <!-- Admin logs table -->
+          <div v-if="tab === 'admin'">
+            <div v-if="adminLoading" class="p-4 space-y-3">
+              <div v-for="n in 6" :key="n" class="h-12 bg-gray-50 rounded-lg animate-pulse"></div>
+            </div>
+            <div v-else-if="!adminLogs.length" class="py-12 text-center text-gray-400 text-sm">
+              <ClockIcon class="w-8 h-8 mx-auto mb-2 text-gray-300" />
+              Aucun journal administratif
+            </div>
+            <table v-else class="min-w-full">
+              <thead>
+                <tr class="bg-[#f8fafc]">
+                  <th class="px-6 py-3 text-left text-xs font-semibold text-[#6b7280] uppercase tracking-wider">Timestamp</th>
+                  <th class="px-6 py-3 text-left text-xs font-semibold text-[#6b7280] uppercase tracking-wider">Admin User</th>
+                  <th class="px-6 py-3 text-left text-xs font-semibold text-[#6b7280] uppercase tracking-wider">Action Effectuée</th>
+                  <th class="px-6 py-3 text-left text-xs font-semibold text-[#6b7280] uppercase tracking-wider">Contexte Entité</th>
+                  <th class="px-6 py-3 text-left text-xs font-semibold text-[#6b7280] uppercase tracking-wider">Statut</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-[#f8fafc]">
+                <tr
+                  v-for="log in adminLogs"
+                  :key="log.id"
+                  class="hover:bg-[#f8fafc] cursor-pointer transition-colors"
+                  @click="openModal(log, 'admin')"
+                >
+                  <td class="px-6 py-3.5 text-xs font-mono text-gray-500 whitespace-nowrap">
+                    {{ formatDateShort(log.created_at) }}
+                  </td>
+                  <td class="px-6 py-3.5">
+                    <div class="flex items-center gap-2">
+                      <div class="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
+                        :style="{ backgroundColor: avatarColor(log.admin_name) }">
+                        {{ (log.admin_name?.trim() || 'S').charAt(0).toUpperCase() }}
+                      </div>
+                      <span class="text-sm font-medium text-[#001d32]">{{ log.admin_name?.trim() || 'Système' }}</span>
+                    </div>
+                  </td>
+                  <td class="px-6 py-3.5 text-sm text-gray-600">{{ actionLabel(log.action) }}</td>
+                  <td class="px-6 py-3.5">
+                    <span v-if="log.resource_type" class="text-xs font-medium px-2 py-0.5 rounded-full" :class="actionBadgeClass(log.action)">
+                      {{ log.resource_type }}
+                      <span v-if="log.resource_id" class="opacity-60"> #{{ log.resource_id }}</span>
+                    </span>
+                    <span v-else class="text-xs text-gray-400">—</span>
+                  </td>
+                  <td class="px-6 py-3.5">
+                    <span class="text-xs font-semibold px-2 py-0.5 rounded-full" :class="statusBadge(log.action)">
+                      {{ statusText(log.action) }}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Platform logs -->
+          <div v-if="tab === 'platform'">
+            <div v-if="platformLoading" class="p-4 space-y-3">
+              <div v-for="n in 5" :key="n" class="h-12 bg-gray-50 rounded-lg animate-pulse"></div>
+            </div>
+            <div v-else-if="!platformLogs.length" class="py-12 text-center text-gray-400 text-sm">
+              <UsersIcon class="w-8 h-8 mx-auto mb-2 text-gray-300" />
+              Aucune activité plateforme
+            </div>
+            <div v-else class="divide-y divide-[#f8fafc]">
+              <div
+                v-for="entry in platformLogs"
+                :key="entry.id + entry.type"
+                class="flex items-center gap-4 px-6 py-3.5 hover:bg-[#f8fafc] transition-colors cursor-pointer"
+                @click="openModal(entry, 'platform')"
+              >
+                <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
+                  :class="entry.type === 'provider' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'">
+                  <span class="text-xs font-bold">{{ entry.type === 'provider' ? 'P' : 'U' }}</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-medium text-[#001d32]">{{ entry.name }}</p>
+                  <p class="text-xs text-gray-400">{{ entry.email }} · {{ formatDate(entry.created_at) }}</p>
+                </div>
+                <span class="text-xs font-semibold px-2 py-0.5 rounded-full"
+                  :class="entry.type === 'provider' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'">
+                  {{ entry.type === 'provider' ? 'Prestataire' : 'Utilisateur' }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right col (1/3) -->
+      <div class="space-y-4">
+        <!-- Localisation card -->
+        <div class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm p-5">
+          <h3 class="font-semibold text-[#001d32] mb-4">Localisation</h3>
+          <div class="space-y-3">
+            <div class="flex items-center justify-between py-2 border-b border-[#f8fafc]">
+              <span class="text-sm text-gray-600">Default Language</span>
+              <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-[#dcfce7] text-[#166534]">FR</span>
+            </div>
+            <div class="flex items-center justify-between py-2">
+              <span class="text-sm text-gray-600">Active Locales</span>
+              <div class="flex items-center gap-1">
+                <span class="text-xs font-medium px-1.5 py-0.5 rounded bg-[#f1f5f9] text-[#475569]">FR</span>
+                <span class="text-xs font-medium px-1.5 py-0.5 rounded bg-[#f1f5f9] text-[#475569]">EN</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Terminal DB dark card -->
+        <div class="rounded-2xl p-5" style="background: linear-gradient(135deg, #001d32, #0a2e4a);">
+          <div class="flex items-center gap-2 mb-3">
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-white/10">
+              <CircleStackIcon class="w-4 h-4 text-white" />
+            </div>
+            <div>
+              <p class="text-sm font-bold text-white">Terminal Base de Données</p>
+              <div class="flex items-center gap-1.5 mt-0.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
+                <span class="text-[10px] font-semibold text-green-400 uppercase tracking-wider">LIVE</span>
+              </div>
+            </div>
+          </div>
+          <p class="text-xs text-white/60 mb-4">
+            Accédez directement à l'interface de gestion de base de données pour des opérations avancées.
+          </p>
+          <RouterLink
+            v-if="auth.isSuperAdmin"
+            to="/admin/database"
+            class="w-full flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-semibold bg-white/10 hover:bg-white/20 text-white transition"
+          >
+            Ouvrir Instance #DB-P01
+            <ArrowTopRightOnSquareIcon class="w-4 h-4" />
+          </RouterLink>
+          <div v-else class="text-xs text-white/40 text-center py-2">
+            Accès réservé aux super-administrateurs
+          </div>
+        </div>
+
+        <!-- System capacities -->
+        <div class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm p-5">
+          <h3 class="font-semibold text-[#001d32] mb-4">Capacités Système</h3>
+          <div class="space-y-4">
+            <div>
+              <div class="flex justify-between text-xs text-gray-500 mb-1.5">
+                <span class="font-medium uppercase tracking-wider">ECO-BOX STANDARD</span>
+                <span class="font-bold text-[#001d32]">68%</span>
+              </div>
+              <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div class="h-full rounded-full" style="width:68%; background:#006d35;"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-xs text-gray-500 mb-1.5">
+                <span class="font-medium uppercase tracking-wider">NOTIFICATION QUEUE</span>
+                <span class="font-bold text-[#001d32]">23%</span>
+              </div>
+              <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div class="h-full rounded-full" style="width:23%; background:#40617f;"></div>
+              </div>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3 mt-4">
+            <div class="p-3 rounded-xl bg-[#f8fafc] text-center">
+              <p class="text-xs text-gray-400 mb-1">Email Templates</p>
+              <p class="text-sm font-bold text-[#001d32]">12 actifs</p>
+            </div>
+            <div class="p-3 rounded-xl bg-[#f8fafc] text-center">
+              <p class="text-xs text-gray-400 mb-1">SMS Gateways</p>
+              <p class="text-sm font-bold text-[#001d32]">2 actifs</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <div v-if="tab === 'platform'" class="card overflow-hidden">
-      <div class="px-4 py-3 border-b border-gray-100">
-        <span class="text-sm font-medium text-gray-700">{{ t('logs.platformSubtitle') }}</span>
-      </div>
-      <div v-if="platformLoading" class="p-6 space-y-3">
-        <div v-for="n in 8" :key="n" class="h-10 bg-gray-100 rounded-lg animate-pulse"></div>
-      </div>
-      <div v-else-if="!platformLogs.length" class="py-16 text-center text-gray-400">
-        <div class="text-4xl mb-2">👥</div>
-        <p>{{ t('logs.platformEmpty') }}</p>
-      </div>
-      <div v-else class="divide-y divide-gray-50">
-        <div v-for="entry in platformLogs" :key="entry.id + entry.type" class="flex items-start gap-4 px-4 py-3 hover:bg-gray-50 transition-colors">
-          <div class="w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-lg" :class="entry.type === 'provider' ? 'bg-purple-50' : 'bg-blue-50'">
-            {{ entry.type === 'provider' ? '🔨' : '👤' }}
-          </div>
-          <div class="flex-1 min-w-0">
-            <p class="text-sm text-gray-800">
-              <span class="font-semibold">{{ entry.name }}</span>
-              — {{ entry.type === 'provider' ? t('logs.registrationProvider') : t('logs.registrationUser') }}
-              <span v-if="entry.company" class="text-gray-500"> ({{ entry.company }})</span>
-            </p>
-            <p class="text-xs text-gray-400 mt-0.5">{{ entry.email }} · {{ formatDate(entry.created_at) }}</p>
-          </div>
-          <span class="shrink-0 text-xs px-2 py-0.5 rounded-full font-medium" :class="entry.type === 'provider' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'">
-            {{ entry.type === 'provider' ? t('logs.typeProvider') : t('logs.typeUser') }}
-          </span>
+    <!-- Staff governance section -->
+    <div class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm overflow-hidden">
+      <div class="px-6 py-4 border-b border-[#f1f5f9] flex items-center justify-between">
+        <div>
+          <h3 class="font-semibold text-[#001d32]">Gouvernance du Staff</h3>
+          <p class="text-xs text-gray-400 mt-0.5">Équipe administrative active</p>
         </div>
       </div>
+
+      <div v-if="!auth.isSuperAdmin" class="px-6 py-8 text-center text-gray-400 text-sm">
+        <ShieldCheckIcon class="w-8 h-8 mx-auto mb-2 text-gray-300" />
+        Accès réservé aux super-administrateurs
+      </div>
+
+      <template v-else>
+        <div v-if="adminsLoading" class="p-4 space-y-3">
+          <div v-for="n in 3" :key="n" class="h-12 bg-gray-50 rounded-lg animate-pulse"></div>
+        </div>
+        <table v-else-if="admins.length" class="min-w-full">
+          <thead>
+            <tr class="bg-[#f8fafc]">
+              <th class="px-6 py-3 text-left text-xs font-semibold text-[#6b7280] uppercase tracking-wider">Administrateur</th>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-[#6b7280] uppercase tracking-wider">Niveau / Badge</th>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-[#6b7280] uppercase tracking-wider">Email</th>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-[#6b7280] uppercase tracking-wider">Depuis le</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[#f8fafc]">
+            <tr v-for="admin in admins" :key="admin.id" class="hover:bg-[#f8fafc] transition-colors">
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-9 h-9 rounded-full flex items-center justify-center text-white text-xs font-bold" style="background-color:#001d32;">
+                    {{ ((admin.first_name?.[0] || '') + (admin.last_name?.[0] || '')).toUpperCase() }}
+                  </div>
+                  <span class="text-sm font-semibold text-[#001d32]">{{ admin.first_name }} {{ admin.last_name }}</span>
+                </div>
+              </td>
+              <td class="px-6 py-4">
+                <span class="text-xs font-semibold px-2.5 py-1 rounded-full capitalize"
+                  :class="admin.role === 'super_admin' ? 'bg-[#fef9c3] text-[#854d0e]' : 'bg-[#dcfce7] text-[#166534]'">
+                  {{ admin.role === 'super_admin' ? 'Super Admin' : 'Admin' }}
+                </span>
+              </td>
+              <td class="px-6 py-4 text-sm text-gray-400">{{ admin.email }}</td>
+              <td class="px-6 py-4 text-sm text-gray-400">{{ formatDateShort(admin.created_at) }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <div v-else class="px-6 py-8 text-center text-gray-400 text-sm">Aucun administrateur</div>
+      </template>
     </div>
+
+    <!-- Terminal Modal -->
+    <Teleport to="body">
+      <Transition name="modal">
+        <div v-if="selectedLog" class="fixed inset-0 z-50 flex items-center justify-center p-4" @click.self="closeModal">
+          <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+          <div class="relative w-full max-w-2xl rounded-xl overflow-hidden shadow-2xl border border-gray-700">
+            <div class="flex items-center gap-2 px-4 py-3 bg-gray-800 border-b border-gray-700">
+              <button @click="closeModal" class="w-3 h-3 rounded-full bg-red-500 hover:bg-red-400 transition-colors"></button>
+              <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+              <div class="w-3 h-3 rounded-full bg-green-500"></div>
+              <span class="ml-3 text-xs font-mono text-gray-400">upcycleconnect — log#{{ selectedLog.id }}</span>
+              <button @click="closeModal" class="ml-auto text-gray-500 hover:text-gray-300 transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+              </button>
+            </div>
+            <div class="bg-gray-900 p-5 font-mono text-sm leading-relaxed">
+              <div class="flex items-center gap-2 mb-4 pb-3 border-b border-gray-700">
+                <span class="text-green-400">root@upcycleconnect</span>
+                <span class="text-gray-500">:</span>
+                <span class="text-blue-400">~/logs</span>
+                <span class="text-gray-500">$</span>
+                <span class="text-white">cat log.{{ selectedLog.id }}.json</span>
+              </div>
+              <template v-if="selectedLogType === 'admin'">
+                <div class="space-y-1.5">
+                  <div class="flex gap-3"><span class="text-gray-500 w-28 shrink-0">id</span><span class="text-yellow-300">{{ selectedLog.id }}</span></div>
+                  <div class="flex gap-3"><span class="text-gray-500 w-28 shrink-0">timestamp</span><span class="text-cyan-300">{{ formatDateFull(selectedLog.created_at) }}</span></div>
+                  <div class="flex gap-3"><span class="text-gray-500 w-28 shrink-0">ip_address</span><span class="text-green-300">{{ selectedLog.ip_address || 'unknown' }}</span></div>
+                  <div class="flex gap-3"><span class="text-gray-500 w-28 shrink-0">admin</span><span class="text-white">{{ selectedLog.admin_name?.trim() || 'system' }}</span></div>
+                  <div class="flex gap-3"><span class="text-gray-500 w-28 shrink-0">admin_id</span><span class="text-yellow-300">{{ selectedLog.admin_id ?? '—' }}</span></div>
+                  <div class="flex gap-3"><span class="text-gray-500 w-28 shrink-0">action</span><span :class="actionTerminalColor(selectedLog.action)" class="font-bold">{{ selectedLog.action }}</span></div>
+                  <div class="flex gap-3"><span class="text-gray-500 w-28 shrink-0">resource_type</span><span class="text-purple-300">{{ selectedLog.resource_type || '—' }}</span></div>
+                  <div class="flex gap-3"><span class="text-gray-500 w-28 shrink-0">resource_id</span><span class="text-yellow-300">{{ selectedLog.resource_id ?? '—' }}</span></div>
+                </div>
+              </template>
+              <template v-else>
+                <div class="space-y-1.5">
+                  <div class="flex gap-3"><span class="text-gray-500 w-28 shrink-0">id</span><span class="text-yellow-300">{{ selectedLog.id }}</span></div>
+                  <div class="flex gap-3"><span class="text-gray-500 w-28 shrink-0">timestamp</span><span class="text-cyan-300">{{ formatDateFull(selectedLog.created_at) }}</span></div>
+                  <div class="flex gap-3"><span class="text-gray-500 w-28 shrink-0">type</span><span :class="selectedLog.type === 'provider' ? 'text-purple-300' : 'text-blue-300'" class="font-bold">{{ selectedLog.type }}</span></div>
+                  <div class="flex gap-3"><span class="text-gray-500 w-28 shrink-0">name</span><span class="text-white">{{ selectedLog.name }}</span></div>
+                  <div class="flex gap-3"><span class="text-gray-500 w-28 shrink-0">email</span><span class="text-green-300">{{ selectedLog.email }}</span></div>
+                  <div v-if="selectedLog.company" class="flex gap-3"><span class="text-gray-500 w-28 shrink-0">company</span><span class="text-gray-300">{{ selectedLog.company }}</span></div>
+                </div>
+              </template>
+              <div class="mt-4 pt-3 border-t border-gray-700 flex items-center gap-1">
+                <span class="text-green-400">root@upcycleconnect</span>
+                <span class="text-gray-500">:</span>
+                <span class="text-blue-400">~/logs</span>
+                <span class="text-gray-500">$</span>
+                <span class="inline-block w-2 h-4 bg-green-400 ml-1 animate-pulse"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { ref, onMounted, onUnmounted } from 'vue'
+import { useAuthStore } from '@/stores/auth'
 import api from '@/services/api'
+import {
+  ClockIcon, UsersIcon, ShieldCheckIcon,
+  ArrowDownTrayIcon, CircleStackIcon,
+  ArrowTopRightOnSquareIcon,
+} from '@heroicons/vue/24/outline'
 
-const { t } = useI18n()
+const auth = useAuthStore()
 const tab = ref('admin')
 const adminLogs = ref([])
 const platformLogs = ref([])
 const adminLoading = ref(false)
 const platformLoading = ref(false)
+const admins = ref([])
+const adminsLoading = ref(false)
+const selectedLog = ref(null)
+const selectedLogType = ref('admin')
+
+function openModal(log, type) { selectedLog.value = log; selectedLogType.value = type }
+function closeModal() { selectedLog.value = null }
+function onKeydown(e) { if (e.key === 'Escape') closeModal() }
+onMounted(() => window.addEventListener('keydown', onKeydown))
+onUnmounted(() => window.removeEventListener('keydown', onKeydown))
 
 async function loadAdminLogs() {
   adminLoading.value = true
@@ -112,54 +376,87 @@ async function loadPlatformLogs() {
   }
 }
 
+async function fetchAdmins() {
+  if (!auth.isSuperAdmin) return
+  adminsLoading.value = true
+  try {
+    const { data } = await api.get('/admins')
+    admins.value = data.data || []
+  } finally {
+    adminsLoading.value = false
+  }
+}
+
 onMounted(() => {
   loadAdminLogs()
   loadPlatformLogs()
+  fetchAdmins()
 })
+
+const avatarColors = ['#006d35', '#1b8848', '#40617f', '#001d32', '#7c3aed', '#0891b2', '#b45309']
+function avatarColor(name) {
+  if (!name) return '#94a3b8'
+  return avatarColors[name.charCodeAt(0) % avatarColors.length]
+}
 
 function formatDate(dateStr) {
   const d = new Date(dateStr)
   const now = new Date()
   const diff = Math.floor((now - d) / 1000)
-  if (diff < 60) return t('dashboard.actionInstant')
-  if (diff < 3600) return t('dashboard.actionMinutesAgo', { n: Math.floor(diff / 60) })
-  if (diff < 86400) return t('dashboard.actionHoursAgo', { n: Math.floor(diff / 3600) })
-  return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+  if (diff < 60) return "à l'instant"
+  if (diff < 3600) return `il y a ${Math.floor(diff / 60)}min`
+  if (diff < 86400) return `il y a ${Math.floor(diff / 3600)}h`
+  return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+}
+function formatDateShort(iso) {
+  return new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+}
+function formatDateFull(dateStr) {
+  const d = new Date(dateStr)
+  return d.toLocaleDateString('fr-FR', {
+    weekday: 'short', day: '2-digit', month: 'short', year: 'numeric',
+    hour: '2-digit', minute: '2-digit', second: '2-digit',
+  }) + ` (UTC${d.getTimezoneOffset() <= 0 ? '+' : '-'}${Math.abs(d.getTimezoneOffset() / 60)})`
 }
 
-function actionIcon(action) {
-  if (action.includes('created')) return '✅'
-  if (action.includes('deleted')) return '🗑️'
-  if (action.includes('banned')) return '🚫'
-  if (action.includes('approved')) return '✔️'
-  if (action.includes('suspended')) return '⏸️'
-  if (action.includes('activated')) return '🔓'
-  return '✏️'
-}
-function actionBgClass(action) {
-  if (action.includes('deleted') || action.includes('banned') || action.includes('suspended')) return 'bg-red-50'
-  if (action.includes('approved') || action.includes('activated') || action.includes('created')) return 'bg-green-50'
-  return 'bg-gray-50'
-}
 function actionLabel(action) {
   const labels = {
-    'user.banned':        t('logs.actionUserBanned'),
-    'user.activated':     t('logs.actionUserActivated'),
-    'user.deleted':       t('logs.actionUserDeleted'),
-    'provider.approved':  t('logs.actionProviderApproved'),
-    'provider.suspended': t('logs.actionProviderSuspended'),
-    'admin.created':      t('logs.actionAdminCreated'),
-    'admin.deleted':      t('logs.actionAdminDeleted'),
-    'category.created':   t('logs.actionCategoryCreated'),
-    'category.deleted':   t('logs.actionCategoryDeleted'),
-    'category.toggled':   t('logs.actionCategoryToggled'),
+    'user.banned':        'A banni un utilisateur',
+    'user.activated':     'A activé un utilisateur',
+    'user.deleted':       'A supprimé un utilisateur',
+    'provider.approved':  'A approuvé un prestataire',
+    'provider.suspended': 'A suspendu un prestataire',
+    'admin.created':      'A créé un administrateur',
+    'admin.deleted':      'A supprimé un administrateur',
+    'category.created':   'A créé une catégorie',
+    'category.deleted':   'A supprimé une catégorie',
+    'category.toggled':   'A modifié une catégorie',
   }
   return labels[action] || action
 }
 function actionBadgeClass(action) {
-  if (action.includes('deleted') || action.includes('banned')) return 'bg-red-100 text-red-700'
-  if (action.includes('approved') || action.includes('activated') || action.includes('created')) return 'bg-green-100 text-green-700'
-  if (action.includes('suspended')) return 'bg-orange-100 text-orange-700'
-  return 'bg-gray-100 text-gray-600'
+  if (action.includes('deleted') || action.includes('banned')) return 'bg-[#fee2e2] text-[#991b1b]'
+  if (action.includes('approved') || action.includes('activated') || action.includes('created')) return 'bg-[#dcfce7] text-[#166534]'
+  if (action.includes('suspended')) return 'bg-[#fef9c3] text-[#854d0e]'
+  return 'bg-[#f1f5f9] text-[#475569]'
+}
+function statusBadge(action) {
+  if (action.includes('deleted') || action.includes('banned') || action.includes('suspended')) return 'bg-[#fef9c3] text-[#854d0e]'
+  return 'bg-[#dcfce7] text-[#166534]'
+}
+function statusText(action) {
+  if (action.includes('deleted') || action.includes('banned') || action.includes('suspended')) return 'Warning'
+  return 'Success'
+}
+function actionTerminalColor(action) {
+  if (action.includes('deleted') || action.includes('banned')) return 'text-red-400'
+  if (action.includes('suspended')) return 'text-orange-400'
+  if (action.includes('approved') || action.includes('activated') || action.includes('created')) return 'text-green-400'
+  return 'text-gray-300'
 }
 </script>
+
+<style scoped>
+.modal-enter-active, .modal-leave-active { transition: opacity 0.2s ease; }
+.modal-enter-from, .modal-leave-to { opacity: 0; }
+</style>
