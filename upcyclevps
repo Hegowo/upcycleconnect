@@ -1,0 +1,44 @@
+#!/bin/bash
+set -e
+
+REGISTRY="docker.upcycleconnect.xyz"
+PROJECT="upcycleconnect"
+NETWORK="uc-net"
+
+echo ">>> Login registry"
+docker login "$REGISTRY"
+
+echo ">>> Pull images"
+docker pull "$REGISTRY/$PROJECT/backend:latest"
+docker pull "$REGISTRY/$PROJECT/frontend:latest"
+
+echo ">>> Redémarrage uc-backend"
+docker stop uc-backend 2>/dev/null || true
+docker rm   uc-backend 2>/dev/null || true
+docker run -d \
+  --name uc-backend \
+  --restart unless-stopped \
+  --network "$NETWORK" \
+  -p 127.0.0.1:8081:80 \
+  -e DB_HOST=uc-mysql \
+  -e DB_PASSWORD=ucpassword \
+  "$REGISTRY/$PROJECT/backend:latest"
+
+echo ">>> Redémarrage uc-frontend"
+docker stop uc-frontend 2>/dev/null || true
+docker rm   uc-frontend 2>/dev/null || true
+docker run -d \
+  --name uc-frontend \
+  --restart unless-stopped \
+  --network "$NETWORK" \
+  -p 127.0.0.1:4000:80 \
+  "$REGISTRY/$PROJECT/frontend:latest"
+
+echo ">>> Vérification"
+sleep 2
+docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" | grep -E "NAME|uc-"
+echo ""
+curl -sf http://127.0.0.1:8081/up && echo "backend  OK" || echo "backend  KO"
+curl -sf -o /dev/null http://127.0.0.1:4000  && echo "frontend OK" || echo "frontend KO"
+echo ""
+echo "Déploiement terminé."

@@ -1,5 +1,5 @@
 <template>
-  <div class="flex h-screen bg-gray-50 overflow-hidden">
+  <div class="flex h-screen overflow-hidden" style="background-color:#f8fafc;">
     <TheSidebar />
     <div class="flex-1 flex flex-col overflow-hidden">
       <TheHeader />

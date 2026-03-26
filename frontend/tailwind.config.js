@@ -12,7 +12,16 @@ export default {
           'dark-green':  '#10522b',
           green:         '#1B8848',
           'green-light': '#22a357',
+          // New design system
+          primary:       '#006d35',
+          dark:          '#001d32',
+          'blue-gray':   '#40617f',
+          'bg-light':    '#f7f9ff',
+          'card-blue':   '#edf4ff',
         },
+      },
+      fontFamily: {
+        jakarta: ["'Plus Jakarta Sans'", 'sans-serif'],
       },
     },
   },
