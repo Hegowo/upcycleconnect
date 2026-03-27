@@ -72,7 +72,6 @@ func ToEventResponse(e *Event) EventResponse {
 	}
 }
 
-// ToEventResponseWithCount inclut le nombre de participants inscrits.
 func ToEventResponseWithCount(e *Event, count int64) EventResponse {
 	r := ToEventResponse(e)
 	r.RegistrationsCount = count

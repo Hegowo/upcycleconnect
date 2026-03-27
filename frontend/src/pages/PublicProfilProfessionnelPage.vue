@@ -1,15 +1,15 @@
 <template>
   <div class="bg-[#f7f9ff] pb-0">
 
-    <!-- Professional Hero Header -->
+    
     <section class="bg-[#edf4ff] px-6 py-12 overflow-hidden relative">
       <div class="max-w-[1280px] mx-auto flex items-center gap-8">
-        <!-- Logo -->
+        
         <div class="bg-white rounded-[24px] p-4 w-48 h-48 flex items-center justify-center shrink-0 shadow-xl">
           <BuildingStorefrontIcon class="w-24 h-24 text-[#006d35]/40" />
         </div>
 
-        <!-- Info -->
+        
         <div class="flex-1 flex flex-col gap-3">
           <div class="flex items-center gap-3">
             <span class="bg-[#006d35] text-white text-xs font-bold uppercase tracking-wide px-3 py-1 rounded-full">
@@ -34,7 +34,7 @@
           </div>
         </div>
 
-        <!-- Stats -->
+        
         <div class="flex flex-col gap-4 w-60 shrink-0">
           <div class="bg-white rounded-xl p-4 flex items-center gap-4 shadow-sm">
             <div class="w-11 h-11 bg-[#d1fae5] rounded-xl flex items-center justify-center shrink-0">
@@ -56,21 +56,21 @@
           </div>
         </div>
 
-        <!-- Decorative -->
+        
         <div class="absolute -right-0 -top-0 w-60 h-60 opacity-20 pointer-events-none">
           <div class="w-full h-full rounded-full bg-gradient-to-br from-[#006d35] to-transparent blur-3xl" />
         </div>
       </div>
     </section>
 
-    <!-- Bento Grid -->
+    
     <div class="max-w-[1280px] mx-auto px-6 py-10">
       <div class="grid grid-cols-12 gap-6">
 
-        <!-- Left column: Services & Certs -->
+        
         <div class="col-span-4 flex flex-col gap-6">
 
-          <!-- Services -->
+          
           <div class="bg-white rounded-[24px] p-8 flex flex-col gap-6">
             <h2 class="font-jakarta font-bold text-[#001d32] text-xl">Mes Services</h2>
             <div class="flex flex-col gap-5">
@@ -90,7 +90,7 @@
             </div>
           </div>
 
-          <!-- Certifications -->
+          
           <div class="bg-white rounded-[24px] p-8 flex flex-col gap-6">
             <h2 class="font-jakarta font-bold text-[#001d32] text-xl">Engagements & Certifs</h2>
             <div class="grid grid-cols-2 gap-4">
@@ -108,10 +108,10 @@
 
         </div>
 
-        <!-- Right column: Projects & Shop -->
+        
         <div class="col-span-8 flex flex-col gap-6">
 
-          <!-- Projects showcase -->
+          
           <div class="bg-white rounded-[24px] p-8 flex flex-col gap-8">
             <div class="flex items-end justify-between">
               <div>
@@ -148,7 +148,7 @@
             </div>
           </div>
 
-          <!-- Online shop -->
+          
           <div class="bg-[#edf4ff] rounded-[24px] p-8 flex flex-col gap-8">
             <div>
               <h2 class="font-jakarta font-bold text-[#001d32] text-2xl">Boutique en ligne</h2>
@@ -191,8 +191,7 @@
   </div>
 </template>
 
-<script setup>
-import {
+<script setup>import {
   BuildingStorefrontIcon,
   EnvelopeIcon,
   ShareIcon,

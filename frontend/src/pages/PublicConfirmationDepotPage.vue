@@ -2,7 +2,7 @@
   <div class="bg-[#f7f9ff] pb-0">
     <div class="max-w-[1280px] mx-auto px-8 pt-12 pb-16">
 
-      <!-- Success Hero -->
+      
       <div class="flex flex-col items-center text-center mb-12">
         <div class="w-20 h-20 rounded-full bg-[#d1fae5] flex items-center justify-center mb-6 shadow-sm">
           <CheckCircleIcon class="w-10 h-10 text-[#006d35]" />
@@ -15,13 +15,13 @@
         </p>
       </div>
 
-      <!-- Main Bento Grid -->
+      
       <div class="grid grid-cols-12 gap-6">
 
-        <!-- Depot Pass (col-span-8) -->
+        
         <div class="col-span-8 bg-white rounded-[24px] p-8 shadow-[0_12px_40px_0_rgba(0,29,50,0.06)] flex flex-col gap-8">
 
-          <!-- Pass header -->
+          
           <div class="flex items-center justify-between">
             <div>
               <h2 class="font-jakarta font-bold text-[#001d32] text-2xl">Bon de Dépôt</h2>
@@ -32,15 +32,15 @@
             </span>
           </div>
 
-          <!-- QR + Code -->
+          
           <div class="flex gap-8 items-start">
-            <!-- QR Code placeholder -->
+            
             <div class="w-40 h-40 rounded-[20px] bg-[#edf4ff] border-2 border-[#d8eaff] flex flex-col items-center justify-center shrink-0 gap-3">
               <QrCodeIcon class="w-20 h-20 text-[#001d32]" />
               <span class="text-[#001d32] font-mono font-bold text-xs tracking-widest">UP-789-QZ</span>
             </div>
 
-            <!-- Details -->
+            
             <div class="flex-1 flex flex-col gap-5">
               <div class="grid grid-cols-2 gap-4">
                 <div class="bg-[#f7f9ff] rounded-xl p-4">
@@ -63,7 +63,7 @@
             </div>
           </div>
 
-          <!-- Print button -->
+          
           <button
             class="flex items-center justify-center gap-2 w-full py-4 rounded-xl text-white font-bold text-base transition hover:opacity-90"
             style="background: linear-gradient(135deg, #006d35 0%, #1b8848 100%);"
@@ -73,10 +73,10 @@
           </button>
         </div>
 
-        <!-- Right column: Object + Location -->
+        
         <div class="col-span-4 flex flex-col gap-6">
 
-          <!-- Object summary -->
+          
           <div class="bg-white rounded-[24px] p-6 shadow-[0_12px_40px_0_rgba(0,29,50,0.06)] flex flex-col gap-4">
             <h3 class="font-jakarta font-bold text-[#001d32] text-lg">Votre objet</h3>
             <div class="h-32 rounded-xl bg-gradient-to-br from-[#fef3c7] to-[#fde68a] flex items-center justify-center">
@@ -93,7 +93,7 @@
             </div>
           </div>
 
-          <!-- Location card -->
+          
           <div class="bg-[#edf4ff] rounded-[24px] p-6 flex flex-col gap-4">
             <h3 class="font-jakarta font-bold text-[#001d32] text-lg">Point de collecte</h3>
             <div class="flex items-start gap-3">
@@ -112,7 +112,7 @@
           </div>
         </div>
 
-        <!-- Instructions (full width) -->
+        
         <div class="col-span-12 bg-white rounded-[24px] p-8 shadow-[0_12px_40px_0_rgba(0,29,50,0.06)]">
           <h3 class="font-jakarta font-bold text-[#001d32] text-xl mb-6">Comment procéder ?</h3>
           <div class="grid grid-cols-3 gap-6">
@@ -130,7 +130,7 @@
 
       </div>
 
-      <!-- Back link -->
+      
       <div class="flex items-center justify-center mt-10">
         <RouterLink to="/profil" class="flex items-center gap-2 text-[#40617f] hover:text-[#006d35] font-medium text-sm transition">
           <ArrowLeftIcon class="w-4 h-4" />
@@ -143,8 +143,7 @@
   </div>
 </template>
 
-<script setup>
-import { RouterLink } from 'vue-router'
+<script setup>import { RouterLink } from 'vue-router'
 import {
   CheckCircleIcon,
   QrCodeIcon,

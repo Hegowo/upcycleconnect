@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen flex flex-col bg-[#f7f9ff]">
 
-    <!-- Header minimal standalone -->
+    
     <header class="px-6 py-4 flex items-center justify-between max-w-[1280px] mx-auto w-full">
       <RouterLink to="/" class="flex items-center gap-2">
         <img src="/logoentier.png" class="h-10 w-auto" alt="UpcycleConnect" />
@@ -12,11 +12,11 @@
       </button>
     </header>
 
-    <!-- Contenu principal -->
+    
     <main class="flex-1 flex items-center justify-center px-4 py-12">
       <div class="w-full max-w-[896px] flex flex-col gap-12">
 
-        <!-- Indicateur d'étapes -->
+        
         <div class="flex items-center justify-center gap-3">
           <div
             v-for="i in (accountType === 'provider' ? 3 : 2)"
@@ -30,10 +30,10 @@
           />
         </div>
 
-        <!-- Transitions entre étapes -->
+        
         <Transition name="step" mode="out-in">
 
-          <!-- ── Étape 1 : Choix du profil ── -->
+          
           <div v-if="step === 'type'" key="type" class="flex flex-col gap-12">
             <div class="flex flex-col items-center gap-4 text-center">
               <h1 class="font-jakarta font-extrabold text-[#001d32] text-[30px] md:text-[48px] leading-[1.1] tracking-[-0.025em]">
@@ -44,9 +44,9 @@
               </p>
             </div>
 
-            <!-- Cartes de sélection -->
+            
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
-              <!-- Particulier -->
+              
               <button
                 @click="accountType = 'user'"
                 class="relative flex flex-col justify-between items-start p-10 rounded-[24px] border-2 text-left transition-all duration-200 hover:shadow-xl bg-white shadow-[0px_12px_40px_0px_rgba(0,29,50,0.06)]"
@@ -76,7 +76,7 @@
                 </div>
               </button>
 
-              <!-- Prestataire -->
+              
               <button
                 @click="accountType = 'provider'"
                 class="relative flex flex-col justify-between items-start p-10 rounded-[24px] border-2 text-left transition-all duration-200 hover:shadow-xl bg-white shadow-[0px_12px_40px_0px_rgba(0,29,50,0.06)]"
@@ -107,7 +107,7 @@
               </button>
             </div>
 
-            <!-- Action -->
+            
             <div class="flex flex-col items-center gap-6 pt-4">
               <button
                 @click="goToNext"
@@ -126,7 +126,7 @@
             </div>
           </div>
 
-          <!-- ── Étape 2 : SIRET (prestataires) ── -->
+          
           <div v-else-if="step === 'siret'" key="siret" class="max-w-lg mx-auto w-full">
             <button @click="step = 'type'" class="inline-flex items-center gap-1 text-sm text-[#40617f] hover:text-[#001d32] transition mb-6">
               <ArrowLeftIcon class="w-4 h-4" /> Retour
@@ -224,7 +224,7 @@
             </div>
           </div>
 
-          <!-- ── Étape 2b : Confirmation Entreprise ── -->
+          
           <div v-else-if="step === 'siret-confirm'" key="siret-confirm" class="max-w-[640px] mx-auto w-full">
             <button @click="step = 'siret'" class="inline-flex items-center gap-1 text-sm text-[#40617f] hover:text-[#001d32] transition mb-6">
               <ArrowLeftIcon class="w-4 h-4" /> Retour
@@ -237,7 +237,7 @@
             </div>
 
             <div v-if="companyData" class="bg-white rounded-[24px] shadow-[0px_12px_40px_0px_rgba(0,29,50,0.06)] overflow-hidden">
-              <!-- Company header -->
+              
               <div class="p-8 flex items-start gap-6 border-b border-[#edf4ff]">
                 <div class="w-20 h-20 rounded-[20px] bg-[#edf4ff] flex items-center justify-center shrink-0">
                   <BuildingOfficeIcon class="w-10 h-10 text-[#40617f]" />
@@ -257,7 +257,7 @@
                 </div>
               </div>
 
-              <!-- Company details grid -->
+              
               <div class="p-8 grid grid-cols-2 gap-4">
                 <div class="bg-[#f7f9ff] rounded-xl p-4">
                   <p class="text-[#40617f] text-xs uppercase tracking-wide mb-1">SIRET</p>
@@ -277,7 +277,7 @@
                 </div>
               </div>
 
-              <!-- Actions -->
+              
               <div class="px-8 pb-8 flex flex-col gap-3">
                 <button
                   @click="useCompanyData"
@@ -297,7 +297,7 @@
             </div>
           </div>
 
-          <!-- ── Étape 3 : Formulaire ── -->
+          
           <div v-else-if="step === 'form'" key="form" class="max-w-lg mx-auto w-full">
             <button @click="goBack" class="inline-flex items-center gap-1 text-sm text-[#40617f] hover:text-[#001d32] transition mb-6">
               <ArrowLeftIcon class="w-4 h-4" /> Retour
@@ -432,7 +432,7 @@
             </p>
           </div>
 
-          <!-- ── Étape finale : Email envoyé ── -->
+          
           <div v-else-if="step === 'done'" key="done" class="max-w-lg mx-auto w-full text-center">
             <div class="bg-white rounded-[24px] shadow-[0px_12px_40px_0px_rgba(0,29,50,0.06)] p-10 space-y-6">
               <div class="w-20 h-20 rounded-full flex items-center justify-center mx-auto" style="background:#dcfce7;">
@@ -458,7 +458,7 @@
       </div>
     </main>
 
-    <!-- Footer minimal -->
+    
     <footer class="border-t border-[#edf4ff]">
       <div class="max-w-[1280px] mx-auto px-8 py-12 flex flex-col sm:flex-row items-center justify-between gap-4">
         <div>
@@ -476,8 +476,7 @@
   </div>
 </template>
 
-<script setup>
-import { ref, computed } from 'vue'
+<script setup>import { ref, computed } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 import { useUserAuthStore } from '@/stores/userAuth'
 import {
@@ -579,7 +578,6 @@ async function fetchSiret(siret) {
 function useCompanyData() {
   const d = companyData.value?.infolegales
   if (!d) return
-  // If coming from confirm screen, go straight to form
   if (step.value === 'siret-confirm') {
     form.value.companyName = d.nomcommercialrne || d.nomcommercialinsee || d.denorne || d.denoinsee || ''
     form.value.siret       = siretInput.value
@@ -587,7 +585,6 @@ function useCompanyData() {
     form.value.address     = [d.voieadressageinsee, d.codepostalinsee, d.villeinsee].filter(Boolean).join(', ')
     step.value = 'form'
   } else {
-    // From siret search card — show confirm screen
     step.value = 'siret-confirm'
   }
 }
@@ -622,7 +619,6 @@ async function handleRegister() {
       activity:     form.value.activity || null,
       address:      form.value.address || null,
     })
-    // Compte créé en "pending" — rediriger vers page "vérifiez votre email"
     step.value = 'done'
   } catch (e) {
     error.value = e.message || 'Une erreur est survenue. Veuillez réessayer.'

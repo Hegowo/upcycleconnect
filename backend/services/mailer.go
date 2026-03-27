@@ -37,7 +37,6 @@ func (m *Mailer) Send(to, subject, body string) error {
 	return smtp.SendMail(addr, auth, m.cfg.MailFrom, []string{to}, []byte(msg))
 }
 
-// sendSSL connecte via SSL/TLS direct (port 465)
 func (m *Mailer) sendSSL(addr string, auth smtp.Auth, to string, msg []byte) error {
 	tlsConfig := &tls.Config{ServerName: m.cfg.SMTPHost}
 	conn, err := tls.Dial("tcp", addr, tlsConfig)
@@ -67,8 +66,6 @@ func (m *Mailer) sendSSL(addr string, auth smtp.Auth, to string, msg []byte) err
 	}
 	return w.Close()
 }
-
-// ─── Templates ────────────────────────────────────────────────────────────────
 
 func (m *Mailer) SendRegisterVerification(to, firstName, token string) error {
 	link := fmt.Sprintf("%s/verify-email?token=%s", m.cfg.AppURL, token)

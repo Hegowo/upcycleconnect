@@ -1,6 +1,6 @@
 <template>
   <div class="space-y-6">
-    <!-- Header -->
+    
     <div class="flex items-start justify-between gap-3">
       <div>
         <h2 class="text-xl sm:text-2xl font-bold text-[#001d32]">Demandes de Dépôt</h2>
@@ -11,7 +11,7 @@
       </span>
     </div>
 
-    <!-- Filters -->
+    
     <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
       <div class="relative flex-1">
         <MagnifyingGlassIcon class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -36,10 +36,10 @@
       </div>
     </div>
 
-    <!-- Split layout -->
+    
     <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
 
-      <!-- Left col: Queue (2/5) -->
+      
       <div class="lg:col-span-2" :class="selectedRequest ? 'hidden lg:block' : ''">
         <div class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm overflow-hidden">
           <div class="px-5 py-4 border-b border-[#f1f5f9]">
@@ -47,18 +47,18 @@
             <p class="text-xs text-gray-400 mt-0.5">{{ meta.total }} demandes au total</p>
           </div>
 
-          <!-- Loading -->
+          
           <div v-if="loading" class="flex items-center justify-center py-12">
             <div class="w-6 h-6 border-2 border-[#006d35] border-t-transparent rounded-full animate-spin"></div>
           </div>
 
-          <!-- Empty -->
+          
           <div v-else-if="requests.length === 0" class="flex flex-col items-center justify-center py-12 text-gray-400">
             <InboxIcon class="w-10 h-10 mb-2 text-gray-300" />
             <p class="text-sm">Aucune demande</p>
           </div>
 
-          <!-- List -->
+          
           <div v-else class="divide-y divide-[#f8fafc] max-h-[600px] overflow-y-auto">
             <div
               v-for="req in requests"
@@ -85,7 +85,7 @@
             </div>
           </div>
 
-          <!-- Pagination -->
+          
           <div v-if="meta.last_page > 1" class="flex items-center justify-between px-5 py-3 border-t border-[#f1f5f9]">
             <button @click="changePage(meta.current_page - 1)" :disabled="meta.current_page <= 1" class="text-xs text-[#40617f] disabled:opacity-40 hover:text-[#006d35] transition">← Précédent</button>
             <span class="text-xs text-gray-400">{{ meta.current_page }} / {{ meta.last_page }}</span>
@@ -94,7 +94,7 @@
         </div>
       </div>
 
-      <!-- Right col: Detail (3/5) -->
+      
       <div class="lg:col-span-3" ref="detailPanel">
         <div v-if="!selectedRequest" class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm flex items-center justify-center h-96">
           <div class="text-center text-gray-400">
@@ -105,14 +105,14 @@
         </div>
 
         <div v-else class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm overflow-hidden">
-          <!-- Back button (mobile only) -->
+          
           <div class="lg:hidden px-4 py-2 border-b border-[#f1f5f9]">
             <button @click="selectedRequest = null" class="flex items-center gap-1.5 text-sm text-[#40617f] font-medium">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
               Retour à la liste
             </button>
           </div>
-          <!-- Header -->
+          
           <div class="px-6 py-4 border-b border-[#f1f5f9] flex items-center justify-between">
             <div>
               <h3 class="font-semibold text-[#001d32]">{{ selectedRequest.title }}</h3>
@@ -124,7 +124,7 @@
           </div>
 
           <div class="p-6 space-y-5">
-            <!-- Info grid -->
+            
             <div>
               <p class="text-xs font-semibold text-[#6b7280] uppercase tracking-wider mb-3">Informations</p>
               <div class="grid grid-cols-2 sm:grid-cols-2 gap-3">
@@ -148,19 +148,19 @@
               </div>
             </div>
 
-            <!-- Description -->
+            
             <div>
               <p class="text-xs font-semibold text-[#6b7280] uppercase tracking-wider mb-2">Description</p>
               <p class="text-sm text-gray-600 bg-[#f8fafc] rounded-xl p-3 leading-relaxed">{{ selectedRequest.description }}</p>
             </div>
 
-            <!-- History -->
+            
             <div v-if="selectedRequest.history">
               <p class="text-xs font-semibold text-[#6b7280] uppercase tracking-wider mb-2">Historique de l'objet</p>
               <p class="text-sm text-gray-600 bg-[#f8fafc] rounded-xl p-3 leading-relaxed">{{ selectedRequest.history }}</p>
             </div>
 
-            <!-- Impact metrics -->
+            
             <div v-if="selectedRequest.carbon_savings">
               <p class="text-xs font-semibold text-[#6b7280] uppercase tracking-wider mb-3">Impact Environnemental</p>
               <div class="rounded-xl p-3 text-center" style="background:#f0fdf4;">
@@ -169,7 +169,7 @@
               </div>
             </div>
 
-            <!-- QR Code (if approved) -->
+            
             <div v-if="selectedRequest.qr_code" class="bg-[#f0fdf4] rounded-xl p-3 flex items-center gap-3">
               <QrCodeIcon class="w-5 h-5 text-[#006d35] shrink-0" />
               <div>
@@ -178,13 +178,13 @@
               </div>
             </div>
 
-            <!-- Existing validation note (if rejected) -->
+            
             <div v-if="selectedRequest.validation_note && selectedRequest.status !== 'pending'">
               <p class="text-xs font-semibold text-[#6b7280] uppercase tracking-wider mb-2">Note de validation</p>
               <p class="text-sm text-gray-600 bg-[#f8fafc] rounded-xl p-3">{{ selectedRequest.validation_note }}</p>
             </div>
 
-            <!-- Action area (only if pending) -->
+            
             <template v-if="selectedRequest.status === 'pending'">
               <div>
                 <p class="text-xs font-semibold text-[#6b7280] uppercase tracking-wider mb-2">Note de validation</p>
@@ -196,7 +196,7 @@
                 ></textarea>
               </div>
 
-              <!-- Error -->
+              
               <p v-if="actionError" class="text-xs text-red-500">{{ actionError }}</p>
 
               <div class="flex items-center gap-3 pt-2">
@@ -227,8 +227,7 @@
   </div>
 </template>
 
-<script setup>
-import { ref, computed, onMounted, watch, nextTick } from 'vue'
+<script setup>import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import {
   InboxIcon, PhotoIcon, CheckCircleIcon, XCircleIcon,
   MagnifyingGlassIcon, QrCodeIcon,
@@ -259,7 +258,6 @@ const statusFilters = [
 ]
 
 const pendingCount = computed(() => {
-  // Use total from a dedicated pending count if we're not filtering
   if (statusFilter.value === 'pending') return meta.value.total
   return requests.value.filter(r => r.status === 'pending').length
 })
@@ -286,7 +284,6 @@ async function fetchRequests(page = 1) {
 async function selectRequest(req) {
   validationNote.value = ''
   actionError.value = ''
-  // Fetch full detail
   try {
     const res = await fetch(`${BASE}/deposits/${req.id}`, { credentials: 'include' })
     if (!res.ok) throw new Error()
@@ -313,7 +310,6 @@ async function updateStatus(status) {
     }
     const updated = await res.json()
     selectedRequest.value = updated
-    // Refresh list
     const idx = requests.value.findIndex(r => r.id === updated.id)
     if (idx !== -1) requests.value[idx] = { ...requests.value[idx], status: updated.status }
     validationNote.value = ''

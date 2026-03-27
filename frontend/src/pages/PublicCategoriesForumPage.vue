@@ -1,7 +1,7 @@
 <template>
   <div class="bg-[#f7f9ff] min-h-screen flex">
 
-    <!-- Sidebar -->
+    
     <aside class="w-64 shrink-0 bg-[#f8fafc] border-r border-[#e2e8f0] flex flex-col py-6 px-4 sticky top-[65px] h-[calc(100vh-65px)] overflow-y-auto">
       <div class="px-4 py-6">
         <p class="text-[#15803d] font-semibold text-sm">Navigation Forum</p>
@@ -32,7 +32,7 @@
         </button>
       </div>
 
-      <!-- Bottom links -->
+      
       <div class="mt-auto flex flex-col gap-1 pb-4">
         <button class="flex items-center gap-3 px-4 py-3 rounded-xl text-[#64748b] text-sm font-semibold hover:bg-[#f0fdf4] hover:text-[#15803d] transition">
           <Cog6ToothIcon class="w-5 h-5 shrink-0" />
@@ -45,11 +45,11 @@
       </div>
     </aside>
 
-    <!-- Main content -->
+    
     <main class="flex-1 min-w-0 p-8">
       <div class="max-w-[1152px] flex flex-col gap-12">
 
-        <!-- Header -->
+        
         <div class="flex flex-col gap-2">
           <p class="text-[#006d35] text-xs font-semibold uppercase tracking-[1.2px]">Forum Communautaire</p>
           <h1 class="font-jakarta font-extrabold text-[#001d32] text-5xl tracking-tight">Catégories de Discussion</h1>
@@ -58,10 +58,10 @@
           </p>
         </div>
 
-        <!-- Bento Grid -->
+        
         <div class="grid grid-cols-12 gap-6">
 
-          <!-- Matériaux & Ressources (col-7) -->
+          
           <div class="col-span-7 bg-white rounded-[24px] p-10 relative flex flex-col justify-between min-h-[378px]">
             <div class="flex items-start justify-between">
               <div class="w-14 h-14 rounded-xl bg-[#edf4ff] flex items-center justify-center">
@@ -86,7 +86,7 @@
             </button>
           </div>
 
-          <!-- Techniques d'Upcycling (col-5) -->
+          
           <div class="col-span-5 bg-white rounded-[24px] p-10 relative flex flex-col justify-between min-h-[378px]">
             <div class="w-14 h-14 rounded-xl bg-[#edf4ff] flex items-center justify-center">
               <WrenchScrewdriverIcon class="w-7 h-7 text-[#40617f]" />
@@ -103,9 +103,9 @@
             </button>
           </div>
 
-          <!-- Projets & Inspirations (col-4) -->
+          
           <div class="col-span-4 bg-white rounded-[24px] p-10 relative flex flex-col justify-between min-h-[374px] overflow-hidden">
-            <!-- Decorative corner element -->
+            
             <div class="absolute -right-4 -top-4 w-24 h-32 opacity-5 pointer-events-none">
               <div class="w-full h-full bg-[#006d35] rounded-xl" />
             </div>
@@ -123,7 +123,7 @@
             </button>
           </div>
 
-          <!-- Éco-conception & Impact (col-8) -->
+          
           <div class="col-span-8 bg-white rounded-[24px] p-10 flex gap-8 items-center min-h-[374px]">
             <div class="flex-1">
               <div class="w-14 h-14 rounded-xl bg-[#edf4ff] flex items-center justify-center">
@@ -138,9 +138,9 @@
               </button>
             </div>
 
-            <!-- A+ Score ring -->
+            
             <div class="bg-[#edf4ff] rounded-xl w-64 h-64 flex items-center justify-center shrink-0 relative">
-              <!-- SVG ring -->
+              
               <svg class="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 256 256">
                 <circle cx="128" cy="128" r="100" fill="none" stroke="#d8eaff" stroke-width="12" />
                 <circle cx="128" cy="128" r="100" fill="none" stroke="#006d35" stroke-width="12"
@@ -153,7 +153,7 @@
             </div>
           </div>
 
-          <!-- Entraide & Questions (col-6) -->
+          
           <div class="col-span-6 bg-white rounded-[24px] p-10 flex flex-col gap-6 self-start">
             <div class="flex items-center gap-4">
               <div class="w-14 h-14 rounded-xl bg-[#edf4ff] flex items-center justify-center shrink-0">
@@ -172,7 +172,7 @@
             </button>
           </div>
 
-          <!-- Vente & Business (col-6) -->
+          
           <div class="col-span-6 bg-white rounded-[24px] p-10 flex flex-col gap-6 self-start">
             <div class="flex items-center gap-4">
               <div class="w-14 h-14 rounded-xl bg-[#edf4ff] flex items-center justify-center shrink-0">
@@ -191,9 +191,9 @@
             </button>
           </div>
 
-          <!-- Dark CTA (full width) -->
+          
           <div class="col-span-12 bg-[#0f172a] rounded-[32px] px-12 py-16 flex items-center justify-between relative overflow-hidden">
-            <!-- Decorative glow -->
+            
             <div class="absolute -right-20 -top-16 w-64 h-64 rounded-full bg-[rgba(0,109,53,0.2)] blur-[32px] pointer-events-none" />
             <div>
               <h3 class="font-jakarta font-bold text-white text-3xl">Vous ne trouvez pas votre bonheur ?</h3>
@@ -213,8 +213,7 @@
   </div>
 </template>
 
-<script setup>
-import { RouterLink } from 'vue-router'
+<script setup>import { RouterLink } from 'vue-router'
 import {
   ChatBubbleLeftEllipsisIcon,
   LightBulbIcon,

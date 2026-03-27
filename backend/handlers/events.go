@@ -68,7 +68,6 @@ func (h *EventHandler) Index(c *gin.Context) {
 		Limit(perPage).
 		Find(&events)
 
-	// Charger les compteurs de participants pour tous les événements récupérés
 	type regCount struct {
 		EventID uint
 		Count   int64
@@ -216,7 +215,6 @@ func (h *EventHandler) Update(c *gin.Context) {
 		return
 	}
 
-	// Capture full before state for the diff
 	oldLocation := ""
 	if event.Location != nil {
 		oldLocation = *event.Location

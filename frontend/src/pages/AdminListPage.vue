@@ -11,17 +11,17 @@
       </RouterLink>
     </div>
 
-    <!-- Mobile admin cards (lg:hidden) -->
+    
     <div class="lg:hidden">
-      <!-- Loading -->
+      
       <div v-if="loading" class="space-y-3">
         <div v-for="n in 4" :key="n" class="bg-white rounded-2xl border border-[#f1f5f9] h-20 animate-pulse"></div>
       </div>
-      <!-- Empty -->
+      
       <div v-else-if="!admins.length" class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm py-12 text-center">
         <p class="text-gray-500 font-medium text-sm">{{ t('common.noResults') }}</p>
       </div>
-      <!-- Cards -->
+      
       <div v-else class="space-y-3">
         <div v-for="admin in admins" :key="admin.id" class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm p-4">
           <div class="flex items-center gap-3 mb-3">
@@ -157,8 +157,7 @@
   </div>
 </template>
 
-<script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+<script setup>import { ref, reactive, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { adminUserService } from '@/services/userService'
 import { useAuthStore } from '@/stores/auth'

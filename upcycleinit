@@ -1,11 +1,6 @@
 #!/usr/bin/env bash
-# =============================================================================
-#  upcycleinit — Premier démarrage UpcycleConnect (macOS / Linux)
-#  Usage : chmod +x upcycleinit && ./upcycleinit
-# =============================================================================
 set -euo pipefail
 
-# ── Couleurs ──────────────────────────────────────────────────────────────────
 BOLD="\033[1m"
 DIM="\033[2m"
 GREEN="\033[0;32m"
@@ -28,7 +23,6 @@ ENV_FILE="$ROOT/.env"
 ENV_EXAMPLE="$ROOT/.env.example"
 COMPOSE_FILE="$ROOT/docker-compose.yml"
 
-# ── Banner ────────────────────────────────────────────────────────────────────
 echo -e ""
 echo -e "${BGREEN}  ██╗   ██╗██████╗  ██████╗██╗   ██╗ ██████╗██╗     ███████╗${RESET}"
 echo -e "${BGREEN}  ██║   ██║██╔══██╗██╔════╝╚██╗ ██╔╝██╔════╝██║     ██╔════╝${RESET}"
@@ -39,13 +33,11 @@ echo -e "${BGREEN}   ╚═════╝ ╚═╝      ╚═════╝ 
 echo -e "${DIM}  UpcycleConnect — Initialisation premier démarrage${RESET}"
 echo -e "${DIM}  ─────────────────────────────────────────────────${RESET}\n"
 
-# ── 1. Prérequis ──────────────────────────────────────────────────────────────
 step "Vérification des prérequis"
 
 command -v docker &>/dev/null || fail "Docker n'est pas installé. Téléchargez-le sur https://docs.docker.com/get-docker/"
 ok "Docker trouvé : $(docker --version | head -1)"
 
-# docker compose (plugin v2) ou docker-compose (v1)
 if docker compose version &>/dev/null 2>&1; then
   COMPOSE="docker compose"
 elif command -v docker-compose &>/dev/null; then
@@ -55,7 +47,6 @@ else
 fi
 ok "Compose trouvé : $($COMPOSE version --short 2>/dev/null || $COMPOSE version)"
 
-# Docker daemon actif ?
 docker info &>/dev/null 2>&1 || fail "Le démon Docker n'est pas démarré. Lancez Docker Desktop et réessayez."
 ok "Démon Docker actif"
 
@@ -65,7 +56,6 @@ ok "docker-compose.yml présent"
 [[ -f "$SQL_FILE" ]] || fail "Fichier SQL introuvable : $SQL_FILE"
 ok "Fichier SQL présent : upcycleconnect.sql"
 
-# ── 2. Fichier .env ───────────────────────────────────────────────────────────
 step "Configuration de l'environnement"
 
 if [[ ! -f "$ENV_FILE" ]]; then
@@ -77,7 +67,6 @@ else
   ok ".env déjà présent"
 fi
 
-# Lecture des variables .env (ignore les lignes vides / commentaires)
 _env_get() {
   local key="$1" default="${2:-}"
   local val
@@ -93,7 +82,6 @@ APP_PORT=$(_env_get "APP_PORT" "8080")
 
 info "Base : ${DB_DATABASE}  |  Utilisateur : ${DB_USERNAME}  |  Port app : ${APP_PORT}"
 
-# ── 3. Volume MySQL existant ? ─────────────────────────────────────────────────
 step "Vérification des données existantes"
 
 VOLUME_NAME="upcycleconnect_mysql_data"
@@ -111,7 +99,6 @@ if docker volume inspect "$VOLUME_NAME" &>/dev/null 2>&1; then
   case "$CHOICE" in
     1)
       info "Suppression du volume MySQL existant…"
-      # Arrêt propre des conteneurs si actifs
       $COMPOSE -f "$COMPOSE_FILE" down --volumes 2>/dev/null || true
       docker volume rm "$VOLUME_NAME" 2>/dev/null || true
       ok "Volume supprimé — réinitialisation propre"
@@ -130,7 +117,6 @@ else
   SKIP_IMPORT=false
 fi
 
-# ── 4. Build des images ───────────────────────────────────────────────────────
 step "Construction des images Docker"
 
 info "Build en cours… (peut prendre quelques minutes la première fois)"
@@ -138,7 +124,6 @@ $COMPOSE -f "$COMPOSE_FILE" build --parallel 2>&1 | \
   grep -E "^(#[0-9]+ |Step |Successfully|=>|ERROR)" || true
 ok "Images construites"
 
-# ── 5. Démarrage MySQL ────────────────────────────────────────────────────────
 step "Démarrage de MySQL"
 
 $COMPOSE -f "$COMPOSE_FILE" up -d mysql
@@ -157,14 +142,12 @@ done
 echo ""
 ok "MySQL est prêt (${ELAPSED}s)"
 
-# ── 6. Import SQL ─────────────────────────────────────────────────────────────
 if [[ "$SKIP_IMPORT" == false ]]; then
   step "Import de la base de données"
 
   info "Import de upcycleconnect.sql en cours…"
   IMPORT_START=$SECONDS
 
-  # Utilise root pour l'import (droits CREATE/DROP nécessaires)
   if docker exec -i upcycleconnect_mysql \
       mysql -u root -p"${DB_ROOT_PASSWORD}" \
       --default-character-set=utf8mb4 \
@@ -184,26 +167,22 @@ else
   info "Import ignoré (données conservées)"
 fi
 
-# ── 7. Démarrage de tous les services ─────────────────────────────────────────
 step "Démarrage de tous les services"
 
 $COMPOSE -f "$COMPOSE_FILE" up -d
 ok "Tous les services démarrés"
 
-# ── 8. Vérification finale ────────────────────────────────────────────────────
 step "Vérification de l'état des services"
 
 info "Attente de la stabilisation (15s)…"
 sleep 15
 
-# État des conteneurs
 echo ""
 echo -e "  ${BOLD}Conteneurs :${RESET}"
 docker ps --format "  {{if eq .Status \"Up\"}}${GREEN}✔${RESET}{{else}}${RED}✘${RESET}{{end}}  {{.Names}}\t{{.Status}}\t{{.Ports}}" \
   --filter "name=upcycleconnect_" 2>/dev/null || \
   docker ps --filter "name=upcycleconnect_" --format "  {{.Names}}\t{{.Status}}\t{{.Ports}}"
 
-# Health check HTTP
 echo ""
 echo -e "  ${BOLD}Endpoints :${RESET}"
 BACKEND_OK=false
@@ -223,7 +202,6 @@ else
   warn "Frontend → http://localhost:${APP_PORT}/ (pas encore joignable)"
 fi
 
-# ── 9. Résumé ─────────────────────────────────────────────────────────────────
 echo ""
 echo -e "${DIM}  ─────────────────────────────────────────────────${RESET}"
 echo -e "\n${BGREEN}  ✅  UpcycleConnect est prêt !${RESET}\n"

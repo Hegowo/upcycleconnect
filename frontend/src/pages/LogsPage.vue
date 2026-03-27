@@ -1,6 +1,6 @@
 <template>
   <div class="space-y-6">
-    <!-- Header -->
+    
     <div class="flex items-center justify-between">
       <div>
         <h2 class="text-2xl font-bold text-[#001d32]">{{ t('logs.title') }}</h2>
@@ -8,7 +8,7 @@
       </div>
     </div>
 
-    <!-- Activity feed -->
+    
     <div>
       <div>
         <div class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm overflow-hidden">
@@ -22,7 +22,7 @@
             </div>
           </div>
 
-          <!-- Tabs -->
+          
           <div class="flex gap-1 p-3 bg-[#f8fafc] border-b border-[#f1f5f9]">
             <button @click="tab='admin'" :class="tab==='admin' ? 'bg-white shadow text-[#001d32] font-semibold' : 'text-gray-500 hover:text-gray-700'" class="px-4 py-2 rounded-lg text-sm transition">
               {{ t('logs.tabAdmin') }}
@@ -32,7 +32,7 @@
             </button>
           </div>
 
-          <!-- Admin logs table -->
+          
           <div v-if="tab === 'admin'" class="overflow-x-auto">
             <div v-if="adminLoading" class="p-4 space-y-3">
               <div v-for="n in 6" :key="n" class="h-12 bg-gray-50 rounded-lg animate-pulse"></div>
@@ -87,7 +87,7 @@
               </tbody>
             </table>
 
-            <!-- Mobile admin log cards -->
+            
             <div v-if="!adminLoading && adminLogs.length" class="lg:hidden divide-y divide-[#f8fafc]">
               <div
                 v-for="log in adminLogs"
@@ -118,7 +118,7 @@
             </div>
           </div>
 
-          <!-- Platform logs -->
+          
           <div v-if="tab === 'platform'">
             <div v-if="platformLoading" class="p-4 space-y-3">
               <div v-for="n in 5" :key="n" class="h-12 bg-gray-50 rounded-lg animate-pulse"></div>
@@ -153,7 +153,7 @@
       </div>
     </div>
 
-    <!-- Staff governance section -->
+    
     <div class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm overflow-hidden">
       <div class="px-6 py-4 border-b border-[#f1f5f9] flex items-center justify-between">
         <div>
@@ -203,7 +203,7 @@
             </tbody>
           </table>
 
-          <!-- Mobile admin governance cards -->
+          
           <div class="lg:hidden divide-y divide-[#f8fafc]">
             <div v-for="admin in admins" :key="admin.id" class="flex items-center gap-3 px-5 py-4">
               <div class="w-10 h-10 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0" style="background-color:#001d32;">
@@ -227,7 +227,7 @@
       </template>
     </div>
 
-    <!-- Terminal Modal -->
+    
     <Teleport to="body">
       <Transition name="modal">
         <div v-if="selectedLog" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4" @click.self="closeModal">
@@ -299,8 +299,7 @@
   </div>
 </template>
 
-<script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+<script setup>import { ref, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth'
 import api from '@/services/api'

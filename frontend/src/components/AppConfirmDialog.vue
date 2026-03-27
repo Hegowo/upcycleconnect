@@ -29,8 +29,7 @@
   </Teleport>
 </template>
 
-<script setup>
-import { computed } from 'vue'
+<script setup>import { computed } from 'vue'
 
 const props = defineProps({
   show:         { type: Boolean, default: false },

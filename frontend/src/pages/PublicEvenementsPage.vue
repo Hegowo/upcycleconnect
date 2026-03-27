@@ -1,7 +1,7 @@
 <template>
   <div class="bg-[#f7f9ff]">
 
-    <!-- ── Hero ── -->
+    
     <section class="px-4 sm:px-6 pt-10 sm:pt-16 pb-8 sm:pb-12 max-w-[1280px] mx-auto">
       <div class="flex flex-col md:flex-row items-start gap-8 md:gap-16">
         <div class="flex-1 flex flex-col gap-6">
@@ -14,7 +14,7 @@
             autour de l'upcycling et de l'économie circulaire.
           </p>
         </div>
-        <!-- Image décorative (desktop seulement) -->
+        
         <div class="hidden md:block shrink-0 relative w-72 h-72 lg:w-80 lg:h-80">
           <div class="absolute inset-0 bg-[rgba(0,109,53,0.05)] blur-[32px] rounded-full" />
           <div class="relative w-full h-full rounded-[40px] overflow-hidden shadow-2xl rotate-3 bg-gradient-to-br from-[#dbeafe] to-[#bfdbfe] flex items-center justify-center">
@@ -24,11 +24,11 @@
       </div>
     </section>
 
-    <!-- ── Recherche & Filtres ── -->
+    
     <section class="px-6 pb-12 max-w-[1280px] mx-auto">
       <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
 
-        <!-- Barre de recherche -->
+        
         <div class="md:col-span-8 bg-[#edf4ff] rounded-[32px] p-8 flex flex-col gap-4">
           <p class="text-[#001d32] font-jakarta font-bold text-lg">Trouver un événement</p>
           <div class="relative">
@@ -57,7 +57,7 @@
           </div>
         </div>
 
-        <!-- Filtres par type -->
+        
         <div class="md:col-span-4 bg-[#edf4ff] rounded-[32px] p-8 flex flex-col gap-4">
           <p class="text-[#001d32] font-jakarta font-bold text-lg">Type d'événement</p>
           <div class="flex flex-col gap-2">
@@ -78,10 +78,10 @@
       </div>
     </section>
 
-    <!-- ── Grille d'événements ── -->
+    
     <section class="px-6 pb-16 max-w-[1280px] mx-auto">
 
-      <!-- Résultats -->
+      
       <div class="flex items-center justify-between mb-8">
         <p class="text-[#40617f] text-sm">
           <span class="font-bold text-[#001d32]">{{ filteredEvents.length }}</span> événement{{ filteredEvents.length > 1 ? 's' : '' }} trouvé{{ filteredEvents.length > 1 ? 's' : '' }}
@@ -95,7 +95,7 @@
           :key="event.id"
           class="bg-white rounded-[32px] overflow-hidden flex flex-col hover:shadow-xl transition-shadow duration-300"
         >
-          <!-- Image / Couleur -->
+          
           <div class="relative h-56 overflow-hidden flex-shrink-0">
             <div
               class="absolute inset-0 flex items-center justify-center"
@@ -103,7 +103,7 @@
             >
               <component :is="event.icon" class="w-20 h-20 text-white/25" />
             </div>
-            <!-- Badge type -->
+            
             <div class="absolute top-4 left-4">
               <span
                 class="text-xs font-bold uppercase tracking-[0.6px] px-3 py-1 rounded-full"
@@ -112,7 +112,7 @@
                 {{ event.type }}
               </span>
             </div>
-            <!-- Badge disponibilité -->
+            
             <div class="absolute top-4 right-4">
               <span
                 class="text-xs font-bold px-3 py-1 rounded-full"
@@ -125,9 +125,9 @@
             </div>
           </div>
 
-          <!-- Contenu -->
+          
           <div class="p-8 flex flex-col flex-1">
-            <!-- Date -->
+            
             <div class="flex items-center gap-2 text-[#006d35] text-sm font-semibold mb-3">
               <CalendarDaysIcon class="w-4 h-4" />
               {{ event.date }}
@@ -168,7 +168,7 @@
 
       </div>
 
-      <!-- Afficher plus -->
+      
       <div v-if="filteredEvents.length > displayCount" class="flex justify-center mt-12">
         <button
           @click="displayCount += 6"
@@ -179,7 +179,7 @@
         </button>
       </div>
 
-      <!-- Aucun résultat -->
+      
       <div v-if="filteredEvents.length === 0" class="flex flex-col items-center justify-center py-20 text-center">
         <CalendarDaysIcon class="w-16 h-16 text-[#40617f]/30 mb-4" />
         <p class="text-[#001d32] font-bold text-xl mb-2">Aucun événement trouvé</p>
@@ -188,7 +188,7 @@
 
     </section>
 
-    <!-- ── CTA Proposer un événement ── -->
+    
     <section class="px-6 pb-16 max-w-[1280px] mx-auto">
       <div class="rounded-[40px] p-12 flex flex-col md:flex-row items-center justify-between gap-8" style="background: #195687;">
         <div class="flex flex-col gap-4 flex-1">
@@ -213,8 +213,7 @@
   </div>
 </template>
 
-<script setup>
-import { ref, computed } from 'vue'
+<script setup>import { ref, computed } from 'vue'
 import {
   MagnifyingGlassIcon,
   CalendarDaysIcon,

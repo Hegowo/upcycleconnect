@@ -92,8 +92,7 @@
   </div>
 </template>
 
-<script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+<script setup>import { ref, reactive, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { eventService } from '@/services/eventService'

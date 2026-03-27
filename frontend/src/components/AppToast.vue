@@ -15,8 +15,7 @@
   </Teleport>
 </template>
 
-<script setup>
-import { useToast } from '@/utils/useToast'
+<script setup>import { useToast } from '@/utils/useToast'
 
 const { toasts, remove } = useToast()
 

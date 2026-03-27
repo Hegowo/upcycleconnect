@@ -1,16 +1,16 @@
 <template>
   <div class="space-y-6 max-w-3xl">
-    <!-- Header -->
+    
     <div>
       <h2 class="text-2xl font-bold text-[#001d32]">{{ t('settings.title') }}</h2>
       <p class="text-sm text-[#40617f] mt-0.5">{{ t('settings.subtitle') }}</p>
     </div>
 
-    <!-- Global settings card -->
+    
     <div class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm p-6 space-y-6">
       <h3 class="font-semibold text-[#001d32] text-base">{{ t('settings.globalSettings') }}</h3>
 
-      <!-- Toggle 1: Auto validation -->
+      
       <div class="flex items-center justify-between py-3 border-b border-[#f8fafc]">
         <div>
           <p class="text-sm font-medium text-[#001d32]">{{ t('settings.autoValidation') }}</p>
@@ -24,7 +24,7 @@
         </button>
       </div>
 
-      <!-- Languages -->
+      
       <div class="py-3 border-b border-[#f8fafc]">
         <p class="text-sm font-medium text-[#001d32] mb-1">{{ t('settings.langManagement') }}</p>
         <p class="text-xs text-gray-400 mb-3">{{ t('settings.langManagementDesc') }}</p>
@@ -46,7 +46,7 @@
         </div>
       </div>
 
-      <!-- Toggle 2: Email notifications -->
+      
       <div class="flex items-center justify-between py-3 border-b border-[#f8fafc]">
         <div>
           <p class="text-sm font-medium text-[#001d32]">{{ t('settings.emailNotif') }}</p>
@@ -60,7 +60,7 @@
         </button>
       </div>
 
-      <!-- Language selector (functional) -->
+      
       <div class="py-3">
         <p class="text-sm font-medium text-[#001d32] mb-3">{{ t('settings.adminLang') }}</p>
         <div class="flex gap-3">
@@ -81,7 +81,7 @@
         </div>
       </div>
 
-      <!-- Profile info (read-only) -->
+      
       <div class="py-3 border-t border-[#f8fafc]">
         <p class="text-sm font-medium text-[#001d32] mb-3">{{ t('settings.profileInfo') }}</p>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -104,7 +104,7 @@
         </div>
       </div>
 
-      <!-- Action buttons -->
+      
       <div class="flex items-center gap-3 pt-2">
         <button class="px-6 py-2.5 text-sm font-semibold rounded-lg border border-[#e5e7eb] text-[#374151] hover:bg-gray-50 transition">
           {{ t('settings.cancelBtn') }}
@@ -118,8 +118,7 @@
   </div>
 </template>
 
-<script setup>
-import { ref, computed } from 'vue'
+<script setup>import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from '@/utils/useToast'

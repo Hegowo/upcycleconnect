@@ -1,12 +1,12 @@
 <template>
   <div class="space-y-6">
-    <!-- Header -->
+    
     <div>
       <h2 class="text-xl sm:text-2xl font-bold text-[#001d32]">Gestion Catalogue</h2>
       <p class="text-sm text-[#40617f] mt-0.5 hidden sm:block">Prestations & Services — Gérez l'offre de la plateforme</p>
     </div>
 
-    <!-- Mobile filter toggle -->
+    
     <div class="lg:hidden">
       <button @click="showFilters = !showFilters" class="flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg border border-[#e5e7eb] text-[#374151] hover:bg-gray-50 transition">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"/></svg>
@@ -15,10 +15,10 @@
       </button>
     </div>
 
-    <!-- Layout: sidebar filters + grid -->
+    
     <div class="flex flex-col lg:flex-row gap-6 items-start">
 
-      <!-- Sidebar filters -->
+      
       <div :class="['w-full lg:w-64 lg:shrink-0', showFilters ? 'block' : 'hidden lg:block']">
         <div class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm p-5 sticky top-6">
           <div class="flex items-center justify-between mb-4">
@@ -28,7 +28,7 @@
             </button>
           </div>
 
-          <!-- Search -->
+          
           <div class="mb-4">
             <div class="relative">
               <MagnifyingGlassIcon class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -42,7 +42,7 @@
             </div>
           </div>
 
-          <!-- Price type (content type) -->
+          
           <div class="mb-4">
             <p class="text-xs font-semibold text-[#6b7280] uppercase tracking-wider mb-2">Type de Contenu</p>
             <div class="space-y-2">
@@ -59,7 +59,7 @@
             </div>
           </div>
 
-          <!-- Status -->
+          
           <div class="mb-4">
             <p class="text-xs font-semibold text-[#6b7280] uppercase tracking-wider mb-2">Statut</p>
             <div class="space-y-2">
@@ -76,7 +76,7 @@
             </div>
           </div>
 
-          <!-- Category -->
+          
           <div>
             <p class="text-xs font-semibold text-[#6b7280] uppercase tracking-wider mb-2">Catégorie</p>
             <select v-model="filters.category_id" @change="fetchPrestations" class="w-full text-sm border border-[#e5e7eb] rounded-lg px-3 py-2 bg-[#f8fafc] text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#006d35]/30">
@@ -87,14 +87,14 @@
         </div>
       </div>
 
-      <!-- Grid -->
+      
       <div class="flex-1 min-w-0">
-        <!-- Loading -->
+        
         <div v-if="loading" class="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <div v-for="n in 4" :key="n" class="bg-white rounded-2xl border border-[#f1f5f9] h-52 animate-pulse"></div>
         </div>
 
-        <!-- Empty -->
+        
         <div v-else-if="!prestations.length" class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm py-16 text-center">
           <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-3">
             <MagnifyingGlassIcon class="w-6 h-6 text-gray-400" />
@@ -103,7 +103,7 @@
           <p class="text-gray-400 text-sm mt-1">Modifiez vos critères de filtrage</p>
         </div>
 
-        <!-- Cards grid -->
+        
         <div v-else class="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <div
             v-for="p in prestations"
@@ -111,7 +111,7 @@
             class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
           >
             <div class="p-5">
-              <!-- Badges top -->
+              
               <div class="flex items-center gap-2 mb-3 flex-wrap">
                 <span class="text-xs font-semibold px-2 py-0.5 rounded-full" :class="prestationStatusBadge(p.status)">
                   {{ prestationStatusText(p.status) }}
@@ -124,10 +124,10 @@
                 </span>
               </div>
 
-              <!-- Title -->
+              
               <h4 class="text-sm font-bold text-[#001d32] mb-2 line-clamp-2">{{ p.title }}</h4>
 
-              <!-- Details -->
+              
               <div class="space-y-1.5 mb-4">
                 <div class="flex items-center gap-2 text-xs text-gray-500">
                   <UserIcon class="w-3.5 h-3.5 text-gray-400 shrink-0" />
@@ -140,7 +140,7 @@
                 </div>
               </div>
 
-              <!-- Actions -->
+              
               <div class="flex items-center gap-2 pt-3 border-t border-[#f8fafc]">
                 <button
                   v-if="p.status === 'draft'"
@@ -173,14 +173,14 @@
           </div>
         </div>
 
-        <!-- Pagination -->
+        
         <div v-if="prestations.length" class="mt-4 flex justify-end">
           <AppPagination :current-page="meta.current_page" :last-page="meta.last_page" @page-change="fetchPrestations" />
         </div>
       </div>
     </div>
 
-    <!-- Footer stats bar -->
+    
     <div class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm p-4">
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
         <div class="text-center">
@@ -215,7 +215,7 @@
       @cancel="deleteConfirm.show = false"
     />
 
-    <!-- Floating create button -->
+    
     <RouterLink
       to="/admin/prestations/create"
       class="fixed bottom-20 right-4 lg:bottom-8 lg:right-8 w-14 h-14 rounded-full flex items-center justify-center text-white shadow-lg hover:shadow-xl transition-shadow z-40"
@@ -227,8 +227,7 @@
   </div>
 </template>
 
-<script setup>
-import { ref, reactive, onMounted } from 'vue'
+<script setup>import { ref, reactive, onMounted } from 'vue'
 import { prestationService } from '@/services/prestationService'
 import { categoryService } from '@/services/categoryService'
 import { useToast } from '@/utils/useToast'

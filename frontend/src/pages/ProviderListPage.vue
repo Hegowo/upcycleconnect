@@ -1,6 +1,6 @@
 <template>
   <div class="space-y-6">
-    <!-- Header -->
+    
     <div class="flex items-center justify-between gap-3">
       <div class="min-w-0">
         <h2 class="text-xl sm:text-2xl font-bold text-[#001d32] truncate">{{ t('providers.title') }}</h2>
@@ -11,7 +11,7 @@
       </span>
     </div>
 
-    <!-- Filters bar -->
+    
     <div class="bg-white rounded-2xl p-3 sm:p-4 border border-[#f1f5f9] shadow-sm space-y-2 sm:space-y-0 sm:flex sm:flex-wrap sm:gap-3 sm:items-center">
       <div class="relative flex-1 min-w-0">
         <MagnifyingGlassIcon class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -41,18 +41,18 @@
       </div>
     </div>
 
-    <!-- Mobile provider cards (lg:hidden) -->
+    
 <div class="lg:hidden">
-  <!-- Loading -->
+  
   <div v-if="loading" class="space-y-3">
     <div v-for="n in 5" :key="n" class="bg-white rounded-2xl border border-[#f1f5f9] h-28 animate-pulse"></div>
   </div>
-  <!-- Empty -->
+  
   <div v-else-if="!providers.length" class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm py-12 text-center">
     <MagnifyingGlassIcon class="w-8 h-8 text-gray-300 mx-auto mb-2" />
     <p class="text-gray-500 font-medium text-sm">{{ t('providers.noFound') }}</p>
   </div>
-  <!-- Cards -->
+  
   <div v-else class="space-y-3">
     <div
       v-for="p in providers"
@@ -101,14 +101,14 @@
         </div>
       </div>
     </div>
-    <!-- Mobile pagination -->
+    
     <div class="flex justify-center pt-2">
       <AppPagination :current-page="meta.current_page" :last-page="meta.last_page" @page-change="fetchProviders" />
     </div>
   </div>
 </div>
 
-    <!-- Table -->
+    
     <div class="hidden lg:block bg-white rounded-2xl border border-[#f1f5f9] shadow-sm overflow-hidden">
       <div class="px-6 py-4 border-b border-[#f1f5f9] flex items-center justify-between">
         <span class="font-semibold text-sm text-[#001d32]">{{ t('providers.listTitle') }}</span>
@@ -215,7 +215,7 @@
       </div>
     </div>
 
-    <!-- Bottom cards -->
+    
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
       <div class="rounded-2xl p-5 text-white" style="background: linear-gradient(135deg, #006d35, #1b8848);">
         <div class="flex items-center gap-3 mb-3">
@@ -248,8 +248,7 @@
   </div>
 </template>
 
-<script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+<script setup>import { ref, reactive, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { providerService } from '@/services/userService'
 import { useToast } from '@/utils/useToast'

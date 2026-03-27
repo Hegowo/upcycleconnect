@@ -46,8 +46,7 @@
   </AuthLayout>
 </template>
 
-<script setup>
-import { ref, reactive } from 'vue'
+<script setup>import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from 'vue-i18n'

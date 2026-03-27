@@ -37,8 +37,7 @@
   </div>
 </template>
 
-<script setup>
-import { computed } from 'vue'
+<script setup>import { computed } from 'vue'
 
 const props = defineProps({
   currentPage: { type: Number, required: true },

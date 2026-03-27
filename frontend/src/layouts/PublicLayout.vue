@@ -1,16 +1,16 @@
 <template>
   <div class="min-h-screen flex flex-col" :style="{ backgroundColor: route.meta.hideNav ? '#f7f9ff' : '#f8fafc' }">
 
-    <!-- Navbar (masquée sur les pages standalone comme l'inscription) -->
+    
     <header v-if="!route.meta.hideNav" class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-[#e2e8f0]">
       <div class="max-w-[1280px] mx-auto px-6 py-4 flex items-center justify-between">
 
-        <!-- Logo -->
+        
         <RouterLink to="/" class="flex items-center">
           <img src="/logoentier.png" alt="UpcycleConnect" class="h-12 w-auto" />
         </RouterLink>
 
-        <!-- Navigation desktop -->
+        
         <nav class="hidden md:flex items-center gap-8">
           <RouterLink
             v-for="link in navLinks"
@@ -25,7 +25,7 @@
           </RouterLink>
         </nav>
 
-        <!-- Droite : recherche + auth -->
+        
         <div class="flex items-center gap-2">
           <div class="relative hidden lg:block">
             <input
@@ -36,7 +36,7 @@
             <MagnifyingGlassIcon class="w-[18px] h-[18px] absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           </div>
 
-          <!-- Non connecté -->
+          
           <template v-if="!userAuth.isLoggedIn">
             <RouterLink
               to="/connexion"
@@ -53,14 +53,14 @@
             </RouterLink>
           </template>
 
-          <!-- Connecté -->
+          
           <template v-else>
-            <!-- Cloche -->
+            
             <button class="hidden sm:flex w-9 h-9 rounded-full items-center justify-center text-[#40617f] hover:bg-[#edf4ff] transition">
               <BellIcon class="w-5 h-5" />
             </button>
 
-            <!-- Avatar + dropdown -->
+            
             <div class="relative">
               <button
                 @click="profileMenuOpen = !profileMenuOpen"
@@ -76,7 +76,7 @@
                   v-click-outside="closeMenu"
                   class="absolute right-0 top-12 w-56 bg-white rounded-2xl shadow-xl border border-[#e2e8f0] py-2 z-50"
                 >
-                  <!-- User info -->
+                  
                   <div class="px-4 py-3 border-b border-[#f1f5f9]">
                     <p class="text-sm font-semibold text-[#001d32] truncate">{{ userAuth.fullName }}</p>
                     <p class="text-xs text-gray-400 truncate">{{ userAuth.user?.email }}</p>
@@ -107,7 +107,7 @@
             </div>
           </template>
         </div>
-        <!-- Mobile hamburger -->
+        
         <button
           @click="mobileMenuOpen = !mobileMenuOpen"
           class="md:hidden p-2 rounded-lg text-[#40617f] hover:bg-[#edf4ff] transition"
@@ -119,7 +119,7 @@
         </button>
       </div>
 
-      <!-- Mobile nav dropdown -->
+      
       <Transition name="dropdown">
         <div v-if="mobileMenuOpen" class="md:hidden border-t border-[#e2e8f0] bg-white px-6 py-4 space-y-1">
           <RouterLink
@@ -150,12 +150,12 @@
       <RouterView />
     </main>
 
-    <!-- Footer (masqué sur les pages standalone) -->
+    
     <footer v-if="!route.meta.hideNav" class="bg-white border-t border-[#e2e8f0]">
       <div class="max-w-[1280px] mx-auto px-8 pt-16 pb-8">
 
         <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
-          <!-- Colonne 1 : Brand -->
+          
           <div class="space-y-4">
             <RouterLink to="/" class="block">
               <img src="/logoentier.png" alt="UpcycleConnect" class="h-20 w-auto" />
@@ -176,7 +176,7 @@
             </div>
           </div>
 
-          <!-- Colonne 2 : Plateforme -->
+          
           <div class="space-y-4">
             <h4 class="text-[#0f172a] text-xs font-semibold uppercase tracking-[0.7px]">Plateforme</h4>
             <ul class="space-y-3">
@@ -188,7 +188,7 @@
             </ul>
           </div>
 
-          <!-- Colonne 3 : Communauté -->
+          
           <div class="space-y-4">
             <h4 class="text-[#0f172a] text-xs font-semibold uppercase tracking-[0.7px]">Communauté</h4>
             <ul class="space-y-3">
@@ -200,7 +200,7 @@
             </ul>
           </div>
 
-          <!-- Colonne 4 : Légal -->
+          
           <div class="space-y-4">
             <h4 class="text-[#0f172a] text-xs font-semibold uppercase tracking-[0.7px]">Légal</h4>
             <ul class="space-y-3">
@@ -213,7 +213,7 @@
           </div>
         </div>
 
-        <!-- Barre inférieure -->
+        
         <div class="border-t border-[#e2e8f0] pt-8 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p class="text-[#334155] text-base">© {{ new Date().getFullYear() }} UpcycleConnect — Tous droits réservés.</p>
           <p class="text-[#334155] text-sm flex items-center gap-1">
@@ -226,8 +226,7 @@
   </div>
 </template>
 
-<script setup>
-import { ref, onMounted } from 'vue'
+<script setup>import { ref, onMounted } from 'vue'
 import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
 import { MagnifyingGlassIcon, BellIcon, UserCircleIcon } from '@heroicons/vue/24/outline'
 import { useUserAuthStore } from '@/stores/userAuth'
@@ -281,7 +280,6 @@ const footerLegal = [
   { label: 'Contact',                   path: '/' },
 ]
 
-// Click-outside directive
 const vClickOutside = {
   mounted(el, binding) {
     el._clickOutside = (e) => { if (!el.contains(e.target)) binding.value(e) }

@@ -1,6 +1,6 @@
 <template>
   <div class="space-y-6">
-    <!-- Header -->
+    
     <div class="flex items-center justify-between gap-3">
       <div class="min-w-0">
         <h2 class="text-xl sm:text-2xl font-bold text-[#001d32] truncate">{{ t('events.listTitle') }}</h2>
@@ -16,9 +16,9 @@
       </RouterLink>
     </div>
 
-    <!-- Next event + health cards -->
+    
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-      <!-- Next event -->
+      
       <div class="lg:col-span-2 bg-white rounded-2xl p-5 border border-[#f1f5f9] shadow-sm">
         <div class="flex items-center justify-between mb-4">
           <h3 class="font-semibold text-[#001d32]">{{ t('events.nextWorkshop') }}</h3>
@@ -68,7 +68,7 @@
         </div>
       </div>
 
-      <!-- Event health -->
+      
       <div class="bg-white rounded-2xl p-5 border border-[#f1f5f9] shadow-sm">
         <h3 class="font-semibold text-[#001d32] mb-4">{{ t('events.healthTitle') }}</h3>
         <div class="space-y-4">
@@ -97,7 +97,7 @@
       </div>
     </div>
 
-    <!-- Filters -->
+    
     <div class="bg-white rounded-2xl p-4 border border-[#f1f5f9] shadow-sm flex flex-wrap gap-3 items-center">
       <select v-model="filters.status" @change="fetchEvents" class="text-sm border border-[#e5e7eb] rounded-lg px-3 py-2 bg-[#f8fafc] text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#006d35]/30">
         <option value="">{{ t('events.allStatuses') }}</option>
@@ -107,21 +107,21 @@
       </select>
     </div>
 
-    <!-- Mobile event cards (lg:hidden) -->
+    
 <div class="lg:hidden">
-  <!-- Loading -->
+  
   <div v-if="loading" class="space-y-3">
     <div v-for="n in 5" :key="n" class="bg-white rounded-2xl border border-[#f1f5f9] h-28 animate-pulse"></div>
   </div>
-  <!-- Empty -->
+  
   <div v-else-if="!events.length" class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm py-12 text-center">
     <CalendarIcon class="w-8 h-8 text-gray-300 mx-auto mb-2" />
     <p class="text-gray-500 font-medium text-sm">{{ t('events.noFound') }}</p>
   </div>
-  <!-- Cards -->
+  
   <div v-else class="space-y-3">
     <div v-for="e in events" :key="e.id" class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm p-4">
-      <!-- Top row: title + status badge -->
+      
       <div class="flex items-start gap-2 mb-3">
         <div class="flex-1 min-w-0">
           <h4 class="text-sm font-semibold text-[#001d32] leading-tight truncate">{{ e.title }}</h4>
@@ -136,7 +136,7 @@
           {{ eventStatusText(e.status) }}
         </span>
       </div>
-      <!-- Info row -->
+      
       <div class="flex items-center gap-3 text-xs text-gray-500 mb-3">
         <span class="flex items-center gap-1">
           <ClockIcon class="w-3 h-3" />
@@ -147,7 +147,7 @@
           {{ e.max_participants ?? '∞' }} {{ t('events.places') }}
         </span>
       </div>
-      <!-- Actions -->
+      
       <div class="flex items-center gap-2 pt-2 border-t border-[#f8fafc]">
         <button
           v-if="e.status === 'draft'"
@@ -177,14 +177,14 @@
         </button>
       </div>
     </div>
-    <!-- Mobile pagination -->
+    
     <div class="flex justify-center pt-2">
       <AppPagination :current-page="meta.current_page" :last-page="meta.last_page" @page-change="fetchEvents" />
     </div>
   </div>
 </div>
 
-    <!-- Events table -->
+    
     <div class="hidden lg:block bg-white rounded-2xl border border-[#f1f5f9] shadow-sm overflow-hidden">
       <div class="px-6 py-4 border-b border-[#f1f5f9] flex items-center justify-between">
         <span class="font-semibold text-sm text-[#001d32]">{{ t('events.allEvents') }}</span>
@@ -285,8 +285,7 @@
   </div>
 </template>
 
-<script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+<script setup>import { ref, reactive, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth'
 import { eventService } from '@/services/eventService'

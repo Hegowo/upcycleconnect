@@ -2,7 +2,7 @@
   <div class="bg-[#f7f9ff] min-h-screen py-10">
     <div class="max-w-2xl mx-auto px-6 space-y-6">
 
-      <!-- Header -->
+      
       <div class="flex items-center gap-4">
         <button @click="router.push('/profil')" class="p-2 rounded-xl hover:bg-white transition">
           <ArrowLeftIcon class="w-5 h-5 text-[#40617f]" />
@@ -13,7 +13,7 @@
         </div>
       </div>
 
-      <!-- Avatar -->
+      
       <div class="bg-white rounded-2xl p-6 flex items-center gap-6">
         <div class="relative cursor-pointer group" @click="$refs.avatarInput.click()">
           <div class="w-24 h-24 rounded-2xl overflow-hidden bg-gradient-to-br from-[#006d35] to-[#1b8848] flex items-center justify-center shadow-sm">
@@ -46,7 +46,7 @@
         </div>
       </div>
 
-      <!-- Informations personnelles -->
+      
       <div class="bg-white rounded-2xl p-6 space-y-4">
         <h2 class="font-semibold text-[#001d32]">Informations personnelles</h2>
         <div class="grid grid-cols-2 gap-4">
@@ -74,7 +74,7 @@
         </div>
       </div>
 
-      <!-- Mot de passe -->
+      
       <div class="bg-white rounded-2xl p-6 space-y-4">
         <h2 class="font-semibold text-[#001d32]">Changer le mot de passe</h2>
         <div class="space-y-3">
@@ -102,12 +102,12 @@
         </div>
       </div>
 
-      <!-- Changement d'email -->
+      
       <div class="bg-white rounded-2xl p-6 space-y-4">
         <h2 class="font-semibold text-[#001d32]">Changer l'adresse email</h2>
         <p class="text-sm text-[#40617f]">Email actuel : <span class="font-medium text-[#001d32]">{{ userAuth.user?.email }}</span></p>
 
-        <!-- Step 0 : bouton démarrer -->
+        
         <div v-if="emailStep === 0">
           <button @click="emailStart" :disabled="emailLoading" class="px-5 py-2 text-sm font-semibold rounded-lg border-2 border-[#006d35] text-[#006d35] hover:bg-[#f0fdf4] transition disabled:opacity-60">
             {{ emailLoading ? 'Envoi…' : 'Changer mon email' }}
@@ -115,7 +115,7 @@
           <span v-if="emailError" class="block text-xs text-red-500 mt-2">{{ emailError }}</span>
         </div>
 
-        <!-- Step 1 : code envoyé à l'adresse actuelle -->
+        
         <div v-else-if="emailStep === 1" class="space-y-3">
           <div class="flex items-start gap-3 p-3 bg-blue-50 rounded-xl text-sm text-[#40617f]">
             <EnvelopeIcon class="w-4 h-4 mt-0.5 shrink-0 text-[#006d35]" />
@@ -140,7 +140,7 @@
           </div>
         </div>
 
-        <!-- Step 2 : code envoyé à la nouvelle adresse -->
+        
         <div v-else-if="emailStep === 2" class="space-y-3">
           <div class="flex items-start gap-3 p-3 bg-blue-50 rounded-xl text-sm text-[#40617f]">
             <EnvelopeIcon class="w-4 h-4 mt-0.5 shrink-0 text-[#006d35]" />
@@ -160,7 +160,7 @@
           </div>
         </div>
 
-        <!-- Step 3 : succès -->
+        
         <div v-else-if="emailStep === 3" class="flex items-center gap-2 text-[#006d35] text-sm font-medium">
           <CheckCircleIcon class="w-5 h-5" />
           Email modifié avec succès. Vous utilisez maintenant <strong>{{ emailNew }}</strong>.
@@ -171,8 +171,7 @@
   </div>
 </template>
 
-<script setup>
-import { ref, onMounted } from 'vue'
+<script setup>import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserAuthStore } from '@/stores/userAuth'
 import {
@@ -197,7 +196,6 @@ onMounted(() => {
   avatarPreview.value       = userAuth.user?.avatar_url || null
 })
 
-// ── Avatar ────────────────────────────────────────────────────────────────────
 const avatarPreview = ref(null)
 const avatarFile    = ref(null)
 const avatarLoading = ref(false)
@@ -236,7 +234,6 @@ async function uploadAvatar() {
     if (!res.ok) throw new Error(json.message || 'Erreur')
     avatarSuccess.value = true
     avatarFile.value    = null
-    // Mettre à jour le store
     if (userAuth.user) userAuth.user.avatar_url = json.avatar_url
     await userAuth.fetchMe()
   } catch (err) {
@@ -246,7 +243,6 @@ async function uploadAvatar() {
   }
 }
 
-// ── Informations ──────────────────────────────────────────────────────────────
 const infoForm    = ref({ first_name: '', last_name: '', phone: '' })
 const infoLoading = ref(false)
 const infoSuccess = ref(false)
@@ -281,7 +277,6 @@ async function saveInfo() {
   }
 }
 
-// ── Mot de passe ──────────────────────────────────────────────────────────────
 const pwForm    = ref({ current: '', new: '', confirm: '' })
 const pwLoading = ref(false)
 const pwSuccess = ref(false)
@@ -319,7 +314,6 @@ async function changePassword() {
   }
 }
 
-// ── Email ─────────────────────────────────────────────────────────────────────
 const emailStep    = ref(0)
 const emailLoading = ref(false)
 const emailError   = ref('')
@@ -391,7 +385,6 @@ async function emailVerifyNew() {
     const json = await res.json()
     if (!res.ok) throw new Error(json.message || 'Erreur')
     emailStep.value = 3
-    // Mettre à jour le store
     if (userAuth.user) userAuth.user.email = json.email
     localStorage.setItem('user_data', JSON.stringify(userAuth.user))
   } catch (err) {

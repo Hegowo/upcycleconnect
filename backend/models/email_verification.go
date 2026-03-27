@@ -6,7 +6,7 @@ type EmailVerification struct {
 	ID        uint       `gorm:"primaryKey" json:"id"`
 	UserID    uint       `gorm:"index;not null" json:"user_id"`
 	Token     string     `gorm:"uniqueIndex;size:64;not null" json:"token"`
-	Type      string     `gorm:"size:20;not null" json:"type"` // "register" | "login"
+	Type      string     `gorm:"size:20;not null" json:"type"`
 	IPAddress *string    `gorm:"size:45" json:"ip_address"`
 	UsedAt    *time.Time `json:"used_at"`
 	ExpiresAt time.Time  `json:"expires_at"`

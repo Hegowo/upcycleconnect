@@ -1,7 +1,7 @@
 <template>
   <div class="bg-[#f7f9ff]">
 
-    <!-- ── Hero ── -->
+    
     <section class="px-4 sm:px-6 pt-10 sm:pt-16 pb-8 sm:pb-12 max-w-[1280px] mx-auto">
       <div class="flex flex-col md:flex-row items-start gap-8 md:gap-16">
         <div class="flex-1 flex flex-col gap-6">
@@ -14,7 +14,7 @@
             Donnez une seconde vie à votre intérieur tout en préservant la planète.
           </p>
         </div>
-        <!-- Image décorative (desktop seulement) -->
+        
         <div class="hidden md:block shrink-0 relative w-72 h-72 lg:w-80 lg:h-80">
           <div class="absolute inset-0 bg-[rgba(0,109,53,0.05)] blur-[32px] rounded-full" />
           <div class="relative w-full h-full rounded-[40px] overflow-hidden shadow-2xl rotate-3 bg-gradient-to-br from-[#d1fae5] to-[#bbf7d0] flex items-center justify-center">
@@ -24,11 +24,11 @@
       </div>
     </section>
 
-    <!-- ── Recherche & Filtres ── -->
+    
     <section class="px-4 sm:px-6 pb-8 sm:pb-12 max-w-[1280px] mx-auto">
       <div class="bg-[#edf4ff] rounded-[32px] p-6 sm:p-12 flex flex-col gap-6 sm:gap-8">
 
-        <!-- Barre de recherche -->
+        
         <div class="flex gap-4">
           <div class="flex-1 relative">
             <input
@@ -48,7 +48,7 @@
           </button>
         </div>
 
-        <!-- Filtres par catégorie -->
+        
         <div class="flex flex-wrap gap-3">
           <button
             v-for="cat in categories"
@@ -66,7 +66,7 @@
       </div>
     </section>
 
-    <!-- ── Grille de prestations ── -->
+    
     <section class="px-4 sm:px-6 pb-12 sm:pb-16 max-w-[1280px] mx-auto">
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 
@@ -75,12 +75,12 @@
           :key="prestation.id"
           class="bg-white rounded-[32px] overflow-hidden flex flex-col hover:shadow-xl transition-shadow duration-300"
         >
-          <!-- Image -->
+          
           <div class="relative h-64 overflow-hidden flex-shrink-0">
             <div class="absolute inset-0 flex items-center justify-center" :style="`background: linear-gradient(135deg, ${prestation.colorFrom}, ${prestation.colorTo});`">
               <component :is="prestation.icon" class="w-24 h-24 text-white/30" />
             </div>
-            <!-- Badge score éco -->
+            
             <div class="absolute top-4 left-4">
               <div class="flex items-center gap-1.5 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-[#006d35]">
                 <span>🌿</span> Score {{ prestation.score }}
@@ -88,7 +88,7 @@
             </div>
           </div>
 
-          <!-- Contenu -->
+          
           <div class="p-8 flex flex-col flex-1">
             <h3 class="font-jakarta font-extrabold text-[#001d32] text-2xl leading-[30px] mb-4">
               {{ prestation.title }}
@@ -109,7 +109,7 @@
           </div>
         </article>
 
-        <!-- Carte "Sur-mesure" -->
+        
         <article class="rounded-[32px] overflow-hidden flex flex-col p-8 justify-between" style="background: #1b8848;">
           <div class="flex flex-col gap-4">
             <span class="self-start text-xs font-bold uppercase tracking-[0.6px] text-white bg-white/20 backdrop-blur-sm px-4 py-1.5 rounded-full">
@@ -132,7 +132,7 @@
       </div>
     </section>
 
-    <!-- ── Newsletter / Saviez-vous ── -->
+    
     <section class="bg-[#edf4ff] px-4 sm:px-8 py-12 sm:py-20">
       <div class="max-w-[896px] mx-auto flex flex-col items-center gap-8 text-center px-6">
         <span class="flex items-center gap-2 bg-[rgba(0,109,53,0.1)] text-[#006d35] font-bold text-sm px-4 py-2 rounded-full">
@@ -164,8 +164,7 @@
   </div>
 </template>
 
-<script setup>
-import { ref, computed } from 'vue'
+<script setup>import { ref, computed } from 'vue'
 import {
   MagnifyingGlassIcon,
   AdjustmentsHorizontalIcon,

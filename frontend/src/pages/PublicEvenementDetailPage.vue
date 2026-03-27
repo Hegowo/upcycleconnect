@@ -2,7 +2,7 @@
   <div class="bg-[#f7f9ff] pb-16">
     <div class="max-w-[1280px] mx-auto px-6 py-10">
 
-      <!-- Breadcrumb -->
+      
       <div class="flex items-center gap-2 text-sm text-[#40617f] mb-8">
         <RouterLink to="/evenements" class="hover:text-[#006d35] transition">Événements</RouterLink>
         <ChevronRightIcon class="w-3.5 h-3.5" />
@@ -11,13 +11,13 @@
 
       <div class="grid grid-cols-12 gap-8">
 
-        <!-- ── Left column ── -->
+        
         <div class="col-span-8 flex flex-col gap-8">
 
-          <!-- Hero image -->
+          
           <div class="relative h-[500px] rounded-[32px] overflow-hidden bg-gradient-to-br from-[#dbeafe] to-[#60a5fa]/40 flex items-center justify-center shadow-sm">
             <ScissorsIcon class="w-48 h-48 text-[#1d4ed8]/20" />
-            <!-- Badges overlay -->
+            
             <div class="absolute top-6 left-6 flex gap-2">
               <span class="bg-white/90 backdrop-blur-sm text-[#006d35] font-bold text-sm px-4 py-2 rounded-full shadow-sm">
                 Atelier Créatif
@@ -28,7 +28,7 @@
             </div>
           </div>
 
-          <!-- Title & meta -->
+          
           <div class="flex flex-col gap-4">
             <h1 class="font-jakarta font-extrabold text-[#001d32] text-[60px] leading-[1] tracking-tight">
               Upcycling Textile : Denim Créatif
@@ -49,7 +49,7 @@
             </div>
           </div>
 
-          <!-- Description -->
+          
           <div class="bg-white rounded-[32px] p-10 shadow-sm flex flex-col gap-6">
             <h2 class="font-jakarta font-bold text-[#001d32] text-2xl">À propos de cet atelier</h2>
             <p class="text-[#40617f] text-lg leading-relaxed">
@@ -60,7 +60,7 @@
             </p>
           </div>
 
-          <!-- Expert card -->
+          
           <div class="bg-[#edf4ff] rounded-[32px] p-8 flex gap-6">
             <div class="w-24 h-24 rounded-2xl overflow-hidden bg-gradient-to-br from-[#d1fae5] to-[#a7f3d0] flex items-center justify-center shrink-0 shadow-md">
               <UserCircleIcon class="w-16 h-16 text-[#006d35]/40" />
@@ -76,12 +76,12 @@
 
         </div>
 
-        <!-- ── Sticky sidebar ── -->
+        
         <div class="col-span-4 flex flex-col gap-6">
 
-          <!-- Booking card -->
+          
           <div class="bg-white border border-[#d8eaff] rounded-[40px] p-8 shadow-[0_12px_40px_0_rgba(0,29,50,0.06)] relative overflow-hidden">
-            <!-- Decorative corner -->
+            
             <div class="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-[rgba(0,109,53,0.05)]" />
 
             <div class="flex items-baseline justify-between mb-3">
@@ -117,7 +117,7 @@
             </button>
           </div>
 
-          <!-- Upcycling score -->
+          
           <div class="bg-[rgba(216,234,255,0.5)] border border-white rounded-[32px] p-6">
             <div class="flex items-center justify-between mb-4">
               <h3 class="font-jakarta font-bold text-[#001d32] text-base">Upcycling Score</h3>
@@ -129,7 +129,7 @@
             <p class="text-[#40617f] text-xs font-bold uppercase tracking-wide">Impact Environnemental : Très Élevé</p>
           </div>
 
-          <!-- Location card -->
+          
           <div class="bg-white border border-[#d8eaff] rounded-[32px] p-6 flex items-center justify-between">
             <div>
               <p class="font-jakarta font-bold text-[#001d32] text-sm">Lieu</p>
@@ -147,8 +147,7 @@
   </div>
 </template>
 
-<script setup>
-import { RouterLink } from 'vue-router'
+<script setup>import { RouterLink } from 'vue-router'
 import {
   ChevronRightIcon,
   CalendarDaysIcon,

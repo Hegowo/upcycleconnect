@@ -2,7 +2,7 @@
   <div class="bg-[#f7f9ff] min-h-screen">
     <div class="max-w-[1280px] mx-auto px-6 py-8 flex gap-8 items-start">
 
-      <!-- ── Sidebar ── -->
+      
       <aside class="bg-[#edf4ff] rounded-[24px] p-4 w-[256px] shrink-0 flex flex-col gap-2 sticky top-24">
         <div class="px-2 pb-6">
           <p class="font-jakarta font-bold text-[#001d32] text-lg">Navigation</p>
@@ -34,10 +34,10 @@
         </div>
       </aside>
 
-      <!-- ── Main Content ── -->
+      
       <div class="flex-1 min-w-0 flex flex-col gap-10">
 
-        <!-- Hero -->
+        
         <section
           class="relative h-64 rounded-[24px] overflow-hidden"
           style="background: #b9dbfe;"
@@ -50,12 +50,12 @@
               Partagez, apprenez et inspirez la transition écologique à travers l'upcycling créatif.
             </p>
           </div>
-          <!-- Decorative circles -->
+          
           <div class="absolute right-12 top-8 w-40 h-40 rounded-full bg-[rgba(185,219,254,0.5)] blur-2xl" />
           <div class="absolute right-32 bottom-4 w-24 h-24 rounded-full bg-[rgba(0,109,53,0.1)] blur-xl" />
         </section>
 
-        <!-- Projets Partagés -->
+        
         <section>
           <div class="flex items-end justify-between mb-6">
             <div>
@@ -66,7 +66,7 @@
           </div>
 
           <div class="grid grid-cols-12 gap-6">
-            <!-- Featured project card -->
+            
             <div class="col-span-8 bg-white rounded-[24px] shadow-sm p-6 flex gap-6">
               <div class="w-[280px] h-[280px] rounded-xl overflow-hidden shrink-0 bg-gradient-to-br from-[#d1fae5] to-[#a7f3d0] flex items-center justify-center">
                 <HomeModernIcon class="w-24 h-24 text-[#006d35]/30" />
@@ -93,7 +93,7 @@
               </div>
             </div>
 
-            <!-- Small project card -->
+            
             <div class="col-span-4 bg-white rounded-[24px] shadow-sm p-6 flex flex-col justify-between">
               <div class="w-full h-36 rounded-xl overflow-hidden bg-gradient-to-br from-[#d1fae5] to-[#bbf7d0] flex items-center justify-center mb-4">
                 <SparklesIcon class="w-16 h-16 text-[#006d35]/30" />
@@ -116,7 +116,7 @@
           </div>
         </section>
 
-        <!-- Forum Discussions -->
+        
         <section class="bg-[#edf4ff] rounded-[24px] p-8">
           <div class="flex items-center justify-between mb-8">
             <div>
@@ -164,7 +164,7 @@
           </div>
         </section>
 
-        <!-- Conseils & Actualités -->
+        
         <section>
           <div class="flex items-center gap-4 mb-8">
             <h2 class="font-jakarta font-bold text-[#001d32] text-2xl shrink-0">Conseils & Actualités</h2>
@@ -199,8 +199,7 @@
   </div>
 </template>
 
-<script setup>
-import {
+<script setup>import {
   ChatBubbleLeftEllipsisIcon,
   FolderOpenIcon,
   NewspaperIcon,

@@ -2,7 +2,7 @@
   <div class="bg-[#f7f9ff] pb-0">
     <div class="max-w-[1280px] mx-auto px-4 sm:px-8 pt-8 sm:pt-12 pb-12 sm:pb-16">
 
-      <!-- Hero -->
+      
       <div class="mb-12">
         <h1 class="font-jakarta font-extrabold text-[#001d32] text-3xl sm:text-5xl tracking-tight">Déposer un objet</h1>
         <p class="text-[#40617f] text-lg mt-4 max-w-2xl leading-relaxed">
@@ -10,10 +10,10 @@
         </p>
       </div>
 
-      <!-- Bento Grid Form -->
+      
       <div class="grid grid-cols-12 gap-4 sm:gap-6">
 
-        <!-- Photos upload -->
+        
         <div class="col-span-12 lg:col-span-8 bg-white rounded-[24px] p-6 sm:p-8 shadow-[0_12px_40px_0_rgba(0,29,50,0.06)] flex flex-col gap-6">
           <div class="flex items-center justify-between">
             <h2 class="font-jakarta font-bold text-[#001d32] text-xl">Photos de l'objet</h2>
@@ -43,7 +43,7 @@
           </p>
         </div>
 
-        <!-- Description -->
+        
         <div class="col-span-12 lg:col-span-4 bg-white rounded-[24px] p-6 sm:p-8 shadow-[0_12px_40px_0_rgba(0,29,50,0.06)] flex flex-col gap-6">
           <h2 class="font-jakarta font-bold text-[#001d32] text-xl">Description</h2>
 
@@ -70,7 +70,7 @@
           </div>
         </div>
 
-        <!-- Classification -->
+        
         <div class="col-span-12 lg:col-span-5 bg-white rounded-[24px] p-6 sm:p-8 shadow-[0_12px_40px_0_rgba(0,29,50,0.06)] flex flex-col gap-6">
           <h2 class="font-jakarta font-bold text-[#001d32] text-xl">Classification</h2>
 
@@ -92,7 +92,7 @@
           </div>
         </div>
 
-        <!-- Condition + Submit -->
+        
         <div class="col-span-12 lg:col-span-7 bg-white rounded-[24px] p-6 sm:p-8 shadow-[0_12px_40px_0_rgba(0,29,50,0.06)] flex flex-col gap-6">
           <h2 class="font-jakarta font-bold text-[#001d32] text-xl">État de l'objet</h2>
 
@@ -128,7 +128,7 @@
           </div>
         </div>
 
-        <!-- How it works (full width) -->
+        
         <div class="col-span-12 rounded-[24px] overflow-hidden relative min-h-[160px] sm:h-48">
           <div class="absolute inset-0 bg-gradient-to-br from-[#d1fae5] to-[#a7f3d0] opacity-50" />
           <div class="absolute inset-0 bg-gradient-to-r from-[#f7f9ff] to-transparent" />
@@ -146,8 +146,7 @@
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue'
+<script setup>import { ref } from 'vue'
 import {
   PhotoIcon,
   CheckCircleIcon,
@@ -173,7 +172,6 @@ const conditions = ['Neuf', 'Très bon état', 'Bon état', 'Usé', 'Cassé/Pour
 const footerLinks = ['Privacy Policy', 'Terms of Service', 'Sustainability Report', 'Contact']
 
 const triggerUpload = (id) => {
-  // Demo: toggle file state
   const slot = photoSlots.value.find(s => s.id === id)
   if (slot) slot.file = slot.file ? null : 'placeholder'
 }

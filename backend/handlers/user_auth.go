@@ -25,8 +25,6 @@ type UserAuthHandler struct {
 	Mailer *services.Mailer
 }
 
-// ─── Register ────────────────────────────────────────────────────────────────
-
 func (h *UserAuthHandler) Register(c *gin.Context) {
 	var req struct {
 		FirstName   string  `json:"first_name" binding:"required"`
@@ -58,7 +56,6 @@ func (h *UserAuthHandler) Register(c *gin.Context) {
 		return
 	}
 
-	// Compte créé en statut "pending" jusqu'à la vérification email
 	user := models.User{
 		FirstName: req.FirstName,
 		LastName:  req.LastName,
@@ -92,7 +89,6 @@ func (h *UserAuthHandler) Register(c *gin.Context) {
 		h.DB.Create(&profile)
 	}
 
-	// Générer + stocker le token de vérification
 	token := newToken()
 	expires := time.Now().Add(24 * time.Hour)
 	ev := models.EmailVerification{
@@ -103,7 +99,6 @@ func (h *UserAuthHandler) Register(c *gin.Context) {
 	}
 	h.DB.Create(&ev)
 
-	// Envoyer l'email (erreur non-bloquante)
 	if err := h.Mailer.SendRegisterVerification(user.Email, user.FirstName, token); err != nil {
 		log.Printf("[mailer] register verification to %s: %v", user.Email, err)
 	}
@@ -112,8 +107,6 @@ func (h *UserAuthHandler) Register(c *gin.Context) {
 		"message": "Compte créé. Vérifiez votre email pour activer votre compte.",
 	})
 }
-
-// ─── Login ────────────────────────────────────────────────────────────────────
 
 func (h *UserAuthHandler) Login(c *gin.Context) {
 	var req struct {
@@ -148,12 +141,10 @@ func (h *UserAuthHandler) Login(c *gin.Context) {
 
 	clientIP := c.ClientIP()
 
-	// Vérifier si l'IP est connue
 	var knownIP models.UserKnownIP
 	isKnown := h.DB.Where("user_id = ? AND ip_address = ?", user.ID, clientIP).First(&knownIP).Error == nil
 
 	if isKnown {
-		// Connexion normale
 		tokenStr, err := h.issueJWT(user.ID)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"message": "Erreur lors de la création du token."})
@@ -166,7 +157,6 @@ func (h *UserAuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	// IP inconnue — envoyer un email de vérification
 	token := newToken()
 	expires := time.Now().Add(15 * time.Minute)
 	ip := clientIP
@@ -190,8 +180,6 @@ func (h *UserAuthHandler) Login(c *gin.Context) {
 	})
 }
 
-// ─── VerifyEmail ──────────────────────────────────────────────────────────────
-
 func (h *UserAuthHandler) VerifyEmail(c *gin.Context) {
 	token := c.Query("token")
 	if token == "" {
@@ -213,17 +201,14 @@ func (h *UserAuthHandler) VerifyEmail(c *gin.Context) {
 		return
 	}
 
-	// Activer l'utilisateur
 	now := time.Now()
 	h.DB.Model(&models.User{}).Where("id = ?", ev.UserID).Updates(map[string]interface{}{
 		"status":            "active",
 		"email_verified_at": now,
 	})
 
-	// Marquer le token comme utilisé
 	h.DB.Model(&ev).Update("used_at", now)
 
-	// Enregistrer l'IP de vérification comme connue
 	clientIP := c.ClientIP()
 	h.DB.Exec(
 		"INSERT IGNORE INTO user_known_ips (user_id, ip_address, created_at) VALUES (?, ?, ?)",
@@ -232,8 +217,6 @@ func (h *UserAuthHandler) VerifyEmail(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Email vérifié. Votre compte est activé."})
 }
-
-// ─── VerifyLogin ──────────────────────────────────────────────────────────────
 
 func (h *UserAuthHandler) VerifyLogin(c *gin.Context) {
 	token := c.Query("token")
@@ -264,21 +247,18 @@ func (h *UserAuthHandler) VerifyLogin(c *gin.Context) {
 
 	now := time.Now()
 
-	// Marquer l'IP comme connue
 	if ev.IPAddress != nil {
 		h.DB.Exec(
 			"INSERT IGNORE INTO user_known_ips (user_id, ip_address, created_at) VALUES (?, ?, ?)",
 			ev.UserID, *ev.IPAddress, now,
 		)
 	}
-	// Aussi enregistrer l'IP courante (si différente, ex: proxy)
 	clientIP := c.ClientIP()
 	h.DB.Exec(
 		"INSERT IGNORE INTO user_known_ips (user_id, ip_address, created_at) VALUES (?, ?, ?)",
 		ev.UserID, clientIP, now,
 	)
 
-	// Marquer le token comme utilisé
 	h.DB.Model(&ev).Update("used_at", now)
 
 	tokenStr, err := h.issueJWT(user.ID)
@@ -293,8 +273,6 @@ func (h *UserAuthHandler) VerifyLogin(c *gin.Context) {
 	})
 }
 
-// ─── Me / Logout ──────────────────────────────────────────────────────────────
-
 func (h *UserAuthHandler) Me(c *gin.Context) {
 	user := middleware.GetAuthUser(c)
 	if user == nil {
@@ -307,8 +285,6 @@ func (h *UserAuthHandler) Me(c *gin.Context) {
 func (h *UserAuthHandler) Logout(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Déconnexion réussie."})
 }
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 func (h *UserAuthHandler) issueJWT(userID uint) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{

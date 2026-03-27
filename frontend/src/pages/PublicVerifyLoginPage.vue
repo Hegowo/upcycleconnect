@@ -2,13 +2,13 @@
   <div class="min-h-[70vh] flex items-center justify-center py-16 px-4">
     <div class="w-full max-w-md text-center">
 
-      <!-- Loading -->
+      
       <div v-if="state === 'loading'" class="space-y-4">
         <div class="w-14 h-14 border-4 border-[#006d35] border-t-transparent rounded-full animate-spin mx-auto"></div>
         <p class="text-[#40617f] text-sm">Vérification en cours...</p>
       </div>
 
-      <!-- Success -->
+      
       <div v-else-if="state === 'success'" class="space-y-6">
         <div class="w-20 h-20 rounded-full flex items-center justify-center mx-auto" style="background:#dcfce7;">
           <ShieldCheckIcon class="w-10 h-10 text-[#006d35]" />
@@ -20,7 +20,7 @@
         <p class="text-xs text-gray-400">Redirection en cours...</p>
       </div>
 
-      <!-- Expired -->
+      
       <div v-else-if="state === 'expired'" class="space-y-6">
         <div class="w-20 h-20 rounded-full flex items-center justify-center mx-auto" style="background:#fef9c3;">
           <ClockIcon class="w-10 h-10" style="color:#854d0e;" />
@@ -34,7 +34,7 @@
         </RouterLink>
       </div>
 
-      <!-- Error -->
+      
       <div v-else class="space-y-6">
         <div class="w-20 h-20 rounded-full flex items-center justify-center mx-auto" style="background:#fee2e2;">
           <XCircleIcon class="w-10 h-10 text-red-500" />
@@ -52,8 +52,7 @@
   </div>
 </template>
 
-<script setup>
-import { ref, onMounted } from 'vue'
+<script setup>import { ref, onMounted } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { ShieldCheckIcon, ClockIcon, XCircleIcon } from '@heroicons/vue/24/outline'
 import { useUserAuthStore } from '@/stores/userAuth'
@@ -76,13 +75,11 @@ onMounted(async () => {
     const json = await res.json().catch(() => ({}))
 
     if (res.ok) {
-      // Stocker le JWT et les infos utilisateur
       userAuth.token = json.token
       userAuth.user  = json.user
       localStorage.setItem('user_token', json.token)
       localStorage.setItem('user_data', JSON.stringify(json.user))
       state.value = 'success'
-      // Redirection après 1.5s
       setTimeout(() => router.push('/'), 1500)
     } else if (res.status === 410) {
       state.value = 'expired'

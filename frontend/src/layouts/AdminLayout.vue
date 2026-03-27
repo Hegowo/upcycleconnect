@@ -14,8 +14,7 @@
   </div>
 </template>
 
-<script setup>
-import { useRoute } from 'vue-router'
+<script setup>import { useRoute } from 'vue-router'
 import TheSidebar from '@/components/Sidebar.vue'
 import TheHeader from '@/components/Header.vue'
 import AdminBottomNav from '@/components/AdminBottomNav.vue'

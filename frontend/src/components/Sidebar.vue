@@ -1,12 +1,12 @@
 <template>
   <aside class="hidden lg:flex w-64 bg-white border-r border-[#e5e7eb] flex-col shrink-0 h-screen">
-    <!-- Logo -->
+    
     <div class="flex items-center gap-3 px-4 py-4 border-b border-[#e5e7eb]">
       <img src="/logoentier.png" alt="UpcycleConnect" class="h-9 w-auto object-contain" />
       <p class="text-[10px] font-semibold tracking-widest uppercase text-gray-400 whitespace-nowrap">Admin Terminal</p>
     </div>
 
-    <!-- Navigation -->
+    
     <nav class="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
       <RouterLink
         v-for="item in navItems"
@@ -57,7 +57,7 @@
       </template>
     </nav>
 
-    <!-- New report button -->
+    
     <div class="px-3 pb-3">
       <button class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-white text-sm font-semibold transition hover:opacity-90" style="background-color:#006d35;">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -67,7 +67,7 @@
       </button>
     </div>
 
-    <!-- User footer -->
+    
     <div class="px-4 py-4 border-t border-[#e5e7eb]">
       <div class="flex items-center gap-3">
         <div class="w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0" style="background-color:#001d32;">
@@ -82,8 +82,7 @@
   </aside>
 </template>
 
-<script setup>
-import { computed } from 'vue'
+<script setup>import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth'
 import {

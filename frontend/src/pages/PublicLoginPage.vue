@@ -2,7 +2,7 @@
   <div class="min-h-[70vh] flex items-center justify-center py-16 px-4">
     <div class="w-full max-w-md">
 
-      <!-- Header -->
+      
       <div class="text-center mb-8">
         <RouterLink to="/" class="inline-block mb-6">
           <img src="/logoentier.png" class="h-12 mx-auto" alt="UpcycleConnect" />
@@ -11,7 +11,7 @@
         <p class="text-[#40617f] text-sm mt-2">Connectez-vous à votre espace personnel</p>
       </div>
 
-      <!-- Form card -->
+      
       <div class="bg-white rounded-[24px] shadow-[0px_12px_40px_0px_rgba(0,29,50,0.06)] border border-[#edf4ff] p-8 space-y-5">
 
         <div>
@@ -45,7 +45,7 @@
           </div>
         </div>
 
-        <!-- Email vérifié (après activation) -->
+        
         <Transition name="fade">
           <p v-if="verified" class="text-[#006d35] text-sm bg-[#f0fdf4] p-3 rounded-xl border border-[#bbf7d0] flex items-start gap-2">
             <CheckCircleIcon class="w-4 h-4 shrink-0 mt-0.5" />
@@ -53,7 +53,7 @@
           </p>
         </Transition>
 
-        <!-- Vérification en cours (nouvel IP) -->
+        
         <Transition name="fade">
           <div v-if="pendingVerification" class="text-[#854d0e] text-sm bg-[#fef9c3] p-4 rounded-xl border border-[#fde047] space-y-1">
             <p class="font-semibold flex items-center gap-2">
@@ -65,7 +65,7 @@
           </div>
         </Transition>
 
-        <!-- Error -->
+        
         <Transition name="fade">
           <p v-if="error" class="text-red-600 text-sm bg-red-50 p-3 rounded-xl border border-red-200 flex items-start gap-2">
             <ExclamationTriangleIcon class="w-4 h-4 shrink-0 mt-0.5" />
@@ -84,7 +84,7 @@
           {{ loading ? 'Connexion...' : 'Se connecter' }}
         </button>
 
-        <!-- Divider -->
+        
         <div class="flex items-center gap-3">
           <div class="flex-1 h-px bg-[#e2e8f0]"></div>
           <span class="text-xs text-gray-400">ou</span>
@@ -109,8 +109,7 @@
   </div>
 </template>
 
-<script setup>
-import { ref, computed } from 'vue'
+<script setup>import { ref, computed } from 'vue'
 import { RouterLink, useRouter, useRoute } from 'vue-router'
 import { EyeIcon, EyeSlashIcon, ExclamationTriangleIcon, ArrowRightCircleIcon, CheckCircleIcon, ShieldCheckIcon } from '@heroicons/vue/24/outline'
 import { useUserAuthStore } from '@/stores/userAuth'
@@ -137,7 +136,6 @@ async function handleLogin() {
     router.push(redirect ? String(redirect) : '/')
   } catch (e) {
     if (e.status === 202) {
-      // IP inconnue — vérification email envoyée
       pendingVerification.value = true
     } else {
       error.value = e.message || 'Identifiants invalides.'

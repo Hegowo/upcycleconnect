@@ -24,8 +24,6 @@ type ProfileHandler struct {
 	Mailer *services.Mailer
 }
 
-// ─── GET /api/v1/profile ─────────────────────────────────────────────────────
-
 func (h *ProfileHandler) Stats(c *gin.Context) {
 	user := middleware.GetAuthUser(c)
 
@@ -127,8 +125,6 @@ func (h *ProfileHandler) Stats(c *gin.Context) {
 	})
 }
 
-// ─── PUT /api/v1/profile/info ─────────────────────────────────────────────────
-
 func (h *ProfileHandler) UpdateInfo(c *gin.Context) {
 	user := middleware.GetAuthUser(c)
 	var req struct {
@@ -153,8 +149,6 @@ func (h *ProfileHandler) UpdateInfo(c *gin.Context) {
 	user.Phone = req.Phone
 	c.JSON(http.StatusOK, models.ToUserResponse(user))
 }
-
-// ─── POST /api/v1/profile/avatar ──────────────────────────────────────────────
 
 func (h *ProfileHandler) UploadAvatar(c *gin.Context) {
 	user := middleware.GetAuthUser(c)
@@ -196,8 +190,6 @@ func (h *ProfileHandler) UploadAvatar(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"avatar_url": url})
 }
 
-// ─── POST /api/v1/profile/change-password ─────────────────────────────────────
-
 func (h *ProfileHandler) ChangePassword(c *gin.Context) {
 	user := middleware.GetAuthUser(c)
 	var req struct {
@@ -225,13 +217,9 @@ func (h *ProfileHandler) ChangePassword(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Mot de passe modifié avec succès."})
 }
 
-// ─── POST /api/v1/profile/email/start ────────────────────────────────────────
-// Envoie un code à l'adresse actuelle
-
 func (h *ProfileHandler) EmailChangeStart(c *gin.Context) {
 	user := middleware.GetAuthUser(c)
 
-	// Supprimer toute demande précédente
 	h.DB.Where("user_id = ?", user.ID).Delete(&models.EmailChangeRequest{})
 
 	code := randCode()
@@ -249,9 +237,6 @@ func (h *ProfileHandler) EmailChangeStart(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Code envoyé à votre adresse actuelle."})
 }
-
-// ─── POST /api/v1/profile/email/verify-current ───────────────────────────────
-// Vérifie le code + reçoit la nouvelle adresse + envoie code sur la nouvelle
 
 func (h *ProfileHandler) EmailVerifyCurrent(c *gin.Context) {
 	user := middleware.GetAuthUser(c)
@@ -275,7 +260,6 @@ func (h *ProfileHandler) EmailVerifyCurrent(c *gin.Context) {
 		return
 	}
 
-	// Vérifier que la nouvelle adresse n'est pas déjà utilisée
 	var count int64
 	h.DB.Model(&models.User{}).
 		Where("email = ? AND deleted_at IS NULL AND id != ?", req.NewEmail, user.ID).
@@ -300,9 +284,6 @@ func (h *ProfileHandler) EmailVerifyCurrent(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Code envoyé à votre nouvelle adresse."})
 }
-
-// ─── POST /api/v1/profile/email/verify-new ───────────────────────────────────
-// Vérifie le code de la nouvelle adresse et met à jour l'email
 
 func (h *ProfileHandler) EmailVerifyNew(c *gin.Context) {
 	user := middleware.GetAuthUser(c)
@@ -337,8 +318,6 @@ func (h *ProfileHandler) EmailVerifyNew(c *gin.Context) {
 		"email":   *ecr.NewEmail,
 	})
 }
-
-// ─── Event registration ───────────────────────────────────────────────────────
 
 func (h *ProfileHandler) RegisterForEvent(c *gin.Context) {
 	user := middleware.GetAuthUser(c)
@@ -382,8 +361,6 @@ func (h *ProfileHandler) UnregisterFromEvent(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "Désinscription effectuée."})
 }
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 func randCode() string {
 	b := make([]byte, 4)

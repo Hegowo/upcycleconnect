@@ -2,14 +2,14 @@
   <div class="bg-[#f7f9ff] pb-0">
     <div class="max-w-[1280px] mx-auto px-6 py-10">
 
-      <!-- Loading skeleton -->
+      
       <div v-if="loading" class="flex items-center justify-center py-24">
         <div class="w-8 h-8 border-4 border-[#006d35] border-t-transparent rounded-full animate-spin" />
       </div>
 
       <div v-else class="grid grid-cols-12 gap-4 sm:gap-6">
 
-        <!-- ── Profile Header ── -->
+        
         <div class="col-span-12 lg:col-span-8 bg-white rounded-[24px] p-6 sm:p-8 flex gap-4 sm:gap-8 overflow-hidden relative">
           <div class="relative shrink-0">
             <div class="w-32 h-32 rounded-[24px] overflow-hidden shadow-sm bg-gradient-to-br from-[#006d35] to-[#1b8848] flex items-center justify-center">
@@ -44,7 +44,7 @@
           <div class="absolute -right-10 -top-10 w-36 h-36 rounded-full bg-[rgba(0,109,53,0.05)]" />
         </div>
 
-        <!-- ── Upcycling Score ── -->
+        
         <div class="col-span-12 lg:col-span-4 bg-[#edf4ff] rounded-[24px] p-6 sm:p-8 flex flex-col justify-between">
           <div class="flex items-center justify-between mb-6">
             <h2 class="font-jakarta font-bold text-[#001d32] text-lg">Upcycling Score</h2>
@@ -74,7 +74,7 @@
           </div>
         </div>
 
-        <!-- ── Mes Dépôts (col-span-12) ── -->
+        
         <div class="col-span-12 bg-white rounded-[24px] p-8">
           <div class="flex items-center justify-between mb-6">
             <h2 class="font-jakarta font-bold text-[#001d32] text-2xl">Mes Dépôts</h2>
@@ -106,7 +106,7 @@
           </div>
         </div>
 
-        <!-- ── Mes Réservations ── -->
+        
         <div class="col-span-12 lg:col-span-7 bg-[#edf4ff] rounded-[24px] p-6 sm:p-8">
           <h2 class="font-jakarta font-bold text-[#001d32] text-xl mb-6">Mes Réservations</h2>
 
@@ -135,7 +135,7 @@
           </div>
         </div>
 
-        <!-- ── Mes Badges ── -->
+        
         <div class="col-span-12 lg:col-span-5 bg-white rounded-[24px] p-6 sm:p-8 flex flex-col justify-between">
           <h2 class="font-jakarta font-bold text-[#001d32] text-xl mb-6">Mes Badges</h2>
 
@@ -172,8 +172,7 @@
   </div>
 </template>
 
-<script setup>
-import { ref, computed, onMounted } from 'vue'
+<script setup>import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserAuthStore } from '@/stores/userAuth'
 import {
@@ -272,7 +271,6 @@ function statusClass(s) {
   }[s] ?? 'bg-white/90 text-gray-600'
 }
 
-// Badge helpers
 const BADGE_META = {
   premier_pas:  { bg: '#fef9c3', border: 'rgba(202,138,4,0.3)', iconColor: '#92400e', icon: SparklesIcon },
   donneur:      { bg: '#fce7f3', border: 'rgba(219,39,119,0.2)', iconColor: '#be185d', icon: HeartIcon },

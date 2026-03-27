@@ -1,21 +1,21 @@
 <template>
   <div class="space-y-4 sm:space-y-6">
 
-    <!-- ── Header ── -->
+    
     <div class="flex items-start justify-between gap-3">
       <div>
         <h2 class="text-xl sm:text-2xl font-bold text-[#001d32]">{{ t('dashboard.title') }}</h2>
         <p class="text-xs sm:text-sm text-[#40617f] mt-0.5">{{ todayFormatted }}</p>
       </div>
       <div class="flex items-center gap-2 shrink-0">
-        <!-- Export: icon only on mobile, full label on desktop -->
+        
         <button @click="exportDashboard" class="flex items-center gap-1.5 px-2 sm:px-4 py-2 text-xs sm:text-sm font-semibold rounded-lg border border-[#e5e7eb] text-[#374151] hover:bg-gray-50 transition">
           <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
           </svg>
           <span class="hidden sm:inline">{{ t('common.exportCsv') }}</span>
         </button>
-        <!-- Refresh: icon only on mobile -->
+        
         <button @click="refresh" class="flex items-center gap-1.5 px-2 sm:px-4 py-2 text-xs sm:text-sm font-semibold rounded-lg text-white transition hover:opacity-90" style="background-color:#006d35;">
           <span v-if="loading">
             <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.4 0 0 5.4 0 12h4z"/></svg>
@@ -30,7 +30,7 @@
       </div>
     </div>
 
-    <!-- ── Stat cards ── -->
+    
     <div v-if="loading" class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
       <div v-for="n in 4" :key="n" class="bg-white rounded-2xl p-4 sm:p-5 animate-pulse h-24 sm:h-28 border border-[#f1f5f9]"></div>
     </div>
@@ -94,7 +94,7 @@
 
     </div>
 
-    <!-- ── Mobile quick actions (hidden on desktop) ── -->
+    
     <div class="grid grid-cols-2 gap-3 xl:hidden">
       <RouterLink to="/admin/providers"
         class="flex items-center gap-3 bg-gradient-to-r from-[#006d35] to-[#1b8848] rounded-2xl p-4 text-white">
@@ -120,13 +120,13 @@
       </RouterLink>
     </div>
 
-    <!-- ── Main content: 2 columns on xl ── -->
+    
     <div class="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
 
-      <!-- Left (2/3): chart + activity -->
+      
       <div class="xl:col-span-2 space-y-4 sm:space-y-6">
 
-        <!-- Monthly trend chart -->
+        
         <div class="bg-white rounded-2xl p-4 sm:p-6 border border-[#f1f5f9] shadow-sm">
           <div class="flex items-center justify-between mb-4 sm:mb-5">
             <div>
@@ -153,7 +153,7 @@
           </div>
         </div>
 
-        <!-- Activity feed -->
+        
         <div class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm overflow-hidden">
           <div class="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-[#f1f5f9]">
             <h3 class="font-semibold text-[#001d32] text-sm sm:text-base">{{ t('dashboard.recentActivity') }}</h3>
@@ -173,15 +173,15 @@
               class="flex items-start gap-3 px-4 sm:px-6 py-3 sm:py-3.5 hover:bg-[#f8fafc] transition-colors cursor-pointer"
               @click="openModal(log)"
             >
-              <!-- Avatar -->
+              
               <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center shrink-0 text-xs font-bold text-white mt-0.5"
                 :style="{ backgroundColor: avatarColor(log.admin_name) }">
                 {{ (log.admin_name?.trim() || 'S').charAt(0).toUpperCase() }}
               </div>
 
-              <!-- Content -->
+              
               <div class="flex-1 min-w-0">
-                <!-- Desktop: text + badges in one row -->
+                
                 <div class="hidden sm:flex items-center gap-3">
                   <p class="text-sm text-gray-800 flex-1 min-w-0 truncate">
                     <span class="font-medium">{{ log.admin_name?.trim() || 'Système' }}</span>
@@ -197,7 +197,7 @@
                     </span>
                   </div>
                 </div>
-                <!-- Mobile: compact layout -->
+                
                 <div class="sm:hidden">
                   <p class="text-xs text-gray-800 leading-snug">
                     <span class="font-semibold">{{ log.admin_name?.trim() || 'Système' }}</span>
@@ -213,7 +213,7 @@
                     </span>
                   </div>
                 </div>
-                <!-- Desktop timestamp -->
+                
                 <p class="hidden sm:block text-xs text-gray-400 mt-0.5">{{ formatDate(log.created_at) }}</p>
               </div>
             </div>
@@ -222,7 +222,7 @@
 
       </div>
 
-      <!-- Right (1/3): CTA cards — desktop only (mobile version above) -->
+      
       <div class="hidden xl:block space-y-4">
         <div class="rounded-2xl p-5 text-white" style="background: linear-gradient(135deg, #006d35, #1b8848);">
           <div class="flex items-start justify-between mb-4">
@@ -258,12 +258,12 @@
 
     </div>
 
-    <!-- ── Terminal Modal ── -->
+    
     <Teleport to="body">
       <Transition name="modal">
         <div v-if="selectedLog" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4" @click.self="closeModal">
           <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
-          <!-- On mobile: bottom sheet style; on desktop: centered modal -->
+          
           <div class="relative w-full sm:max-w-2xl rounded-t-2xl sm:rounded-xl overflow-hidden shadow-2xl border border-gray-700">
             <div class="flex items-center gap-2 px-4 py-3 bg-gray-800 border-b border-gray-700">
               <button @click="closeModal" class="w-3 h-3 rounded-full bg-red-500 hover:bg-red-400 transition-colors"></button>
@@ -321,8 +321,7 @@
   </div>
 </template>
 
-<script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+<script setup>import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth'
 import api from '@/services/api'

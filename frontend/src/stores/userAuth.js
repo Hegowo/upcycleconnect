@@ -8,7 +8,6 @@ async function apiFetch(path, options = {}, token = null) {
   if (token) headers['Authorization'] = `Bearer ${token}`
   const res = await fetch(`${BASE}${path}`, { ...options, headers })
   const json = await res.json().catch(() => ({}))
-  // 202 = vérification email en attente (nouveau IP) — throw avec status 202
   if (!res.ok) throw Object.assign(new Error(json.message || 'Erreur réseau'), { status: res.status, data: json })
   return json
 }

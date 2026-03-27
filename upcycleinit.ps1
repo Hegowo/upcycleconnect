@@ -1,12 +1,6 @@
-# =============================================================================
-#  upcycleinit.ps1 — Premier démarrage UpcycleConnect (Windows / PowerShell)
-#  Usage : .\upcycleinit.ps1
-#  Requis : PowerShell 5.1+ ou PowerShell 7+, Docker Desktop installé
-# =============================================================================
 #Requires -Version 5.1
 $ErrorActionPreference = "Stop"
 
-# ── Couleurs & helpers ────────────────────────────────────────────────────────
 function Write-Ok   { param($msg) Write-Host "  " -NoNewline; Write-Host "v" -ForegroundColor Green -NoNewline; Write-Host "  $msg" }
 function Write-Info { param($msg) Write-Host "  " -NoNewline; Write-Host "i" -ForegroundColor Cyan  -NoNewline; Write-Host "  $msg" }
 function Write-Warn { param($msg) Write-Host "  " -NoNewline; Write-Host "!" -ForegroundColor Yellow -NoNewline; Write-Host "  $msg" }
@@ -18,7 +12,6 @@ function Write-Fail {
   exit 1
 }
 
-# Lecture d'une variable depuis un fichier .env
 function Get-EnvValue {
   param([string]$Key, [string]$Default = "")
   $envPath = Join-Path $PSScriptRoot ".env"
@@ -28,7 +21,6 @@ function Get-EnvValue {
   return ($line -split "=", 2)[1].Trim().Trim('"').Trim("'")
 }
 
-# ── Banner ────────────────────────────────────────────────────────────────────
 Write-Host ""
 Write-Host "  UpcycleConnect" -ForegroundColor Green
 Write-Host "  Initialisation premier demarrage (Windows)" -ForegroundColor DarkGray
@@ -41,7 +33,6 @@ $ENV_FILE      = Join-Path $ROOT ".env"
 $ENV_EXAMPLE   = Join-Path $ROOT ".env.example"
 $COMPOSE_FILE  = Join-Path $ROOT "docker-compose.yml"
 
-# ── 1. Prérequis ──────────────────────────────────────────────────────────────
 Write-Step "Verification des prerequis"
 
 if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
@@ -49,7 +40,6 @@ if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
 }
 Write-Ok "Docker trouve : $(docker --version)"
 
-# Docker Compose v2 (plugin) ou v1 (binaire)
 $COMPOSE_CMD = $null
 try {
   docker compose version | Out-Null
@@ -64,7 +54,6 @@ try {
   }
 }
 
-# Daemon Docker actif ?
 try {
   docker info | Out-Null
   Write-Ok "Demon Docker actif"
@@ -78,7 +67,6 @@ Write-Ok "docker-compose.yml present"
 if (-not (Test-Path $SQL_FILE)) { Write-Fail "Fichier SQL introuvable : $SQL_FILE" }
 Write-Ok "Fichier SQL present : upcycleconnect.sql"
 
-# ── 2. Fichier .env ───────────────────────────────────────────────────────────
 Write-Step "Configuration de l'environnement"
 
 if (-not (Test-Path $ENV_FILE)) {
@@ -98,7 +86,6 @@ $APP_PORT         = Get-EnvValue "APP_PORT"          "8080"
 
 Write-Info "Base : $DB_DATABASE  |  Utilisateur : $DB_USERNAME  |  Port app : $APP_PORT"
 
-# ── 3. Volume MySQL existant ? ─────────────────────────────────────────────────
 Write-Step "Verification des donnees existantes"
 
 $VOLUME_NAME  = "upcycleconnect_mysql_data"
@@ -145,7 +132,6 @@ if ($volumeExists) {
   $SKIP_IMPORT = $false
 }
 
-# ── 4. Build des images ───────────────────────────────────────────────────────
 Write-Step "Construction des images Docker"
 
 Write-Info "Build en cours... (peut prendre quelques minutes la premiere fois)"
@@ -158,7 +144,6 @@ if ($COMPOSE_CMD -eq "docker compose") {
 
 Write-Ok "Images construites"
 
-# ── 5. Démarrage MySQL ────────────────────────────────────────────────────────
 Write-Step "Demarrage de MySQL"
 
 if ($COMPOSE_CMD -eq "docker compose") {
@@ -193,7 +178,6 @@ if (-not $mysqlReady) {
 }
 Write-Ok "MySQL est pret (${elapsed}s)"
 
-# ── 6. Import SQL ─────────────────────────────────────────────────────────────
 if (-not $SKIP_IMPORT) {
   Write-Step "Import de la base de donnees"
   Write-Info "Import de upcycleconnect.sql en cours..."
@@ -201,7 +185,6 @@ if (-not $SKIP_IMPORT) {
   $importStart = Get-Date
   $importSuccess = $false
 
-  # Tentative avec root
   try {
     $sqlContent = Get-Content $SQL_FILE -Raw -Encoding UTF8
     $sqlContent | docker exec -i upcycleconnect_mysql `
@@ -213,7 +196,6 @@ if (-not $SKIP_IMPORT) {
     $importSuccess = $false
   }
 
-  # Tentative avec l'utilisateur applicatif si root échoue
   if (-not $importSuccess) {
     Write-Warn "Tentative avec l'utilisateur $DB_USERNAME..."
     try {
@@ -238,7 +220,6 @@ if (-not $SKIP_IMPORT) {
   Write-Info "Import ignore (donnees conservees)"
 }
 
-# ── 7. Démarrage de tous les services ─────────────────────────────────────────
 Write-Step "Demarrage de tous les services"
 
 if ($COMPOSE_CMD -eq "docker compose") {
@@ -249,7 +230,6 @@ if ($COMPOSE_CMD -eq "docker compose") {
 
 Write-Ok "Tous les services demarres"
 
-# ── 8. Vérification finale ────────────────────────────────────────────────────
 Write-Step "Verification de l'etat des services"
 
 Write-Info "Attente de la stabilisation (15s)..."
@@ -262,7 +242,6 @@ docker ps --filter "name=upcycleconnect_" --format "  {{.Names}} | {{.Status}} |
 Write-Host ""
 Write-Host "  Endpoints :" -ForegroundColor White
 
-# Health check backend
 try {
   $response = Invoke-WebRequest -Uri "http://localhost:$APP_PORT/up" -TimeoutSec 5 -UseBasicParsing -ErrorAction Stop
   if ($response.StatusCode -eq 200) {
@@ -272,7 +251,6 @@ try {
   Write-Warn "Backend  -> http://localhost:$APP_PORT/up (pas encore joignable)"
 }
 
-# Health check frontend
 try {
   $response = Invoke-WebRequest -Uri "http://localhost:$APP_PORT/" -TimeoutSec 5 -UseBasicParsing -ErrorAction Stop
   if ($response.StatusCode -eq 200) {
@@ -282,7 +260,6 @@ try {
   Write-Warn "Frontend -> http://localhost:$APP_PORT/ (pas encore joignable)"
 }
 
-# ── 9. Résumé ─────────────────────────────────────────────────────────────────
 Write-Host ""
 Write-Host "  -----------------------------------------------" -ForegroundColor DarkGray
 Write-Host ""

@@ -19,8 +19,7 @@
   </nav>
 </template>
 
-<script setup>
-import { computed } from 'vue'
+<script setup>import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth'

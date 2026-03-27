@@ -1,9 +1,9 @@
 <template>
   <header class="h-14 lg:h-16 bg-white border-b border-[#e5e7eb] flex items-center justify-between px-4 md:px-6 shrink-0">
-    <!-- Left: page title -->
+    
     <h1 class="text-sm lg:text-base font-semibold text-gray-900 truncate">{{ title }}</h1>
 
-    <!-- Center search bar (desktop only) -->
+    
     <div class="hidden md:flex items-center flex-1 max-w-md mx-8">
       <div class="relative w-full">
         <MagnifyingGlassIcon class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -15,9 +15,9 @@
       </div>
     </div>
 
-    <!-- Right actions -->
+    
     <div class="flex items-center gap-2 md:gap-3">
-      <!-- Notification bell -->
+      
       <button class="relative p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition">
         <BellIcon class="w-5 h-5" />
         <span v-if="pendingCount > 0" class="absolute top-1 right-1 w-2 h-2 rounded-full bg-red-500"></span>
@@ -25,7 +25,7 @@
 
       <div class="h-6 w-px bg-[#e5e7eb] hidden sm:block"></div>
 
-      <!-- User info -->
+      
       <div class="flex items-center gap-2.5">
         <div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0" style="background-color:#001d32;">
           {{ initials }}
@@ -36,7 +36,7 @@
         </div>
       </div>
 
-      <!-- Logout -->
+      
       <button
         @click="handleLogout"
         :disabled="loading"
@@ -49,8 +49,7 @@
   </header>
 </template>
 
-<script setup>
-import { ref, computed } from 'vue'
+<script setup>import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth'
