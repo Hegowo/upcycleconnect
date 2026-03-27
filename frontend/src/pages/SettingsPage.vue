@@ -2,19 +2,19 @@
   <div class="space-y-6 max-w-3xl">
     <!-- Header -->
     <div>
-      <h2 class="text-2xl font-bold text-[#001d32]">Paramètres Système</h2>
-      <p class="text-sm text-[#40617f] mt-0.5">Configuration Globale — Gérez les paramètres de la plateforme</p>
+      <h2 class="text-2xl font-bold text-[#001d32]">{{ t('settings.title') }}</h2>
+      <p class="text-sm text-[#40617f] mt-0.5">{{ t('settings.subtitle') }}</p>
     </div>
 
     <!-- Global settings card -->
     <div class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm p-6 space-y-6">
-      <h3 class="font-semibold text-[#001d32] text-base">Paramètres Globaux</h3>
+      <h3 class="font-semibold text-[#001d32] text-base">{{ t('settings.globalSettings') }}</h3>
 
       <!-- Toggle 1: Auto validation -->
       <div class="flex items-center justify-between py-3 border-b border-[#f8fafc]">
         <div>
-          <p class="text-sm font-medium text-[#001d32]">Validation automatique des petits objets</p>
-          <p class="text-xs text-gray-400 mt-0.5">Approuver automatiquement les dépôts de moins de 5kg</p>
+          <p class="text-sm font-medium text-[#001d32]">{{ t('settings.autoValidation') }}</p>
+          <p class="text-xs text-gray-400 mt-0.5">{{ t('settings.autoValidationDesc') }}</p>
         </div>
         <button
           @click="toggleAutoValidation"
@@ -26,22 +26,22 @@
 
       <!-- Languages -->
       <div class="py-3 border-b border-[#f8fafc]">
-        <p class="text-sm font-medium text-[#001d32] mb-1">Gestion des langues</p>
-        <p class="text-xs text-gray-400 mb-3">Langues actives sur la plateforme</p>
+        <p class="text-sm font-medium text-[#001d32] mb-1">{{ t('settings.langManagement') }}</p>
+        <p class="text-xs text-gray-400 mb-3">{{ t('settings.langManagementDesc') }}</p>
         <div class="flex items-center gap-2 flex-wrap">
           <span class="px-3 py-1.5 rounded-lg text-xs font-semibold border-2 flex items-center gap-1.5" style="border-color:#006d35; color:#006d35; background:#f0fdf4;">
             🇫🇷 FR
-            <span class="text-[10px] text-green-600">actif</span>
+            <span class="text-[10px] text-green-600">{{ t('settings.active') }}</span>
           </span>
           <span class="px-3 py-1.5 rounded-lg text-xs font-semibold border-2 flex items-center gap-1.5" style="border-color:#006d35; color:#006d35; background:#f0fdf4;">
             🇬🇧 EN
-            <span class="text-[10px] text-green-600">actif</span>
+            <span class="text-[10px] text-green-600">{{ t('settings.active') }}</span>
           </span>
           <span class="px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-200 text-gray-400 flex items-center gap-1.5">
             🇩🇪 DE
           </span>
           <button class="px-3 py-1.5 rounded-lg text-xs font-medium border border-dashed border-[#006d35] text-[#006d35] hover:bg-[#f0fdf4] transition">
-            + Ajouter
+            {{ t('settings.addLang') }}
           </button>
         </div>
       </div>
@@ -49,8 +49,8 @@
       <!-- Toggle 2: Email notifications -->
       <div class="flex items-center justify-between py-3 border-b border-[#f8fafc]">
         <div>
-          <p class="text-sm font-medium text-[#001d32]">Emails de notification activés</p>
-          <p class="text-xs text-gray-400 mt-0.5">Envoyer des notifications par email aux administrateurs</p>
+          <p class="text-sm font-medium text-[#001d32]">{{ t('settings.emailNotif') }}</p>
+          <p class="text-xs text-gray-400 mt-0.5">{{ t('settings.emailNotifDesc') }}</p>
         </div>
         <button
           @click="emailNotifications = !emailNotifications"
@@ -62,43 +62,43 @@
 
       <!-- Language selector (functional) -->
       <div class="py-3">
-        <p class="text-sm font-medium text-[#001d32] mb-3">Langue de l'interface admin</p>
+        <p class="text-sm font-medium text-[#001d32] mb-3">{{ t('settings.adminLang') }}</p>
         <div class="flex gap-3">
           <button
             @click="setLang('fr')"
             class="flex items-center gap-2 px-5 py-3 rounded-xl transition text-sm font-medium border-2"
             :style="currentLang === 'fr' ? 'border-color:#006d35; color:#006d35; background:#f0fdf4;' : 'border-color:#e5e7eb; color:#6b7280;'"
           >
-            🇫🇷 Français
+            🇫🇷 {{ t('settings.langFr') }}
           </button>
           <button
             @click="setLang('en')"
             class="flex items-center gap-2 px-5 py-3 rounded-xl transition text-sm font-medium border-2"
             :style="currentLang === 'en' ? 'border-color:#006d35; color:#006d35; background:#f0fdf4;' : 'border-color:#e5e7eb; color:#6b7280;'"
           >
-            🇬🇧 English
+            🇬🇧 {{ t('settings.langEn') }}
           </button>
         </div>
       </div>
 
       <!-- Profile info (read-only) -->
       <div class="py-3 border-t border-[#f8fafc]">
-        <p class="text-sm font-medium text-[#001d32] mb-3">Informations du profil</p>
-        <div class="grid grid-cols-2 gap-4">
+        <p class="text-sm font-medium text-[#001d32] mb-3">{{ t('settings.profileInfo') }}</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label class="text-xs font-medium text-gray-400 uppercase tracking-wider">Prénom</label>
+            <label class="text-xs font-medium text-gray-400 uppercase tracking-wider">{{ t('settings.fieldFirstName') }}</label>
             <p class="text-sm text-[#001d32] mt-1 px-3 py-2 bg-[#f8fafc] rounded-lg">{{ auth.user?.first_name || '—' }}</p>
           </div>
           <div>
-            <label class="text-xs font-medium text-gray-400 uppercase tracking-wider">Nom</label>
+            <label class="text-xs font-medium text-gray-400 uppercase tracking-wider">{{ t('settings.fieldLastName') }}</label>
             <p class="text-sm text-[#001d32] mt-1 px-3 py-2 bg-[#f8fafc] rounded-lg">{{ auth.user?.last_name || '—' }}</p>
           </div>
           <div>
-            <label class="text-xs font-medium text-gray-400 uppercase tracking-wider">Email</label>
+            <label class="text-xs font-medium text-gray-400 uppercase tracking-wider">{{ t('settings.fieldEmail') }}</label>
             <p class="text-sm text-[#001d32] mt-1 px-3 py-2 bg-[#f8fafc] rounded-lg">{{ auth.user?.email || '—' }}</p>
           </div>
           <div>
-            <label class="text-xs font-medium text-gray-400 uppercase tracking-wider">Rôle</label>
+            <label class="text-xs font-medium text-gray-400 uppercase tracking-wider">{{ t('settings.fieldRole') }}</label>
             <p class="text-sm capitalize mt-1 px-3 py-2 bg-[#f8fafc] rounded-lg font-medium" style="color:#006d35;">{{ auth.user?.role?.replace('_', ' ') || '—' }}</p>
           </div>
         </div>
@@ -107,41 +107,14 @@
       <!-- Action buttons -->
       <div class="flex items-center gap-3 pt-2">
         <button class="px-6 py-2.5 text-sm font-semibold rounded-lg border border-[#e5e7eb] text-[#374151] hover:bg-gray-50 transition">
-          Annuler
+          {{ t('settings.cancelBtn') }}
         </button>
         <button @click="saveSettings" class="px-6 py-2.5 text-sm font-semibold rounded-lg text-white transition hover:opacity-90" style="background-color:#006d35;">
-          Sauvegarder Configuration
+          {{ t('settings.saveBtn') }}
         </button>
       </div>
     </div>
 
-    <!-- API Access dark card -->
-    <div class="rounded-2xl p-6" style="background: linear-gradient(135deg, #001d32, #0a2e4a);">
-      <div class="flex items-start justify-between">
-        <div>
-          <div class="flex items-center gap-2 mb-2">
-            <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-white/10">
-              <CodeBracketIcon class="w-4 h-4 text-white" />
-            </div>
-            <h3 class="font-bold text-white">Accès API Avancé</h3>
-          </div>
-          <p class="text-sm text-white/60 max-w-md">
-            Accédez à la documentation complète de l'API REST, gérez vos tokens d'authentification et explorez les endpoints disponibles.
-          </p>
-          <div class="flex items-center gap-3 mt-4">
-            <div class="flex items-center gap-1.5 text-xs text-white/40">
-              <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span>
-              API v1 active
-            </div>
-            <div class="text-xs text-white/40">•</div>
-            <div class="text-xs text-white/40">Go / Gin backend</div>
-          </div>
-        </div>
-        <button class="px-5 py-2.5 rounded-lg text-sm font-semibold text-[#001d32] bg-white hover:bg-gray-100 transition shrink-0">
-          Portail Développeur
-        </button>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -150,9 +123,8 @@ import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from '@/utils/useToast'
-import { CodeBracketIcon } from '@heroicons/vue/24/outline'
 
-const { locale } = useI18n()
+const { t, locale } = useI18n()
 const auth = useAuthStore()
 const toast = useToast()
 
@@ -167,11 +139,11 @@ function toggleAutoValidation() {
 function setLang(lang) {
   locale.value = lang
   localStorage.setItem('admin_lang', lang)
-  toast.showSuccess('Langue mise à jour')
+  toast.showSuccess(t('settings.toastLangUpdated'))
 }
 
 function saveSettings() {
-  toast.showSuccess('Configuration sauvegardée')
+  toast.showSuccess(t('settings.toastSaved'))
 }
 </script>
 

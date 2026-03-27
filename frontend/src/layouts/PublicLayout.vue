@@ -10,7 +10,7 @@
           <img src="/logoentier.png" alt="UpcycleConnect" class="h-12 w-auto" />
         </RouterLink>
 
-        <!-- Navigation -->
+        <!-- Navigation desktop -->
         <nav class="hidden md:flex items-center gap-8">
           <RouterLink
             v-for="link in navLinks"
@@ -56,7 +56,7 @@
           <!-- Connecté -->
           <template v-else>
             <!-- Cloche -->
-            <button class="w-9 h-9 rounded-full flex items-center justify-center text-[#40617f] hover:bg-[#edf4ff] transition">
+            <button class="hidden sm:flex w-9 h-9 rounded-full items-center justify-center text-[#40617f] hover:bg-[#edf4ff] transition">
               <BellIcon class="w-5 h-5" />
             </button>
 
@@ -107,7 +107,43 @@
             </div>
           </template>
         </div>
+        <!-- Mobile hamburger -->
+        <button
+          @click="mobileMenuOpen = !mobileMenuOpen"
+          class="md:hidden p-2 rounded-lg text-[#40617f] hover:bg-[#edf4ff] transition"
+        >
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path v-if="!mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
       </div>
+
+      <!-- Mobile nav dropdown -->
+      <Transition name="dropdown">
+        <div v-if="mobileMenuOpen" class="md:hidden border-t border-[#e2e8f0] bg-white px-6 py-4 space-y-1">
+          <RouterLink
+            v-for="link in navLinks"
+            :key="link.path"
+            :to="link.path"
+            @click="mobileMenuOpen = false"
+            class="block py-2.5 text-[15px] font-semibold font-jakarta transition-colors"
+            :class="isActive(link.path) ? 'text-[#006d35]' : 'text-[#475569]'"
+          >
+            {{ link.label }}
+          </RouterLink>
+          <div class="pt-3 border-t border-[#e2e8f0]">
+            <template v-if="!userAuth.isLoggedIn">
+              <RouterLink to="/connexion" @click="mobileMenuOpen = false" class="block py-2 text-sm font-medium text-[#40617f]">Connexion</RouterLink>
+              <RouterLink to="/inscription" @click="mobileMenuOpen = false" class="block py-2 text-sm font-bold text-[#006d35]">S'inscrire</RouterLink>
+            </template>
+            <template v-else>
+              <RouterLink to="/profil" @click="mobileMenuOpen = false" class="block py-2 text-sm font-medium text-[#334155]">Mon profil</RouterLink>
+              <button @click="handleLogout(); mobileMenuOpen = false" class="block py-2 text-sm font-medium text-red-500">Se déconnecter</button>
+            </template>
+          </div>
+        </div>
+      </Transition>
     </header>
 
     <main class="flex-1">
@@ -201,6 +237,7 @@ const router   = useRouter()
 const userAuth = useUserAuthStore()
 
 const profileMenuOpen = ref(false)
+const mobileMenuOpen = ref(false)
 
 onMounted(() => userAuth.init())
 

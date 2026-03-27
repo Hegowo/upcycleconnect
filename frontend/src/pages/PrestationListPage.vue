@@ -1,18 +1,25 @@
 <template>
   <div class="space-y-6">
     <!-- Header -->
-    <div class="flex items-center justify-between">
-      <div>
-        <h2 class="text-2xl font-bold text-[#001d32]">Gestion Catalogue</h2>
-        <p class="text-sm text-[#40617f] mt-0.5">Prestations & Services — Gérez l'offre de la plateforme</p>
-      </div>
+    <div>
+      <h2 class="text-xl sm:text-2xl font-bold text-[#001d32]">Gestion Catalogue</h2>
+      <p class="text-sm text-[#40617f] mt-0.5 hidden sm:block">Prestations & Services — Gérez l'offre de la plateforme</p>
     </div>
 
-    <!-- 3-column layout: sidebar filters + grid -->
-    <div class="flex gap-6 items-start">
+    <!-- Mobile filter toggle -->
+    <div class="lg:hidden">
+      <button @click="showFilters = !showFilters" class="flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg border border-[#e5e7eb] text-[#374151] hover:bg-gray-50 transition">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"/></svg>
+        Filtres
+        <span v-if="showFilters">▲</span><span v-else>▼</span>
+      </button>
+    </div>
+
+    <!-- Layout: sidebar filters + grid -->
+    <div class="flex flex-col lg:flex-row gap-6 items-start">
 
       <!-- Sidebar filters -->
-      <div class="w-64 shrink-0">
+      <div :class="['w-full lg:w-64 lg:shrink-0', showFilters ? 'block' : 'hidden lg:block']">
         <div class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm p-5 sticky top-6">
           <div class="flex items-center justify-between mb-4">
             <h3 class="font-semibold text-[#001d32] text-sm">Filtres Catalogue</h3>
@@ -101,7 +108,7 @@
           <div
             v-for="p in prestations"
             :key="p.id"
-            class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm overflow-hidden hover:shadow-md transition-shadow"
+            class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
           >
             <div class="p-5">
               <!-- Badges top -->
@@ -175,7 +182,7 @@
 
     <!-- Footer stats bar -->
     <div class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm p-4">
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
         <div class="text-center">
           <p class="text-xs text-gray-400 uppercase tracking-wider mb-1">Prévision Revenus</p>
           <p class="text-lg font-bold text-[#001d32]">12 400 €</p>
@@ -211,7 +218,7 @@
     <!-- Floating create button -->
     <RouterLink
       to="/admin/prestations/create"
-      class="fixed bottom-8 right-8 w-14 h-14 rounded-full flex items-center justify-center text-white shadow-lg hover:shadow-xl transition-shadow z-40"
+      class="fixed bottom-20 right-4 lg:bottom-8 lg:right-8 w-14 h-14 rounded-full flex items-center justify-center text-white shadow-lg hover:shadow-xl transition-shadow z-40"
       style="background-color:#006d35;"
       title="Nouvelle prestation"
     >
@@ -238,6 +245,7 @@ const categories  = ref([])
 const loading     = ref(false)
 const meta        = ref({ current_page: 1, last_page: 1, total: 0 })
 const filters     = reactive({ status: '', category_id: '', search: '' })
+const showFilters = ref(false)
 const selectedTypes = ref([])
 const deleteConfirm = reactive({ show: false, item: null, loading: false })
 

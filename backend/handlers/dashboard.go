@@ -54,6 +54,17 @@ func (h *DashboardHandler) Stats(c *gin.Context) {
 	var depositsPending int64
 	h.DB.Model(&models.DepositRequest{}).Where("status = ?", "pending").Count(&depositsPending)
 
+	var depositsAccepted int64
+	h.DB.Model(&models.DepositRequest{}).
+		Where("status IN ?", []string{"accepted", "validated"}).
+		Count(&depositsAccepted)
+
+	var co2Total float64
+	h.DB.Model(&models.DepositRequest{}).
+		Where("status IN ?", []string{"accepted", "validated"}).
+		Select("COALESCE(SUM(carbon_savings), 0)").
+		Scan(&co2Total)
+
 	c.JSON(http.StatusOK, gin.H{
 		"users_count":           usersCount,
 		"providers_count":       providersCount,
@@ -62,5 +73,7 @@ func (h *DashboardHandler) Stats(c *gin.Context) {
 		"events_count":          eventsCount,
 		"prestations_by_status": prestationsByStatus,
 		"deposits_pending":      depositsPending,
+		"deposits_accepted":     depositsAccepted,
+		"co2_total":             co2Total,
 	})
 }

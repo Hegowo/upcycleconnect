@@ -1,18 +1,18 @@
 <template>
   <div class="space-y-6">
     <!-- Header -->
-    <div class="flex items-center justify-between">
-      <div>
-        <h2 class="text-2xl font-bold text-[#001d32]">Catégories Objets</h2>
-        <p class="text-sm text-[#40617f] mt-0.5">Organisez les types d'objets et de prestations</p>
+    <div class="flex items-center justify-between gap-3">
+      <div class="min-w-0">
+        <h2 class="text-xl sm:text-2xl font-bold text-[#001d32] truncate">{{ t('categories.objectTitle') }}</h2>
+        <p class="text-sm text-[#40617f] mt-0.5 hidden sm:block">{{ t('categories.objectSubtitle') }}</p>
       </div>
       <RouterLink
         to="/admin/categories/create"
-        class="px-4 py-2 text-sm font-semibold rounded-lg text-white transition hover:opacity-90 flex items-center gap-2"
+        class="p-2 sm:px-4 sm:py-2 text-sm font-semibold rounded-lg text-white transition hover:opacity-90 flex items-center gap-2 shrink-0"
         style="background-color:#006d35;"
       >
         <PlusIcon class="w-4 h-4" />
-        Nouvelle Catégorie
+        <span class="hidden sm:inline">{{ t('categories.newCategoryBtn') }}</span>
       </RouterLink>
     </div>
 
@@ -26,8 +26,8 @@
       <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-3">
         <TagIcon class="w-6 h-6 text-gray-400" />
       </div>
-      <p class="text-gray-500 font-medium">Aucune catégorie</p>
-      <p class="text-gray-400 text-sm mt-1">Créez votre première catégorie</p>
+      <p class="text-gray-500 font-medium">{{ t('categories.noCategories') }}</p>
+      <p class="text-gray-400 text-sm mt-1">{{ t('categories.createFirst') }}</p>
     </div>
 
     <!-- Categories grid -->
@@ -47,7 +47,7 @@
             <button
               @click="toggleCategory(cat)"
               :class="['relative inline-flex h-5 w-9 items-center rounded-full transition-colors shrink-0', cat.is_active ? 'bg-[#006d35]' : 'bg-gray-300']"
-              :title="cat.is_active ? 'Désactiver' : 'Activer'"
+              :title="cat.is_active ? t('categories.deactivate') : t('categories.activate')"
             >
               <span :class="['inline-block h-3 w-3 transform rounded-full bg-white transition-transform shadow', cat.is_active ? 'translate-x-5' : 'translate-x-1']" />
             </button>
@@ -55,15 +55,15 @@
 
           <!-- Name + desc -->
           <h4 class="text-sm font-bold text-[#001d32] mb-1">{{ cat.name }}</h4>
-          <p class="text-xs text-gray-400 mb-3 line-clamp-2">{{ cat.description || 'Aucune description' }}</p>
+          <p class="text-xs text-gray-400 mb-3 line-clamp-2">{{ cat.description || t('categories.noDescription') }}</p>
 
           <!-- Count -->
           <div class="flex items-center justify-between mb-4">
             <span class="text-xs font-semibold px-2 py-0.5 rounded-full" :class="cat.is_active ? 'bg-[#dcfce7] text-[#166534]' : 'bg-gray-100 text-gray-500'">
-              {{ cat.is_active ? 'Actif' : 'Inactif' }}
+              {{ cat.is_active ? t('categories.active') : t('categories.inactive') }}
             </span>
             <span class="text-xs text-gray-400 font-medium">
-              {{ cat.prestations_count ?? 0 }} articles
+              {{ cat.prestations_count ?? 0 }} {{ t('categories.articles') }}
             </span>
           </div>
 
@@ -74,12 +74,12 @@
               class="flex-1 py-1.5 rounded-lg text-xs font-semibold text-center transition"
               style="background:#f1f5f9; color:#475569;"
             >
-              Modifier
+              {{ t('categories.actionEdit') }}
             </RouterLink>
             <button
               @click="openDelete(cat)"
               class="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition"
-              title="Supprimer"
+              :title="t('categories.actionDelete')"
             >
               <TrashIcon class="w-4 h-4" />
             </button>
@@ -90,17 +90,17 @@
 
     <!-- Summary bar -->
     <div v-if="categories.length" class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm p-4">
-      <div class="grid grid-cols-3 gap-6">
+      <div class="grid grid-cols-3 gap-3 sm:gap-6">
         <div class="text-center">
-          <p class="text-xs text-gray-400 uppercase tracking-wider mb-1">Total Catégories</p>
+          <p class="text-xs text-gray-400 uppercase tracking-wider mb-1">{{ t('categories.totalCategories') }}</p>
           <p class="text-lg font-bold text-[#001d32]">{{ categories.length }}</p>
         </div>
         <div class="text-center">
-          <p class="text-xs text-gray-400 uppercase tracking-wider mb-1">Actives</p>
+          <p class="text-xs text-gray-400 uppercase tracking-wider mb-1">{{ t('categories.activeCount') }}</p>
           <p class="text-lg font-bold text-[#006d35]">{{ categories.filter(c => c.is_active).length }}</p>
         </div>
         <div class="text-center">
-          <p class="text-xs text-gray-400 uppercase tracking-wider mb-1">Inactives</p>
+          <p class="text-xs text-gray-400 uppercase tracking-wider mb-1">{{ t('categories.inactiveCount') }}</p>
           <p class="text-lg font-bold text-gray-400">{{ categories.filter(c => !c.is_active).length }}</p>
         </div>
       </div>
@@ -108,9 +108,9 @@
 
     <AppConfirmDialog
       :show="deleteConfirm.show"
-      title="Supprimer cette catégorie ?"
-      :message="`Voulez-vous supprimer la catégorie : ${deleteConfirm.category?.name} ?`"
-      confirm-label="Supprimer"
+      :title="t('categories.confirmDeleteCategoryTitle')"
+      :message="t('categories.confirmDeleteCategoryMsg', { name: deleteConfirm.category?.name })"
+      :confirm-label="t('categories.actionDelete')"
       confirm-variant="danger"
       :loading="deleteConfirm.loading"
       @confirm="executeDelete"
@@ -121,6 +121,7 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { categoryService } from '@/services/categoryService'
 import { useToast } from '@/utils/useToast'
 import AppConfirmDialog from '@/components/AppConfirmDialog.vue'
@@ -131,6 +132,7 @@ import {
 } from '@heroicons/vue/24/outline'
 
 const toast      = useToast()
+const { t }      = useI18n()
 const categories = ref([])
 const loading    = ref(false)
 const deleteConfirm = reactive({ show: false, category: null, loading: false })
@@ -162,7 +164,7 @@ async function fetchCategories() {
     const data = await categoryService.list()
     categories.value = data.data
   } catch {
-    toast.showError('Impossible de charger les catégories')
+    toast.showError(t('categories.toastLoadError'))
   } finally {
     loading.value = false
   }
@@ -172,9 +174,9 @@ async function toggleCategory(cat) {
   try {
     await categoryService.toggle(cat.id)
     cat.is_active = !cat.is_active
-    toast.showSuccess('Catégorie mise à jour')
+    toast.showSuccess(t('categories.toastToggledMsg'))
   } catch {
-    toast.showError('Impossible de mettre à jour la catégorie')
+    toast.showError(t('categories.toastToggleError'))
   }
 }
 
@@ -188,10 +190,10 @@ async function executeDelete() {
   try {
     await categoryService.remove(deleteConfirm.category.id)
     categories.value = categories.value.filter((c) => c.id !== deleteConfirm.category.id)
-    toast.showSuccess('Catégorie supprimée')
+    toast.showSuccess(t('categories.toastDeleted'))
     deleteConfirm.show = false
   } catch {
-    toast.showError('Impossible de supprimer la catégorie')
+    toast.showError(t('categories.toastDeleteErrorMsg'))
   } finally {
     deleteConfirm.loading = false
   }

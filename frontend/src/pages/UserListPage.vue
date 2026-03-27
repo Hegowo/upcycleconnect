@@ -1,19 +1,19 @@
 <template>
   <div class="space-y-6">
     <!-- Header -->
-    <div class="flex items-center justify-between">
-      <div>
-        <h2 class="text-2xl font-bold text-[#001d32]">Gestion Utilisateurs</h2>
-        <p class="text-sm text-[#40617f] mt-0.5">User Management — Gérez les membres de la plateforme</p>
+    <div class="flex items-center justify-between gap-3">
+      <div class="min-w-0">
+        <h2 class="text-xl sm:text-2xl font-bold text-[#001d32] truncate">{{ t('users.title') }}</h2>
+        <p class="text-sm text-[#40617f] mt-0.5 hidden sm:block">{{ t('users.subtitle') }}</p>
       </div>
-      <div class="flex items-center gap-2">
-        <button class="px-4 py-2 text-sm font-semibold rounded-lg border border-[#e5e7eb] text-[#374151] hover:bg-gray-50 transition flex items-center gap-2">
+      <div class="flex items-center gap-2 shrink-0">
+        <button class="p-2 sm:px-4 sm:py-2 text-sm font-semibold rounded-lg border border-[#e5e7eb] text-[#374151] hover:bg-gray-50 transition flex items-center gap-2">
           <AdjustmentsHorizontalIcon class="w-4 h-4" />
-          Filtres Avancés
+          <span class="hidden sm:inline">{{ t('users.advancedFilters') }}</span>
         </button>
-        <button class="px-4 py-2 text-sm font-semibold rounded-lg text-white transition hover:opacity-90 flex items-center gap-2" style="background-color:#006d35;">
+        <button class="p-2 sm:px-4 sm:py-2 text-sm font-semibold rounded-lg text-white transition hover:opacity-90 flex items-center gap-2" style="background-color:#006d35;">
           <PlusIcon class="w-4 h-4" />
-          Ajouter Membre
+          <span class="hidden sm:inline">{{ t('users.addMember') }}</span>
         </button>
       </div>
     </div>
@@ -27,7 +27,7 @@
           </div>
         </div>
         <p class="text-2xl font-bold text-[#001d32]">{{ meta.total }}</p>
-        <p class="text-xs text-gray-400 mt-1">Total Membres</p>
+        <p class="text-xs text-gray-400 mt-1">{{ t('users.totalMembers') }}</p>
       </div>
       <div class="bg-white rounded-2xl p-5 border border-[#f1f5f9] shadow-sm">
         <div class="flex items-center justify-between mb-3">
@@ -36,7 +36,7 @@
           </div>
         </div>
         <p class="text-2xl font-bold text-[#001d32]">{{ activeCount }}</p>
-        <p class="text-xs text-gray-400 mt-1">Utilisateurs Actifs</p>
+        <p class="text-xs text-gray-400 mt-1">{{ t('users.activeUsers') }}</p>
       </div>
       <div class="bg-white rounded-2xl p-5 border border-[#f1f5f9] shadow-sm">
         <div class="flex items-center justify-between mb-3">
@@ -45,42 +45,42 @@
           </div>
         </div>
         <p class="text-2xl font-bold text-[#001d32]">—</p>
-        <p class="text-xs text-gray-400 mt-1">Prestataires Vérifiés</p>
+        <p class="text-xs text-gray-400 mt-1">{{ t('users.verifiedProviders') }}</p>
       </div>
       <div class="bg-white rounded-2xl p-5 border border-[#f1f5f9] shadow-sm" :class="pendingCount > 0 ? 'border-red-200' : ''">
         <div class="flex items-center justify-between mb-3">
           <div class="w-9 h-9 rounded-xl flex items-center justify-center" :class="pendingCount > 0 ? 'bg-red-50' : 'bg-gray-50'">
             <ClockIcon class="w-5 h-5" :class="pendingCount > 0 ? 'text-red-500' : 'text-gray-400'" />
           </div>
-          <span v-if="pendingCount > 0" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-700">Action Requise</span>
+          <span v-if="pendingCount > 0" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-700">{{ t('users.actionRequired') }}</span>
         </div>
         <p class="text-2xl font-bold" :class="pendingCount > 0 ? 'text-red-600' : 'text-[#001d32]'">{{ pendingCount }}</p>
-        <p class="text-xs text-gray-400 mt-1">En Attente d'Approbation</p>
+        <p class="text-xs text-gray-400 mt-1">{{ t('users.pendingApproval') }}</p>
       </div>
     </div>
 
     <!-- Tabs -->
-    <div class="flex gap-1 p-1 bg-[#f8fafc] rounded-xl w-fit border border-[#e5e7eb]">
+    <div class="flex gap-1 p-1 bg-[#f8fafc] rounded-xl border border-[#e5e7eb] overflow-x-auto tab-scroll">
       <button
         @click="activeTab = 'all'; fetchUsers()"
         :class="activeTab === 'all' ? 'bg-white shadow text-[#001d32] font-semibold' : 'text-gray-500 hover:text-gray-700'"
         class="px-4 py-2 rounded-lg text-sm transition"
       >
-        Tous les Membres
+        {{ t('users.allMembers') }}
       </button>
       <button
         @click="activeTab = 'professionals'; filters.status = ''; fetchUsers()"
         :class="activeTab === 'professionals' ? 'bg-white shadow text-[#001d32] font-semibold' : 'text-gray-500 hover:text-gray-700'"
         class="px-4 py-2 rounded-lg text-sm transition"
       >
-        Professionnels
+        {{ t('users.professionals') }}
       </button>
       <button
         @click="activeTab = 'pending'; filters.status = 'pending'; fetchUsers()"
         :class="activeTab === 'pending' ? 'bg-white shadow text-[#001d32] font-semibold' : 'text-gray-500 hover:text-gray-700'"
         class="px-4 py-2 rounded-lg text-sm transition"
       >
-        En Attente de Validation
+        {{ t('users.pendingValidation') }}
       </button>
     </div>
 
@@ -93,33 +93,100 @@
           @input="debouncedFetch"
           type="text"
           class="w-full pl-9 pr-4 py-2 text-sm bg-[#f8fafc] border border-[#e5e7eb] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#006d35]/30 focus:border-[#006d35] transition"
-          placeholder="Rechercher un utilisateur..."
+          :placeholder="t('users.searchUser')"
         />
       </div>
       <select v-model="filters.status" @change="fetchUsers" class="text-sm border border-[#e5e7eb] rounded-lg px-3 py-2 bg-[#f8fafc] text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#006d35]/30">
-        <option value="">Tous les statuts</option>
-        <option value="active">Actif</option>
-        <option value="inactive">Inactif</option>
-        <option value="banned">Banni</option>
+        <option value="">{{ t('users.allStatuses') }}</option>
+        <option value="active">{{ t('users.statusActive') }}</option>
+        <option value="inactive">{{ t('users.statusInactive') }}</option>
+        <option value="banned">{{ t('users.statusBanned') }}</option>
       </select>
     </div>
 
+    <!-- Mobile user cards (lg:hidden) -->
+    <div class="lg:hidden">
+      <!-- Loading skeletons -->
+      <div v-if="loading" class="space-y-3">
+        <div v-for="n in 5" :key="n" class="bg-white rounded-2xl border border-[#f1f5f9] h-24 animate-pulse"></div>
+      </div>
+      <!-- Empty state -->
+      <div v-else-if="!users.length" class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm py-12 text-center">
+        <MagnifyingGlassIcon class="w-8 h-8 text-gray-300 mx-auto mb-2" />
+        <p class="text-gray-500 font-medium text-sm">{{ t('common.noResults') }}</p>
+        <p class="text-gray-400 text-xs mt-1">{{ t('common.searchCriteria') }}</p>
+      </div>
+      <!-- User cards -->
+      <div v-else class="space-y-3">
+        <div
+          v-for="user in users"
+          :key="user.id"
+          class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm p-4 active:bg-[#f8fafc] transition-colors"
+          @click="router.push(`/admin/users/${user.id}`)"
+        >
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0" style="background-color:#001d32;">
+              {{ (user.first_name?.[0] || '') + (user.last_name?.[0] || '') }}
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-semibold text-[#001d32] truncate">{{ user.first_name }} {{ user.last_name }}</p>
+              <p class="text-xs text-gray-400 truncate">{{ user.email }}</p>
+            </div>
+            <span class="text-xs font-semibold px-2 py-0.5 rounded-full shrink-0" :class="statusBadge(user.status)">
+              {{ statusText(user.status) }}
+            </span>
+          </div>
+          <div class="flex items-center justify-between pt-2 border-t border-[#f8fafc]">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-medium px-2 py-0.5 rounded-full" :class="hasProviderRole(user) ? 'bg-[#dbeafe] text-blue-700' : 'bg-[#f1f5f9] text-[#475569]'">
+                {{ hasProviderRole(user) ? t('users.professional') : t('users.individual') }}
+              </span>
+              <span class="text-xs text-gray-400">{{ formatDate(user.created_at) }}</span>
+            </div>
+            <div class="flex items-center gap-1" @click.stop>
+              <button @click.stop="router.push(`/admin/users/${user.id}`)" class="p-2 rounded-lg text-gray-400 hover:text-[#40617f] hover:bg-blue-50 transition">
+                <EyeIcon class="w-4 h-4" />
+              </button>
+              <button
+                v-if="user.status !== 'banned'"
+                @click.stop="openConfirm('ban', user)"
+                class="p-2 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition"
+              >
+                <NoSymbolIcon class="w-4 h-4" />
+              </button>
+              <button
+                v-else
+                @click.stop="openConfirm('activate', user)"
+                class="p-2 rounded-lg text-gray-400 hover:text-green-600 hover:bg-green-50 transition"
+              >
+                <CheckCircleIcon class="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- Mobile pagination -->
+        <div class="flex justify-center pt-2">
+          <AppPagination :current-page="meta.current_page" :last-page="meta.last_page" :total="meta.total" @page-change="changePage" />
+        </div>
+      </div>
+    </div>
+
     <!-- Table -->
-    <div class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm overflow-hidden">
+    <div class="hidden lg:block bg-white rounded-2xl border border-[#f1f5f9] shadow-sm overflow-hidden">
       <div class="px-6 py-4 border-b border-[#f1f5f9] flex items-center justify-between">
-        <span class="font-semibold text-sm text-[#001d32]">Liste des membres</span>
+        <span class="font-semibold text-sm text-[#001d32]">{{ t('users.membersList') }}</span>
         <span class="text-xs px-2.5 py-1 rounded-full font-semibold" style="background:#dcfce7; color:#166534;">{{ meta.total }} total</span>
       </div>
       <div class="overflow-x-auto">
         <table class="min-w-full">
           <thead>
             <tr class="bg-[#f8fafc]">
-              <th class="px-6 py-3 text-left text-xs font-semibold text-[#6b7280] uppercase tracking-wider">Nom / Email</th>
-              <th class="px-6 py-3 text-left text-xs font-semibold text-[#6b7280] uppercase tracking-wider">Rôle</th>
-              <th class="px-6 py-3 text-left text-xs font-semibold text-[#6b7280] uppercase tracking-wider">Statut</th>
-              <th class="px-6 py-3 text-left text-xs font-semibold text-[#6b7280] uppercase tracking-wider">Siret / ID</th>
-              <th class="px-6 py-3 text-left text-xs font-semibold text-[#6b7280] uppercase tracking-wider">Inscription</th>
-              <th class="px-6 py-3 text-right text-xs font-semibold text-[#6b7280] uppercase tracking-wider">Actions</th>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-[#6b7280] uppercase tracking-wider">{{ t('users.colNameEmail') }}</th>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-[#6b7280] uppercase tracking-wider">{{ t('users.colRole') }}</th>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-[#6b7280] uppercase tracking-wider">{{ t('users.colStatus') }}</th>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-[#6b7280] uppercase tracking-wider">{{ t('users.colSiret') }}</th>
+              <th class="px-6 py-3 text-left text-xs font-semibold text-[#6b7280] uppercase tracking-wider">{{ t('users.colJoined') }}</th>
+              <th class="px-6 py-3 text-right text-xs font-semibold text-[#6b7280] uppercase tracking-wider">{{ t('users.colActions') }}</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-[#f8fafc]">
@@ -136,8 +203,8 @@
                 <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-3">
                   <MagnifyingGlassIcon class="w-6 h-6 text-gray-400" />
                 </div>
-                <p class="text-gray-500 font-medium">Aucun résultat</p>
-                <p class="text-gray-400 text-sm mt-1">Modifiez vos critères de recherche</p>
+                <p class="text-gray-500 font-medium">{{ t('common.noResults') }}</p>
+                <p class="text-gray-400 text-sm mt-1">{{ t('common.searchCriteria') }}</p>
               </td>
             </tr>
             <tr
@@ -161,7 +228,7 @@
               <td class="px-6 py-4">
                 <span class="text-xs font-medium px-2.5 py-1 rounded-full"
                   :class="hasProviderRole(user) ? 'bg-[#dbeafe] text-blue-700' : 'bg-[#f1f5f9] text-[#475569]'">
-                  {{ hasProviderRole(user) ? 'Professionnel' : 'Particulier' }}
+                  {{ hasProviderRole(user) ? t('users.professional') : t('users.individual') }}
                 </span>
               </td>
               <td class="px-6 py-4">
@@ -177,17 +244,17 @@
               </td>
               <td class="px-6 py-4 text-right" @click.stop>
                 <div class="flex justify-end gap-1.5">
-                  <button @click="router.push(`/admin/users/${user.id}`)" class="p-1.5 rounded-lg text-gray-400 hover:text-[#40617f] hover:bg-blue-50 transition" title="Voir">
+                  <button @click="router.push(`/admin/users/${user.id}`)" class="p-1.5 rounded-lg text-gray-400 hover:text-[#40617f] hover:bg-blue-50 transition" :title="t('common.edit')">
                     <EyeIcon class="w-4 h-4" />
                   </button>
-                  <button class="p-1.5 rounded-lg text-gray-400 hover:text-[#006d35] hover:bg-green-50 transition" title="Modifier">
+                  <button class="p-1.5 rounded-lg text-gray-400 hover:text-[#006d35] hover:bg-green-50 transition" :title="t('common.edit')">
                     <PencilIcon class="w-4 h-4" />
                   </button>
                   <button
                     v-if="user.status !== 'banned'"
                     @click="openConfirm('ban', user)"
                     class="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition"
-                    title="Bannir"
+                    :title="t('users.actionBan')"
                   >
                     <NoSymbolIcon class="w-4 h-4" />
                   </button>
@@ -195,7 +262,7 @@
                     v-else
                     @click="openConfirm('activate', user)"
                     class="p-1.5 rounded-lg text-gray-400 hover:text-green-600 hover:bg-green-50 transition"
-                    title="Activer"
+                    :title="t('users.actionActivate')"
                   >
                     <CheckCircleIcon class="w-4 h-4" />
                   </button>
@@ -206,7 +273,7 @@
         </table>
       </div>
       <div class="px-6 py-4 border-t border-[#f1f5f9] flex items-center justify-between">
-        <p class="text-xs text-gray-400">{{ meta.total }} membres au total</p>
+        <p class="text-xs text-gray-400">{{ meta.total }} {{ t('users.membersList').toLowerCase() }} {{ t('common.total') }}</p>
         <AppPagination :current-page="meta.current_page" :last-page="meta.last_page" :total="meta.total" @page-change="changePage" />
       </div>
     </div>
@@ -219,8 +286,8 @@
             <ShieldCheckIcon class="w-5 h-5 text-gray-500" />
           </div>
           <div>
-            <p class="text-sm font-semibold text-[#001d32]">Vérification d'Intégrité des Données</p>
-            <p class="text-xs text-gray-400">Analyse automatique hebdomadaire</p>
+            <p class="text-sm font-semibold text-[#001d32]">{{ t('users.integrityCheck') }}</p>
+            <p class="text-xs text-gray-400">{{ t('users.integritySubtitle') }}</p>
           </div>
         </div>
         <div class="flex items-center gap-2 mt-3">
@@ -229,7 +296,7 @@
           </div>
           <span class="text-xs font-semibold text-green-600">97%</span>
         </div>
-        <p class="text-xs text-gray-400 mt-1">Données cohérentes</p>
+        <p class="text-xs text-gray-400 mt-1">{{ t('users.integrityData') }}</p>
       </div>
 
       <RouterLink to="/admin/providers" class="bg-white rounded-2xl p-5 border border-[#f1f5f9] shadow-sm hover:shadow-md transition-shadow block" style="border-top: 3px solid #006d35;">
@@ -238,21 +305,21 @@
             <BriefcaseIcon class="w-5 h-5" style="color:#006d35;" />
           </div>
           <div>
-            <p class="text-sm font-semibold text-[#001d32]">Vérification Prestataires</p>
-            <p class="text-xs text-gray-400">File d'attente de validation</p>
+            <p class="text-sm font-semibold text-[#001d32]">{{ t('users.providerCheck') }}</p>
+            <p class="text-xs text-gray-400">{{ t('users.providerCheckSubtitle') }}</p>
           </div>
         </div>
-        <p class="text-xs font-medium" style="color:#006d35;">Accéder à la liste des prestataires →</p>
+        <p class="text-xs font-medium" style="color:#006d35;">{{ t('users.gotoProviders') }}</p>
       </RouterLink>
     </div>
 
     <AppConfirmDialog
       :show="confirm.show"
-      :title="confirm.action === 'ban' ? 'Bannir cet utilisateur ?' : 'Activer cet utilisateur ?'"
+      :title="confirm.action === 'ban' ? t('users.bannedTitle') : t('users.activateTitle')"
       :message="confirm.action === 'ban'
-        ? `Voulez-vous bannir ${confirm.user?.first_name} ${confirm.user?.last_name} ?`
-        : `Voulez-vous activer ${confirm.user?.first_name} ${confirm.user?.last_name} ?`"
-      :confirm-label="confirm.action === 'ban' ? 'Bannir' : 'Activer'"
+        ? `${t('users.confirmBanMsg', { name: `${confirm.user?.first_name} ${confirm.user?.last_name}` })}`
+        : `${t('users.confirmActivateMsg', { name: `${confirm.user?.first_name} ${confirm.user?.last_name}` })}`"
+      :confirm-label="confirm.action === 'ban' ? t('users.banConfirmLabel') : t('users.activateConfirmLabel')"
       :confirm-variant="confirm.action === 'ban' ? 'danger' : 'primary'"
       :loading="confirm.loading"
       @confirm="executeAction"
@@ -261,9 +328,15 @@
   </div>
 </template>
 
+<style scoped>
+.tab-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+.tab-scroll::-webkit-scrollbar { display: none; }
+</style>
+
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { userService } from '@/services/userService'
 import { useToast } from '@/utils/useToast'
 import AppPagination from '@/components/AppPagination.vue'
@@ -276,6 +349,7 @@ import {
 
 const router = useRouter()
 const toast  = useToast()
+const { t }  = useI18n()
 
 const users      = ref([])
 const loading    = ref(false)
@@ -300,7 +374,7 @@ async function fetchUsers(page = 1) {
     users.value = res.data
     meta.value  = res.meta
   } catch {
-    toast.showError('Impossible de charger les utilisateurs')
+    toast.showError(t('users.toastLoadError'))
   } finally {
     loading.value = false
   }
@@ -320,7 +394,12 @@ function statusBadge(status) {
 }
 
 function statusText(status) {
-  const map = { active: 'Actif', banned: 'Banni', inactive: 'Inactif', pending: 'En attente' }
+  const map = {
+    active:   t('users.statusActive'),
+    banned:   t('users.statusBanned'),
+    inactive: t('users.statusInactive'),
+    pending:  t('users.statusPending'),
+  }
   return map[status] || status
 }
 
@@ -339,15 +418,15 @@ async function executeAction() {
   try {
     if (confirm.action === 'ban') {
       await userService.ban(confirm.user.id)
-      toast.showSuccess(`${confirm.user.first_name} ${confirm.user.last_name} a été banni`)
+      toast.showSuccess(t('users.toastBanned', { name: `${confirm.user.first_name} ${confirm.user.last_name}` }))
     } else {
       await userService.activate(confirm.user.id)
-      toast.showSuccess(`${confirm.user.first_name} ${confirm.user.last_name} a été activé`)
+      toast.showSuccess(t('users.toastActivated', { name: `${confirm.user.first_name} ${confirm.user.last_name}` }))
     }
     confirm.show = false
     fetchUsers(meta.value.current_page)
   } catch {
-    toast.showError('Une erreur est survenue')
+    toast.showError(t('users.toastError'))
   } finally {
     confirm.loading = false
   }

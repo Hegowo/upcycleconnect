@@ -3,10 +3,8 @@
     <!-- Header -->
     <div class="flex items-center justify-between">
       <div>
-        <h2 class="text-2xl font-bold text-[#001d32]">
-          Architecture Système &amp; <span style="color:#006d35;">Journaux Opérationnels</span>
-        </h2>
-        <p class="text-sm text-[#40617f] mt-0.5">Suivi des actions administratives et santé de la plateforme</p>
+        <h2 class="text-2xl font-bold text-[#001d32]">{{ t('logs.title') }}</h2>
+        <p class="text-sm text-[#40617f] mt-0.5">{{ t('logs.subtitle') }}</p>
       </div>
     </div>
 
@@ -15,11 +13,11 @@
       <div>
         <div class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm overflow-hidden">
           <div class="flex items-center justify-between px-6 py-4 border-b border-[#f1f5f9]">
-            <h3 class="font-semibold text-[#001d32]">Flux d'Activité</h3>
+            <h3 class="font-semibold text-[#001d32]">{{ t('logs.activityFeed') }}</h3>
             <div class="flex items-center gap-2">
               <button @click="exportLogs" class="px-3 py-1.5 text-xs font-semibold rounded-lg border border-[#e5e7eb] text-[#374151] hover:bg-gray-50 transition flex items-center gap-1.5">
                 <ArrowDownTrayIcon class="w-3.5 h-3.5" />
-                Exporter CSV
+                {{ t('common.exportCsv') }}
               </button>
             </div>
           </div>
@@ -27,30 +25,30 @@
           <!-- Tabs -->
           <div class="flex gap-1 p-3 bg-[#f8fafc] border-b border-[#f1f5f9]">
             <button @click="tab='admin'" :class="tab==='admin' ? 'bg-white shadow text-[#001d32] font-semibold' : 'text-gray-500 hover:text-gray-700'" class="px-4 py-2 rounded-lg text-sm transition">
-              Journaux Admin
+              {{ t('logs.tabAdmin') }}
             </button>
             <button @click="tab='platform'" :class="tab==='platform' ? 'bg-white shadow text-[#001d32] font-semibold' : 'text-gray-500 hover:text-gray-700'" class="px-4 py-2 rounded-lg text-sm transition">
-              Activité Plateforme
+              {{ t('logs.tabPlatform') }}
             </button>
           </div>
 
           <!-- Admin logs table -->
-          <div v-if="tab === 'admin'">
+          <div v-if="tab === 'admin'" class="overflow-x-auto">
             <div v-if="adminLoading" class="p-4 space-y-3">
               <div v-for="n in 6" :key="n" class="h-12 bg-gray-50 rounded-lg animate-pulse"></div>
             </div>
             <div v-else-if="!adminLogs.length" class="py-12 text-center text-gray-400 text-sm">
               <ClockIcon class="w-8 h-8 mx-auto mb-2 text-gray-300" />
-              Aucun journal administratif
+              {{ t('logs.adminEmpty') }}
             </div>
-            <table v-else class="min-w-full">
+            <table v-else class="min-w-full hidden lg:table">
               <thead>
                 <tr class="bg-[#f8fafc]">
-                  <th class="px-6 py-3 text-left text-xs font-semibold text-[#6b7280] uppercase tracking-wider">Timestamp</th>
-                  <th class="px-6 py-3 text-left text-xs font-semibold text-[#6b7280] uppercase tracking-wider">Admin User</th>
-                  <th class="px-6 py-3 text-left text-xs font-semibold text-[#6b7280] uppercase tracking-wider">Action Effectuée</th>
-                  <th class="px-6 py-3 text-left text-xs font-semibold text-[#6b7280] uppercase tracking-wider">Contexte Entité</th>
-                  <th class="px-6 py-3 text-left text-xs font-semibold text-[#6b7280] uppercase tracking-wider">Statut</th>
+                  <th class="px-6 py-3 text-left text-xs font-semibold text-[#6b7280] uppercase tracking-wider">{{ t('logs.colTimestamp') }}</th>
+                  <th class="px-6 py-3 text-left text-xs font-semibold text-[#6b7280] uppercase tracking-wider">{{ t('logs.colAdmin') }}</th>
+                  <th class="px-6 py-3 text-left text-xs font-semibold text-[#6b7280] uppercase tracking-wider">{{ t('logs.colAction') }}</th>
+                  <th class="px-6 py-3 text-left text-xs font-semibold text-[#6b7280] uppercase tracking-wider">{{ t('logs.colEntity') }}</th>
+                  <th class="px-6 py-3 text-left text-xs font-semibold text-[#6b7280] uppercase tracking-wider">{{ t('logs.colStatus') }}</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-[#f8fafc]">
@@ -69,7 +67,7 @@
                         :style="{ backgroundColor: avatarColor(log.admin_name) }">
                         {{ (log.admin_name?.trim() || 'S').charAt(0).toUpperCase() }}
                       </div>
-                      <span class="text-sm font-medium text-[#001d32]">{{ log.admin_name?.trim() || 'Système' }}</span>
+                      <span class="text-sm font-medium text-[#001d32]">{{ log.admin_name?.trim() || t('logs.system') }}</span>
                     </div>
                   </td>
                   <td class="px-6 py-3.5 text-sm text-gray-600">{{ actionLabel(log.action) }}</td>
@@ -88,6 +86,36 @@
                 </tr>
               </tbody>
             </table>
+
+            <!-- Mobile admin log cards -->
+            <div v-if="!adminLoading && adminLogs.length" class="lg:hidden divide-y divide-[#f8fafc]">
+              <div
+                v-for="log in adminLogs"
+                :key="log.id"
+                class="flex items-start gap-3 p-4 hover:bg-[#f8fafc] cursor-pointer transition-colors"
+                @click="openModal(log, 'admin')"
+              >
+                <div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
+                  :style="{ backgroundColor: avatarColor(log.admin_name) }">
+                  {{ (log.admin_name?.trim() || 'S').charAt(0).toUpperCase() }}
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center justify-between gap-2 mb-1">
+                    <p class="text-sm font-medium text-[#001d32] truncate">{{ log.admin_name?.trim() || t('logs.system') }}</p>
+                    <span class="text-xs font-semibold px-2 py-0.5 rounded-full shrink-0" :class="statusBadge(log.action)">
+                      {{ statusText(log.action) }}
+                    </span>
+                  </div>
+                  <p class="text-xs text-gray-600 mb-1">{{ actionLabel(log.action) }}</p>
+                  <div class="flex items-center gap-2">
+                    <span v-if="log.resource_type" class="text-xs font-medium px-1.5 py-0.5 rounded-full" :class="actionBadgeClass(log.action)">
+                      {{ log.resource_type }}<span v-if="log.resource_id" class="opacity-60"> #{{ log.resource_id }}</span>
+                    </span>
+                    <span class="text-xs text-gray-400 font-mono">{{ formatDateShort(log.created_at) }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- Platform logs -->
@@ -97,7 +125,7 @@
             </div>
             <div v-else-if="!platformLogs.length" class="py-12 text-center text-gray-400 text-sm">
               <UsersIcon class="w-8 h-8 mx-auto mb-2 text-gray-300" />
-              Aucune activité plateforme
+              {{ t('logs.platformEmpty') }}
             </div>
             <div v-else class="divide-y divide-[#f8fafc]">
               <div
@@ -116,7 +144,7 @@
                 </div>
                 <span class="text-xs font-semibold px-2 py-0.5 rounded-full"
                   :class="entry.type === 'provider' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'">
-                  {{ entry.type === 'provider' ? 'Prestataire' : 'Utilisateur' }}
+                  {{ entry.type === 'provider' ? t('logs.typeProvider') : t('logs.typeUser') }}
                 </span>
               </div>
             </div>
@@ -129,60 +157,82 @@
     <div class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm overflow-hidden">
       <div class="px-6 py-4 border-b border-[#f1f5f9] flex items-center justify-between">
         <div>
-          <h3 class="font-semibold text-[#001d32]">Gouvernance du Staff</h3>
-          <p class="text-xs text-gray-400 mt-0.5">Équipe administrative active</p>
+          <h3 class="font-semibold text-[#001d32]">{{ t('logs.staffGovernance') }}</h3>
+          <p class="text-xs text-gray-400 mt-0.5">{{ t('logs.staffSubtitle') }}</p>
         </div>
       </div>
 
       <div v-if="!auth.isSuperAdmin" class="px-6 py-8 text-center text-gray-400 text-sm">
         <ShieldCheckIcon class="w-8 h-8 mx-auto mb-2 text-gray-300" />
-        Accès réservé aux super-administrateurs
+        {{ t('logs.restrictedAccess') }}
       </div>
 
       <template v-else>
-        <div v-if="adminsLoading" class="p-4 space-y-3">
+        <div v-if="adminsLoading" class="p-4 space-y-3 overflow-x-auto">
           <div v-for="n in 3" :key="n" class="h-12 bg-gray-50 rounded-lg animate-pulse"></div>
         </div>
-        <table v-else-if="admins.length" class="min-w-full">
-          <thead>
-            <tr class="bg-[#f8fafc]">
-              <th class="px-6 py-3 text-left text-xs font-semibold text-[#6b7280] uppercase tracking-wider">Administrateur</th>
-              <th class="px-6 py-3 text-left text-xs font-semibold text-[#6b7280] uppercase tracking-wider">Niveau / Badge</th>
-              <th class="px-6 py-3 text-left text-xs font-semibold text-[#6b7280] uppercase tracking-wider">Email</th>
-              <th class="px-6 py-3 text-left text-xs font-semibold text-[#6b7280] uppercase tracking-wider">Depuis le</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-[#f8fafc]">
-            <tr v-for="admin in admins" :key="admin.id" class="hover:bg-[#f8fafc] transition-colors">
-              <td class="px-6 py-4">
-                <div class="flex items-center gap-3">
-                  <div class="w-9 h-9 rounded-full flex items-center justify-center text-white text-xs font-bold" style="background-color:#001d32;">
-                    {{ ((admin.first_name?.[0] || '') + (admin.last_name?.[0] || '')).toUpperCase() }}
+        <div v-else-if="admins.length">
+          <table class="min-w-full hidden lg:table">
+            <thead>
+              <tr class="bg-[#f8fafc]">
+                <th class="px-6 py-3 text-left text-xs font-semibold text-[#6b7280] uppercase tracking-wider">{{ t('logs.colAdministrator') }}</th>
+                <th class="px-6 py-3 text-left text-xs font-semibold text-[#6b7280] uppercase tracking-wider">{{ t('logs.colLevel') }}</th>
+                <th class="px-6 py-3 text-left text-xs font-semibold text-[#6b7280] uppercase tracking-wider">{{ t('users.colEmail') }}</th>
+                <th class="px-6 py-3 text-left text-xs font-semibold text-[#6b7280] uppercase tracking-wider">{{ t('logs.colSince') }}</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-[#f8fafc]">
+              <tr v-for="admin in admins" :key="admin.id" class="hover:bg-[#f8fafc] transition-colors">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-full flex items-center justify-center text-white text-xs font-bold" style="background-color:#001d32;">
+                      {{ ((admin.first_name?.[0] || '') + (admin.last_name?.[0] || '')).toUpperCase() }}
+                    </div>
+                    <span class="text-sm font-semibold text-[#001d32]">{{ admin.first_name }} {{ admin.last_name }}</span>
                   </div>
-                  <span class="text-sm font-semibold text-[#001d32]">{{ admin.first_name }} {{ admin.last_name }}</span>
-                </div>
-              </td>
-              <td class="px-6 py-4">
-                <span class="text-xs font-semibold px-2.5 py-1 rounded-full capitalize"
+                </td>
+                <td class="px-6 py-4">
+                  <span class="text-xs font-semibold px-2.5 py-1 rounded-full capitalize"
+                    :class="admin.role === 'super_admin' ? 'bg-[#fef9c3] text-[#854d0e]' : 'bg-[#dcfce7] text-[#166534]'">
+                    {{ admin.role === 'super_admin' ? 'Super Admin' : 'Admin' }}
+                  </span>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-400">{{ admin.email }}</td>
+                <td class="px-6 py-4 text-sm text-gray-400">{{ formatDateShort(admin.created_at) }}</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Mobile admin governance cards -->
+          <div class="lg:hidden divide-y divide-[#f8fafc]">
+            <div v-for="admin in admins" :key="admin.id" class="flex items-center gap-3 px-5 py-4">
+              <div class="w-10 h-10 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0" style="background-color:#001d32;">
+                {{ ((admin.first_name?.[0] || '') + (admin.last_name?.[0] || '')).toUpperCase() }}
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold text-[#001d32]">{{ admin.first_name }} {{ admin.last_name }}</p>
+                <p class="text-xs text-gray-400 truncate">{{ admin.email }}</p>
+              </div>
+              <div class="flex flex-col items-end gap-1">
+                <span class="text-xs font-semibold px-2 py-0.5 rounded-full capitalize"
                   :class="admin.role === 'super_admin' ? 'bg-[#fef9c3] text-[#854d0e]' : 'bg-[#dcfce7] text-[#166534]'">
                   {{ admin.role === 'super_admin' ? 'Super Admin' : 'Admin' }}
                 </span>
-              </td>
-              <td class="px-6 py-4 text-sm text-gray-400">{{ admin.email }}</td>
-              <td class="px-6 py-4 text-sm text-gray-400">{{ formatDateShort(admin.created_at) }}</td>
-            </tr>
-          </tbody>
-        </table>
-        <div v-else class="px-6 py-8 text-center text-gray-400 text-sm">Aucun administrateur</div>
+                <span class="text-xs text-gray-400">{{ formatDateShort(admin.created_at) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div v-else class="px-6 py-8 text-center text-gray-400 text-sm">{{ t('logs.noAdmins') }}</div>
       </template>
     </div>
 
     <!-- Terminal Modal -->
     <Teleport to="body">
       <Transition name="modal">
-        <div v-if="selectedLog" class="fixed inset-0 z-50 flex items-center justify-center p-4" @click.self="closeModal">
+        <div v-if="selectedLog" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4" @click.self="closeModal">
           <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
-          <div class="relative w-full max-w-2xl rounded-xl overflow-hidden shadow-2xl border border-gray-700">
+          <div class="relative w-full sm:max-w-2xl rounded-t-2xl sm:rounded-xl overflow-hidden shadow-2xl border border-gray-700 max-h-[85vh] overflow-y-auto">
             <div class="flex items-center gap-2 px-4 py-3 bg-gray-800 border-b border-gray-700">
               <button @click="closeModal" class="w-3 h-3 rounded-full bg-red-500 hover:bg-red-400 transition-colors"></button>
               <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
@@ -210,6 +260,18 @@
                   <div class="flex gap-3"><span class="text-gray-500 w-28 shrink-0">action</span><span :class="actionTerminalColor(selectedLog.action)" class="font-bold">{{ selectedLog.action }}</span></div>
                   <div class="flex gap-3"><span class="text-gray-500 w-28 shrink-0">resource_type</span><span class="text-purple-300">{{ selectedLog.resource_type || '—' }}</span></div>
                   <div class="flex gap-3"><span class="text-gray-500 w-28 shrink-0">resource_id</span><span class="text-yellow-300">{{ selectedLog.resource_id ?? '—' }}</span></div>
+                  <template v-if="selectedLog.old_values">
+                    <div class="flex gap-3 mt-2 pt-2 border-t border-gray-700">
+                      <span class="text-gray-500 w-28 shrink-0">old_values</span>
+                      <span class="text-red-300 break-all text-xs font-mono whitespace-pre">{{ formatJson(selectedLog.old_values) }}</span>
+                    </div>
+                  </template>
+                  <template v-if="selectedLog.new_values">
+                    <div class="flex gap-3">
+                      <span class="text-gray-500 w-28 shrink-0">new_values</span>
+                      <span class="text-green-300 break-all text-xs font-mono whitespace-pre">{{ formatJson(selectedLog.new_values) }}</span>
+                    </div>
+                  </template>
                 </div>
               </template>
               <template v-else>
@@ -239,6 +301,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth'
 import api from '@/services/api'
 import {
@@ -246,6 +309,7 @@ import {
   ArrowDownTrayIcon,
 } from '@heroicons/vue/24/outline'
 
+const { t } = useI18n()
 const auth = useAuthStore()
 const tab = ref('admin')
 const adminLogs = ref([])
@@ -334,36 +398,39 @@ function formatDate(dateStr) {
   const d = new Date(dateStr)
   const now = new Date()
   const diff = Math.floor((now - d) / 1000)
-  if (diff < 60) return "à l'instant"
-  if (diff < 3600) return `il y a ${Math.floor(diff / 60)}min`
-  if (diff < 86400) return `il y a ${Math.floor(diff / 3600)}h`
-  return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+  const locale = t('common.locale') || 'fr-FR'
+  if (diff < 60) return t('dashboard.actionInstant')
+  if (diff < 3600) return t('dashboard.actionMinutesAgo', { n: Math.floor(diff / 60) })
+  if (diff < 86400) return t('dashboard.actionHoursAgo', { n: Math.floor(diff / 3600) })
+  return d.toLocaleDateString(locale, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
 }
 function formatDateShort(iso) {
-  return new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+  const locale = t('common.locale') || 'fr-FR'
+  return new Date(iso).toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
 }
 function formatDateFull(dateStr) {
   const d = new Date(dateStr)
-  return d.toLocaleDateString('fr-FR', {
+  const locale = t('common.locale') || 'fr-FR'
+  return d.toLocaleDateString(locale, {
     weekday: 'short', day: '2-digit', month: 'short', year: 'numeric',
     hour: '2-digit', minute: '2-digit', second: '2-digit',
   }) + ` (UTC${d.getTimezoneOffset() <= 0 ? '+' : '-'}${Math.abs(d.getTimezoneOffset() / 60)})`
 }
 
 function actionLabel(action) {
-  const labels = {
-    'user.banned':        'A banni un utilisateur',
-    'user.activated':     'A activé un utilisateur',
-    'user.deleted':       'A supprimé un utilisateur',
-    'provider.approved':  'A approuvé un prestataire',
-    'provider.suspended': 'A suspendu un prestataire',
-    'admin.created':      'A créé un administrateur',
-    'admin.deleted':      'A supprimé un administrateur',
-    'category.created':   'A créé une catégorie',
-    'category.deleted':   'A supprimé une catégorie',
-    'category.toggled':   'A modifié une catégorie',
+  const map = {
+    'user.banned':        'logs.actionUserBanned',
+    'user.activated':     'logs.actionUserActivated',
+    'user.deleted':       'logs.actionUserDeleted',
+    'provider.approved':  'logs.actionProviderApproved',
+    'provider.suspended': 'logs.actionProviderSuspended',
+    'admin.created':      'logs.actionAdminCreated',
+    'admin.deleted':      'logs.actionAdminDeleted',
+    'category.created':   'logs.actionCategoryCreated',
+    'category.deleted':   'logs.actionCategoryDeleted',
+    'category.toggled':   'logs.actionCategoryToggled',
   }
-  return labels[action] || action
+  return map[action] ? t(map[action]) : action
 }
 function actionBadgeClass(action) {
   if (action.includes('deleted') || action.includes('banned')) return 'bg-[#fee2e2] text-[#991b1b]'
@@ -378,6 +445,13 @@ function statusBadge(action) {
 function statusText(action) {
   if (action.includes('deleted') || action.includes('banned') || action.includes('suspended')) return 'Warning'
   return 'Success'
+}
+function formatJson(raw) {
+  try {
+    return JSON.stringify(JSON.parse(raw), null, 2)
+  } catch {
+    return raw
+  }
 }
 function actionTerminalColor(action) {
   if (action.includes('deleted') || action.includes('banned')) return 'text-red-400'

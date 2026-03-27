@@ -1,21 +1,19 @@
 <template>
   <div class="space-y-6">
     <!-- Header -->
-    <div class="flex items-center justify-between">
+    <div class="flex items-start justify-between gap-3">
       <div>
-        <h2 class="text-2xl font-bold text-[#001d32]">Demandes de Dépôt</h2>
+        <h2 class="text-xl sm:text-2xl font-bold text-[#001d32]">Demandes de Dépôt</h2>
         <p class="text-sm text-[#40617f] mt-0.5">Validez les demandes de dépôt d'objets des utilisateurs</p>
       </div>
-      <div class="flex items-center gap-2">
-        <span class="text-sm font-semibold px-3 py-1 rounded-full" style="background:#fef9c3; color:#854d0e;">
-          {{ pendingCount }} en attente
-        </span>
-      </div>
+      <span class="text-xs sm:text-sm font-semibold px-3 py-1 rounded-full shrink-0" style="background:#fef9c3; color:#854d0e;">
+        {{ pendingCount }} en attente
+      </span>
     </div>
 
     <!-- Filters -->
-    <div class="flex items-center gap-3">
-      <div class="relative flex-1 max-w-xs">
+    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+      <div class="relative flex-1">
         <MagnifyingGlassIcon class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
         <input
           v-model="search"
@@ -25,12 +23,12 @@
           class="w-full pl-9 pr-3 py-2 text-sm bg-white border border-[#e5e7eb] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006d35]/30 focus:border-[#006d35] transition"
         />
       </div>
-      <div class="flex gap-1 bg-white border border-[#e5e7eb] rounded-xl p-1">
+      <div class="flex gap-1 bg-white border border-[#e5e7eb] rounded-xl p-1 overflow-x-auto">
         <button
           v-for="f in statusFilters"
           :key="f.value"
           @click="setFilter(f.value)"
-          class="px-3 py-1.5 rounded-lg text-xs font-semibold transition"
+          class="px-3 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap shrink-0"
           :class="statusFilter === f.value ? 'bg-[#006d35] text-white' : 'text-[#40617f] hover:bg-gray-50'"
         >
           {{ f.label }}
@@ -39,10 +37,10 @@
     </div>
 
     <!-- Split layout -->
-    <div class="grid grid-cols-1 xl:grid-cols-5 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
 
       <!-- Left col: Queue (2/5) -->
-      <div class="xl:col-span-2">
+      <div class="lg:col-span-2" :class="selectedRequest ? 'hidden lg:block' : ''">
         <div class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm overflow-hidden">
           <div class="px-5 py-4 border-b border-[#f1f5f9]">
             <h3 class="font-semibold text-[#001d32]">File d'attente</h3>
@@ -97,7 +95,7 @@
       </div>
 
       <!-- Right col: Detail (3/5) -->
-      <div class="xl:col-span-3">
+      <div class="lg:col-span-3" ref="detailPanel">
         <div v-if="!selectedRequest" class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm flex items-center justify-center h-96">
           <div class="text-center text-gray-400">
             <InboxIcon class="w-12 h-12 mx-auto mb-3 text-gray-300" />
@@ -107,6 +105,13 @@
         </div>
 
         <div v-else class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm overflow-hidden">
+          <!-- Back button (mobile only) -->
+          <div class="lg:hidden px-4 py-2 border-b border-[#f1f5f9]">
+            <button @click="selectedRequest = null" class="flex items-center gap-1.5 text-sm text-[#40617f] font-medium">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+              Retour à la liste
+            </button>
+          </div>
           <!-- Header -->
           <div class="px-6 py-4 border-b border-[#f1f5f9] flex items-center justify-between">
             <div>
@@ -122,7 +127,7 @@
             <!-- Info grid -->
             <div>
               <p class="text-xs font-semibold text-[#6b7280] uppercase tracking-wider mb-3">Informations</p>
-              <div class="grid grid-cols-2 gap-3">
+              <div class="grid grid-cols-2 sm:grid-cols-2 gap-3">
                 <div class="bg-[#f8fafc] rounded-xl p-3">
                   <p class="text-xs text-gray-400 mb-1">Utilisateur</p>
                   <p class="text-sm font-semibold text-[#001d32]">{{ selectedRequest.user?.name || '—' }}</p>
@@ -223,7 +228,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import {
   InboxIcon, PhotoIcon, CheckCircleIcon, XCircleIcon,
   MagnifyingGlassIcon, QrCodeIcon,
@@ -243,6 +248,7 @@ const actionLoading = ref(false)
 const actionError = ref('')
 const search = ref('')
 const statusFilter = ref('')
+const detailPanel = ref(null)
 let searchTimer = null
 
 const statusFilters = [
@@ -354,6 +360,13 @@ function conditionText(condition) {
   const map = { new: 'Neuf', good: 'Bon état', fair: 'État correct', poor: 'Usé' }
   return map[condition] || condition || '—'
 }
+
+watch(() => selectedRequest.value, async (val) => {
+  if (val && window.innerWidth < 1024) {
+    await nextTick()
+    detailPanel.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+})
 
 onMounted(() => fetchRequests())
 </script>

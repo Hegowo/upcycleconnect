@@ -1,30 +1,30 @@
 <template>
   <div class="bg-[#f7f9ff] pb-0">
-    <div class="max-w-[1280px] mx-auto px-8 pt-12 pb-16">
+    <div class="max-w-[1280px] mx-auto px-4 sm:px-8 pt-8 sm:pt-12 pb-12 sm:pb-16">
 
       <!-- Hero -->
       <div class="mb-12">
-        <h1 class="font-jakarta font-extrabold text-[#001d32] text-5xl tracking-tight">Déposer un objet</h1>
+        <h1 class="font-jakarta font-extrabold text-[#001d32] text-3xl sm:text-5xl tracking-tight">Déposer un objet</h1>
         <p class="text-[#40617f] text-lg mt-4 max-w-2xl leading-relaxed">
           Donnez une seconde vie à vos objets. Remplissez les détails ci-dessous pour initier votre demande de dépôt dans notre écosystème circulaire.
         </p>
       </div>
 
       <!-- Bento Grid Form -->
-      <div class="grid grid-cols-12 gap-6">
+      <div class="grid grid-cols-12 gap-4 sm:gap-6">
 
-        <!-- Photos upload (col-span-8) -->
-        <div class="col-span-8 bg-white rounded-[24px] p-8 shadow-[0_12px_40px_0_rgba(0,29,50,0.06)] flex flex-col gap-6">
+        <!-- Photos upload -->
+        <div class="col-span-12 lg:col-span-8 bg-white rounded-[24px] p-6 sm:p-8 shadow-[0_12px_40px_0_rgba(0,29,50,0.06)] flex flex-col gap-6">
           <div class="flex items-center justify-between">
             <h2 class="font-jakarta font-bold text-[#001d32] text-xl">Photos de l'objet</h2>
             <span class="text-[#40617f] text-xs uppercase tracking-wide">Min. 3 slots</span>
           </div>
 
-          <div class="grid grid-cols-3 gap-4">
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
             <div
               v-for="slot in photoSlots"
               :key="slot.id"
-              class="bg-[#edf4ff] border-2 border-dashed border-[#becabc] rounded-xl flex flex-col items-center justify-center cursor-pointer hover:bg-[#d8eaff] transition h-60 group"
+              class="bg-[#edf4ff] border-2 border-dashed border-[#becabc] rounded-xl flex flex-col items-center justify-center cursor-pointer hover:bg-[#d8eaff] transition h-40 sm:h-60 group"
               @click="triggerUpload(slot.id)"
             >
               <div v-if="!slot.file">
@@ -43,8 +43,8 @@
           </p>
         </div>
 
-        <!-- Description (col-span-4) -->
-        <div class="col-span-4 bg-white rounded-[24px] p-8 shadow-[0_12px_40px_0_rgba(0,29,50,0.06)] flex flex-col gap-6">
+        <!-- Description -->
+        <div class="col-span-12 lg:col-span-4 bg-white rounded-[24px] p-6 sm:p-8 shadow-[0_12px_40px_0_rgba(0,29,50,0.06)] flex flex-col gap-6">
           <h2 class="font-jakarta font-bold text-[#001d32] text-xl">Description</h2>
 
           <div class="flex flex-col gap-5">
@@ -70,8 +70,8 @@
           </div>
         </div>
 
-        <!-- Classification (col-span-5) -->
-        <div class="col-span-5 bg-white rounded-[24px] p-8 shadow-[0_12px_40px_0_rgba(0,29,50,0.06)] flex flex-col gap-6">
+        <!-- Classification -->
+        <div class="col-span-12 lg:col-span-5 bg-white rounded-[24px] p-6 sm:p-8 shadow-[0_12px_40px_0_rgba(0,29,50,0.06)] flex flex-col gap-6">
           <h2 class="font-jakarta font-bold text-[#001d32] text-xl">Classification</h2>
 
           <div class="flex flex-col gap-3">
@@ -92,8 +92,8 @@
           </div>
         </div>
 
-        <!-- Condition + Submit (col-span-7) -->
-        <div class="col-span-7 bg-white rounded-[24px] p-8 shadow-[0_12px_40px_0_rgba(0,29,50,0.06)] flex flex-col gap-6">
+        <!-- Condition + Submit -->
+        <div class="col-span-12 lg:col-span-7 bg-white rounded-[24px] p-6 sm:p-8 shadow-[0_12px_40px_0_rgba(0,29,50,0.06)] flex flex-col gap-6">
           <h2 class="font-jakarta font-bold text-[#001d32] text-xl">État de l'objet</h2>
 
           <div class="flex flex-wrap gap-3">
@@ -110,7 +110,7 @@
             </button>
           </div>
 
-          <div class="bg-[rgba(27,136,72,0.1)] rounded-xl p-6 flex items-center justify-between">
+          <div class="bg-[rgba(27,136,72,0.1)] rounded-xl p-4 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:justify-between">
             <div class="flex items-center gap-4">
               <div class="w-6 h-6 bg-[#1b8848] rounded-full shrink-0" />
               <div>
@@ -119,7 +119,7 @@
               </div>
             </div>
             <button
-              class="px-10 py-4 rounded-xl text-white font-semibold text-lg transition hover:opacity-90 shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1)]"
+              class="w-full sm:w-auto px-8 sm:px-10 py-4 rounded-xl text-white font-semibold text-base sm:text-lg transition hover:opacity-90 shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1)]"
               style="background: linear-gradient(135deg, #006d35 0%, #1b8848 100%);"
               @click="submitForm"
             >
@@ -129,11 +129,10 @@
         </div>
 
         <!-- How it works (full width) -->
-        <div class="col-span-12 rounded-[24px] overflow-hidden relative h-48">
-          <!-- BG gradient overlay -->
+        <div class="col-span-12 rounded-[24px] overflow-hidden relative min-h-[160px] sm:h-48">
           <div class="absolute inset-0 bg-gradient-to-br from-[#d1fae5] to-[#a7f3d0] opacity-50" />
           <div class="absolute inset-0 bg-gradient-to-r from-[#f7f9ff] to-transparent" />
-          <div class="relative p-12 flex flex-col justify-center h-full">
+          <div class="relative p-6 sm:p-12 flex flex-col justify-center h-full">
             <h3 class="font-jakarta font-bold text-[#001d32] text-2xl mb-2">Comment ça marche ?</h3>
             <p class="text-[#40617f] text-base leading-relaxed max-w-lg">
               Une fois soumis, nos experts valideront votre objet sous 24h. Vous recevrez ensuite un bon de dépôt pour le point de collecte le plus proche.

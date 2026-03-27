@@ -172,9 +172,16 @@ func (h *PrestationHandler) Update(c *gin.Context) {
 		return
 	}
 
-	old := map[string]interface{}{"title": prestation.Title, "status": prestation.Status}
+	old := map[string]interface{}{
+		"title":      prestation.Title,
+		"status":     prestation.Status,
+		"price":      prestation.Price,
+		"price_type": prestation.PriceType,
+	}
 
 	updates := map[string]interface{}{}
+	after := map[string]interface{}{"title": prestation.Title}
+
 	if req.CategoryID != nil {
 		updates["category_id"] = *req.CategoryID
 	}
@@ -183,18 +190,23 @@ func (h *PrestationHandler) Update(c *gin.Context) {
 	}
 	if req.Title != nil {
 		updates["title"] = *req.Title
+		after["title"] = *req.Title
 	}
 	if req.Description != nil {
 		updates["description"] = *req.Description
+		after["description"] = *req.Description
 	}
 	if req.Price != nil {
 		updates["price"] = *req.Price
+		after["price"] = *req.Price
 	}
 	if req.PriceType != nil {
 		updates["price_type"] = *req.PriceType
+		after["price_type"] = *req.PriceType
 	}
 	if req.Status != nil {
 		updates["status"] = *req.Status
+		after["status"] = *req.Status
 	}
 
 	if len(updates) > 0 {
@@ -203,9 +215,7 @@ func (h *PrestationHandler) Update(c *gin.Context) {
 
 	h.DB.Preload("Category").Preload("Provider.Roles").First(&prestation, prestation.ID)
 
-	h.Audit.Log(c, "prestation.updated", "Prestation", &prestation.ID, old, map[string]interface{}{
-		"title": prestation.Title,
-	})
+	h.Audit.Log(c, "prestation.updated", "Prestation", &prestation.ID, old, after)
 
 	c.JSON(http.StatusOK, models.ToPrestationResponse(&prestation))
 }

@@ -7,10 +7,10 @@
         <div class="w-8 h-8 border-4 border-[#006d35] border-t-transparent rounded-full animate-spin" />
       </div>
 
-      <div v-else class="grid grid-cols-12 gap-6">
+      <div v-else class="grid grid-cols-12 gap-4 sm:gap-6">
 
-        <!-- ── Profile Header (col-span-8) ── -->
-        <div class="col-span-8 bg-white rounded-[24px] p-8 flex gap-8 overflow-hidden relative">
+        <!-- ── Profile Header ── -->
+        <div class="col-span-12 lg:col-span-8 bg-white rounded-[24px] p-6 sm:p-8 flex gap-4 sm:gap-8 overflow-hidden relative">
           <div class="relative shrink-0">
             <div class="w-32 h-32 rounded-[24px] overflow-hidden shadow-sm bg-gradient-to-br from-[#006d35] to-[#1b8848] flex items-center justify-center">
               <img v-if="userAuth.user?.avatar_url" :src="userAuth.user.avatar_url" class="w-full h-full object-cover" />
@@ -44,8 +44,8 @@
           <div class="absolute -right-10 -top-10 w-36 h-36 rounded-full bg-[rgba(0,109,53,0.05)]" />
         </div>
 
-        <!-- ── Upcycling Score (col-span-4) ── -->
-        <div class="col-span-4 bg-[#edf4ff] rounded-[24px] p-8 flex flex-col justify-between">
+        <!-- ── Upcycling Score ── -->
+        <div class="col-span-12 lg:col-span-4 bg-[#edf4ff] rounded-[24px] p-6 sm:p-8 flex flex-col justify-between">
           <div class="flex items-center justify-between mb-6">
             <h2 class="font-jakarta font-bold text-[#001d32] text-lg">Upcycling Score</h2>
             <ArrowTrendingUpIcon class="w-5 h-5 text-[#006d35]" />
@@ -84,7 +84,7 @@
           <div v-if="!profile.deposits?.length" class="text-center py-12 text-[#40617f] text-sm">
             Aucun dépôt pour le moment.
           </div>
-          <div v-else class="grid grid-cols-3 gap-6">
+          <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             <div
               v-for="dep in depositsToShow"
               :key="dep.id"
@@ -106,8 +106,8 @@
           </div>
         </div>
 
-        <!-- ── Mes Réservations (col-span-7) ── -->
-        <div class="col-span-7 bg-[#edf4ff] rounded-[24px] p-8">
+        <!-- ── Mes Réservations ── -->
+        <div class="col-span-12 lg:col-span-7 bg-[#edf4ff] rounded-[24px] p-6 sm:p-8">
           <h2 class="font-jakarta font-bold text-[#001d32] text-xl mb-6">Mes Réservations</h2>
 
           <div v-if="!profile.reservations?.length" class="text-center py-8 text-[#40617f] text-sm">
@@ -135,8 +135,8 @@
           </div>
         </div>
 
-        <!-- ── Mes Badges (col-span-5) ── -->
-        <div class="col-span-5 bg-white rounded-[24px] p-8 flex flex-col justify-between">
+        <!-- ── Mes Badges ── -->
+        <div class="col-span-12 lg:col-span-5 bg-white rounded-[24px] p-6 sm:p-8 flex flex-col justify-between">
           <h2 class="font-jakarta font-bold text-[#001d32] text-xl mb-6">Mes Badges</h2>
 
           <div class="flex gap-4 flex-wrap">

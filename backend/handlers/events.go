@@ -68,8 +68,35 @@ func (h *EventHandler) Index(c *gin.Context) {
 		Limit(perPage).
 		Find(&events)
 
+	// Charger les compteurs de participants pour tous les événements récupérés
+	type regCount struct {
+		EventID uint
+		Count   int64
+	}
+	var regCounts []regCount
+	if len(events) > 0 {
+		ids := make([]uint, len(events))
+		for i, e := range events {
+			ids[i] = e.ID
+		}
+		h.DB.Model(&models.EventRegistration{}).
+			Select("event_id, COUNT(*) as count").
+			Where("event_id IN ?", ids).
+			Group("event_id").
+			Scan(&regCounts)
+	}
+	countByID := make(map[uint]int64)
+	for _, rc := range regCounts {
+		countByID[rc.EventID] = rc.Count
+	}
+
+	responses := make([]models.EventResponse, len(events))
+	for i := range events {
+		responses[i] = models.ToEventResponseWithCount(&events[i], countByID[events[i].ID])
+	}
+
 	c.JSON(http.StatusOK, gin.H{
-		"data": models.ToEventResponses(events),
+		"data": responses,
 		"meta": gin.H{
 			"current_page": page,
 			"last_page":    lastPage,
@@ -155,7 +182,10 @@ func (h *EventHandler) Show(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, models.ToEventResponse(&event))
+	var count int64
+	h.DB.Model(&models.EventRegistration{}).Where("event_id = ?", event.ID).Count(&count)
+
+	c.JSON(http.StatusOK, models.ToEventResponseWithCount(&event, count))
 }
 
 func (h *EventHandler) Update(c *gin.Context) {
@@ -186,20 +216,37 @@ func (h *EventHandler) Update(c *gin.Context) {
 		return
 	}
 
-	old := map[string]interface{}{"title": event.Title, "status": event.Status}
+	// Capture full before state for the diff
+	oldLocation := ""
+	if event.Location != nil {
+		oldLocation = *event.Location
+	}
+	old := map[string]interface{}{
+		"title":            event.Title,
+		"status":           event.Status,
+		"location":         oldLocation,
+		"start_date":       event.StartDate.Format("2006-01-02T15:04"),
+		"end_date":         event.EndDate.Format("2006-01-02T15:04"),
+		"max_participants": event.MaxParticipants,
+	}
 
 	updates := map[string]interface{}{}
+	after := map[string]interface{}{"title": event.Title}
+
 	if req.CategoryID != nil {
 		updates["category_id"] = *req.CategoryID
 	}
 	if req.Title != nil {
 		updates["title"] = *req.Title
+		after["title"] = *req.Title
 	}
 	if req.Description != nil {
 		updates["description"] = *req.Description
+		after["description"] = *req.Description
 	}
 	if req.Location != nil {
 		updates["location"] = *req.Location
+		after["location"] = *req.Location
 	}
 	if req.StartDate != nil {
 		d, err := parseDateTime(*req.StartDate)
@@ -208,6 +255,7 @@ func (h *EventHandler) Update(c *gin.Context) {
 			return
 		}
 		updates["start_date"] = d
+		after["start_date"] = d.Format("2006-01-02T15:04")
 	}
 	if req.EndDate != nil {
 		d, err := parseDateTime(*req.EndDate)
@@ -216,12 +264,15 @@ func (h *EventHandler) Update(c *gin.Context) {
 			return
 		}
 		updates["end_date"] = d
+		after["end_date"] = d.Format("2006-01-02T15:04")
 	}
 	if req.MaxParticipants != nil {
 		updates["max_participants"] = *req.MaxParticipants
+		after["max_participants"] = *req.MaxParticipants
 	}
 	if req.Status != nil {
 		updates["status"] = *req.Status
+		after["status"] = *req.Status
 	}
 
 	if len(updates) > 0 {
@@ -230,9 +281,7 @@ func (h *EventHandler) Update(c *gin.Context) {
 
 	h.DB.Preload("Category").Preload("Creator.Roles").First(&event, event.ID)
 
-	h.Audit.Log(c, "event.updated", "Event", &event.ID, old, map[string]interface{}{
-		"title": event.Title,
-	})
+	h.Audit.Log(c, "event.updated", "Event", &event.ID, old, after)
 
 	c.JSON(http.StatusOK, models.ToEventResponse(&event))
 }
@@ -294,7 +343,9 @@ func parseDateTime(s string) (t time.Time, err error) {
 		"2006-01-02T15:04:05.000000Z",
 		"2006-01-02T15:04:05Z",
 		"2006-01-02T15:04:05",
+		"2006-01-02T15:04",
 		"2006-01-02 15:04:05",
+		"2006-01-02 15:04",
 		"2006-01-02",
 	}
 	for _, f := range formats {

@@ -1,16 +1,71 @@
-npm<template>
+<template>
   <div class="space-y-6">
-    <div class="flex items-center justify-between">
+    <div class="flex items-center justify-between gap-3">
       <div>
         <h2 class="text-xl font-bold text-gray-900">{{ t('admins.title') }}</h2>
         <p class="text-sm text-gray-500 mt-0.5">{{ t('admins.subtitle') }}</p>
       </div>
-      <RouterLink to="/admin/admins/create" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-white text-sm font-semibold transition hover:opacity-90" style="background-color:#1B8848;">
-        {{ t('admins.createBtn') }}
+      <RouterLink to="/admin/admins/create" class="p-2 sm:px-4 sm:py-2 text-sm font-semibold rounded-lg text-white transition hover:opacity-90 flex items-center gap-2 shrink-0" style="background-color:#006d35;">
+        <PlusIcon class="w-4 h-4" />
+        <span class="hidden sm:inline">{{ t('admins.createBtn') }}</span>
       </RouterLink>
     </div>
 
-    <div class="card overflow-hidden">
+    <!-- Mobile admin cards (lg:hidden) -->
+    <div class="lg:hidden">
+      <!-- Loading -->
+      <div v-if="loading" class="space-y-3">
+        <div v-for="n in 4" :key="n" class="bg-white rounded-2xl border border-[#f1f5f9] h-20 animate-pulse"></div>
+      </div>
+      <!-- Empty -->
+      <div v-else-if="!admins.length" class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm py-12 text-center">
+        <p class="text-gray-500 font-medium text-sm">{{ t('common.noResults') }}</p>
+      </div>
+      <!-- Cards -->
+      <div v-else class="space-y-3">
+        <div v-for="admin in admins" :key="admin.id" class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm p-4">
+          <div class="flex items-center gap-3 mb-3">
+            <div
+              class="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0"
+              :style="admin.role === 'super_admin' ? 'background-color:#103652;' : 'background-color:#1B5B88;'"
+            >
+              {{ (admin.first_name?.[0] || '') + (admin.last_name?.[0] || '') }}
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-semibold text-[#001d32] truncate">
+                {{ admin.first_name }} {{ admin.last_name }}
+                <span v-if="admin.id === currentUserId" class="text-xs text-gray-400 ml-1">(moi)</span>
+              </p>
+              <p class="text-xs text-gray-400 truncate">{{ admin.email }}</p>
+            </div>
+            <AppBadge :label="admin.status" />
+          </div>
+          <div class="flex items-center justify-between pt-2 border-t border-[#f8fafc]">
+            <span
+              class="text-xs px-2 py-0.5 rounded-full font-semibold"
+              :class="admin.role === 'super_admin' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'"
+            >
+              {{ admin.role === 'super_admin' ? t('admins.roleSuperAdmin') : t('admins.roleAdmin') }}
+            </span>
+            <div class="flex items-center gap-2">
+              <RouterLink :to="`/admin/admins/${admin.id}/edit`" class="text-xs px-3 py-1.5 rounded-full font-medium transition" style="background:#DBEAFE; color:#1d4ed8;">
+                {{ t('admins.actionEdit') }}
+              </RouterLink>
+              <button
+                v-if="admin.id !== currentUserId"
+                @click="openDelete(admin)"
+                class="text-xs px-3 py-1.5 rounded-full font-medium transition"
+                style="background:#FEE2E2; color:#dc2626;"
+              >
+                {{ t('admins.actionDelete') }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hidden lg:block card overflow-hidden">
       <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
         <span class="font-medium text-sm text-gray-700">{{ t('admins.title') }}</span>
         <span class="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 font-semibold">{{ admins.length }} {{ t('common.total') }}</span>
@@ -110,6 +165,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useToast } from '@/utils/useToast'
 import AppBadge from '@/components/AppBadge.vue'
 import AppConfirmDialog from '@/components/AppConfirmDialog.vue'
+import { PlusIcon } from '@heroicons/vue/24/outline'
 
 const { t } = useI18n()
 const toast  = useToast()

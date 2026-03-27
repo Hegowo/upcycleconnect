@@ -32,7 +32,7 @@
           <AppBadge :label="user.status" />
         </div>
 
-        <dl class="grid grid-cols-2 gap-x-6 gap-y-4 text-sm border-t border-gray-100 pt-6">
+        <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 text-sm border-t border-gray-100 pt-6">
           <div>
             <dt class="text-xs text-gray-400 uppercase font-medium mb-1">{{ t('users.fieldPhone') }}</dt>
             <dd class="text-gray-900 font-medium">{{ user.phone || '—' }}</dd>

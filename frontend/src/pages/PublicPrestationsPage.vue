@@ -2,10 +2,10 @@
   <div class="bg-[#f7f9ff]">
 
     <!-- ── Hero ── -->
-    <section class="px-6 pt-16 pb-12 max-w-[1280px] mx-auto">
-      <div class="flex flex-col md:flex-row items-start gap-16">
+    <section class="px-4 sm:px-6 pt-10 sm:pt-16 pb-8 sm:pb-12 max-w-[1280px] mx-auto">
+      <div class="flex flex-col md:flex-row items-start gap-8 md:gap-16">
         <div class="flex-1 flex flex-col gap-6">
-          <h1 class="font-jakarta font-extrabold text-[#001d32] text-[64px] leading-[72px] tracking-[-0.025em]">
+          <h1 class="font-jakarta font-extrabold text-[#001d32] text-4xl sm:text-5xl md:text-[64px] md:leading-[72px] leading-tight tracking-[-0.025em]">
             Nos Prestations<br />
             <span class="text-[#006d35]">d'Upcycling</span>
           </h1>
@@ -14,8 +14,8 @@
             Donnez une seconde vie à votre intérieur tout en préservant la planète.
           </p>
         </div>
-        <!-- Image décorative -->
-        <div class="shrink-0 relative w-80 h-80">
+        <!-- Image décorative (desktop seulement) -->
+        <div class="hidden md:block shrink-0 relative w-72 h-72 lg:w-80 lg:h-80">
           <div class="absolute inset-0 bg-[rgba(0,109,53,0.05)] blur-[32px] rounded-full" />
           <div class="relative w-full h-full rounded-[40px] overflow-hidden shadow-2xl rotate-3 bg-gradient-to-br from-[#d1fae5] to-[#bbf7d0] flex items-center justify-center">
             <HomeModernIcon class="w-32 h-32 text-[#006d35]/30" />
@@ -25,8 +25,8 @@
     </section>
 
     <!-- ── Recherche & Filtres ── -->
-    <section class="px-6 pb-12 max-w-[1280px] mx-auto">
-      <div class="bg-[#edf4ff] rounded-[32px] p-12 flex flex-col gap-8">
+    <section class="px-4 sm:px-6 pb-8 sm:pb-12 max-w-[1280px] mx-auto">
+      <div class="bg-[#edf4ff] rounded-[32px] p-6 sm:p-12 flex flex-col gap-6 sm:gap-8">
 
         <!-- Barre de recherche -->
         <div class="flex gap-4">
@@ -67,7 +67,7 @@
     </section>
 
     <!-- ── Grille de prestations ── -->
-    <section class="px-6 pb-16 max-w-[1280px] mx-auto">
+    <section class="px-4 sm:px-6 pb-12 sm:pb-16 max-w-[1280px] mx-auto">
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 
         <article
@@ -133,7 +133,7 @@
     </section>
 
     <!-- ── Newsletter / Saviez-vous ── -->
-    <section class="bg-[#edf4ff] px-8 py-20">
+    <section class="bg-[#edf4ff] px-4 sm:px-8 py-12 sm:py-20">
       <div class="max-w-[896px] mx-auto flex flex-col items-center gap-8 text-center px-6">
         <span class="flex items-center gap-2 bg-[rgba(0,109,53,0.1)] text-[#006d35] font-bold text-sm px-4 py-2 rounded-full">
           🌿 LE SAVIEZ-VOUS ?
@@ -144,7 +144,7 @@
         <p class="text-[#40617f] text-base leading-[24px]">
           Rejoignez 12 000 passionnés et recevez nos meilleurs conseils chaque mois.
         </p>
-        <div class="flex gap-4 w-full max-w-[512px]">
+        <div class="flex flex-col sm:flex-row gap-4 w-full max-w-[512px]">
           <input
             v-model="newsletterEmail"
             type="email"

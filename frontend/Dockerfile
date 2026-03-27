@@ -1,4 +1,3 @@
-# ── Build stage ──────────────────────────────────────────────────────────────
 FROM node:20-alpine AS builder
 
 WORKDIR /app
@@ -13,13 +12,11 @@ ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 
 RUN npm run build
 
-# ── Production stage ─────────────────────────────────────────────────────────
 FROM httpd:alpine
 
 COPY --from=builder /app/dist /usr/local/apache2/htdocs/
 COPY apache.conf /usr/local/apache2/conf/extra/spa.conf
 
-# Active mod_rewrite, mod_expires, mod_headers et inclut notre config VirtualHost
 RUN sed -i \
     -e 's/#LoadModule rewrite_module/LoadModule rewrite_module/' \
     -e 's/#LoadModule expires_module/LoadModule expires_module/' \

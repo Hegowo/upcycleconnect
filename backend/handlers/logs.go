@@ -21,6 +21,8 @@ type auditLogRow struct {
 	ResourceID   *uint     `json:"resource_id"`
 	AdminName    string    `json:"admin_name"`
 	IPAddress    *string   `json:"ip_address"`
+	OldValues    *string   `json:"old_values"`
+	NewValues    *string   `json:"new_values"`
 	CreatedAt    time.Time `json:"created_at"`
 }
 
@@ -46,6 +48,8 @@ func (h *LogsHandler) Index(c *gin.Context) {
 			ResourceID:   r.ResourceID,
 			AdminName:    r.AdminName,
 			IPAddress:    r.IPAddress,
+			OldValues:    r.OldValues,
+			NewValues:    r.NewValues,
 			CreatedAt:    r.CreatedAt,
 		}
 	}

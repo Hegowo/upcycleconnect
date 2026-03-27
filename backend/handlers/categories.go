@@ -127,18 +127,25 @@ func (h *CategoryHandler) Update(c *gin.Context) {
 	}
 
 	updates := map[string]interface{}{}
+	after := map[string]interface{}{"name": category.Name}
+
 	if req.Name != nil {
 		updates["name"] = *req.Name
 		updates["slug"] = slug.Make(*req.Name)
+		after["name"] = *req.Name
+		after["slug"] = slug.Make(*req.Name)
 	}
 	if req.Description != nil {
 		updates["description"] = *req.Description
+		after["description"] = *req.Description
 	}
 	if req.SortOrder != nil {
 		updates["sort_order"] = *req.SortOrder
+		after["sort_order"] = *req.SortOrder
 	}
 	if req.IsActive != nil {
 		updates["is_active"] = *req.IsActive
+		after["is_active"] = *req.IsActive
 	}
 
 	if len(updates) > 0 {
@@ -146,9 +153,7 @@ func (h *CategoryHandler) Update(c *gin.Context) {
 		h.DB.Where("id = ? AND deleted_at IS NULL", id).First(&category)
 	}
 
-	h.Audit.Log(c, "category.updated", "PrestationCategory", &category.ID, old, map[string]interface{}{
-		"name": category.Name, "slug": category.Slug,
-	})
+	h.Audit.Log(c, "category.updated", "PrestationCategory", &category.ID, old, after)
 
 	var count int64
 	h.DB.Model(&models.Prestation{}).Where("category_id = ? AND deleted_at IS NULL", category.ID).Count(&count)

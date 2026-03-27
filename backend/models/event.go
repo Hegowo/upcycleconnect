@@ -30,18 +30,19 @@ func (Event) TableName() string {
 }
 
 type EventResponse struct {
-	ID              uint              `json:"id"`
-	Title           string            `json:"title"`
-	Description     *string           `json:"description"`
-	Location        *string           `json:"location"`
-	StartDate       string            `json:"start_date"`
-	EndDate         string            `json:"end_date"`
-	MaxParticipants *int              `json:"max_participants"`
-	Status          string            `json:"status"`
-	Category        *CategoryResponse `json:"category"`
-	Creator         *UserResponse     `json:"creator"`
-	CreatedAt       string            `json:"created_at"`
-	UpdatedAt       string            `json:"updated_at"`
+	ID                 uint              `json:"id"`
+	Title              string            `json:"title"`
+	Description        *string           `json:"description"`
+	Location           *string           `json:"location"`
+	StartDate          string            `json:"start_date"`
+	EndDate            string            `json:"end_date"`
+	MaxParticipants    *int              `json:"max_participants"`
+	RegistrationsCount int64             `json:"registrations_count"`
+	Status             string            `json:"status"`
+	Category           *CategoryResponse `json:"category"`
+	Creator            *UserResponse     `json:"creator"`
+	CreatedAt          string            `json:"created_at"`
+	UpdatedAt          string            `json:"updated_at"`
 }
 
 func ToEventResponse(e *Event) EventResponse {
@@ -69,6 +70,13 @@ func ToEventResponse(e *Event) EventResponse {
 		CreatedAt:       e.CreatedAt.UTC().Format("2006-01-02T15:04:05.000000Z"),
 		UpdatedAt:       e.UpdatedAt.UTC().Format("2006-01-02T15:04:05.000000Z"),
 	}
+}
+
+// ToEventResponseWithCount inclut le nombre de participants inscrits.
+func ToEventResponseWithCount(e *Event, count int64) EventResponse {
+	r := ToEventResponse(e)
+	r.RegistrationsCount = count
+	return r
 }
 
 func ToEventResponses(events []Event) []EventResponse {
