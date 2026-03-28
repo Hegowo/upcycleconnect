@@ -23,6 +23,7 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 
 	authHandler := &handlers.AuthHandler{DB: db, Cfg: cfg}
 	dashHandler := &handlers.DashboardHandler{DB: db}
+	swaggerHandler := &handlers.SwaggerHandler{}
 	userHandler := &handlers.UserHandler{DB: db, Audit: audit}
 	providerHandler := &handlers.ProviderHandler{DB: db, Audit: audit}
 	categoryHandler := &handlers.CategoryHandler{DB: db, Audit: audit}
@@ -83,6 +84,8 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 		{
 			protected.POST("/auth/logout", authHandler.Logout)
 			protected.GET("/auth/me", authHandler.Me)
+
+			protected.GET("/docs/spec", swaggerHandler.Spec)
 
 			protected.GET("/dashboard/stats", dashHandler.Stats)
 

@@ -50,7 +50,8 @@
     "connectedAs": "Connecté en tant que",
     "administration": "Administration",
     "boxRequests": "Demandes Dépôt",
-    "newReport": "Nouveau Rapport"
+    "newReport": "Nouveau Rapport",
+    "apiDocs": "Documentation API"
   },
   "login": {
     "title": "Connexion",

@@ -97,6 +97,7 @@ import {
   CircleStackIcon,
   Cog6ToothIcon,
   InboxIcon,
+  CodeBracketIcon,
 } from '@heroicons/vue/24/outline'
 
 const { t } = useI18n()
@@ -117,6 +118,7 @@ const navItems = computed(() => [
   { to: '/admin/logs',         icon: ClockIcon,                 label: t('nav.logs') },
   { to: '/admin/box-requests', icon: InboxIcon,                 label: t('nav.boxRequests') },
   { to: '/admin/settings',     icon: Cog6ToothIcon,             label: t('nav.settings') },
+  { to: '/admin/docs',         icon: CodeBracketIcon,           label: t('nav.apiDocs') },
 ])
 
 const superAdminItems = computed(() => [
