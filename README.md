@@ -2,9 +2,7 @@
 
 Plateforme complète UpcycleConnect — site public, espace utilisateur et interface d'administration.
 
-Le frontend couvre l'intégralité du site : pages publiques (accueil, prestations, événements, communauté), espace utilisateur connecté (profil, dépôt d'objets, inscriptions aux événements) et back-office admin. Le backend Go expose une API REST unique consommée par toutes ces parties.
-
-## Stack
+## Architecture
 
 | Couche | Technologie |
 |---|---|
