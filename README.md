@@ -1,6 +1,8 @@
-# UpcycleConnect — Administration
+# UpcycleConnect
 
-Interface d'administration de la plateforme UpcycleConnect.
+Plateforme complète UpcycleConnect — site public, espace utilisateur et interface d'administration.
+
+Le frontend couvre l'intégralité du site : pages publiques (accueil, prestations, événements, communauté), espace utilisateur connecté (profil, dépôt d'objets, inscriptions aux événements) et back-office admin. Le backend Go expose une API REST unique consommée par toutes ces parties.
 
 ## Stack
 
@@ -57,6 +59,7 @@ docker exec -i upcycleconnect_mysql mysql -u root -p"${DB_ROOT_PASSWORD}" upcycl
 
 #### 4. Accéder à l'application
 
+- **Site public** : http://localhost:8080/
 - **Interface admin** : http://localhost:8080/admin/login
 - **API** : http://localhost:8080/api/admin/v1
 - **Documentation API** : http://localhost:8080/admin/docs *(admin requis)*
@@ -95,13 +98,13 @@ Frontend disponible sur : http://localhost:5173
 
 ```
 upcycleconnect/
-├── frontend/                  # Vue 3 SPA Admin
+├── frontend/                  # Vue 3 SPA (site complet)
 │   ├── src/
-│   │   ├── pages/             # Pages par module
+│   │   ├── pages/             # Pages publiques (Public*) + admin
 │   │   ├── components/        # Composants réutilisables
 │   │   ├── stores/            # État global (Pinia)
 │   │   ├── services/          # Couche API (Axios)
-│   │   ├── layouts/           # Layouts admin / auth / public
+│   │   ├── layouts/           # PublicLayout / AdminLayout / AuthLayout
 │   │   ├── locales/           # Traductions FR / EN
 │   │   └── router.js          # Routes + guards
 │   └── Dockerfile
