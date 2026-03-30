@@ -16,13 +16,13 @@ func AuthMiddleware(db *gorm.DB, cfg *config.Config) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "Non authentifié"})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "Authentification nécéssaire"})
 			return
 		}
 
 		parts := strings.SplitN(authHeader, " ", 2)
 		if len(parts) != 2 || !strings.EqualFold(parts[0], "Bearer") {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "Non authentifié"})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "Format d'authentification invalide"})
 			return
 		}
 
@@ -42,19 +42,19 @@ func AuthMiddleware(db *gorm.DB, cfg *config.Config) gin.HandlerFunc {
 
 		claims, ok := token.Claims.(jwt.MapClaims)
 		if !ok {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "Non authentifié"})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "Erreur de récupération des informations"})
 			return
 		}
 
 		sub, err := claims.GetSubject()
 		if err != nil || sub == "" {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "Non authentifié"})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "Informations d'authentification invalides ou manquantes"})
 			return
 		}
 
 		var user models.User
 		if err := db.Preload("Roles").Where("id = ? AND deleted_at IS NULL", sub).First(&user).Error; err != nil {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "Non authentifié"})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "Accès refusé ou compte introuvable"})
 			return
 		}
 

@@ -264,7 +264,7 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { userService } from '@/services/userService'
+import { userService, providerService } from '@/services/userService'
 import { useToast } from '@/utils/useToast'
 import AppPagination from '@/components/AppPagination.vue'
 import AppConfirmDialog from '@/components/AppConfirmDialog.vue'
@@ -280,12 +280,18 @@ const toast  = useToast()
 const users      = ref([])
 const loading    = ref(false)
 const activeTab  = ref('all')
-const meta       = ref({ current_page: 1, last_page: 1, total: 0 })
+const meta       = ref({ 
+  current_page: 1, 
+  last_page: 1, 
+  total: 0,
+  pending_count: 0, 
+  active_count: 0   
+})
 const filters    = reactive({ search: '', status: '' })
 const confirm    = reactive({ show: false, action: '', user: null, loading: false })
 
-const activeCount  = computed(() => users.value.filter(u => u.status === 'active').length)
-const pendingCount = computed(() => users.value.filter(u => u.status === 'pending').length)
+const activeCount  = computed(() => meta.value.active_count || 0)
+const pendingCount = computed(() => meta.value.pending_count || 0)
 
 let debounceTimer = null
 function debouncedFetch() {
@@ -296,7 +302,7 @@ function debouncedFetch() {
 async function fetchUsers(page = 1) {
   loading.value = true
   try {
-    const res = await userService.list({ page, per_page: 20, ...filters })
+    const res = await providerService.list({ page, per_page: 20, ...filters })
     users.value = res.data
     meta.value  = res.meta
   } catch {

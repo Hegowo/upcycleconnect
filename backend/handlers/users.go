@@ -34,6 +34,9 @@ func (h *UserHandler) Index(c *gin.Context) {
 	var total int64
 	query.Count(&total)
 
+	var pendingCount int64
+	h.DB.Model(&models.ProviderProfile{}).Where("status = ?", "pending").Count(&pendingCount)
+
 	perPage, _ := strconv.Atoi(c.DefaultQuery("per_page", "20"))
 	if perPage < 1 {
 		perPage = 20
@@ -57,10 +60,11 @@ func (h *UserHandler) Index(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"data": models.ToUserResponses(users),
 		"meta": gin.H{
-			"current_page": page,
-			"last_page":    lastPage,
-			"per_page":     perPage,
-			"total":        total,
+			"current_page":  page,
+			"last_page":     lastPage,
+			"per_page":      perPage,
+			"total":         total,
+			"pending_count": pendingCount,
 		},
 	})
 }

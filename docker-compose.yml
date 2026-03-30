@@ -74,6 +74,8 @@ services:
     image: dbgate/dbgate:latest
     container_name: upcycleconnect_dbgate
     restart: unless-stopped
+    ports:
+      - "3000:3000"
     environment:
       CONNECTIONS: mysql_uc
       LABEL_mysql_uc: UpcycleConnect
