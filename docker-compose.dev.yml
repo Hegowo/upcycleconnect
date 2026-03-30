@@ -7,12 +7,7 @@ services:
 
   backend:
     environment:
-      APP_ENV: local
-      APP_DEBUG: "true"
       LOG_LEVEL: debug
-    volumes:
-      - ./backend:/var/www/html
-      - /var/www/html/vendor
 
   frontend:
     build:
