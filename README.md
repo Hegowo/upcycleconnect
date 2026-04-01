@@ -92,64 +92,6 @@ Frontend disponible sur : http://localhost:5173
 
 ---
 
-## Structure du projet
-
-```
-upcycleconnect/
-├── frontend/                  # Vue 3 SPA (site complet)
-│   ├── src/
-│   │   ├── pages/             # Pages publiques (Public*) + admin
-│   │   ├── components/        # Composants réutilisables
-│   │   ├── stores/            # État global (Pinia)
-│   │   ├── services/          # Couche API (Axios)
-│   │   ├── layouts/           # PublicLayout / AdminLayout / AuthLayout
-│   │   ├── locales/           # Traductions FR / EN
-│   │   └── router.js          # Routes + guards
-│   └── Dockerfile
-├── backend/                   # API REST Go
-│   ├── config/                # Chargement des variables d'environnement
-│   ├── database/              # Connexion MySQL + AutoMigrate
-│   ├── handlers/              # Handlers Gin (un fichier par ressource)
-│   ├── middleware/            # Auth JWT, RBAC, CORS
-│   ├── models/                # Modèles GORM
-│   ├── router/                # Déclaration de toutes les routes
-│   ├── services/              # Mailer, AuditService
-│   ├── main.go
-│   └── Dockerfile
-├── apache/
-│   └── vhost.conf             # Reverse proxy Apache
-├── database/
-│   └── init/                  # Initialisé automatiquement par MySQL au démarrage
-├── docs/
-│   └── arborescence.html      # Documentation complète de l'arborescence
-├── upcycleconnect.sql         # Dump SQL de la base de données
-├── upcycleinit                # Script de démarrage macOS/Linux
-├── upcycleinit.ps1            # Script de démarrage Windows
-├── docker-compose.yml
-└── .env.example
-```
-
----
-
-## Modules admin disponibles
-
-| Module | URL | Rôle requis |
-|---|---|---|
-| Tableau de bord | /admin/dashboard | admin |
-| Utilisateurs | /admin/users | admin |
-| Prestataires | /admin/providers | admin |
-| Catégories | /admin/categories | admin |
-| Prestations | /admin/prestations | admin |
-| Événements | /admin/events | admin |
-| Journaux | /admin/logs | admin |
-| Demandes de dépôt | /admin/box-requests | admin |
-| Paramètres | /admin/settings | admin |
-| Documentation API | /admin/docs | admin |
-| Administrateurs | /admin/admins | super_admin |
-| Base de données | /admin/database | super_admin |
-
----
-
 ## API
 
 - **Base URL admin** : `/api/admin/v1`
@@ -157,7 +99,7 @@ upcycleconnect/
 - **Authentification** : `Authorization: Bearer {token}`
 - **Documentation interactive** : `/admin/docs` (Swagger UI, admin requis)
 
-Le backend Go démarre sur le port 80 en interne. Apache (port `APP_PORT`) proxifie :
+Backend go port 80 en interne. Apache (port `APP_PORT`) proxifie :
 - `/api/*` → backend Go
 - `/dbgate/*` → DBGate
 - `/*` → frontend Vue
