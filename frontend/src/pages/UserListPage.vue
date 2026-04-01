@@ -278,41 +278,6 @@
       </div>
     </div>
 
-    
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-      <div class="bg-white rounded-2xl p-5 border border-[#f1f5f9] shadow-sm">
-        <div class="flex items-center gap-3 mb-3">
-          <div class="w-9 h-9 rounded-xl flex items-center justify-center bg-gray-100">
-            <ShieldCheckIcon class="w-5 h-5 text-gray-500" />
-          </div>
-          <div>
-            <p class="text-sm font-semibold text-[#001d32]">{{ t('users.integrityCheck') }}</p>
-            <p class="text-xs text-gray-400">{{ t('users.integritySubtitle') }}</p>
-          </div>
-        </div>
-        <div class="flex items-center gap-2 mt-3">
-          <div class="h-1.5 flex-1 bg-gray-100 rounded-full overflow-hidden">
-            <div class="h-full rounded-full bg-green-500 w-[97%]"></div>
-          </div>
-          <span class="text-xs font-semibold text-green-600">97%</span>
-        </div>
-        <p class="text-xs text-gray-400 mt-1">{{ t('users.integrityData') }}</p>
-      </div>
-
-      <RouterLink to="/admin/providers" class="bg-white rounded-2xl p-5 border border-[#f1f5f9] shadow-sm hover:shadow-md transition-shadow block" style="border-top: 3px solid #006d35;">
-        <div class="flex items-center gap-3 mb-3">
-          <div class="w-9 h-9 rounded-xl flex items-center justify-center" style="background-color:#dcfce7;">
-            <BriefcaseIcon class="w-5 h-5" style="color:#006d35;" />
-          </div>
-          <div>
-            <p class="text-sm font-semibold text-[#001d32]">{{ t('users.providerCheck') }}</p>
-            <p class="text-xs text-gray-400">{{ t('users.providerCheckSubtitle') }}</p>
-          </div>
-        </div>
-        <p class="text-xs font-medium" style="color:#006d35;">{{ t('users.gotoProviders') }}</p>
-      </RouterLink>
-    </div>
-
     <AppConfirmDialog
       :show="confirm.show"
       :title="confirm.action === 'ban' ? t('users.bannedTitle') : t('users.activateTitle')"
@@ -343,7 +308,7 @@ import AppConfirmDialog from '@/components/AppConfirmDialog.vue'
 import {
   UsersIcon, BriefcaseIcon, CheckCircleIcon, ClockIcon,
   MagnifyingGlassIcon, AdjustmentsHorizontalIcon, PlusIcon,
-  EyeIcon, PencilIcon, NoSymbolIcon, ShieldCheckIcon,
+  EyeIcon, PencilIcon, NoSymbolIcon,
 } from '@heroicons/vue/24/outline'
 
 const router = useRouter()

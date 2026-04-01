@@ -4,7 +4,6 @@
     <div class="flex items-center justify-between">
       <div>
         <h2 class="text-2xl font-bold text-[#001d32]">{{ t('logs.title') }}</h2>
-        <p class="text-sm text-[#40617f] mt-0.5">{{ t('logs.subtitle') }}</p>
       </div>
     </div>
 

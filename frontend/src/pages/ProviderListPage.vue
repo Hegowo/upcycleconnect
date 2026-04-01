@@ -215,22 +215,8 @@
       </div>
     </div>
 
-    
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-      <div class="rounded-2xl p-5 text-white" style="background: linear-gradient(135deg, #006d35, #1b8848);">
-        <div class="flex items-center gap-3 mb-3">
-          <div class="w-9 h-9 rounded-xl flex items-center justify-center bg-white/20">
-            <ArrowTrendingUpIcon class="w-5 h-5 text-white" />
-          </div>
-          <div>
-            <p class="text-sm font-bold">{{ t('providers.growth') }}</p>
-            <p class="text-xs text-white/70">{{ t('providers.growthSub') }}</p>
-          </div>
-        </div>
-        <p class="text-3xl font-bold">+12%</p>
-        <p class="text-xs text-white/70 mt-1">{{ t('providers.growthDesc') }}</p>
-      </div>
 
+    <div class="grid grid-cols-1 gap-4">
       <div class="bg-white rounded-2xl p-5 border border-[#f1f5f9] shadow-sm">
         <div class="flex items-center gap-3 mb-3">
           <div class="w-9 h-9 rounded-xl flex items-center justify-center bg-orange-50">
@@ -255,7 +241,7 @@ import { useToast } from '@/utils/useToast'
 import AppPagination from '@/components/AppPagination.vue'
 import {
   MagnifyingGlassIcon, PlusIcon, ArrowDownTrayIcon,
-  PencilIcon, ClockIcon, ArrowTrendingUpIcon,
+  PencilIcon, ClockIcon,
 } from '@heroicons/vue/24/outline'
 
 const toast     = useToast()

@@ -474,7 +474,7 @@
     "colTimestamp": "Timestamp",
     "colAdmin": "Admin",
     "colAction": "Action Effectuée",
-    "colEntity": "Contexte Entité",
+    "colEntity": "Élément concerné",
     "colStatus": "Statut",
     "staffGovernance": "Gouvernance du Staff",
     "staffSubtitle": "Équipe administrative active",

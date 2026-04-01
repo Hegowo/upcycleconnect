@@ -6,6 +6,24 @@
       <p class="text-sm text-[#40617f] mt-0.5 hidden sm:block">Prestations & Services — Gérez l'offre de la plateforme</p>
     </div>
 
+
+    <div class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm p-4">
+      <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
+        <div class="text-center">
+          <p class="text-xs text-gray-400 uppercase tracking-wider mb-1">Prévision Revenus</p>
+          <p class="text-lg font-bold text-[#001d32]">12 400 €</p>
+        </div>
+        <div class="text-center">
+          <p class="text-xs text-gray-400 uppercase tracking-wider mb-1">Apprenants Actifs</p>
+          <p class="text-lg font-bold text-[#001d32]">{{ meta.total ?? 0 }}</p>
+        </div>
+        <div class="text-center">
+          <p class="text-xs text-gray-400 uppercase tracking-wider mb-1">Total Prestations</p>
+          <p class="text-lg font-bold text-[#001d32]">{{ meta.total ?? 0 }}</p>
+        </div>
+      </div>
+    </div>
+
     
     <div class="lg:hidden">
       <button @click="showFilters = !showFilters" class="flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg border border-[#e5e7eb] text-[#374151] hover:bg-gray-50 transition">
@@ -180,30 +198,6 @@
       </div>
     </div>
 
-    
-    <div class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm p-4">
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
-        <div class="text-center">
-          <p class="text-xs text-gray-400 uppercase tracking-wider mb-1">Prévision Revenus</p>
-          <p class="text-lg font-bold text-[#001d32]">12 400 €</p>
-        </div>
-        <div class="text-center">
-          <p class="text-xs text-gray-400 uppercase tracking-wider mb-1">Apprenants Actifs</p>
-          <p class="text-lg font-bold text-[#001d32]">{{ meta.total ?? 0 }}</p>
-        </div>
-        <div class="text-center">
-          <p class="text-xs text-gray-400 uppercase tracking-wider mb-1">Santé Système</p>
-          <div class="flex items-center justify-center gap-1.5">
-            <span class="w-2 h-2 rounded-full bg-green-500"></span>
-            <p class="text-lg font-bold text-green-600">99.9% Up</p>
-          </div>
-        </div>
-        <div class="text-center">
-          <p class="text-xs text-gray-400 uppercase tracking-wider mb-1">Total Prestations</p>
-          <p class="text-lg font-bold text-[#001d32]">{{ meta.total ?? 0 }}</p>
-        </div>
-      </div>
-    </div>
 
     <AppConfirmDialog
       :show="deleteConfirm.show"

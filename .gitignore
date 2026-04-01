@@ -1,0 +1,38 @@
+# Secrets & Config
+.env
+.env.local
+.env.*.local
+.env.backup
+.env.production
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/*.log
+
+# Backend Go
+backend/server
+backend/*.exe
+backend/tmp/
+
+# Uploads
+uploads/
+
+# Base de données
+upcycleconnect.sql
+database/init/*.sql
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+.fleet/
+*.swp
+*.swo
+
+# Docker
+docker-compose.override.yml
