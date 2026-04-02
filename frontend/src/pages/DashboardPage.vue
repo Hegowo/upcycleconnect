@@ -95,27 +95,17 @@
     </div>
 
     
-    <div class="grid grid-cols-2 gap-3 xl:hidden">
+    <div class="xl:hidden">
       <RouterLink to="/admin/providers"
-        class="flex items-center gap-3 bg-gradient-to-r from-[#006d35] to-[#1b8848] rounded-2xl p-4 text-white">
-        <div class="w-9 h-9 rounded-xl flex items-center justify-center bg-white/20 shrink-0">
-          <BriefcaseIcon class="w-5 h-5 text-white" />
+        class="flex items-center gap-3 bg-white rounded-2xl p-4 border border-[#f1f5f9] shadow-sm" style="border-left: 3px solid #006d35;">
+        <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style="background-color:#dcfce7;">
+          <BriefcaseIcon class="w-5 h-5" style="color:#006d35;" />
         </div>
         <div class="min-w-0">
-          <p class="text-xs font-bold leading-tight">{{ t('dashboard.validateProviders') }}</p>
-          <p v-if="(stats?.providers_pending ?? 0) > 0" class="text-[10px] text-white/70 mt-0.5">
+          <p class="text-xs font-bold text-[#001d32] leading-tight">{{ t('dashboard.validateProviders') }}</p>
+          <p v-if="(stats?.providers_pending ?? 0) > 0" class="text-[10px] text-gray-400 mt-0.5">
             {{ stats.providers_pending }} {{ t('dashboard.statsPending').toLowerCase() }}
           </p>
-        </div>
-      </RouterLink>
-      <RouterLink to="/admin/categories"
-        class="flex items-center gap-3 bg-white rounded-2xl p-4 border border-[#f1f5f9] shadow-sm" style="border-left: 3px solid #40617f;">
-        <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style="background-color:#f0f4f8;">
-          <TagIcon class="w-5 h-5 text-[#40617f]" />
-        </div>
-        <div class="min-w-0">
-          <p class="text-xs font-bold text-[#001d32] leading-tight">{{ t('dashboard.manageCategories') }}</p>
-          <p class="text-[10px] text-gray-400 mt-0.5">{{ t('dashboard.manageCategoriesDesc') }}</p>
         </div>
       </RouterLink>
     </div>
@@ -220,34 +210,20 @@
       </div>
 
       
-      <div class="hidden xl:block space-y-4">
-        <div class="rounded-2xl p-5 text-white" style="background: linear-gradient(135deg, #006d35, #1b8848);">
+      <div class="hidden xl:block">
+        <div class="bg-white rounded-2xl p-5 border border-[#f1f5f9] shadow-sm" style="border-top: 3px solid #006d35;">
           <div class="flex items-start justify-between mb-4">
-            <div class="w-10 h-10 rounded-xl flex items-center justify-center bg-white/20">
-              <BriefcaseIcon class="w-5 h-5 text-white" />
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background-color:#dcfce7;">
+              <BriefcaseIcon class="w-5 h-5" style="color:#006d35;" />
             </div>
-            <span v-if="(stats?.providers_pending ?? 0) > 0" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-white/20 text-white">
+            <span v-if="(stats?.providers_pending ?? 0) > 0" class="text-xs font-semibold px-2 py-0.5 rounded-full" style="background:#dcfce7; color:#166534;">
               {{ stats.providers_pending }} {{ t('dashboard.statsPending').toLowerCase() }}
             </span>
           </div>
-          <h3 class="font-bold text-base mb-1">{{ t('dashboard.validateProviders') }}</h3>
-          <p class="text-xs text-white/70 mb-4">{{ t('dashboard.validateProvidersDesc') }}</p>
-          <RouterLink to="/admin/providers" class="inline-flex items-center gap-1.5 text-sm font-semibold text-white/90 hover:text-white transition">
+          <h3 class="font-bold text-base text-[#001d32] mb-1">{{ t('dashboard.validateProviders') }}</h3>
+          <p class="text-xs text-gray-500 mb-4">{{ t('dashboard.validateProvidersDesc') }}</p>
+          <RouterLink to="/admin/providers" class="inline-flex items-center gap-1.5 text-sm font-semibold transition" style="color:#006d35;">
             {{ t('dashboard.seeProviders') }}
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-          </RouterLink>
-        </div>
-
-        <div class="bg-white rounded-2xl p-5 border border-[#f1f5f9] shadow-sm" style="border-top: 3px solid #40617f;">
-          <div class="flex items-start justify-between mb-4">
-            <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background-color:#f0f4f8;">
-              <TagIcon class="w-5 h-5 text-[#40617f]" />
-            </div>
-          </div>
-          <h3 class="font-bold text-base text-[#001d32] mb-1">{{ t('dashboard.manageCategories') }}</h3>
-          <p class="text-xs text-gray-500 mb-4">{{ t('dashboard.manageCategoriesDesc') }}</p>
-          <RouterLink to="/admin/categories" class="inline-flex items-center gap-1.5 text-sm font-semibold transition" style="color:#40617f;">
-            {{ t('dashboard.manageCategoriasLink') }}
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
           </RouterLink>
         </div>
@@ -322,7 +298,7 @@
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth'
 import api from '@/services/api'
-import { UsersIcon, BriefcaseIcon, TagIcon, InformationCircleIcon } from '@heroicons/vue/24/outline'
+import { UsersIcon, BriefcaseIcon, InformationCircleIcon } from '@heroicons/vue/24/outline'
 
 const { t } = useI18n()
 
