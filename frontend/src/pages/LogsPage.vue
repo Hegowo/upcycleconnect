@@ -152,81 +152,8 @@
       </div>
     </div>
 
-    
-    <div class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm overflow-hidden">
-      <div class="px-6 py-4 border-b border-[#f1f5f9] flex items-center justify-between">
-        <div>
-          <h3 class="font-semibold text-[#001d32]">{{ t('logs.staffGovernance') }}</h3>
-          <p class="text-xs text-gray-400 mt-0.5">{{ t('logs.staffSubtitle') }}</p>
-        </div>
-      </div>
 
-      <div v-if="!auth.isSuperAdmin" class="px-6 py-8 text-center text-gray-400 text-sm">
-        <ShieldCheckIcon class="w-8 h-8 mx-auto mb-2 text-gray-300" />
-        {{ t('logs.restrictedAccess') }}
-      </div>
 
-      <template v-else>
-        <div v-if="adminsLoading" class="p-4 space-y-3 overflow-x-auto">
-          <div v-for="n in 3" :key="n" class="h-12 bg-gray-50 rounded-lg animate-pulse"></div>
-        </div>
-        <div v-else-if="admins.length">
-          <table class="min-w-full hidden lg:table">
-            <thead>
-              <tr class="bg-[#f8fafc]">
-                <th class="px-6 py-3 text-left text-xs font-semibold text-[#6b7280] uppercase tracking-wider">{{ t('logs.colAdministrator') }}</th>
-                <th class="px-6 py-3 text-left text-xs font-semibold text-[#6b7280] uppercase tracking-wider">{{ t('logs.colLevel') }}</th>
-                <th class="px-6 py-3 text-left text-xs font-semibold text-[#6b7280] uppercase tracking-wider">{{ t('users.colEmail') }}</th>
-                <th class="px-6 py-3 text-left text-xs font-semibold text-[#6b7280] uppercase tracking-wider">{{ t('logs.colSince') }}</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-[#f8fafc]">
-              <tr v-for="admin in admins" :key="admin.id" class="hover:bg-[#f8fafc] transition-colors">
-                <td class="px-6 py-4">
-                  <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-full flex items-center justify-center text-white text-xs font-bold" style="background-color:#001d32;">
-                      {{ ((admin.first_name?.[0] || '') + (admin.last_name?.[0] || '')).toUpperCase() }}
-                    </div>
-                    <span class="text-sm font-semibold text-[#001d32]">{{ admin.first_name }} {{ admin.last_name }}</span>
-                  </div>
-                </td>
-                <td class="px-6 py-4">
-                  <span class="text-xs font-semibold px-2.5 py-1 rounded-full capitalize"
-                    :class="admin.role === 'super_admin' ? 'bg-[#fef9c3] text-[#854d0e]' : 'bg-[#dcfce7] text-[#166534]'">
-                    {{ admin.role === 'super_admin' ? 'Super Admin' : 'Admin' }}
-                  </span>
-                </td>
-                <td class="px-6 py-4 text-sm text-gray-400">{{ admin.email }}</td>
-                <td class="px-6 py-4 text-sm text-gray-400">{{ formatDateShort(admin.created_at) }}</td>
-              </tr>
-            </tbody>
-          </table>
-
-          
-          <div class="lg:hidden divide-y divide-[#f8fafc]">
-            <div v-for="admin in admins" :key="admin.id" class="flex items-center gap-3 px-5 py-4">
-              <div class="w-10 h-10 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0" style="background-color:#001d32;">
-                {{ ((admin.first_name?.[0] || '') + (admin.last_name?.[0] || '')).toUpperCase() }}
-              </div>
-              <div class="flex-1 min-w-0">
-                <p class="text-sm font-semibold text-[#001d32]">{{ admin.first_name }} {{ admin.last_name }}</p>
-                <p class="text-xs text-gray-400 truncate">{{ admin.email }}</p>
-              </div>
-              <div class="flex flex-col items-end gap-1">
-                <span class="text-xs font-semibold px-2 py-0.5 rounded-full capitalize"
-                  :class="admin.role === 'super_admin' ? 'bg-[#fef9c3] text-[#854d0e]' : 'bg-[#dcfce7] text-[#166534]'">
-                  {{ admin.role === 'super_admin' ? 'Super Admin' : 'Admin' }}
-                </span>
-                <span class="text-xs text-gray-400">{{ formatDateShort(admin.created_at) }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div v-else class="px-6 py-8 text-center text-gray-400 text-sm">{{ t('logs.noAdmins') }}</div>
-      </template>
-    </div>
-
-    
     <Teleport to="body">
       <Transition name="modal">
         <div v-if="selectedLog" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4" @click.self="closeModal">

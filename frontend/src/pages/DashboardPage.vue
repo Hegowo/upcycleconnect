@@ -131,12 +131,9 @@
           <div class="flex items-center justify-between mb-4 sm:mb-5">
             <div>
               <h3 class="font-semibold text-[#001d32] text-sm sm:text-base">{{ t('dashboard.trends') }}</h3>
-              <p class="text-[10px] sm:text-xs text-gray-400 mt-0.5">{{ t('dashboard.trendsSubtitle') }} — 2025</p>
+              <p class="text-[10px] sm:text-xs text-gray-400 mt-0.5">{{ t('dashboard.trendsSubtitle') }} — 2026</p>
             </div>
-            <select class="text-xs border border-[#e5e7eb] rounded-lg px-2 py-1 text-gray-500 bg-[#f8fafc]">
-              <option>2025</option>
-              <option>2024</option>
-            </select>
+            <span class="text-xs border border-[#e5e7eb] rounded-lg px-2 py-1 text-gray-500 bg-[#f8fafc]">2026</span>
           </div>
           <div class="flex items-end gap-1 sm:gap-2 h-24 sm:h-32">
             <div v-for="(bar, i) in monthlyData" :key="i" class="flex-1 flex flex-col items-center gap-0.5 sm:gap-1">
