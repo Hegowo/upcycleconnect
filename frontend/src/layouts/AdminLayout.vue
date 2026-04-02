@@ -23,7 +23,6 @@ const route = useRoute()
 </script>
 
 <style scoped>
-/* On mobile: add bottom padding = nav height (64px) + iOS safe area */
 @media (max-width: 1023px) {
   .main-pad {
     padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
@@ -31,7 +30,7 @@ const route = useRoute()
 }
 @media (min-width: 1024px) {
   .main-pad {
-    padding-bottom: 1.5rem; /* 24px = p-6 */
+    padding-bottom: 1.5rem;
   }
 }
 </style>
