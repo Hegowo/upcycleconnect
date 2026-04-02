@@ -75,7 +75,6 @@ function isActive(to) {
 .nav-scroll::-webkit-scrollbar {
   display: none;
 }
-/* iOS safe area for home indicator */
 .nav-safe {
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
