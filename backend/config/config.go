@@ -11,12 +11,16 @@ type Config struct {
 	DBPassword    string
 	LogLevel      string
 	SocieteApiKey string
-	SMTPHost     string
-	SMTPPort     string
-	SMTPUser     string
-	SMTPPassword string
-	MailFrom     string
-	AppURL       string
+	SMTPHost      string
+	SMTPPort      string
+	SMTPUser      string
+	SMTPPassword  string
+	MailFrom      string
+	AppURL        string
+
+	StripeSecret        string
+	StripePublicKey     string
+	StripeWebhookSecret string
 }
 
 func Load() *Config {
@@ -35,11 +39,15 @@ func Load() *Config {
 		SMTPPassword:  getEnv("SMTP_PASSWORD", ""),
 		MailFrom:      getEnv("MAIL_FROM", "noreply@upcycleconnect.xyz"),
 		AppURL:        getEnv("APP_URL", "https://upcycleconnect.xyz"),
+
+		StripeSecret:        getEnv("STRIPE_SECRET", ""),
+		StripePublicKey:     getEnv("STRIPE_PUBLIC_KEY", ""),
+		StripeWebhookSecret: getEnv("STRIPE_WEBHOOK_SECRET", ""),
 	}
 }
 
 func getEnv(key, fallback string) string {
-	if val, ok := os.LookupEnv(key); ok {
+	if val, ok := os.LookupEnv(key); ok && val != "" {
 		return val
 	}
 	return fallback

@@ -40,6 +40,17 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 	userDepositHandler := &handlers.UserDepositHandler{DB: db, Audit: audit}
 	userProviderHandler := &handlers.UserProviderHandler{DB: db, Audit: audit}
 
+	stripeService := services.NewStripeService(cfg)
+	pdfService := services.NewPDFService("/var/lib/upcycleconnect/invoices")
+	paymentHandler := &handlers.PaymentHandler{
+		DB:     db,
+		Audit:  audit,
+		Stripe: stripeService,
+		PDF:    pdfService,
+		Mailer: mailer,
+	}
+	invoiceHandler := &handlers.InvoiceHandler{DB: db}
+
 	r.Static("/uploads", "/uploads")
 
 	r.GET("/up", func(c *gin.Context) {
@@ -57,6 +68,8 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 		public.GET("/events/:id", publicHandler.ShowEvent)
 		public.GET("/providers", publicHandler.Providers)
 		public.GET("/providers/:id", publicHandler.ShowProvider)
+
+		public.POST("/payments/webhook", paymentHandler.Webhook)
 	}
 
 	userAPI := r.Group("/api/v1")
@@ -89,6 +102,13 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 			userProtected.DELETE("/deposits/:id", userDepositHandler.Destroy)
 
 			userProtected.GET("/upcycling-score", userDepositHandler.Score)
+
+			userProtected.POST("/prestations/:id/reserve", paymentHandler.Reserve)
+			userProtected.GET("/payments/session", paymentHandler.SessionStatus)
+
+			userProtected.GET("/invoices", invoiceHandler.Index)
+			userProtected.GET("/invoices/:id", invoiceHandler.Show)
+			userProtected.GET("/invoices/:id/download", invoiceHandler.Download)
 
 			userProtected.POST("/provider/apply", userProviderHandler.Apply)
 			userProtected.GET("/provider/profile", userProviderHandler.GetProfile)

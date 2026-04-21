@@ -1,10 +1,15 @@
 package services
 
 import (
+	"crypto/rand"
 	"crypto/tls"
+	"encoding/base64"
 	"fmt"
 	"net"
 	"net/smtp"
+	"os"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"upcycleconnect/backend/config"
@@ -67,6 +72,63 @@ func (m *Mailer) sendSSL(addr string, auth smtp.Auth, to string, msg []byte) err
 	return w.Close()
 }
 
+func (m *Mailer) SendWithAttachment(to, subject, body, attachmentPath string) error {
+	if attachmentPath == "" {
+		return m.Send(to, subject, body)
+	}
+
+	data, err := os.ReadFile(attachmentPath)
+	if err != nil {
+		return fmt.Errorf("read attachment: %w", err)
+	}
+
+	boundaryBytes := make([]byte, 16)
+	if _, err := rand.Read(boundaryBytes); err != nil {
+		return fmt.Errorf("boundary: %w", err)
+	}
+	boundary := fmt.Sprintf("uc-%x", boundaryBytes)
+	filename := filepath.Base(attachmentPath)
+
+	var b strings.Builder
+	fmt.Fprintf(&b, "From: UpcycleConnect <%s>\r\n", m.cfg.MailFrom)
+	fmt.Fprintf(&b, "To: %s\r\n", to)
+	fmt.Fprintf(&b, "Subject: %s\r\n", subject)
+	fmt.Fprintf(&b, "Date: %s\r\n", time.Now().Format(time.RFC1123Z))
+	b.WriteString("MIME-Version: 1.0\r\n")
+	fmt.Fprintf(&b, "Content-Type: multipart/mixed; boundary=\"%s\"\r\n\r\n", boundary)
+
+	fmt.Fprintf(&b, "--%s\r\n", boundary)
+	b.WriteString("Content-Type: text/plain; charset=UTF-8\r\n")
+	b.WriteString("Content-Transfer-Encoding: 7bit\r\n\r\n")
+	b.WriteString(body)
+	b.WriteString("\r\n\r\n")
+
+	fmt.Fprintf(&b, "--%s\r\n", boundary)
+	fmt.Fprintf(&b, "Content-Type: application/pdf; name=\"%s\"\r\n", filename)
+	b.WriteString("Content-Transfer-Encoding: base64\r\n")
+	fmt.Fprintf(&b, "Content-Disposition: attachment; filename=\"%s\"\r\n\r\n", filename)
+
+	encoded := base64.StdEncoding.EncodeToString(data)
+	for i := 0; i < len(encoded); i += 76 {
+		end := i + 76
+		if end > len(encoded) {
+			end = len(encoded)
+		}
+		b.WriteString(encoded[i:end])
+		b.WriteString("\r\n")
+	}
+	fmt.Fprintf(&b, "--%s--\r\n", boundary)
+
+	addr := net.JoinHostPort(m.cfg.SMTPHost, m.cfg.SMTPPort)
+	auth := smtp.PlainAuth("", m.cfg.SMTPUser, m.cfg.SMTPPassword, m.cfg.SMTPHost)
+	msg := []byte(b.String())
+
+	if m.cfg.SMTPPort == "465" {
+		return m.sendSSL(addr, auth, to, msg)
+	}
+	return smtp.SendMail(addr, auth, m.cfg.MailFrom, []string{to}, msg)
+}
+
 func (m *Mailer) SendRegisterVerification(to, firstName, token string) error {
 	link := fmt.Sprintf("%s/verify-email?token=%s", m.cfg.AppURL, token)
 	body := fmt.Sprintf(`Bonjour %s,
@@ -124,4 +186,42 @@ Si vous n'êtes pas à l'origine de cette tentative, ignorez cet email et change
 — L'équipe UpcycleConnect`, firstName, attemptTime, ip, link)
 
 	return m.Send(to, "Nouvelle connexion — Confirmez votre identité", body)
+}
+
+func (m *Mailer) SendPaymentConfirmation(to, firstName, prestationTitle, invoiceNumber string, amountCents int64, pdfPath string) error {
+	amount := fmt.Sprintf("%.2f EUR", float64(amountCents)/100.0)
+	body := fmt.Sprintf(`Bonjour %s,
+
+Nous vous confirmons la réception de votre paiement pour la prestation :
+
+  %s
+
+Montant réglé : %s
+Numéro de facture : %s
+
+Vous trouverez votre facture en pièce jointe de cet email. Elle est également disponible à tout moment depuis votre espace personnel, rubrique "Mes factures".
+
+Merci de votre confiance.
+
+— L'équipe UpcycleConnect`, firstName, prestationTitle, amount, invoiceNumber)
+
+	return m.SendWithAttachment(to, "Confirmation de paiement — UpcycleConnect", body, pdfPath)
+}
+
+func (m *Mailer) SendQuote(to, firstName, prestationTitle, quoteNumber, pdfPath string) error {
+	body := fmt.Sprintf(`Bonjour %s,
+
+Suite à votre demande concernant la prestation :
+
+  %s
+
+Vous trouverez ci-joint votre devis n° %s.
+
+Ce devis est valable 30 jours à compter de sa date d'émission. Il est également disponible dans votre espace personnel, rubrique "Mes factures".
+
+Pour toute question, n'hésitez pas à nous contacter.
+
+— L'équipe UpcycleConnect`, firstName, prestationTitle, quoteNumber)
+
+	return m.SendWithAttachment(to, "Votre devis UpcycleConnect", body, pdfPath)
 }

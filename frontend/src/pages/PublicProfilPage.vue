@@ -27,10 +27,16 @@
               <span class="bg-[rgba(27,136,72,0.1)] text-[#006d35] text-xs font-bold uppercase tracking-wide px-3 py-1 rounded-full">
                 {{ memberLabel }}
               </span>
-              <button @click="router.push('/profil/modifier')"
-                class="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#e5e7eb] text-xs font-medium text-[#40617f] hover:bg-gray-50 transition shrink-0">
-                <PencilIcon class="w-3.5 h-3.5" /> Modifier
-              </button>
+              <div class="ml-auto flex items-center gap-2 shrink-0">
+                <button @click="router.push('/profil/factures')"
+                  class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#cee5ff] text-xs font-medium text-[#001d32] hover:bg-[#b8d8ff] transition">
+                  <DocumentTextIcon class="w-3.5 h-3.5" /> Mes factures
+                </button>
+                <button @click="router.push('/profil/modifier')"
+                  class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#e5e7eb] text-xs font-medium text-[#40617f] hover:bg-gray-50 transition">
+                  <PencilIcon class="w-3.5 h-3.5" /> Modifier
+                </button>
+              </div>
             </div>
             <div class="flex items-center gap-2 text-[#40617f] text-sm">
               <EnvelopeIcon class="w-3.5 h-3.5" />
@@ -189,6 +195,7 @@ import {
   TrophyIcon,
   AcademicCapIcon,
   PencilIcon,
+  DocumentTextIcon,
 } from '@heroicons/vue/24/outline'
 
 const router   = useRouter()

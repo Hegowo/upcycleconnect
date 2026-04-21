@@ -7,6 +7,7 @@ import (
 
 	"upcycleconnect/backend/config"
 	"upcycleconnect/backend/database"
+	"upcycleconnect/backend/models"
 	"upcycleconnect/backend/router"
 )
 
@@ -16,6 +17,13 @@ func main() {
 	db, err := database.Connect(cfg)
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
+	}
+
+	if err := db.AutoMigrate(
+		&models.Reservation{},
+		&models.Invoice{},
+	); err != nil {
+		log.Fatalf("Failed to migrate database: %v", err)
 	}
 
 	r := router.Setup(db, cfg)

@@ -45,10 +45,15 @@ services:
       SMTP_PASSWORD: ${SMTP_PASSWORD}
       MAIL_FROM: ${MAIL_FROM:-noreply@upcycleconnect.xyz}
       SOCIETE_API_KEY: ${SOCIETE_API_KEY}
+      STRIPE_SECRET: ${STRIPE_SECRET}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
+      STRIPE_PUBLIC_KEY: ${STRIPE_KEY}
       LOG_LEVEL: ${LOG_LEVEL:-error}
     depends_on:
       mysql:
         condition: service_healthy
+    volumes:
+      - invoices_data:/var/lib/upcycleconnect/invoices
     networks:
       - upcycleconnect_net
 
@@ -100,6 +105,8 @@ services:
 
 volumes:
   mysql_data:
+    driver: local
+  invoices_data:
     driver: local
 
 networks:
