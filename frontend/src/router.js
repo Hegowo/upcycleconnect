@@ -10,6 +10,7 @@ const router = createRouter({
       children: [
         { path: '',            component: () => import('@/pages/PublicHomePage.vue'),          meta: { title: 'Accueil' } },
         { path: 'connexion',    component: () => import('@/pages/PublicLoginPage.vue'),          meta: { title: 'Connexion' } },
+        { path: 'connexion/verification-requise', component: () => import('@/pages/PublicLoginPendingPage.vue'), meta: { title: 'Vérification requise' } },
         { path: 'inscription',  component: () => import('@/pages/PublicRegisterPage.vue'),       meta: { title: 'Inscription', hideNav: true } },
         { path: 'verify-email', component: () => import('@/pages/PublicVerifyEmailPage.vue'),    meta: { title: 'Activation du compte' } },
         { path: 'verify-login', component: () => import('@/pages/PublicVerifyLoginPage.vue'),    meta: { title: 'Confirmation de connexion' } },

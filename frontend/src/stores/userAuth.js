@@ -28,14 +28,28 @@ export const useUserAuthStore = defineStore('userAuth', () => {
   }
 
   async function login(email, password) {
-    const data = await apiFetch('/auth/login', {
+    const res = await fetch(`${BASE}/auth/login`, {
       method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       body: JSON.stringify({ email, password }),
     })
-    token.value = data.token
-    user.value  = data.user
-    localStorage.setItem('user_token', data.token)
-    localStorage.setItem('user_data', JSON.stringify(data.user))
+    const json = await res.json().catch(() => ({}))
+
+    if (res.status === 202 || json.pending_verification) {
+      const err = new Error(json.message || 'Vérification par email requise.')
+      err.status = 202
+      err.pendingVerification = true
+      err.email = email
+      throw err
+    }
+    if (!res.ok) {
+      throw Object.assign(new Error(json.message || 'Erreur réseau'), { status: res.status, data: json })
+    }
+
+    token.value = json.token
+    user.value  = json.user
+    localStorage.setItem('user_token', json.token)
+    localStorage.setItem('user_data', JSON.stringify(json.user))
   }
 
   async function logout() {
