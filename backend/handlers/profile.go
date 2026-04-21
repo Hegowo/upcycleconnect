@@ -48,6 +48,12 @@ func (h *ProfileHandler) Stats(c *gin.Context) {
 		Order("e.start_date DESC").
 		Find(&regs)
 
+	var prestaReservations []models.Reservation
+	h.DB.Preload("Prestation").
+		Where("user_id = ? AND deleted_at IS NULL", user.ID).
+		Order("created_at DESC").
+		Find(&prestaReservations)
+
 	score := int(float64(acceptedCount)*5 + co2Total*1.5)
 	if score > 100 {
 		score = 100
@@ -61,12 +67,16 @@ func (h *ProfileHandler) Stats(c *gin.Context) {
 		CreatedAt string  `json:"created_at"`
 	}
 	type regSummary struct {
-		ID        uint    `json:"id"`
-		EventID   uint    `json:"event_id"`
-		Title     string  `json:"title"`
-		StartDate string  `json:"start_date"`
-		Location  *string `json:"location"`
-		Past      bool    `json:"past"`
+		ID          uint    `json:"id"`
+		Type        string  `json:"type"`
+		EventID     uint    `json:"event_id,omitempty"`
+		Title       string  `json:"title"`
+		StartDate   string  `json:"start_date"`
+		Location    *string `json:"location,omitempty"`
+		Past        bool    `json:"past"`
+		Status      string  `json:"status,omitempty"`
+		AmountCents int64   `json:"amount_cents,omitempty"`
+		Currency    string  `json:"currency,omitempty"`
 	}
 	type badgeDef struct {
 		Key    string `json:"key"`
@@ -91,18 +101,35 @@ func (h *ProfileHandler) Stats(c *gin.Context) {
 	}
 
 	now := time.Now()
-	regSummaries := make([]regSummary, 0, len(regs))
+	regSummaries := make([]regSummary, 0, len(regs)+len(prestaReservations))
 	for _, r := range regs {
 		if r.Event == nil {
 			continue
 		}
 		regSummaries = append(regSummaries, regSummary{
 			ID:        r.ID,
+			Type:      "event",
 			EventID:   r.EventID,
 			Title:     r.Event.Title,
 			StartDate: r.Event.StartDate.UTC().Format("2006-01-02T15:04:05Z"),
 			Location:  r.Event.Location,
 			Past:      r.Event.EndDate.Before(now),
+		})
+	}
+	for _, pr := range prestaReservations {
+		title := "Prestation"
+		if pr.Prestation != nil {
+			title = pr.Prestation.Title
+		}
+		regSummaries = append(regSummaries, regSummary{
+			ID:          pr.ID,
+			Type:        "prestation",
+			Title:       title,
+			StartDate:   pr.CreatedAt.UTC().Format("2006-01-02T15:04:05Z"),
+			Past:        pr.Status == "paid" || pr.Status == "failed",
+			Status:      pr.Status,
+			AmountCents: pr.AmountCents,
+			Currency:    pr.Currency,
 		})
 	}
 

@@ -69,5 +69,8 @@ func (s *StripeService) VerifyWebhook(payload []byte, signature string) (stripe.
 	if s.cfg.StripeWebhookSecret == "" {
 		return stripe.Event{}, fmt.Errorf("stripe webhook secret is not configured")
 	}
-	return webhook.ConstructEvent(payload, signature, s.cfg.StripeWebhookSecret)
+	return webhook.ConstructEventWithOptions(payload, signature, s.cfg.StripeWebhookSecret, webhook.ConstructEventOptions{
+		IgnoreAPIVersionMismatch: true,
+	})
 }
+

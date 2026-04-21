@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -25,6 +26,7 @@ type PaymentHandler struct {
 	PDF    *services.PDFService
 	Mailer *services.Mailer
 }
+
 
 type reserveRequest struct {
 	Notes *string `json:"notes"`
@@ -200,9 +202,11 @@ func (h *PaymentHandler) Webhook(c *gin.Context) {
 
 	event, err := h.Stripe.VerifyWebhook(payload, signature)
 	if err != nil {
+		log.Printf("[webhook] verification failed: %v", err)
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Signature invalide", "error": err.Error()})
 		return
 	}
+	log.Printf("[webhook] event received: type=%s id=%s", event.Type, event.ID)
 
 	switch event.Type {
 	case "checkout.session.completed":
