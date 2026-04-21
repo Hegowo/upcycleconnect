@@ -508,6 +508,344 @@ func buildOpenAPISpec() map[string]any {
 			},
 		},
 
+		"/api/public/v1/categories": map[string]any{
+			"get": map[string]any{
+				"tags":    []string{"Public"},
+				"summary": "Liste des catégories actives",
+				"description": "Retourne toutes les catégories visibles publiquement (actives) avec le nombre de prestations publiées associées.",
+				"responses": map[string]any{
+					"200": map[string]any{"description": "Liste paginée de catégories", "content": map[string]any{"application/json": map[string]any{"schema": map[string]any{"type": "object", "properties": map[string]any{"data": map[string]any{"type": "array", "items": map[string]any{"$ref": "#/components/schemas/Category"}}}}}}},
+				},
+			},
+		},
+
+		"/api/public/v1/prestations": map[string]any{
+			"get": map[string]any{
+				"tags":    []string{"Public"},
+				"summary": "Liste publique des prestations publiées",
+				"parameters": append([]map[string]any{
+					{"name": "category_id", "in": "query", "schema": map[string]any{"type": "integer"}, "description": "Filtrer par catégorie"},
+					searchParam,
+				}, paginationParams...),
+				"responses": map[string]any{
+					"200": map[string]any{"description": "Prestations publiées", "content": map[string]any{"application/json": map[string]any{"schema": map[string]any{"type": "object", "properties": map[string]any{"data": map[string]any{"type": "array", "items": map[string]any{"$ref": "#/components/schemas/Prestation"}}, "meta": paginationMeta}}}}},
+				},
+			},
+		},
+
+		"/api/public/v1/prestations/{id}": map[string]any{
+			"get": map[string]any{
+				"tags":    []string{"Public"},
+				"summary": "Détail d'une prestation publiée",
+				"parameters": []map[string]any{{"name": "id", "in": "path", "required": true, "schema": map[string]any{"type": "integer"}}},
+				"responses": map[string]any{
+					"200": map[string]any{"description": "Détail", "content": map[string]any{"application/json": map[string]any{"schema": map[string]any{"$ref": "#/components/schemas/Prestation"}}}},
+					"404": map[string]any{"description": "Prestation introuvable"},
+				},
+			},
+		},
+
+		"/api/public/v1/events": map[string]any{
+			"get": map[string]any{
+				"tags":    []string{"Public"},
+				"summary": "Liste publique des événements publiés",
+				"parameters": append([]map[string]any{
+					{"name": "upcoming", "in": "query", "schema": map[string]any{"type": "boolean"}, "description": "Ne retourner que les événements à venir"},
+					{"name": "start_date_from", "in": "query", "schema": map[string]any{"type": "string", "format": "date"}},
+					{"name": "start_date_to", "in": "query", "schema": map[string]any{"type": "string", "format": "date"}},
+				}, paginationParams...),
+				"responses": map[string]any{
+					"200": map[string]any{"description": "Événements publiés", "content": map[string]any{"application/json": map[string]any{"schema": map[string]any{"type": "object", "properties": map[string]any{"data": map[string]any{"type": "array", "items": map[string]any{"$ref": "#/components/schemas/Event"}}, "meta": paginationMeta}}}}},
+				},
+			},
+		},
+
+		"/api/public/v1/events/{id}": map[string]any{
+			"get": map[string]any{
+				"tags":    []string{"Public"},
+				"summary": "Détail d'un événement publié",
+				"parameters": []map[string]any{{"name": "id", "in": "path", "required": true, "schema": map[string]any{"type": "integer"}}},
+				"responses": map[string]any{
+					"200": map[string]any{"description": "Détail", "content": map[string]any{"application/json": map[string]any{"schema": map[string]any{"$ref": "#/components/schemas/Event"}}}},
+					"404": map[string]any{"description": "Événement introuvable"},
+				},
+			},
+		},
+
+		"/api/public/v1/providers": map[string]any{
+			"get": map[string]any{
+				"tags":    []string{"Public"},
+				"summary": "Liste publique des prestataires validés",
+				"parameters": append([]map[string]any{searchParam}, paginationParams...),
+				"responses": map[string]any{
+					"200": map[string]any{"description": "Prestataires approuvés"},
+				},
+			},
+		},
+
+		"/api/public/v1/providers/{id}": map[string]any{
+			"get": map[string]any{
+				"tags":    []string{"Public"},
+				"summary": "Fiche publique d'un prestataire (avec ses prestations publiées)",
+				"parameters": []map[string]any{{"name": "id", "in": "path", "required": true, "schema": map[string]any{"type": "integer"}}},
+				"responses": map[string]any{
+					"200": map[string]any{"description": "Fiche prestataire"},
+					"404": map[string]any{"description": "Prestataire introuvable"},
+				},
+			},
+		},
+
+		"/api/v1/deposits": map[string]any{
+			"get": map[string]any{
+				"tags":     []string{"Dépôts Utilisateur"},
+				"summary":  "Liste de mes dépôts",
+				"security": bearerSecurityReq,
+				"parameters": append([]map[string]any{
+					{"name": "status", "in": "query", "schema": map[string]any{"type": "string", "enum": []string{"pending", "approved", "rejected", "accepted", "validated"}}},
+				}, paginationParams...),
+				"responses": map[string]any{
+					"200": map[string]any{"description": "Mes dépôts", "content": map[string]any{"application/json": map[string]any{"schema": map[string]any{"type": "object", "properties": map[string]any{"data": map[string]any{"type": "array", "items": map[string]any{"$ref": "#/components/schemas/Deposit"}}, "meta": paginationMeta}}}}},
+					"401": map[string]any{"description": "Non authentifié"},
+				},
+			},
+			"post": map[string]any{
+				"tags":     []string{"Dépôts Utilisateur"},
+				"summary":  "Créer une demande de dépôt",
+				"description": "Les particuliers soumettent une demande de dépôt d'objet. Elle est traitée par un admin.",
+				"security": bearerSecurityReq,
+				"requestBody": map[string]any{
+					"required": true,
+					"content": map[string]any{"application/json": map[string]any{"schema": map[string]any{
+						"type":     "object",
+						"required": []string{"title", "description"},
+						"properties": map[string]any{
+							"category_id":      map[string]any{"type": "integer", "nullable": true},
+							"title":            map[string]any{"type": "string", "example": "Aspirateur Dyson"},
+							"description":      map[string]any{"type": "string", "example": "Aspirateur fonctionnel, batterie à remplacer"},
+							"condition":        map[string]any{"type": "string", "enum": []string{"good", "fair", "poor"}, "example": "fair"},
+							"history":          map[string]any{"type": "string", "nullable": true},
+							"estimated_weight": map[string]any{"type": "number", "format": "float", "example": 3.2},
+						},
+					}}},
+				},
+				"responses": map[string]any{
+					"201": map[string]any{"description": "Dépôt créé", "content": map[string]any{"application/json": map[string]any{"schema": map[string]any{"$ref": "#/components/schemas/Deposit"}}}},
+					"401": map[string]any{"description": "Non authentifié"},
+					"422": map[string]any{"description": "Validation échouée"},
+				},
+			},
+		},
+
+		"/api/v1/deposits/{id}": map[string]any{
+			"get": map[string]any{
+				"tags":     []string{"Dépôts Utilisateur"},
+				"summary":  "Détail d'un de mes dépôts",
+				"security": bearerSecurityReq,
+				"parameters": []map[string]any{{"name": "id", "in": "path", "required": true, "schema": map[string]any{"type": "integer"}}},
+				"responses": map[string]any{
+					"200": map[string]any{"description": "Détail", "content": map[string]any{"application/json": map[string]any{"schema": map[string]any{"$ref": "#/components/schemas/Deposit"}}}},
+					"401": map[string]any{"description": "Non authentifié"},
+					"404": map[string]any{"description": "Introuvable"},
+				},
+			},
+			"delete": map[string]any{
+				"tags":     []string{"Dépôts Utilisateur"},
+				"summary":  "Annuler un dépôt en attente",
+				"security": bearerSecurityReq,
+				"parameters": []map[string]any{{"name": "id", "in": "path", "required": true, "schema": map[string]any{"type": "integer"}}},
+				"responses": map[string]any{
+					"204": map[string]any{"description": "Annulé"},
+					"401": map[string]any{"description": "Non authentifié"},
+					"404": map[string]any{"description": "Introuvable"},
+					"409": map[string]any{"description": "Dépôt déjà traité — impossible à annuler"},
+				},
+			},
+		},
+
+		"/api/v1/upcycling-score": map[string]any{
+			"get": map[string]any{
+				"tags":     []string{"Profil Utilisateur"},
+				"summary":  "Score d'upcycling de l'utilisateur",
+				"description": "Calcul : 5 pts/dépôt accepté + 1.5 pt/kg de CO₂ économisé + 3 pts/événement. Plafonné à 100.",
+				"security": bearerSecurityReq,
+				"responses": map[string]any{
+					"200": map[string]any{"description": "Score et détails", "content": map[string]any{"application/json": map[string]any{"schema": map[string]any{
+						"type": "object",
+						"properties": map[string]any{
+							"score":              map[string]any{"type": "integer", "example": 72},
+							"level":              map[string]any{"type": "string", "example": "Confirmé"},
+							"deposits_total":     map[string]any{"type": "integer", "example": 8},
+							"deposits_accepted":  map[string]any{"type": "integer", "example": 6},
+							"deposits_pending":   map[string]any{"type": "integer", "example": 1},
+							"deposits_rejected":  map[string]any{"type": "integer", "example": 1},
+							"weight_saved_kg":    map[string]any{"type": "number", "format": "float"},
+							"co2_saved_kg":       map[string]any{"type": "number", "format": "float"},
+							"events_attended":    map[string]any{"type": "integer", "example": 2},
+						},
+					}}}},
+					"401": map[string]any{"description": "Non authentifié"},
+				},
+			},
+		},
+
+		"/api/v1/provider/apply": map[string]any{
+			"post": map[string]any{
+				"tags":     []string{"Prestataire"},
+				"summary":  "Postuler pour devenir prestataire",
+				"description": "Soumet une candidature prestataire. Elle doit être approuvée par un admin pour que les endpoints prestataire soient accessibles.",
+				"security": bearerSecurityReq,
+				"requestBody": map[string]any{
+					"required": true,
+					"content": map[string]any{"application/json": map[string]any{"schema": map[string]any{
+						"type":     "object",
+						"required": []string{"company_name"},
+						"properties": map[string]any{
+							"company_name": map[string]any{"type": "string", "example": "EcoRépar SARL"},
+							"siret":        map[string]any{"type": "string", "pattern": "^[0-9]{14}$", "example": "12345678901234"},
+							"description":  map[string]any{"type": "string"},
+							"website":      map[string]any{"type": "string", "format": "uri"},
+						},
+					}}},
+				},
+				"responses": map[string]any{
+					"201": map[string]any{"description": "Candidature enregistrée"},
+					"401": map[string]any{"description": "Non authentifié"},
+					"409": map[string]any{"description": "Candidature déjà existante"},
+					"422": map[string]any{"description": "Validation échouée"},
+				},
+			},
+		},
+
+		"/api/v1/provider/profile": map[string]any{
+			"get": map[string]any{
+				"tags":     []string{"Prestataire"},
+				"summary":  "Mon profil prestataire",
+				"security": bearerSecurityReq,
+				"responses": map[string]any{
+					"200": map[string]any{"description": "Profil", "content": map[string]any{"application/json": map[string]any{"schema": map[string]any{"$ref": "#/components/schemas/ProviderProfile"}}}},
+					"401": map[string]any{"description": "Non authentifié"},
+					"404": map[string]any{"description": "Aucun profil — utiliser /provider/apply"},
+				},
+			},
+			"put": map[string]any{
+				"tags":     []string{"Prestataire"},
+				"summary":  "Mettre à jour mon profil prestataire",
+				"security": bearerSecurityReq,
+				"requestBody": map[string]any{
+					"required": true,
+					"content": map[string]any{"application/json": map[string]any{"schema": map[string]any{
+						"type": "object",
+						"properties": map[string]any{
+							"company_name": map[string]any{"type": "string"},
+							"description":  map[string]any{"type": "string"},
+							"website":      map[string]any{"type": "string", "format": "uri"},
+						},
+					}}},
+				},
+				"responses": map[string]any{
+					"200": map[string]any{"description": "Mis à jour"},
+					"401": map[string]any{"description": "Non authentifié"},
+					"404": map[string]any{"description": "Aucun profil"},
+				},
+			},
+		},
+
+		"/api/v1/provider/prestations": map[string]any{
+			"get": map[string]any{
+				"tags":     []string{"Prestataire"},
+				"summary":  "Mes prestations",
+				"security": bearerSecurityReq,
+				"parameters": append([]map[string]any{
+					{"name": "status", "in": "query", "schema": map[string]any{"type": "string", "enum": []string{"draft", "published", "suspended", "archived"}}},
+				}, paginationParams...),
+				"responses": map[string]any{
+					"200": map[string]any{"description": "Liste de mes prestations"},
+					"401": map[string]any{"description": "Non authentifié"},
+					"403": map[string]any{"description": "Profil prestataire non approuvé"},
+				},
+			},
+			"post": map[string]any{
+				"tags":     []string{"Prestataire"},
+				"summary":  "Créer une prestation (brouillon)",
+				"security": bearerSecurityReq,
+				"requestBody": map[string]any{
+					"required": true,
+					"content": map[string]any{"application/json": map[string]any{"schema": map[string]any{
+						"type":     "object",
+						"required": []string{"title"},
+						"properties": map[string]any{
+							"category_id": map[string]any{"type": "integer", "nullable": true},
+							"title":       map[string]any{"type": "string"},
+							"description": map[string]any{"type": "string"},
+							"price":       map[string]any{"type": "string", "example": "49.90"},
+							"price_type":  map[string]any{"type": "string", "enum": []string{"fixed", "hourly", "quote"}},
+						},
+					}}},
+				},
+				"responses": map[string]any{
+					"201": map[string]any{"description": "Créée", "content": map[string]any{"application/json": map[string]any{"schema": map[string]any{"$ref": "#/components/schemas/Prestation"}}}},
+					"401": map[string]any{"description": "Non authentifié"},
+					"403": map[string]any{"description": "Profil prestataire non approuvé"},
+				},
+			},
+		},
+
+		"/api/v1/provider/prestations/{id}": map[string]any{
+			"put": map[string]any{
+				"tags":     []string{"Prestataire"},
+				"summary":  "Mettre à jour ma prestation (repasse en draft)",
+				"security": bearerSecurityReq,
+				"parameters": []map[string]any{{"name": "id", "in": "path", "required": true, "schema": map[string]any{"type": "integer"}}},
+				"requestBody": map[string]any{
+					"required": true,
+					"content": map[string]any{"application/json": map[string]any{"schema": map[string]any{
+						"type": "object",
+						"properties": map[string]any{
+							"category_id": map[string]any{"type": "integer"},
+							"title":       map[string]any{"type": "string"},
+							"description": map[string]any{"type": "string"},
+							"price":       map[string]any{"type": "string"},
+							"price_type":  map[string]any{"type": "string", "enum": []string{"fixed", "hourly", "quote"}},
+						},
+					}}},
+				},
+				"responses": map[string]any{
+					"200": map[string]any{"description": "Mis à jour"},
+					"401": map[string]any{"description": "Non authentifié"},
+					"403": map[string]any{"description": "Profil prestataire non approuvé"},
+					"404": map[string]any{"description": "Introuvable"},
+				},
+			},
+			"delete": map[string]any{
+				"tags":     []string{"Prestataire"},
+				"summary":  "Supprimer ma prestation",
+				"security": bearerSecurityReq,
+				"parameters": []map[string]any{{"name": "id", "in": "path", "required": true, "schema": map[string]any{"type": "integer"}}},
+				"responses": map[string]any{
+					"204": map[string]any{"description": "Supprimée"},
+					"401": map[string]any{"description": "Non authentifié"},
+					"403": map[string]any{"description": "Profil prestataire non approuvé"},
+					"404": map[string]any{"description": "Introuvable"},
+				},
+			},
+		},
+
+		"/api/v1/provider/prestations/{id}/submit": map[string]any{
+			"put": map[string]any{
+				"tags":     []string{"Prestataire"},
+				"summary":  "Publier une prestation brouillon",
+				"security": bearerSecurityReq,
+				"parameters": []map[string]any{{"name": "id", "in": "path", "required": true, "schema": map[string]any{"type": "integer"}}},
+				"responses": map[string]any{
+					"200": map[string]any{"description": "Publiée"},
+					"401": map[string]any{"description": "Non authentifié"},
+					"403": map[string]any{"description": "Profil prestataire non approuvé"},
+					"404": map[string]any{"description": "Introuvable"},
+					"409": map[string]any{"description": "État actuel non compatible avec la publication"},
+				},
+			},
+		},
+
 		"/api/admin/v1/auth/login": map[string]any{
 			"post": map[string]any{
 				"tags":        []string{"Auth Admin"},

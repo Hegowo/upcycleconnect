@@ -36,6 +36,9 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 	mailer          := services.NewMailer(cfg)
 	userAuthHandler := &handlers.UserAuthHandler{DB: db, Cfg: cfg, Mailer: mailer}
 	profileHandler  := &handlers.ProfileHandler{DB: db, Mailer: mailer}
+	publicHandler   := &handlers.PublicHandler{DB: db}
+	userDepositHandler := &handlers.UserDepositHandler{DB: db, Audit: audit}
+	userProviderHandler := &handlers.UserProviderHandler{DB: db, Audit: audit}
 
 	r.Static("/uploads", "/uploads")
 
@@ -46,6 +49,14 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 	public := r.Group("/api/public/v1")
 	{
 		public.GET("/siret/:siret", siretHandler.Lookup)
+
+		public.GET("/categories", publicHandler.Categories)
+		public.GET("/prestations", publicHandler.Prestations)
+		public.GET("/prestations/:id", publicHandler.ShowPrestation)
+		public.GET("/events", publicHandler.Events)
+		public.GET("/events/:id", publicHandler.ShowEvent)
+		public.GET("/providers", publicHandler.Providers)
+		public.GET("/providers/:id", publicHandler.ShowProvider)
 	}
 
 	userAPI := r.Group("/api/v1")
@@ -71,6 +82,22 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 
 			userProtected.POST("/events/:id/register", profileHandler.RegisterForEvent)
 			userProtected.DELETE("/events/:id/register", profileHandler.UnregisterFromEvent)
+
+			userProtected.GET("/deposits", userDepositHandler.Index)
+			userProtected.POST("/deposits", userDepositHandler.Store)
+			userProtected.GET("/deposits/:id", userDepositHandler.Show)
+			userProtected.DELETE("/deposits/:id", userDepositHandler.Destroy)
+
+			userProtected.GET("/upcycling-score", userDepositHandler.Score)
+
+			userProtected.POST("/provider/apply", userProviderHandler.Apply)
+			userProtected.GET("/provider/profile", userProviderHandler.GetProfile)
+			userProtected.PUT("/provider/profile", userProviderHandler.UpdateProfile)
+			userProtected.GET("/provider/prestations", userProviderHandler.ListPrestations)
+			userProtected.POST("/provider/prestations", userProviderHandler.CreatePrestation)
+			userProtected.PUT("/provider/prestations/:id", userProviderHandler.UpdatePrestation)
+			userProtected.PUT("/provider/prestations/:id/submit", userProviderHandler.SubmitPrestation)
+			userProtected.DELETE("/provider/prestations/:id", userProviderHandler.DestroyPrestation)
 		}
 	}
 

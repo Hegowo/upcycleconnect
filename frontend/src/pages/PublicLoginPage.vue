@@ -135,11 +135,14 @@ async function handleLogin() {
     const redirect = route.query.redirect
     router.push(redirect ? String(redirect) : '/')
   } catch (e) {
-    if (e.status === 202) {
-      pendingVerification.value = true
-    } else {
-      error.value = e.message || 'Identifiants invalides.'
+    if (e.status === 202 || e.pendingVerification) {
+      router.push({
+        path: '/connexion/verification-requise',
+        query: { email: form.value.email },
+      })
+      return
     }
+    error.value = e.message || 'Identifiants invalides.'
   } finally {
     loading.value = false
   }
