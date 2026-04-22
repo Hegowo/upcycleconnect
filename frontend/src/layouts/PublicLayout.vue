@@ -91,6 +91,15 @@
                     Mon profil
                   </RouterLink>
 
+                  <RouterLink
+                    to="/profil/factures"
+                    @click="closeMenu"
+                    class="flex items-center gap-3 px-4 py-2.5 text-sm text-[#334155] hover:bg-[#f8fafc] transition"
+                  >
+                    <DocumentTextIcon class="w-4 h-4 text-[#40617f]" />
+                    Mes factures
+                  </RouterLink>
+
                   <div class="border-t border-[#f1f5f9] mt-1 pt-1">
                     <button
                       @click="handleLogout"
@@ -139,6 +148,7 @@
             </template>
             <template v-else>
               <RouterLink to="/profil" @click="mobileMenuOpen = false" class="block py-2 text-sm font-medium text-[#334155]">Mon profil</RouterLink>
+              <RouterLink to="/profil/factures" @click="mobileMenuOpen = false" class="block py-2 text-sm font-medium text-[#334155]">Mes factures</RouterLink>
               <button @click="handleLogout(); mobileMenuOpen = false" class="block py-2 text-sm font-medium text-red-500">Se déconnecter</button>
             </template>
           </div>
@@ -228,7 +238,7 @@
 
 <script setup>import { ref, onMounted } from 'vue'
 import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
-import { MagnifyingGlassIcon, BellIcon, UserCircleIcon } from '@heroicons/vue/24/outline'
+import { MagnifyingGlassIcon, BellIcon, UserCircleIcon, DocumentTextIcon } from '@heroicons/vue/24/outline'
 import { useUserAuthStore } from '@/stores/userAuth'
 
 const route    = useRoute()

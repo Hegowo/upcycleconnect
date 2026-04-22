@@ -116,19 +116,35 @@
           <div v-else class="flex flex-col gap-4">
             <div
               v-for="resa in profile.reservations"
-              :key="resa.id"
+              :key="`${resa.type}-${resa.id}`"
               class="bg-white rounded-xl p-4 flex items-center gap-4"
               :class="resa.past ? 'opacity-70' : ''"
             >
               <div
                 class="w-14 h-14 rounded-lg flex items-center justify-center shrink-0"
-                :class="resa.past ? 'bg-[rgba(185,219,254,0.2)]' : 'bg-[rgba(27,136,72,0.1)]'"
+                :class="reservationIconBg(resa)"
               >
-                <CalendarDaysIcon class="w-6 h-6" :class="resa.past ? 'text-[#40617f]' : 'text-[#006d35]'" />
+                <component :is="reservationIcon(resa)" class="w-6 h-6" :class="reservationIconColor(resa)" />
               </div>
-              <div class="flex-1">
-                <p class="font-semibold text-[#001d32] text-base">{{ resa.title }}</p>
-                <p class="text-[#40617f] text-sm">{{ formatDate(resa.start_date) }}{{ resa.location ? ` · ${resa.location}` : '' }}</p>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <p class="font-semibold text-[#001d32] text-base truncate">{{ resa.title }}</p>
+                  <span v-if="resa.type === 'prestation' && resa.status"
+                    class="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full"
+                    :class="prestaStatusClass(resa.status)"
+                  >
+                    {{ prestaStatusLabel(resa.status) }}
+                  </span>
+                </div>
+                <p class="text-[#40617f] text-sm">
+                  <template v-if="resa.type === 'prestation'">
+                    {{ formatDate(resa.start_date) }}
+                    <span v-if="resa.amount_cents"> · {{ formatAmount(resa.amount_cents, resa.currency) }}</span>
+                  </template>
+                  <template v-else>
+                    {{ formatDate(resa.start_date) }}{{ resa.location ? ` · ${resa.location}` : '' }}
+                  </template>
+                </p>
               </div>
               <component :is="resa.past ? CheckIcon : ChevronRightIcon" class="w-4 h-4 text-[#94a3b8] shrink-0" />
             </div>
@@ -189,6 +205,7 @@ import {
   TrophyIcon,
   AcademicCapIcon,
   PencilIcon,
+  WrenchScrewdriverIcon,
 } from '@heroicons/vue/24/outline'
 
 const router   = useRouter()
@@ -260,6 +277,54 @@ function statusGradient(s) {
     validated: 'linear-gradient(135deg, #d1fae5, #86efac)',
     rejected:  'linear-gradient(135deg, #fee2e2, #fecaca)',
   }[s] ?? 'linear-gradient(135deg, #e2e8f0, #cbd5e1)'
+}
+
+function formatAmount(cents, currency) {
+  const val = (cents || 0) / 100
+  const cur = (currency || 'eur').toUpperCase()
+  try {
+    return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: cur }).format(val)
+  } catch {
+    return `${val.toFixed(2)} €`
+  }
+}
+
+function reservationIcon(r) {
+  return r.type === 'prestation' ? WrenchScrewdriverIcon : CalendarDaysIcon
+}
+function reservationIconBg(r) {
+  if (r.type === 'prestation') {
+    if (r.status === 'paid') return 'bg-[rgba(27,136,72,0.1)]'
+    if (r.status === 'failed') return 'bg-[rgba(239,68,68,0.1)]'
+    if (r.status === 'quote_requested') return 'bg-[rgba(59,130,246,0.1)]'
+    return 'bg-[rgba(245,158,11,0.1)]'
+  }
+  return r.past ? 'bg-[rgba(185,219,254,0.2)]' : 'bg-[rgba(27,136,72,0.1)]'
+}
+function reservationIconColor(r) {
+  if (r.type === 'prestation') {
+    if (r.status === 'paid') return 'text-[#006d35]'
+    if (r.status === 'failed') return 'text-red-500'
+    if (r.status === 'quote_requested') return 'text-blue-500'
+    return 'text-amber-500'
+  }
+  return r.past ? 'text-[#40617f]' : 'text-[#006d35]'
+}
+function prestaStatusLabel(s) {
+  return {
+    pending: 'En attente',
+    paid: 'Payée',
+    failed: 'Échec',
+    quote_requested: 'Devis demandé',
+  }[s] ?? s
+}
+function prestaStatusClass(s) {
+  return {
+    pending: 'bg-amber-100 text-amber-700',
+    paid: 'bg-emerald-100 text-emerald-700',
+    failed: 'bg-red-100 text-red-700',
+    quote_requested: 'bg-blue-100 text-blue-700',
+  }[s] ?? 'bg-gray-100 text-gray-700'
 }
 
 function statusClass(s) {
