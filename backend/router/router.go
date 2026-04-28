@@ -1,6 +1,7 @@
 package router
 
 import (
+	"log"
 	"net/http"
 
 	"upcycleconnect/backend/config"
@@ -41,7 +42,10 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 	userProviderHandler := &handlers.UserProviderHandler{DB: db, Audit: audit}
 
 	stripeService := services.NewStripeService(cfg)
-	pdfService := services.NewPDFService("/var/lib/upcycleconnect/invoices")
+	pdfService, err := services.NewPDFService("/var/lib/upcycleconnect/invoices")
+	if err != nil {
+		log.Fatalf("Failed to initialize PDF service: %v", err)
+	}
 	paymentHandler := &handlers.PaymentHandler{
 		DB:     db,
 		Audit:  audit,
@@ -105,6 +109,7 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 
 			userProtected.POST("/prestations/:id/reserve", paymentHandler.Reserve)
 			userProtected.GET("/payments/session", paymentHandler.SessionStatus)
+			userProtected.GET("/reservations/:id", paymentHandler.ShowReservation)
 
 			userProtected.GET("/invoices", invoiceHandler.Index)
 			userProtected.GET("/invoices/:id", invoiceHandler.Show)

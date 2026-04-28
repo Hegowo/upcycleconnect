@@ -19,6 +19,7 @@ const router = createRouter({
         { path: 'paiement/succes',   component: () => import('@/pages/PublicPaymentSuccessPage.vue'),   meta: { title: 'Paiement confirmé' } },
         { path: 'paiement/annule',   component: () => import('@/pages/PublicPaymentCancelPage.vue'),    meta: { title: 'Paiement annulé' } },
         { path: 'profil/factures',   component: () => import('@/pages/PublicInvoicesPage.vue'),         meta: { title: 'Mes factures' } },
+        { path: 'profil/reservations/:id', component: () => import('@/pages/PublicReservationDetailPage.vue'), meta: { title: 'Détail Réservation' } },
         { path: 'evenements',       component: () => import('@/pages/PublicEvenementsPage.vue'),      meta: { title: 'Événements' } },
         { path: 'evenements/:id',   component: () => import('@/pages/PublicEvenementDetailPage.vue'), meta: { title: 'Détail Événement' } },
         { path: 'communaute',       component: () => import('@/pages/PublicCommunautePage.vue'),      meta: { title: 'Communauté' } },
