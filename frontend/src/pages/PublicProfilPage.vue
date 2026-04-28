@@ -114,11 +114,12 @@
             Aucune réservation pour le moment.
           </div>
           <div v-else class="flex flex-col gap-4">
-            <div
+            <button
               v-for="resa in profile.reservations"
               :key="`${resa.type}-${resa.id}`"
-              class="bg-white rounded-xl p-4 flex items-center gap-4"
-              :class="resa.past ? 'opacity-70' : ''"
+              @click="openReservation(resa)"
+              class="bg-white rounded-xl p-4 flex items-center gap-4 text-left w-full hover:shadow-md hover:-translate-y-0.5 transition cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#006d35]/30"
+              :class="resa.past ? 'opacity-70 hover:opacity-100' : ''"
             >
               <div
                 class="w-14 h-14 rounded-lg flex items-center justify-center shrink-0"
@@ -146,8 +147,8 @@
                   </template>
                 </p>
               </div>
-              <component :is="resa.past ? CheckIcon : ChevronRightIcon" class="w-4 h-4 text-[#94a3b8] shrink-0" />
-            </div>
+              <ChevronRightIcon class="w-4 h-4 text-[#94a3b8] shrink-0" />
+            </button>
           </div>
         </div>
 
@@ -277,6 +278,14 @@ function statusGradient(s) {
     validated: 'linear-gradient(135deg, #d1fae5, #86efac)',
     rejected:  'linear-gradient(135deg, #fee2e2, #fecaca)',
   }[s] ?? 'linear-gradient(135deg, #e2e8f0, #cbd5e1)'
+}
+
+function openReservation(r) {
+  if (r.type === 'prestation') {
+    router.push(`/profil/reservations/${r.id}`)
+  } else if (r.type === 'event' && r.event_id) {
+    router.push(`/evenements/${r.event_id}`)
+  }
 }
 
 function formatAmount(cents, currency) {
