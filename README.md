@@ -14,25 +14,6 @@ Plateforme complète UpcycleConnect — site public, espace utilisateur et inter
 
 ---
 
-## Démarrage rapide (Docker)
-
-Le script `upcycleinit` (macOS/Linux) ou `upcycleinit.ps1` (Windows) automatise l'intégralité du premier démarrage : build des images, attente MySQL, import SQL, démarrage de tous les services.
-
-### macOS / Linux
-
-```bash
-chmod +x upcycleinit
-./upcycleinit
-```
-
-### Windows (PowerShell)
-
-```powershell
-.\upcycleinit.ps1
-```
-
----
-
 ### Démarrage manuel
 
 #### 1. Variables d'environnement
