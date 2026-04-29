@@ -1,16 +1,13 @@
 <template>
   <div class="min-h-screen flex flex-col" :style="{ backgroundColor: route.meta.hideNav ? '#f7f9ff' : '#f8fafc' }">
 
-    
     <header v-if="!route.meta.hideNav" class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-[#e2e8f0]">
       <div class="max-w-[1280px] mx-auto px-6 py-4 flex items-center justify-between">
 
-        
         <RouterLink to="/" class="flex items-center">
-          <img src="/logoentier.png" alt="UpcycleConnect" class="h-12 w-auto" />
+          <img src="/logoentier.png" :alt="t('public.layout.logoAlt')" class="h-12 w-auto" />
         </RouterLink>
 
-        
         <nav class="hidden md:flex items-center gap-8">
           <RouterLink
             v-for="link in navLinks"
@@ -25,42 +22,45 @@
           </RouterLink>
         </nav>
 
-        
         <div class="flex items-center gap-2">
           <div class="relative hidden lg:block">
             <input
               type="text"
-              placeholder="Rechercher..."
+              :placeholder="t('public.layout.searchPlaceholder')"
               class="bg-[#edf4ff] pl-10 pr-4 py-2.5 rounded-xl text-sm text-gray-500 w-56 outline-none focus:ring-2 focus:ring-[#006d35]/20"
             />
             <MagnifyingGlassIcon class="w-[18px] h-[18px] absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           </div>
 
-          
+          <RouterLink
+            to="/depot"
+            class="hidden md:flex items-center gap-1.5 text-sm font-bold font-jakarta px-4 py-2 rounded-full text-[#006d35] border-2 border-[#006d35]/15 hover:border-[#006d35]/40 hover:bg-[#006d35]/5 transition"
+          >
+            <PlusCircleIcon class="w-4 h-4" />
+            {{ t('public.layout.btnDeposit') }}
+          </RouterLink>
+
           <template v-if="!userAuth.isLoggedIn">
             <RouterLink
               to="/connexion"
               class="hidden sm:block text-sm font-medium px-4 py-2 rounded-lg text-[#40617f] hover:bg-[#edf4ff] transition"
             >
-              Connexion
+              {{ t('public.layout.btnLogin') }}
             </RouterLink>
             <RouterLink
               to="/inscription"
               class="text-sm font-bold font-jakarta px-5 py-2.5 rounded-full text-white transition hover:opacity-90"
               style="background: #006d35;"
             >
-              S'inscrire
+              {{ t('public.layout.btnRegister') }}
             </RouterLink>
           </template>
 
-          
           <template v-else>
-            
             <button class="hidden sm:flex w-9 h-9 rounded-full items-center justify-center text-[#40617f] hover:bg-[#edf4ff] transition">
               <BellIcon class="w-5 h-5" />
             </button>
 
-            
             <div class="relative">
               <button
                 @click="profileMenuOpen = !profileMenuOpen"
@@ -76,7 +76,6 @@
                   v-click-outside="closeMenu"
                   class="absolute right-0 top-12 w-56 bg-white rounded-2xl shadow-xl border border-[#e2e8f0] py-2 z-50"
                 >
-                  
                   <div class="px-4 py-3 border-b border-[#f1f5f9]">
                     <p class="text-sm font-semibold text-[#001d32] truncate">{{ userAuth.fullName }}</p>
                     <p class="text-xs text-gray-400 truncate">{{ userAuth.user?.email }}</p>
@@ -88,7 +87,16 @@
                     class="flex items-center gap-3 px-4 py-2.5 text-sm text-[#334155] hover:bg-[#f8fafc] transition"
                   >
                     <UserCircleIcon class="w-4 h-4 text-[#40617f]" />
-                    Mon profil
+                    {{ t('public.layout.menuMyProfile') }}
+                  </RouterLink>
+
+                  <RouterLink
+                    to="/depot"
+                    @click="closeMenu"
+                    class="flex items-center gap-3 px-4 py-2.5 text-sm text-[#334155] hover:bg-[#f8fafc] transition"
+                  >
+                    <PlusCircleIcon class="w-4 h-4 text-[#006d35]" />
+                    {{ t('public.layout.menuDeposit') }}
                   </RouterLink>
 
                   <RouterLink
@@ -97,7 +105,7 @@
                     class="flex items-center gap-3 px-4 py-2.5 text-sm text-[#334155] hover:bg-[#f8fafc] transition"
                   >
                     <DocumentTextIcon class="w-4 h-4 text-[#40617f]" />
-                    Mes factures
+                    {{ t('public.layout.menuMyInvoices') }}
                   </RouterLink>
 
                   <div class="border-t border-[#f1f5f9] mt-1 pt-1">
@@ -108,7 +116,7 @@
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                       </svg>
-                      Se déconnecter
+                      {{ t('public.layout.menuLogout') }}
                     </button>
                   </div>
                 </div>
@@ -116,7 +124,7 @@
             </div>
           </template>
         </div>
-        
+
         <button
           @click="mobileMenuOpen = !mobileMenuOpen"
           class="md:hidden p-2 rounded-lg text-[#40617f] hover:bg-[#edf4ff] transition"
@@ -128,7 +136,6 @@
         </button>
       </div>
 
-      
       <Transition name="dropdown">
         <div v-if="mobileMenuOpen" class="md:hidden border-t border-[#e2e8f0] bg-white px-6 py-4 space-y-1">
           <RouterLink
@@ -142,14 +149,15 @@
             {{ link.label }}
           </RouterLink>
           <div class="pt-3 border-t border-[#e2e8f0]">
+            <RouterLink to="/depot" @click="mobileMenuOpen = false" class="block py-2 text-sm font-bold text-[#006d35]">+ {{ t('public.layout.btnDeposit') }}</RouterLink>
             <template v-if="!userAuth.isLoggedIn">
-              <RouterLink to="/connexion" @click="mobileMenuOpen = false" class="block py-2 text-sm font-medium text-[#40617f]">Connexion</RouterLink>
-              <RouterLink to="/inscription" @click="mobileMenuOpen = false" class="block py-2 text-sm font-bold text-[#006d35]">S'inscrire</RouterLink>
+              <RouterLink to="/connexion" @click="mobileMenuOpen = false" class="block py-2 text-sm font-medium text-[#40617f]">{{ t('public.layout.btnLogin') }}</RouterLink>
+              <RouterLink to="/inscription" @click="mobileMenuOpen = false" class="block py-2 text-sm font-bold text-[#006d35]">{{ t('public.layout.btnRegister') }}</RouterLink>
             </template>
             <template v-else>
-              <RouterLink to="/profil" @click="mobileMenuOpen = false" class="block py-2 text-sm font-medium text-[#334155]">Mon profil</RouterLink>
-              <RouterLink to="/profil/factures" @click="mobileMenuOpen = false" class="block py-2 text-sm font-medium text-[#334155]">Mes factures</RouterLink>
-              <button @click="handleLogout(); mobileMenuOpen = false" class="block py-2 text-sm font-medium text-red-500">Se déconnecter</button>
+              <RouterLink to="/profil" @click="mobileMenuOpen = false" class="block py-2 text-sm font-medium text-[#334155]">{{ t('public.layout.menuMyProfile') }}</RouterLink>
+              <RouterLink to="/profil/factures" @click="mobileMenuOpen = false" class="block py-2 text-sm font-medium text-[#334155]">{{ t('public.layout.menuMyInvoices') }}</RouterLink>
+              <button @click="handleLogout(); mobileMenuOpen = false" class="block py-2 text-sm font-medium text-red-500">{{ t('public.layout.menuLogout') }}</button>
             </template>
           </div>
         </div>
@@ -160,18 +168,16 @@
       <RouterView />
     </main>
 
-    
     <footer v-if="!route.meta.hideNav" class="bg-white border-t border-[#e2e8f0]">
       <div class="max-w-[1280px] mx-auto px-8 pt-16 pb-8">
 
         <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
-          
           <div class="space-y-4">
             <RouterLink to="/" class="block">
-              <img src="/logoentier.png" alt="UpcycleConnect" class="h-20 w-auto" />
+              <img src="/logoentier.png" :alt="t('public.layout.logoAlt')" class="h-20 w-auto" />
             </RouterLink>
             <p class="text-[#334155] text-sm leading-relaxed">
-              La plateforme de référence pour connecter particuliers et artisans engagés dans l'upcycling et l'économie circulaire.
+              {{ t('public.layout.footerTagline') }}
             </p>
             <div class="flex items-center gap-4">
               <a href="#" class="text-[#334155] hover:text-[#006d35] transition" aria-label="Facebook">
@@ -186,9 +192,8 @@
             </div>
           </div>
 
-          
           <div class="space-y-4">
-            <h4 class="text-[#0f172a] text-xs font-semibold uppercase tracking-[0.7px]">Plateforme</h4>
+            <h4 class="text-[#0f172a] text-xs font-semibold uppercase tracking-[0.7px]">{{ t('public.layout.footerColPlatform') }}</h4>
             <ul class="space-y-3">
               <li v-for="link in footerPlateforme" :key="link.label">
                 <RouterLink :to="link.path" class="text-[#334155] text-base hover:text-[#006d35] transition">
@@ -198,9 +203,8 @@
             </ul>
           </div>
 
-          
           <div class="space-y-4">
-            <h4 class="text-[#0f172a] text-xs font-semibold uppercase tracking-[0.7px]">Communauté</h4>
+            <h4 class="text-[#0f172a] text-xs font-semibold uppercase tracking-[0.7px]">{{ t('public.layout.footerColCommunity') }}</h4>
             <ul class="space-y-3">
               <li v-for="link in footerCommunaute" :key="link.label">
                 <RouterLink :to="link.path" class="text-[#334155] text-base hover:text-[#006d35] transition">
@@ -210,9 +214,8 @@
             </ul>
           </div>
 
-          
           <div class="space-y-4">
-            <h4 class="text-[#0f172a] text-xs font-semibold uppercase tracking-[0.7px]">Légal</h4>
+            <h4 class="text-[#0f172a] text-xs font-semibold uppercase tracking-[0.7px]">{{ t('public.layout.footerColLegal') }}</h4>
             <ul class="space-y-3">
               <li v-for="link in footerLegal" :key="link.label">
                 <RouterLink :to="link.path" class="text-[#334155] text-base hover:text-[#006d35] transition">
@@ -223,11 +226,10 @@
           </div>
         </div>
 
-        
         <div class="border-t border-[#e2e8f0] pt-8 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p class="text-[#334155] text-base">© {{ new Date().getFullYear() }} UpcycleConnect — Tous droits réservés.</p>
+          <p class="text-[#334155] text-base">{{ t('public.layout.footerCopyright', { year: new Date().getFullYear() }) }}</p>
           <p class="text-[#334155] text-sm flex items-center gap-1">
-            Fait avec <span class="text-red-500 mx-0.5">♥</span> pour la planète.
+            {{ t('public.layout.footerMadeWith') }} <span class="text-red-500 mx-0.5">♥</span> {{ t('public.layout.footerForPlanet') }}
           </p>
         </div>
       </div>
@@ -236,11 +238,13 @@
   </div>
 </template>
 
-<script setup>import { ref, onMounted } from 'vue'
+<script setup>import { ref, onMounted, computed } from 'vue'
 import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
-import { MagnifyingGlassIcon, BellIcon, UserCircleIcon, DocumentTextIcon } from '@heroicons/vue/24/outline'
+import { useI18n } from 'vue-i18n'
+import { MagnifyingGlassIcon, BellIcon, UserCircleIcon, DocumentTextIcon, PlusCircleIcon } from '@heroicons/vue/24/outline'
 import { useUserAuthStore } from '@/stores/userAuth'
 
+const { t } = useI18n()
 const route    = useRoute()
 const router   = useRouter()
 const userAuth = useUserAuthStore()
@@ -258,37 +262,38 @@ async function handleLogout() {
   router.push('/')
 }
 
-const navLinks = [
-  { label: 'Accueil',     path: '/' },
-  { label: 'Prestations', path: '/prestations' },
-  { label: 'Évènements',  path: '/evenements' },
-  { label: 'Communauté',  path: '/communaute' },
-]
+const navLinks = computed(() => [
+  { label: t('public.layout.navHome'),         path: '/' },
+  { label: t('public.layout.navPrestations'),  path: '/prestations' },
+  { label: t('public.layout.navEvents'),       path: '/evenements' },
+  { label: t('public.layout.navCommunity'),    path: '/communaute' },
+])
 
 function isActive(path) {
   if (path === '/') return route.path === '/'
   return route.path.startsWith(path)
 }
 
-const footerPlateforme = [
-  { label: 'Trouver une prestation', path: '/prestations' },
-  { label: 'Événements',             path: '/evenements' },
-  { label: 'Devenir prestataire',    path: '/inscription' },
-  { label: 'Comment ça marche ?',   path: '/' },
-]
+const footerPlateforme = computed(() => [
+  { label: t('public.layout.footerLinkDeposit'),        path: '/depot' },
+  { label: t('public.layout.footerLinkFindPrestation'), path: '/prestations' },
+  { label: t('public.layout.footerLinkEvents'),         path: '/evenements' },
+  { label: t('public.layout.footerLinkBecomeProvider'), path: '/inscription' },
+  { label: t('public.layout.footerLinkHowItWorks'),     path: '/' },
+])
 
-const footerCommunaute = [
-  { label: 'Blog',        path: '/' },
-  { label: 'Témoignages', path: '/' },
-  { label: 'Ressources',  path: '/' },
-]
+const footerCommunaute = computed(() => [
+  { label: t('public.layout.footerLinkBlog'),         path: '/' },
+  { label: t('public.layout.footerLinkTestimonials'), path: '/' },
+  { label: t('public.layout.footerLinkResources'),    path: '/' },
+])
 
-const footerLegal = [
-  { label: 'Mentions légales',          path: '/' },
-  { label: 'CGU / CGV',                 path: '/' },
-  { label: 'Politique de confidentialité', path: '/' },
-  { label: 'Contact',                   path: '/' },
-]
+const footerLegal = computed(() => [
+  { label: t('public.layout.footerLinkLegalNotice'), path: '/' },
+  { label: t('public.layout.footerLinkTerms'),       path: '/' },
+  { label: t('public.layout.footerLinkPrivacy'),     path: '/' },
+  { label: t('public.layout.footerLinkContact'),     path: '/' },
+])
 
 const vClickOutside = {
   mounted(el, binding) {
