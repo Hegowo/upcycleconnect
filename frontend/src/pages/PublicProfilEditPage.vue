@@ -2,18 +2,16 @@
   <div class="bg-[#f7f9ff] min-h-screen py-10">
     <div class="max-w-2xl mx-auto px-6 space-y-6">
 
-      
       <div class="flex items-center gap-4">
         <button @click="router.push('/profil')" class="p-2 rounded-xl hover:bg-white transition">
           <ArrowLeftIcon class="w-5 h-5 text-[#40617f]" />
         </button>
         <div>
-          <h1 class="font-jakarta font-extrabold text-[#001d32] text-2xl">Modifier mon profil</h1>
-          <p class="text-sm text-[#40617f]">Gérez vos informations personnelles</p>
+          <h1 class="font-jakarta font-extrabold text-[#001d32] text-2xl">{{ t('public.profileEdit.title') }}</h1>
+          <p class="text-sm text-[#40617f]">{{ t('public.profileEdit.subtitle') }}</p>
         </div>
       </div>
 
-      
       <div class="bg-white rounded-2xl p-6 flex items-center gap-6">
         <div class="relative cursor-pointer group" @click="$refs.avatarInput.click()">
           <div class="w-24 h-24 rounded-2xl overflow-hidden bg-gradient-to-br from-[#006d35] to-[#1b8848] flex items-center justify-center shadow-sm">
@@ -26,8 +24,8 @@
         </div>
         <input ref="avatarInput" type="file" accept=".jpg,.jpeg,.png,.webp" class="hidden" @change="handleAvatarChange" />
         <div class="flex-1">
-          <p class="font-semibold text-[#001d32] text-sm">Photo de profil</p>
-          <p class="text-xs text-[#40617f] mt-0.5">JPG, PNG ou WebP · max 2 Mo</p>
+          <p class="font-semibold text-[#001d32] text-sm">{{ t('public.profileEdit.avatarLabel') }}</p>
+          <p class="text-xs text-[#40617f] mt-0.5">{{ t('public.profileEdit.avatarHint') }}</p>
           <div class="flex items-center gap-3 mt-3">
             <button
               v-if="avatarFile"
@@ -36,134 +34,127 @@
               class="px-4 py-1.5 text-xs font-semibold rounded-lg text-white transition"
               style="background-color:#006d35;"
             >
-              {{ avatarLoading ? 'Envoi…' : 'Enregistrer la photo' }}
+              {{ avatarLoading ? t('public.profileEdit.avatarUploading') : t('public.profileEdit.avatarUpload') }}
             </button>
             <span v-if="avatarSuccess" class="text-xs text-[#006d35] font-medium flex items-center gap-1">
-              <CheckIcon class="w-3.5 h-3.5" /> Photo mise à jour
+              <CheckIcon class="w-3.5 h-3.5" /> {{ t('public.profileEdit.avatarSuccess') }}
             </span>
             <span v-if="avatarError" class="text-xs text-red-500">{{ avatarError }}</span>
           </div>
         </div>
       </div>
 
-      
       <div class="bg-white rounded-2xl p-6 space-y-4">
-        <h2 class="font-semibold text-[#001d32]">Informations personnelles</h2>
+        <h2 class="font-semibold text-[#001d32]">{{ t('public.profileEdit.infoTitle') }}</h2>
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="text-xs font-medium text-[#40617f] uppercase tracking-wide">Prénom</label>
+            <label class="text-xs font-medium text-[#40617f] uppercase tracking-wide">{{ t('public.profileEdit.fieldFirstName') }}</label>
             <input v-model="infoForm.first_name" type="text" class="mt-1 w-full px-3 py-2 rounded-lg border border-[#e5e7eb] text-sm text-[#001d32] focus:outline-none focus:ring-2 focus:ring-[#006d35]/30" />
           </div>
           <div>
-            <label class="text-xs font-medium text-[#40617f] uppercase tracking-wide">Nom</label>
+            <label class="text-xs font-medium text-[#40617f] uppercase tracking-wide">{{ t('public.profileEdit.fieldLastName') }}</label>
             <input v-model="infoForm.last_name" type="text" class="mt-1 w-full px-3 py-2 rounded-lg border border-[#e5e7eb] text-sm text-[#001d32] focus:outline-none focus:ring-2 focus:ring-[#006d35]/30" />
           </div>
           <div class="col-span-2">
-            <label class="text-xs font-medium text-[#40617f] uppercase tracking-wide">Téléphone</label>
-            <input v-model="infoForm.phone" type="tel" placeholder="+33 6 00 00 00 00" class="mt-1 w-full px-3 py-2 rounded-lg border border-[#e5e7eb] text-sm text-[#001d32] focus:outline-none focus:ring-2 focus:ring-[#006d35]/30" />
+            <label class="text-xs font-medium text-[#40617f] uppercase tracking-wide">{{ t('public.profileEdit.fieldPhone') }}</label>
+            <input v-model="infoForm.phone" type="tel" :placeholder="t('public.profileEdit.fieldPhonePlaceholder')" class="mt-1 w-full px-3 py-2 rounded-lg border border-[#e5e7eb] text-sm text-[#001d32] focus:outline-none focus:ring-2 focus:ring-[#006d35]/30" />
           </div>
         </div>
         <div class="flex items-center gap-3 pt-1">
           <button @click="saveInfo" :disabled="infoLoading" class="px-5 py-2 text-sm font-semibold rounded-lg text-white transition hover:opacity-90 disabled:opacity-60" style="background-color:#006d35;">
-            {{ infoLoading ? 'Enregistrement…' : 'Enregistrer' }}
+            {{ infoLoading ? t('public.profileEdit.savingInfo') : t('public.profileEdit.saveInfo') }}
           </button>
           <span v-if="infoSuccess" class="text-xs text-[#006d35] font-medium flex items-center gap-1">
-            <CheckIcon class="w-3.5 h-3.5" /> Modifications enregistrées
+            <CheckIcon class="w-3.5 h-3.5" /> {{ t('public.profileEdit.infoSuccess') }}
           </span>
           <span v-if="infoError" class="text-xs text-red-500">{{ infoError }}</span>
         </div>
       </div>
 
-      
       <div class="bg-white rounded-2xl p-6 space-y-4">
-        <h2 class="font-semibold text-[#001d32]">Changer le mot de passe</h2>
+        <h2 class="font-semibold text-[#001d32]">{{ t('public.profileEdit.passwordTitle') }}</h2>
         <div class="space-y-3">
           <div>
-            <label class="text-xs font-medium text-[#40617f] uppercase tracking-wide">Mot de passe actuel</label>
+            <label class="text-xs font-medium text-[#40617f] uppercase tracking-wide">{{ t('public.profileEdit.fieldCurrentPassword') }}</label>
             <input v-model="pwForm.current" type="password" class="mt-1 w-full px-3 py-2 rounded-lg border border-[#e5e7eb] text-sm focus:outline-none focus:ring-2 focus:ring-[#006d35]/30" />
           </div>
           <div>
-            <label class="text-xs font-medium text-[#40617f] uppercase tracking-wide">Nouveau mot de passe</label>
+            <label class="text-xs font-medium text-[#40617f] uppercase tracking-wide">{{ t('public.profileEdit.fieldNewPassword') }}</label>
             <input v-model="pwForm.new" type="password" class="mt-1 w-full px-3 py-2 rounded-lg border border-[#e5e7eb] text-sm focus:outline-none focus:ring-2 focus:ring-[#006d35]/30" />
           </div>
           <div>
-            <label class="text-xs font-medium text-[#40617f] uppercase tracking-wide">Confirmer le nouveau mot de passe</label>
+            <label class="text-xs font-medium text-[#40617f] uppercase tracking-wide">{{ t('public.profileEdit.fieldConfirmPassword') }}</label>
             <input v-model="pwForm.confirm" type="password" class="mt-1 w-full px-3 py-2 rounded-lg border border-[#e5e7eb] text-sm focus:outline-none focus:ring-2 focus:ring-[#006d35]/30" />
           </div>
         </div>
         <div class="flex items-center gap-3 pt-1">
           <button @click="changePassword" :disabled="pwLoading" class="px-5 py-2 text-sm font-semibold rounded-lg text-white transition hover:opacity-90 disabled:opacity-60" style="background-color:#006d35;">
-            {{ pwLoading ? 'Modification…' : 'Modifier le mot de passe' }}
+            {{ pwLoading ? t('public.profileEdit.savingPassword') : t('public.profileEdit.savePassword') }}
           </button>
           <span v-if="pwSuccess" class="text-xs text-[#006d35] font-medium flex items-center gap-1">
-            <CheckIcon class="w-3.5 h-3.5" /> Mot de passe modifié
+            <CheckIcon class="w-3.5 h-3.5" /> {{ t('public.profileEdit.passwordSuccess') }}
           </span>
           <span v-if="pwError" class="text-xs text-red-500">{{ pwError }}</span>
         </div>
       </div>
 
-      
       <div class="bg-white rounded-2xl p-6 space-y-4">
-        <h2 class="font-semibold text-[#001d32]">Changer l'adresse email</h2>
-        <p class="text-sm text-[#40617f]">Email actuel : <span class="font-medium text-[#001d32]">{{ userAuth.user?.email }}</span></p>
+        <h2 class="font-semibold text-[#001d32]">{{ t('public.profileEdit.emailTitle') }}</h2>
+        <p class="text-sm text-[#40617f]">{{ t('public.profileEdit.currentEmail') }} <span class="font-medium text-[#001d32]">{{ userAuth.user?.email }}</span></p>
 
-        
         <div v-if="emailStep === 0">
           <button @click="emailStart" :disabled="emailLoading" class="px-5 py-2 text-sm font-semibold rounded-lg border-2 border-[#006d35] text-[#006d35] hover:bg-[#f0fdf4] transition disabled:opacity-60">
-            {{ emailLoading ? 'Envoi…' : 'Changer mon email' }}
+            {{ emailLoading ? t('public.profileEdit.startingEmailChange') : t('public.profileEdit.startEmailChange') }}
           </button>
           <span v-if="emailError" class="block text-xs text-red-500 mt-2">{{ emailError }}</span>
         </div>
 
-        
         <div v-else-if="emailStep === 1" class="space-y-3">
           <div class="flex items-start gap-3 p-3 bg-blue-50 rounded-xl text-sm text-[#40617f]">
             <EnvelopeIcon class="w-4 h-4 mt-0.5 shrink-0 text-[#006d35]" />
-            <span>Un code à 6 chiffres a été envoyé à <strong>{{ userAuth.user?.email }}</strong>. Saisissez-le ci-dessous.</span>
+            <span>{{ t('public.profileEdit.codeNotice1Pre') }} <strong>{{ userAuth.user?.email }}</strong>{{ t('public.profileEdit.codeNotice1Post') }}</span>
           </div>
           <div>
-            <label class="text-xs font-medium text-[#40617f] uppercase tracking-wide">Code reçu sur votre adresse actuelle</label>
+            <label class="text-xs font-medium text-[#40617f] uppercase tracking-wide">{{ t('public.profileEdit.codeCurrentLabel') }}</label>
             <input v-model="emailCode1" type="text" maxlength="6" placeholder="000000"
               class="mt-1 w-40 px-3 py-2 rounded-lg border border-[#e5e7eb] text-sm text-center tracking-widest font-mono focus:outline-none focus:ring-2 focus:ring-[#006d35]/30" />
           </div>
           <div>
-            <label class="text-xs font-medium text-[#40617f] uppercase tracking-wide">Nouvelle adresse email</label>
-            <input v-model="emailNew" type="email" placeholder="nouvelle@adresse.com"
+            <label class="text-xs font-medium text-[#40617f] uppercase tracking-wide">{{ t('public.profileEdit.newEmailLabel') }}</label>
+            <input v-model="emailNew" type="email" :placeholder="t('public.profileEdit.newEmailPlaceholder')"
               class="mt-1 w-full px-3 py-2 rounded-lg border border-[#e5e7eb] text-sm focus:outline-none focus:ring-2 focus:ring-[#006d35]/30" />
           </div>
           <div class="flex items-center gap-3">
             <button @click="emailVerifyCurrent" :disabled="emailLoading" class="px-5 py-2 text-sm font-semibold rounded-lg text-white transition hover:opacity-90 disabled:opacity-60" style="background-color:#006d35;">
-              {{ emailLoading ? 'Vérification…' : 'Valider' }}
+              {{ emailLoading ? t('public.profileEdit.verifyingCurrent') : t('public.profileEdit.verifyCurrent') }}
             </button>
-            <button @click="emailStep = 0; emailError = ''" class="text-xs text-[#40617f] hover:underline">Annuler</button>
+            <button @click="emailStep = 0; emailError = ''" class="text-xs text-[#40617f] hover:underline">{{ t('public.profileEdit.cancel') }}</button>
             <span v-if="emailError" class="text-xs text-red-500">{{ emailError }}</span>
           </div>
         </div>
 
-        
         <div v-else-if="emailStep === 2" class="space-y-3">
           <div class="flex items-start gap-3 p-3 bg-blue-50 rounded-xl text-sm text-[#40617f]">
             <EnvelopeIcon class="w-4 h-4 mt-0.5 shrink-0 text-[#006d35]" />
-            <span>Un code a été envoyé à <strong>{{ emailNew }}</strong>. Saisissez-le pour confirmer le changement.</span>
+            <span>{{ t('public.profileEdit.codeNotice2Pre') }} <strong>{{ emailNew }}</strong>{{ t('public.profileEdit.codeNotice2Post') }}</span>
           </div>
           <div>
-            <label class="text-xs font-medium text-[#40617f] uppercase tracking-wide">Code reçu sur votre nouvelle adresse</label>
+            <label class="text-xs font-medium text-[#40617f] uppercase tracking-wide">{{ t('public.profileEdit.codeNewLabel') }}</label>
             <input v-model="emailCode2" type="text" maxlength="6" placeholder="000000"
               class="mt-1 w-40 px-3 py-2 rounded-lg border border-[#e5e7eb] text-sm text-center tracking-widest font-mono focus:outline-none focus:ring-2 focus:ring-[#006d35]/30" />
           </div>
           <div class="flex items-center gap-3">
             <button @click="emailVerifyNew" :disabled="emailLoading" class="px-5 py-2 text-sm font-semibold rounded-lg text-white transition hover:opacity-90 disabled:opacity-60" style="background-color:#006d35;">
-              {{ emailLoading ? 'Confirmation…' : 'Confirmer le changement' }}
+              {{ emailLoading ? t('public.profileEdit.verifyingNew') : t('public.profileEdit.verifyNew') }}
             </button>
-            <button @click="emailStep = 0; emailError = ''" class="text-xs text-[#40617f] hover:underline">Annuler</button>
+            <button @click="emailStep = 0; emailError = ''" class="text-xs text-[#40617f] hover:underline">{{ t('public.profileEdit.cancel') }}</button>
             <span v-if="emailError" class="text-xs text-red-500">{{ emailError }}</span>
           </div>
         </div>
 
-        
         <div v-else-if="emailStep === 3" class="flex items-center gap-2 text-[#006d35] text-sm font-medium">
           <CheckCircleIcon class="w-5 h-5" />
-          Email modifié avec succès. Vous utilisez maintenant <strong>{{ emailNew }}</strong>.
+          {{ t('public.profileEdit.doneEmailChange1') }} <strong>{{ emailNew }}</strong>.
         </div>
       </div>
 
@@ -173,6 +164,7 @@
 
 <script setup>import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useUserAuthStore } from '@/stores/userAuth'
 import {
   ArrowLeftIcon,
@@ -182,6 +174,7 @@ import {
   EnvelopeIcon,
 } from '@heroicons/vue/24/outline'
 
+const { t } = useI18n()
 const router   = useRouter()
 const userAuth = useUserAuthStore()
 
@@ -206,7 +199,7 @@ function handleAvatarChange(e) {
   const file = e.target.files[0]
   if (!file) return
   if (file.size > 2 * 1024 * 1024) {
-    avatarError.value = 'Fichier trop volumineux (max 2 Mo).'
+    avatarError.value = t('public.profileEdit.avatarTooBig')
     return
   }
   avatarFile.value    = file
@@ -231,7 +224,7 @@ async function uploadAvatar() {
       body: fd,
     })
     const json = await res.json()
-    if (!res.ok) throw new Error(json.message || 'Erreur')
+    if (!res.ok) throw new Error(json.message || t('public.profileEdit.errorGeneric'))
     avatarSuccess.value = true
     avatarFile.value    = null
     if (userAuth.user) userAuth.user.avatar_url = json.avatar_url
@@ -266,7 +259,7 @@ async function saveInfo() {
       }),
     })
     const json = await res.json()
-    if (!res.ok) throw new Error(json.message || 'Erreur')
+    if (!res.ok) throw new Error(json.message || t('public.profileEdit.errorGeneric'))
     infoSuccess.value  = true
     userAuth.user = { ...userAuth.user, ...json }
     localStorage.setItem('user_data', JSON.stringify(userAuth.user))
@@ -286,11 +279,11 @@ async function changePassword() {
   pwError.value   = ''
   pwSuccess.value = false
   if (pwForm.value.new !== pwForm.value.confirm) {
-    pwError.value = 'Les mots de passe ne correspondent pas.'
+    pwError.value = t('public.profileEdit.passwordMismatch')
     return
   }
   if (pwForm.value.new.length < 8) {
-    pwError.value = 'Le nouveau mot de passe doit faire au moins 8 caractères.'
+    pwError.value = t('public.profileEdit.passwordTooShort')
     return
   }
   pwLoading.value = true
@@ -304,7 +297,7 @@ async function changePassword() {
       body: JSON.stringify({ current: pwForm.value.current, new: pwForm.value.new }),
     })
     const json = await res.json()
-    if (!res.ok) throw new Error(json.message || 'Erreur')
+    if (!res.ok) throw new Error(json.message || t('public.profileEdit.errorGeneric'))
     pwSuccess.value = true
     pwForm.value = { current: '', new: '', confirm: '' }
   } catch (err) {
@@ -330,7 +323,7 @@ async function emailStart() {
       headers: { Authorization: `Bearer ${userAuth.token}` },
     })
     const json = await res.json()
-    if (!res.ok) throw new Error(json.message || 'Erreur')
+    if (!res.ok) throw new Error(json.message || t('public.profileEdit.errorGeneric'))
     emailStep.value = 1
   } catch (err) {
     emailError.value = err.message
@@ -341,7 +334,7 @@ async function emailStart() {
 
 async function emailVerifyCurrent() {
   if (!emailCode1.value || !emailNew.value) {
-    emailError.value = 'Veuillez remplir tous les champs.'
+    emailError.value = t('public.profileEdit.missingFields')
     return
   }
   emailLoading.value = true
@@ -356,7 +349,7 @@ async function emailVerifyCurrent() {
       body: JSON.stringify({ code: emailCode1.value, new_email: emailNew.value }),
     })
     const json = await res.json()
-    if (!res.ok) throw new Error(json.message || 'Erreur')
+    if (!res.ok) throw new Error(json.message || t('public.profileEdit.errorGeneric'))
     emailStep.value = 2
     emailCode1.value = ''
   } catch (err) {
@@ -368,7 +361,7 @@ async function emailVerifyCurrent() {
 
 async function emailVerifyNew() {
   if (!emailCode2.value) {
-    emailError.value = 'Veuillez saisir le code.'
+    emailError.value = t('public.profileEdit.missingCode')
     return
   }
   emailLoading.value = true
@@ -383,7 +376,7 @@ async function emailVerifyNew() {
       body: JSON.stringify({ code: emailCode2.value }),
     })
     const json = await res.json()
-    if (!res.ok) throw new Error(json.message || 'Erreur')
+    if (!res.ok) throw new Error(json.message || t('public.profileEdit.errorGeneric'))
     emailStep.value = 3
     if (userAuth.user) userAuth.user.email = json.email
     localStorage.setItem('user_data', JSON.stringify(userAuth.user))

@@ -5,18 +5,17 @@
         <XCircleIcon class="w-12 h-12 text-orange-500" />
       </div>
       <h1 class="font-jakarta font-extrabold text-[#001d32] text-3xl mb-3">
-        Paiement annulé
+        {{ t('public.paymentCancel.title') }}
       </h1>
       <p class="text-[#40617f] text-base leading-7 mb-6">
-        Votre paiement a été annulé. Aucun montant ne vous a été facturé. Vous pouvez réessayer
-        à tout moment depuis la page de la prestation.
+        {{ t('public.paymentCancel.subtitle') }}
       </p>
       <router-link
         to="/prestations"
         class="px-6 py-3 rounded-xl text-white font-bold transition hover:opacity-90 inline-block"
         style="background: linear-gradient(134deg, #006d35 0%, #1b8848 100%);"
       >
-        Retour aux prestations
+        {{ t('public.paymentCancel.ctaBack') }}
       </router-link>
     </div>
   </div>
@@ -24,4 +23,6 @@
 
 <script setup>
 import { XCircleIcon } from '@heroicons/vue/24/outline'
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 </script>

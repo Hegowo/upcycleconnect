@@ -62,6 +62,7 @@ func (h *UserAuthHandler) Register(c *gin.Context) {
 		Email:     req.Email,
 		Password:  string(hashed),
 		Phone:     req.Phone,
+		Address:   req.Address,
 		Status:    "pending",
 	}
 
@@ -71,19 +72,11 @@ func (h *UserAuthHandler) Register(c *gin.Context) {
 	}
 
 	if req.AccountType == "provider" && req.CompanyName != nil && *req.CompanyName != "" {
-		var desc *string
-		if req.Activity != nil && *req.Activity != "" {
-			d := *req.Activity
-			if req.Address != nil && *req.Address != "" {
-				d = d + " — " + *req.Address
-			}
-			desc = &d
-		}
 		profile := models.ProviderProfile{
 			UserID:      user.ID,
 			CompanyName: *req.CompanyName,
 			Siret:       req.Siret,
-			Description: desc,
+			Description: req.Activity,
 			Status:      "pending",
 		}
 		h.DB.Create(&profile)

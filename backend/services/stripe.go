@@ -29,7 +29,7 @@ type CheckoutParams struct {
 
 func (s *StripeService) CreateCheckoutSession(p CheckoutParams) (*stripe.CheckoutSession, error) {
 	if s.cfg.StripeSecret == "" {
-		return nil, fmt.Errorf("stripe secret key is not configured")
+		return nil, fmt.Errorf("Clé secrète stripe pas configurée")
 	}
 	stripe.Key = s.cfg.StripeSecret
 
@@ -42,11 +42,11 @@ func (s *StripeService) CreateCheckoutSession(p CheckoutParams) (*stripe.Checkou
 	cancelURL := fmt.Sprintf("%s/paiement/annule", s.cfg.AppURL)
 
 	params := &stripe.CheckoutSessionParams{
-		Mode:               stripe.String(string(stripe.CheckoutSessionModePayment)),
-		SuccessURL:         stripe.String(successURL),
-		CancelURL:          stripe.String(cancelURL),
-		CustomerEmail:      stripe.String(p.UserEmail),
-		ClientReferenceID:  stripe.String(fmt.Sprintf("%d", p.ReservationID)),
+		Mode:              stripe.String(string(stripe.CheckoutSessionModePayment)),
+		SuccessURL:        stripe.String(successURL),
+		CancelURL:         stripe.String(cancelURL),
+		CustomerEmail:     stripe.String(p.UserEmail),
+		ClientReferenceID: stripe.String(fmt.Sprintf("%d", p.ReservationID)),
 		LineItems: []*stripe.CheckoutSessionLineItemParams{
 			{
 				PriceData: &stripe.CheckoutSessionLineItemPriceDataParams{
@@ -73,4 +73,3 @@ func (s *StripeService) VerifyWebhook(payload []byte, signature string) (stripe.
 		IgnoreAPIVersionMismatch: true,
 	})
 }
-

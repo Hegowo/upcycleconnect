@@ -26,6 +26,7 @@ func main() {
 	}
 
 	if err := db.AutoMigrate(
+		&models.User{},
 		&models.Reservation{},
 		&models.Invoice{},
 	); err != nil {

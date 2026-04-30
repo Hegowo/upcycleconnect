@@ -13,6 +13,7 @@ type User struct {
 	FirstName       string          `gorm:"size:100" json:"first_name"`
 	LastName        string          `gorm:"size:100" json:"last_name"`
 	Phone           *string         `gorm:"size:20" json:"phone"`
+	Address         *string         `gorm:"size:512" json:"address"`
 	AvatarURL       *string         `gorm:"size:255" json:"avatar_url"`
 	Status          string          `gorm:"size:20;default:active" json:"status"`
 	EmailVerifiedAt *time.Time      `json:"email_verified_at"`
@@ -71,6 +72,7 @@ type UserResponse struct {
 	FirstName       string  `json:"first_name"`
 	LastName        string  `json:"last_name"`
 	Phone           *string `json:"phone"`
+	Address         *string `json:"address"`
 	AvatarURL       *string `json:"avatar_url"`
 	Status          string  `json:"status"`
 	Role            *string `json:"role"`
@@ -91,6 +93,7 @@ func ToUserResponse(u *User) UserResponse {
 		FirstName:       u.FirstName,
 		LastName:        u.LastName,
 		Phone:           u.Phone,
+		Address:         u.Address,
 		AvatarURL:       u.AvatarURL,
 		Status:          u.Status,
 		Role:            u.PrimaryRole(),
