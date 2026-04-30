@@ -342,46 +342,49 @@
                     <div>
                       <label class="block text-xs font-medium text-[#001d32] mb-1">{{ t('public.register.fieldAddress') }}</label>
                       <AddressAutocomplete
-                        :model-value="[form.streetNumber, form.streetName, form.postalCode, form.city].filter(Boolean).join(' ')"
-                        @update:model-value="() => {}"
+                        v-model="addressQuery"
                         @select="handleAddressSelect"
                         :placeholder="t('public.register.fieldAddressSearch')"
                         class="w-full px-3 py-2.5 border rounded-xl text-sm focus:outline-none transition-colors pr-10"
                         :class="companyData ? 'border-green-300 bg-green-50/40' : 'border-[#e2e8f0] bg-white focus:border-[#006d35]'"
                       />
                     </div>
-                    <div class="grid grid-cols-[80px_1fr] gap-2">
-                      <div>
-                        <label class="block text-xs font-medium text-[#001d32] mb-1">{{ t('public.register.fieldStreetNumber') }}</label>
-                        <input v-model="form.streetNumber" type="text"
-                          class="w-full px-3 py-2.5 border rounded-xl text-sm focus:outline-none transition-colors"
-                          :class="companyData ? 'border-green-300 bg-green-50/40' : 'border-[#e2e8f0] bg-white focus:border-[#006d35]'"
-                          :placeholder="t('public.register.fieldStreetNumberPlaceholder')" />
+                    <Transition name="fade">
+                      <div v-if="showAddressFields" class="space-y-2">
+                        <div class="grid grid-cols-[80px_1fr] gap-2">
+                          <div>
+                            <label class="block text-xs font-medium text-[#001d32] mb-1">{{ t('public.register.fieldStreetNumber') }}</label>
+                            <input v-model="form.streetNumber" type="text"
+                              class="w-full px-3 py-2.5 border rounded-xl text-sm focus:outline-none transition-colors"
+                              :class="companyData ? 'border-green-300 bg-green-50/40' : 'border-[#e2e8f0] bg-white focus:border-[#006d35]'"
+                              :placeholder="t('public.register.fieldStreetNumberPlaceholder')" />
+                          </div>
+                          <div>
+                            <label class="block text-xs font-medium text-[#001d32] mb-1">{{ t('public.register.fieldStreetName') }}</label>
+                            <input v-model="form.streetName" type="text"
+                              class="w-full px-3 py-2.5 border rounded-xl text-sm focus:outline-none transition-colors"
+                              :class="companyData ? 'border-green-300 bg-green-50/40' : 'border-[#e2e8f0] bg-white focus:border-[#006d35]'"
+                              :placeholder="t('public.register.fieldStreetNamePlaceholder')" />
+                          </div>
+                        </div>
+                        <div class="grid grid-cols-[120px_1fr] gap-2">
+                          <div>
+                            <label class="block text-xs font-medium text-[#001d32] mb-1">{{ t('public.register.fieldPostalCode') }}</label>
+                            <input v-model="form.postalCode" type="text" maxlength="5"
+                              class="w-full px-3 py-2.5 border rounded-xl text-sm focus:outline-none transition-colors font-mono"
+                              :class="companyData ? 'border-green-300 bg-green-50/40' : 'border-[#e2e8f0] bg-white focus:border-[#006d35]'"
+                              :placeholder="t('public.register.fieldPostalCodePlaceholder')" />
+                          </div>
+                          <div>
+                            <label class="block text-xs font-medium text-[#001d32] mb-1">{{ t('public.register.fieldCity') }}</label>
+                            <input v-model="form.city" type="text"
+                              class="w-full px-3 py-2.5 border rounded-xl text-sm focus:outline-none transition-colors"
+                              :class="companyData ? 'border-green-300 bg-green-50/40' : 'border-[#e2e8f0] bg-white focus:border-[#006d35]'"
+                              :placeholder="t('public.register.fieldCityPlaceholder')" />
+                          </div>
+                        </div>
                       </div>
-                      <div>
-                        <label class="block text-xs font-medium text-[#001d32] mb-1">{{ t('public.register.fieldStreetName') }}</label>
-                        <input v-model="form.streetName" type="text"
-                          class="w-full px-3 py-2.5 border rounded-xl text-sm focus:outline-none transition-colors"
-                          :class="companyData ? 'border-green-300 bg-green-50/40' : 'border-[#e2e8f0] bg-white focus:border-[#006d35]'"
-                          :placeholder="t('public.register.fieldStreetNamePlaceholder')" />
-                      </div>
-                    </div>
-                    <div class="grid grid-cols-[120px_1fr] gap-2">
-                      <div>
-                        <label class="block text-xs font-medium text-[#001d32] mb-1">{{ t('public.register.fieldPostalCode') }}</label>
-                        <input v-model="form.postalCode" type="text" maxlength="5"
-                          class="w-full px-3 py-2.5 border rounded-xl text-sm focus:outline-none transition-colors font-mono"
-                          :class="companyData ? 'border-green-300 bg-green-50/40' : 'border-[#e2e8f0] bg-white focus:border-[#006d35]'"
-                          :placeholder="t('public.register.fieldPostalCodePlaceholder')" />
-                      </div>
-                      <div>
-                        <label class="block text-xs font-medium text-[#001d32] mb-1">{{ t('public.register.fieldCity') }}</label>
-                        <input v-model="form.city" type="text"
-                          class="w-full px-3 py-2.5 border rounded-xl text-sm focus:outline-none transition-colors"
-                          :class="companyData ? 'border-green-300 bg-green-50/40' : 'border-[#e2e8f0] bg-white focus:border-[#006d35]'"
-                          :placeholder="t('public.register.fieldCityPlaceholder')" />
-                      </div>
-                    </div>
+                    </Transition>
                   </div>
                 </template>
 
@@ -415,41 +418,44 @@
                   <div>
                     <label class="block text-xs font-medium text-[#001d32] mb-1">{{ t('public.register.fieldAddress') }}</label>
                     <AddressAutocomplete
-                      :model-value="[form.streetNumber, form.streetName, form.postalCode, form.city].filter(Boolean).join(' ')"
-                      @update:model-value="() => {}"
+                      v-model="addressQuery"
                       @select="handleAddressSelect"
                       :placeholder="t('public.register.fieldAddressSearch')"
                       class="w-full px-3 py-2.5 border border-[#e2e8f0] rounded-xl text-sm focus:outline-none focus:border-[#006d35] transition-colors bg-white pr-10"
                     />
                   </div>
-                  <div class="grid grid-cols-[80px_1fr] gap-2">
-                    <div>
-                      <label class="block text-xs font-medium text-[#001d32] mb-1">{{ t('public.register.fieldStreetNumber') }}</label>
-                      <input v-model="form.streetNumber" type="text"
-                        class="w-full px-3 py-2.5 border border-[#e2e8f0] rounded-xl text-sm focus:outline-none focus:border-[#006d35] transition-colors bg-white"
-                        :placeholder="t('public.register.fieldStreetNumberPlaceholder')" />
+                  <Transition name="fade">
+                    <div v-if="showAddressFields" class="space-y-2">
+                      <div class="grid grid-cols-[80px_1fr] gap-2">
+                        <div>
+                          <label class="block text-xs font-medium text-[#001d32] mb-1">{{ t('public.register.fieldStreetNumber') }}</label>
+                          <input v-model="form.streetNumber" type="text"
+                            class="w-full px-3 py-2.5 border border-[#e2e8f0] rounded-xl text-sm focus:outline-none focus:border-[#006d35] transition-colors bg-white"
+                            :placeholder="t('public.register.fieldStreetNumberPlaceholder')" />
+                        </div>
+                        <div>
+                          <label class="block text-xs font-medium text-[#001d32] mb-1">{{ t('public.register.fieldStreetName') }}</label>
+                          <input v-model="form.streetName" type="text"
+                            class="w-full px-3 py-2.5 border border-[#e2e8f0] rounded-xl text-sm focus:outline-none focus:border-[#006d35] transition-colors bg-white"
+                            :placeholder="t('public.register.fieldStreetNamePlaceholder')" />
+                        </div>
+                      </div>
+                      <div class="grid grid-cols-[120px_1fr] gap-2">
+                        <div>
+                          <label class="block text-xs font-medium text-[#001d32] mb-1">{{ t('public.register.fieldPostalCode') }}</label>
+                          <input v-model="form.postalCode" type="text" maxlength="5"
+                            class="w-full px-3 py-2.5 border border-[#e2e8f0] rounded-xl text-sm focus:outline-none focus:border-[#006d35] transition-colors bg-white font-mono"
+                            :placeholder="t('public.register.fieldPostalCodePlaceholder')" />
+                        </div>
+                        <div>
+                          <label class="block text-xs font-medium text-[#001d32] mb-1">{{ t('public.register.fieldCity') }}</label>
+                          <input v-model="form.city" type="text"
+                            class="w-full px-3 py-2.5 border border-[#e2e8f0] rounded-xl text-sm focus:outline-none focus:border-[#006d35] transition-colors bg-white"
+                            :placeholder="t('public.register.fieldCityPlaceholder')" />
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <label class="block text-xs font-medium text-[#001d32] mb-1">{{ t('public.register.fieldStreetName') }}</label>
-                      <input v-model="form.streetName" type="text"
-                        class="w-full px-3 py-2.5 border border-[#e2e8f0] rounded-xl text-sm focus:outline-none focus:border-[#006d35] transition-colors bg-white"
-                        :placeholder="t('public.register.fieldStreetNamePlaceholder')" />
-                    </div>
-                  </div>
-                  <div class="grid grid-cols-[120px_1fr] gap-2">
-                    <div>
-                      <label class="block text-xs font-medium text-[#001d32] mb-1">{{ t('public.register.fieldPostalCode') }}</label>
-                      <input v-model="form.postalCode" type="text" maxlength="5"
-                        class="w-full px-3 py-2.5 border border-[#e2e8f0] rounded-xl text-sm focus:outline-none focus:border-[#006d35] transition-colors bg-white font-mono"
-                        :placeholder="t('public.register.fieldPostalCodePlaceholder')" />
-                    </div>
-                    <div>
-                      <label class="block text-xs font-medium text-[#001d32] mb-1">{{ t('public.register.fieldCity') }}</label>
-                      <input v-model="form.city" type="text"
-                        class="w-full px-3 py-2.5 border border-[#e2e8f0] rounded-xl text-sm focus:outline-none focus:border-[#006d35] transition-colors bg-white"
-                        :placeholder="t('public.register.fieldCityPlaceholder')" />
-                    </div>
-                  </div>
+                  </Transition>
                   <div>
                     <label class="block text-xs font-medium text-[#001d32] mb-1">{{ t('public.register.fieldPassword') }} <span class="text-red-400">*</span></label>
                     <div class="relative">
@@ -570,6 +576,8 @@ const companyData = ref(null)
 const showPassword = ref(false)
 const loading = ref(false)
 const error = ref('')
+const addressQuery = ref('')
+const showAddressFields = ref(false)
 
 const form = ref({
   firstName: '',
@@ -643,6 +651,7 @@ function handleAddressSelect(props) {
   form.value.streetName   = props.street || props.name || ''
   form.value.postalCode   = props.postcode || ''
   form.value.city         = props.city || ''
+  showAddressFields.value = true
 }
 
 function useCompanyData() {
@@ -658,6 +667,7 @@ function useCompanyData() {
     form.value.streetName   = numMatch ? numMatch[2] : rawAddress
     form.value.postalCode   = d.codepostalinsee || ''
     form.value.city         = d.villeinsee || ''
+    showAddressFields.value = true
     step.value = 'form'
   } else {
     step.value = 'siret-confirm'
