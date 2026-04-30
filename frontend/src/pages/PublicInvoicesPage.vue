@@ -6,11 +6,11 @@
         class="flex items-center gap-2 text-[#40617f] hover:text-[#006d35] mb-6"
       >
         <ArrowLeftIcon class="w-5 h-5" />
-        Retour
+        {{ t('public.invoices.back') }}
       </button>
 
       <h1 class="font-jakarta font-extrabold text-[#001d32] text-3xl md:text-4xl mb-8">
-        Mes factures & devis
+        {{ t('public.invoices.title') }}
       </h1>
 
       <div class="flex gap-3 mb-6">
@@ -19,29 +19,28 @@
           class="px-5 py-2 rounded-full text-sm font-semibold transition"
           :class="filter === '' ? 'bg-[#006d35] text-white' : 'bg-white text-[#40617f] hover:bg-[#006d35]/5'"
         >
-          Tous
+          {{ t('public.invoices.filterAll') }}
         </button>
         <button
           @click="filter = 'invoice'"
           class="px-5 py-2 rounded-full text-sm font-semibold transition"
           :class="filter === 'invoice' ? 'bg-[#006d35] text-white' : 'bg-white text-[#40617f] hover:bg-[#006d35]/5'"
         >
-          Factures
+          {{ t('public.invoices.filterInvoices') }}
         </button>
         <button
           @click="filter = 'quote'"
           class="px-5 py-2 rounded-full text-sm font-semibold transition"
           :class="filter === 'quote' ? 'bg-[#006d35] text-white' : 'bg-white text-[#40617f] hover:bg-[#006d35]/5'"
         >
-          Devis
+          {{ t('public.invoices.filterQuotes') }}
         </button>
       </div>
 
-      <div v-if="loading" class="text-center py-16 text-[#40617f]">Chargement...</div>
+      <div v-if="loading" class="text-center py-16 text-[#40617f]">{{ t('public.invoices.loading') }}</div>
       <div v-else-if="error" class="text-center py-16 text-red-600">{{ error }}</div>
       <div v-else-if="items.length === 0" class="bg-white rounded-[24px] p-10 text-center text-[#40617f]">
-        Aucun document pour le moment. Après un paiement ou une demande de devis, vos documents
-        apparaîtront ici.
+        {{ t('public.invoices.empty') }}
       </div>
       <div v-else class="flex flex-col gap-3">
         <div
@@ -59,7 +58,7 @@
             <div class="min-w-0">
               <p class="font-bold text-[#001d32] truncate">{{ inv.prestation_title }}</p>
               <p class="text-xs text-[#40617f]">
-                {{ inv.type === 'quote' ? 'Devis' : 'Facture' }} n° {{ inv.number }} •
+                {{ inv.type === 'quote' ? t('public.invoices.labelQuote') : t('public.invoices.labelInvoice') }} {{ t('public.invoices.numberPrefix') }} {{ inv.number }} •
                 {{ formatDate(inv.issued_at) }}
               </p>
             </div>
@@ -74,7 +73,7 @@
               class="flex items-center gap-1 px-4 py-2 rounded-xl bg-[#cee5ff] text-[#001d32] font-semibold text-sm hover:bg-[#b8d8ff]"
             >
               <ArrowDownTrayIcon class="w-4 h-4" />
-              PDF
+              {{ t('public.invoices.downloadButton') }}
             </button>
           </div>
         </div>
@@ -85,9 +84,11 @@
 
 <script setup>
 import { ref, watch, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { ArrowLeftIcon, DocumentTextIcon, ArrowDownTrayIcon } from '@heroicons/vue/24/outline'
 import { userApi } from '@/services/publicApi'
 
+const { t, locale } = useI18n()
 const items = ref([])
 const loading = ref(false)
 const error = ref('')
@@ -96,7 +97,8 @@ const filter = ref('')
 function formatDate(s) {
   if (!s) return ''
   try {
-    return new Date(s).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })
+    const localeCode = locale.value === 'en' ? 'en-US' : 'fr-FR'
+    return new Date(s).toLocaleDateString(localeCode, { day: '2-digit', month: 'long', year: 'numeric' })
   } catch {
     return s
   }
@@ -114,7 +116,7 @@ async function load() {
     const res = await userApi(path)
     items.value = res.data || []
   } catch (e) {
-    error.value = e.message || 'Erreur de chargement'
+    error.value = e.message || t('public.invoices.loadError')
   } finally {
     loading.value = false
   }
@@ -126,7 +128,7 @@ async function download(inv) {
     headers: { Authorization: `Bearer ${token}` },
   })
   if (!res.ok) {
-    alert('Erreur de téléchargement')
+    alert(t('public.invoices.downloadError'))
     return
   }
   const blob = await res.blob()

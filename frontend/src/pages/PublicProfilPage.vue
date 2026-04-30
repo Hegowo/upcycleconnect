@@ -2,14 +2,12 @@
   <div class="bg-[#f7f9ff] pb-0">
     <div class="max-w-[1280px] mx-auto px-6 py-10">
 
-      
       <div v-if="loading" class="flex items-center justify-center py-24">
         <div class="w-8 h-8 border-4 border-[#006d35] border-t-transparent rounded-full animate-spin" />
       </div>
 
       <div v-else class="grid grid-cols-12 gap-4 sm:gap-6">
 
-        
         <div class="col-span-12 lg:col-span-8 bg-white rounded-[24px] p-6 sm:p-8 flex gap-4 sm:gap-8 overflow-hidden relative">
           <div class="relative shrink-0">
             <div class="w-32 h-32 rounded-[24px] overflow-hidden shadow-sm bg-gradient-to-br from-[#006d35] to-[#1b8848] flex items-center justify-center">
@@ -29,7 +27,7 @@
               </span>
               <button @click="router.push('/profil/modifier')"
                 class="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#e5e7eb] text-xs font-medium text-[#40617f] hover:bg-gray-50 transition shrink-0">
-                <PencilIcon class="w-3.5 h-3.5" /> Modifier
+                <PencilIcon class="w-3.5 h-3.5" /> {{ t('public.profile.edit') }}
               </button>
             </div>
             <div class="flex items-center gap-2 text-[#40617f] text-sm">
@@ -37,24 +35,23 @@
               <span>{{ userAuth.user?.email }}</span>
             </div>
             <p class="text-[#3f4a3f] text-base leading-relaxed mt-2 max-w-md text-sm text-gray-500">
-              Membre depuis {{ memberSince }}
+              {{ t('public.profile.memberSince', { date: memberSince }) }}
             </p>
           </div>
 
           <div class="absolute -right-10 -top-10 w-36 h-36 rounded-full bg-[rgba(0,109,53,0.05)]" />
         </div>
 
-        
         <div class="col-span-12 lg:col-span-4 bg-[#edf4ff] rounded-[24px] p-6 sm:p-8 flex flex-col justify-between">
           <div class="flex items-center justify-between mb-6">
-            <h2 class="font-jakarta font-bold text-[#001d32] text-lg">Upcycling Score</h2>
+            <h2 class="font-jakarta font-bold text-[#001d32] text-lg">{{ t('public.profile.scoreTitle') }}</h2>
             <ArrowTrendingUpIcon class="w-5 h-5 text-[#006d35]" />
           </div>
 
           <div class="mb-4">
             <div class="flex items-baseline gap-1">
               <span class="font-jakarta font-extrabold text-[#006d35] text-5xl">{{ profile.score }}</span>
-              <span class="text-[#40617f] text-lg">/100</span>
+              <span class="text-[#40617f] text-lg">{{ t('public.profile.scoreOutOf') }}</span>
             </div>
             <div class="mt-3 h-3 bg-[#cee5ff] rounded-full overflow-hidden">
               <div class="h-full rounded-full bg-gradient-to-r from-[#006d35] to-[#1b8848] transition-all duration-700"
@@ -64,25 +61,24 @@
 
           <div class="grid grid-cols-2 gap-4">
             <div class="bg-white rounded-xl p-3">
-              <p class="text-[#40617f] text-xs uppercase tracking-wide">CO2 Économisé</p>
+              <p class="text-[#40617f] text-xs uppercase tracking-wide">{{ t('public.profile.scoreCo2') }}</p>
               <p class="font-semibold text-[#001d32] text-lg mt-0.5">{{ co2Display }} kg</p>
             </div>
             <div class="bg-white rounded-xl p-3">
-              <p class="text-[#40617f] text-xs uppercase tracking-wide">Objets Sauvés</p>
+              <p class="text-[#40617f] text-xs uppercase tracking-wide">{{ t('public.profile.scoreObjects') }}</p>
               <p class="font-semibold text-[#001d32] text-lg mt-0.5">{{ profile.objects_saved }}</p>
             </div>
           </div>
         </div>
 
-        
         <div class="col-span-12 bg-white rounded-[24px] p-8">
           <div class="flex items-center justify-between mb-6">
-            <h2 class="font-jakarta font-bold text-[#001d32] text-2xl">Mes Dépôts</h2>
-            <span class="text-xs text-[#40617f]">{{ profile.deposits?.length || 0 }} au total</span>
+            <h2 class="font-jakarta font-bold text-[#001d32] text-2xl">{{ t('public.profile.depositsTitle') }}</h2>
+            <span class="text-xs text-[#40617f]">{{ t('public.profile.depositsTotal', { n: profile.deposits?.length || 0 }) }}</span>
           </div>
 
           <div v-if="!profile.deposits?.length" class="text-center py-12 text-[#40617f] text-sm">
-            Aucun dépôt pour le moment.
+            {{ t('public.profile.depositsEmpty') }}
           </div>
           <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             <div
@@ -106,12 +102,11 @@
           </div>
         </div>
 
-        
         <div class="col-span-12 lg:col-span-7 bg-[#edf4ff] rounded-[24px] p-6 sm:p-8">
-          <h2 class="font-jakarta font-bold text-[#001d32] text-xl mb-6">Mes Réservations</h2>
+          <h2 class="font-jakarta font-bold text-[#001d32] text-xl mb-6">{{ t('public.profile.reservationsTitle') }}</h2>
 
           <div v-if="!profile.reservations?.length" class="text-center py-8 text-[#40617f] text-sm">
-            Aucune réservation pour le moment.
+            {{ t('public.profile.reservationsEmpty') }}
           </div>
           <div v-else class="flex flex-col gap-4">
             <button
@@ -152,9 +147,8 @@
           </div>
         </div>
 
-        
         <div class="col-span-12 lg:col-span-5 bg-white rounded-[24px] p-6 sm:p-8 flex flex-col justify-between">
-          <h2 class="font-jakarta font-bold text-[#001d32] text-xl mb-6">Mes Badges</h2>
+          <h2 class="font-jakarta font-bold text-[#001d32] text-xl mb-6">{{ t('public.profile.badgesTitle') }}</h2>
 
           <div class="flex gap-4 flex-wrap">
             <div
@@ -179,7 +173,7 @@
 
           <div class="border-t border-[#edf4ff] pt-6 mt-6 flex items-center justify-between">
             <span class="text-[#40617f] text-xs font-semibold uppercase tracking-wide">
-              {{ earnedBadgesCount }} / {{ profile.badges?.length || 0 }} Badges
+              {{ t('public.profile.badgesProgress', { earned: earnedBadgesCount, total: profile.badges?.length || 0 }) }}
             </span>
           </div>
         </div>
@@ -191,6 +185,7 @@
 
 <script setup>import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useUserAuthStore } from '@/stores/userAuth'
 import {
   CheckIcon,
@@ -209,6 +204,7 @@ import {
   WrenchScrewdriverIcon,
 } from '@heroicons/vue/24/outline'
 
+const { t, locale } = useI18n()
 const router   = useRouter()
 const userAuth = useUserAuthStore()
 
@@ -241,17 +237,19 @@ onMounted(async () => {
   loading.value = false
 })
 
+const localeCode = computed(() => locale.value === 'en' ? 'en-US' : 'fr-FR')
+
 const memberSince = computed(() => {
   if (!userAuth.user?.created_at) return ''
-  return new Date(userAuth.user.created_at).toLocaleDateString('fr-FR', { year: 'numeric', month: 'long' })
+  return new Date(userAuth.user.created_at).toLocaleDateString(localeCode.value, { year: 'numeric', month: 'long' })
 })
 
 const memberLabel = computed(() => {
   const score = profile.value.score
-  if (score >= 75) return 'Éco-Champion'
-  if (score >= 50) return 'Membre Actif'
-  if (score >= 20) return 'Membre Éco-Actif'
-  return 'Nouveau Membre'
+  if (score >= 75) return t('public.profile.memberLabelChampion')
+  if (score >= 50) return t('public.profile.memberLabelActive')
+  if (score >= 20) return t('public.profile.memberLabelEcoActive')
+  return t('public.profile.memberLabelNew')
 })
 
 const co2Display = computed(() => {
@@ -264,11 +262,16 @@ const earnedBadgesCount = computed(() => (profile.value.badges || []).filter(b =
 
 function formatDate(iso) {
   if (!iso) return ''
-  return new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+  return new Date(iso).toLocaleDateString(localeCode.value, { day: 'numeric', month: 'long', year: 'numeric' })
 }
 
 function statusLabel(s) {
-  return { pending: 'En attente', accepted: 'Accepté', validated: 'Validé', rejected: 'Refusé' }[s] ?? s
+  return {
+    pending:   t('public.profile.depositStatusPending'),
+    accepted:  t('public.profile.depositStatusAccepted'),
+    validated: t('public.profile.depositStatusValidated'),
+    rejected:  t('public.profile.depositStatusRejected'),
+  }[s] ?? s
 }
 
 function statusGradient(s) {
@@ -292,7 +295,7 @@ function formatAmount(cents, currency) {
   const val = (cents || 0) / 100
   const cur = (currency || 'eur').toUpperCase()
   try {
-    return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: cur }).format(val)
+    return new Intl.NumberFormat(localeCode.value, { style: 'currency', currency: cur }).format(val)
   } catch {
     return `${val.toFixed(2)} €`
   }
@@ -321,10 +324,10 @@ function reservationIconColor(r) {
 }
 function prestaStatusLabel(s) {
   return {
-    pending: 'En attente',
-    paid: 'Payée',
-    failed: 'Échec',
-    quote_requested: 'Devis demandé',
+    pending:         t('public.profile.reservationStatusPending'),
+    paid:            t('public.profile.reservationStatusPaid'),
+    failed:          t('public.profile.reservationStatusFailed'),
+    quote_requested: t('public.profile.reservationStatusQuote'),
   }[s] ?? s
 }
 function prestaStatusClass(s) {

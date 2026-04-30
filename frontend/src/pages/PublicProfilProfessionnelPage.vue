@@ -1,40 +1,37 @@
 <template>
   <div class="bg-[#f7f9ff] pb-0">
 
-    
     <section class="bg-[#edf4ff] px-6 py-12 overflow-hidden relative">
       <div class="max-w-[1280px] mx-auto flex items-center gap-8">
-        
+
         <div class="bg-white rounded-[24px] p-4 w-48 h-48 flex items-center justify-center shrink-0 shadow-xl">
           <BuildingStorefrontIcon class="w-24 h-24 text-[#006d35]/40" />
         </div>
 
-        
         <div class="flex-1 flex flex-col gap-3">
           <div class="flex items-center gap-3">
             <span class="bg-[#006d35] text-white text-xs font-bold uppercase tracking-wide px-3 py-1 rounded-full">
-              Artisan Certifié
+              {{ t('public.profileProfessionnel.badgeCertified') }}
             </span>
-            <span class="text-[#40617f] text-xs uppercase tracking-wider">SIRET : 842 109 452 00018</span>
+            <span class="text-[#40617f] text-xs uppercase tracking-wider">{{ t('public.profileProfessionnel.siretLabel') }}</span>
           </div>
-          <h1 class="font-jakarta font-extrabold text-[#001d32] text-5xl tracking-tight">Julien Mercier</h1>
-          <p class="font-jakarta font-semibold text-[#006d35] text-2xl">Ébénisterie Circulaire & Restauration</p>
+          <h1 class="font-jakarta font-extrabold text-[#001d32] text-5xl tracking-tight">{{ t('public.profileProfessionnel.demoName') }}</h1>
+          <p class="font-jakarta font-semibold text-[#006d35] text-2xl">{{ t('public.profileProfessionnel.demoActivity') }}</p>
           <div class="flex gap-4 mt-2">
             <button
               class="flex items-center gap-2 px-8 py-3 rounded-xl text-white font-bold text-sm transition hover:opacity-90"
               style="background: linear-gradient(168deg, #006d35 0%, #1b8848 100%);"
             >
               <EnvelopeIcon class="w-4 h-4" />
-              Contacter l'Atelier
+              {{ t('public.profileProfessionnel.ctaContact') }}
             </button>
             <button class="flex items-center gap-2 bg-[#cee5ff] text-[#001d32] font-bold text-sm px-8 py-3 rounded-xl hover:bg-[#b8d8ff] transition">
               <ShareIcon class="w-4 h-4" />
-              Partager le profil
+              {{ t('public.profileProfessionnel.ctaShare') }}
             </button>
           </div>
         </div>
 
-        
         <div class="flex flex-col gap-4 w-60 shrink-0">
           <div class="bg-white rounded-xl p-4 flex items-center gap-4 shadow-sm">
             <div class="w-11 h-11 bg-[#d1fae5] rounded-xl flex items-center justify-center shrink-0">
@@ -42,7 +39,7 @@
             </div>
             <div>
               <p class="font-jakarta font-bold text-[#001d32] text-2xl">142</p>
-              <p class="text-[#40617f] text-xs uppercase tracking-wide">Projets Réalisés</p>
+              <p class="text-[#40617f] text-xs uppercase tracking-wide">{{ t('public.profileProfessionnel.statProjects') }}</p>
             </div>
           </div>
           <div class="bg-white rounded-xl p-4 flex items-center gap-4 shadow-sm">
@@ -51,28 +48,24 @@
             </div>
             <div>
               <p class="font-jakarta font-bold text-[#001d32] text-2xl">4.9/5</p>
-              <p class="text-[#40617f] text-xs uppercase tracking-wide">Note Clients</p>
+              <p class="text-[#40617f] text-xs uppercase tracking-wide">{{ t('public.profileProfessionnel.statRating') }}</p>
             </div>
           </div>
         </div>
 
-        
         <div class="absolute -right-0 -top-0 w-60 h-60 opacity-20 pointer-events-none">
           <div class="w-full h-full rounded-full bg-gradient-to-br from-[#006d35] to-transparent blur-3xl" />
         </div>
       </div>
     </section>
 
-    
     <div class="max-w-[1280px] mx-auto px-6 py-10">
       <div class="grid grid-cols-12 gap-6">
 
-        
         <div class="col-span-4 flex flex-col gap-6">
 
-          
           <div class="bg-white rounded-[24px] p-8 flex flex-col gap-6">
-            <h2 class="font-jakarta font-bold text-[#001d32] text-xl">Mes Services</h2>
+            <h2 class="font-jakarta font-bold text-[#001d32] text-xl">{{ t('public.profileProfessionnel.servicesTitle') }}</h2>
             <div class="flex flex-col gap-5">
               <div
                 v-for="service in services"
@@ -90,9 +83,8 @@
             </div>
           </div>
 
-          
           <div class="bg-white rounded-[24px] p-8 flex flex-col gap-6">
-            <h2 class="font-jakarta font-bold text-[#001d32] text-xl">Engagements & Certifs</h2>
+            <h2 class="font-jakarta font-bold text-[#001d32] text-xl">{{ t('public.profileProfessionnel.certsTitle') }}</h2>
             <div class="grid grid-cols-2 gap-4">
               <div
                 v-for="cert in certs"
@@ -108,18 +100,16 @@
 
         </div>
 
-        
         <div class="col-span-8 flex flex-col gap-6">
 
-          
           <div class="bg-white rounded-[24px] p-8 flex flex-col gap-8">
             <div class="flex items-end justify-between">
               <div>
-                <h2 class="font-jakarta font-bold text-[#001d32] text-2xl">Projets d'Upcycling</h2>
-                <p class="text-[#3f4a3f] text-sm mt-1">L'impact concret de la revalorisation.</p>
+                <h2 class="font-jakarta font-bold text-[#001d32] text-2xl">{{ t('public.profileProfessionnel.projectsTitle') }}</h2>
+                <p class="text-[#3f4a3f] text-sm mt-1">{{ t('public.profileProfessionnel.projectsSubtitle') }}</p>
               </div>
               <button class="flex items-center gap-1 text-[#006d35] font-bold text-sm hover:underline">
-                Voir tout <ChevronRightIcon class="w-3.5 h-3.5" />
+                {{ t('public.profileProfessionnel.seeAll') }} <ChevronRightIcon class="w-3.5 h-3.5" />
               </button>
             </div>
 
@@ -148,11 +138,10 @@
             </div>
           </div>
 
-          
           <div class="bg-[#edf4ff] rounded-[24px] p-8 flex flex-col gap-8">
             <div>
-              <h2 class="font-jakarta font-bold text-[#001d32] text-2xl">Boutique en ligne</h2>
-              <p class="text-[#3f4a3f] text-sm mt-1">Pièces uniques disponibles immédiatement.</p>
+              <h2 class="font-jakarta font-bold text-[#001d32] text-2xl">{{ t('public.profileProfessionnel.shopTitle') }}</h2>
+              <p class="text-[#3f4a3f] text-sm mt-1">{{ t('public.profileProfessionnel.shopSubtitle') }}</p>
             </div>
 
             <div class="grid grid-cols-3 gap-6">
@@ -191,7 +180,9 @@
   </div>
 </template>
 
-<script setup>import {
+<script setup>import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+import {
   BuildingStorefrontIcon,
   EnvelopeIcon,
   ShareIcon,
@@ -209,58 +200,58 @@
   TrophyIcon,
 } from '@heroicons/vue/24/outline'
 
-const services = [
+const { t } = useI18n()
+
+const services = computed(() => [
   {
     icon: HomeModernIcon,
-    title: 'Restauration de mobilier',
-    desc: 'Donnez une seconde vie à vos pièces anciennes avec des techniques durables.',
+    title: t('public.profileProfessionnel.service1Title'),
+    desc:  t('public.profileProfessionnel.service1Desc'),
   },
   {
     icon: ScissorsIcon,
-    title: 'Customisation textile',
-    desc: "Revalorisation de tissus d'ameublement et création sur mesure.",
+    title: t('public.profileProfessionnel.service2Title'),
+    desc:  t('public.profileProfessionnel.service2Desc'),
   },
   {
     icon: LightBulbIcon,
-    title: 'Éco-conception',
-    desc: 'Design de mobilier neuf à partir de matériaux 100% recyclés.',
+    title: t('public.profileProfessionnel.service3Title'),
+    desc:  t('public.profileProfessionnel.service3Desc'),
   },
-]
+])
 
-const certs = [
-  { icon: GlobeAltIcon, label: 'Membre Réseau', wide: false },
-  { icon: LeafIcon, label: 'Zéro Déchet', wide: false },
-  { icon: TrophyIcon, label: "Artisan d'Art 2024", wide: true },
-]
+const certs = computed(() => [
+  { icon: GlobeAltIcon, label: t('public.profileProfessionnel.certNetwork'),    wide: false },
+  { icon: LeafIcon,     label: t('public.profileProfessionnel.certZeroWaste'),  wide: false },
+  { icon: TrophyIcon,   label: t('public.profileProfessionnel.certArtisan'),    wide: true  },
+])
 
-const projects = [
+const projects = computed(() => [
   {
     id: 1,
-    title: "Fauteuil Louis XV 'Reborn'",
-    desc: 'Restauration complète avec garnissage en crin végétal et tissu en lin upcyclé.',
-    badge: 'Avant / Après',
-    impact: 'Impact: -12kg CO2',
+    title: t('public.profileProfessionnel.project1Title'),
+    desc:  t('public.profileProfessionnel.project1Desc'),
+    badge: t('public.profileProfessionnel.project1Badge'),
+    impact: t('public.profileProfessionnel.project1Impact'),
     colorFrom: '#d1fae5',
     colorTo: '#a7f3d0',
     icon: HomeModernIcon,
   },
   {
     id: 2,
-    title: 'Bureau en Chêne de Grange',
-    desc: 'Fabrication sur mesure à partir de poutres de grange du 19ème siècle.',
-    badge: "Récup' Créative",
-    impact: 'Impact: 100% Matériaux Sauvés',
+    title: t('public.profileProfessionnel.project2Title'),
+    desc:  t('public.profileProfessionnel.project2Desc'),
+    badge: t('public.profileProfessionnel.project2Badge'),
+    impact: t('public.profileProfessionnel.project2Impact'),
     colorFrom: '#fef3c7',
     colorTo: '#fde68a',
     icon: LightBulbIcon,
   },
-]
+])
 
-const products = [
-  { id: 1, title: "Lampe 'Industrial Copper'", price: '85,00 €', colorFrom: '#fef3c7', colorTo: '#fde68a', icon: LightBulbIcon },
-  { id: 2, title: 'Console Minimaliste', price: '210,00 €', colorFrom: '#d1fae5', colorTo: '#a7f3d0', icon: HomeModernIcon },
-  { id: 3, title: 'Vase en Verre Soufflé', price: '45,00 €', colorFrom: '#f3e8ff', colorTo: '#e9d5ff', icon: SparklesIcon },
-]
-
-const footerLinks = ['À propos', 'Confidentialité', "Conditions d'utilisation", 'Aide', 'Partenaires']
+const products = computed(() => [
+  { id: 1, title: t('public.profileProfessionnel.product1Title'), price: '85,00 €',  colorFrom: '#fef3c7', colorTo: '#fde68a', icon: LightBulbIcon },
+  { id: 2, title: t('public.profileProfessionnel.product2Title'), price: '210,00 €', colorFrom: '#d1fae5', colorTo: '#a7f3d0', icon: HomeModernIcon },
+  { id: 3, title: t('public.profileProfessionnel.product3Title'), price: '45,00 €',  colorFrom: '#f3e8ff', colorTo: '#e9d5ff', icon: SparklesIcon },
+])
 </script>
