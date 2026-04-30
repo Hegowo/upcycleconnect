@@ -5,6 +5,11 @@
 .env.backup
 .env.production
 
+# Scripts avec secrets inline (deploy / build / lancement local)
+upcyclevps
+upcyclemacos
+upcyclelocal
+
 # Front
 frontend/node_modules/
 frontend/dist/

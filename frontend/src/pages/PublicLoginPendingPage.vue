@@ -7,30 +7,30 @@
       </div>
 
       <h1 class="font-jakarta font-extrabold text-[#001d32] text-3xl tracking-tight">
-        Vérifiez votre boîte mail
+        {{ t('public.loginPending.title') }}
       </h1>
 
       <p class="text-[#40617f] mt-3 leading-relaxed">
-        Pour votre sécurité, une connexion depuis
-        <strong class="text-[#001d32]">un nouvel emplacement</strong>
-        a été détectée.
+        {{ t('public.loginPending.subtitle1') }}
+        <strong class="text-[#001d32]">{{ t('public.loginPending.subtitle2') }}</strong>
+        {{ t('public.loginPending.subtitle3') }}
       </p>
 
       <div class="mt-6 bg-white rounded-2xl border border-[#edf4ff] p-6 text-left shadow-[0px_12px_40px_0px_rgba(0,29,50,0.06)]">
         <div class="flex gap-3 items-start">
           <ShieldCheckIcon class="w-5 h-5 text-[#006d35] shrink-0 mt-0.5" />
           <div class="text-sm text-[#40617f] leading-relaxed">
-            Un email contenant un lien de validation vient d'être envoyé
-            <span v-if="email" class="text-[#001d32] font-semibold">à {{ email }}</span>.
+            {{ t('public.loginPending.emailNotice1') }}
+            <span v-if="email" class="text-[#001d32] font-semibold">{{ t('public.loginPending.emailNoticeTo') }} {{ email }}</span>.
             <br />
-            Cliquez sur le lien pour finaliser votre connexion.
+            {{ t('public.loginPending.emailNotice2') }}
           </div>
         </div>
         <div class="mt-4 flex gap-3 items-start">
           <ClockIcon class="w-5 h-5 text-[#854d0e] shrink-0 mt-0.5" />
           <div class="text-sm text-[#40617f] leading-relaxed">
-            Le lien est valable <strong class="text-[#001d32]">15 minutes</strong>.
-            Pensez à vérifier vos spams si vous ne le recevez pas.
+            {{ t('public.loginPending.expiry1') }} <strong class="text-[#001d32]">{{ t('public.loginPending.expiryDuration') }}</strong>.
+            {{ t('public.loginPending.expiry2') }}
           </div>
         </div>
       </div>
@@ -41,14 +41,14 @@
           class="inline-flex items-center justify-center gap-2 px-8 py-3 rounded-xl font-bold text-[#006d35] border-2 border-[#006d35]/30 hover:bg-[#f0fdf4] transition"
         >
           <ArrowLeftIcon class="w-4 h-4" />
-          Retour à la connexion
+          {{ t('public.loginPending.backToLogin') }}
         </RouterLink>
 
         <RouterLink
           to="/"
           class="text-xs text-gray-400 hover:text-[#006d35] transition underline-offset-2 hover:underline"
         >
-          Revenir à l'accueil
+          {{ t('public.loginPending.backToHome') }}
         </RouterLink>
       </div>
 
@@ -59,8 +59,10 @@
 <script setup>
 import { computed } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { EnvelopeIcon, ShieldCheckIcon, ClockIcon, ArrowLeftIcon } from '@heroicons/vue/24/outline'
 
+const { t } = useI18n()
 const route = useRoute()
 const email = computed(() => route.query.email || '')
 </script>
