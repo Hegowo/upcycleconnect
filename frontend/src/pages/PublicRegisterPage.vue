@@ -2,9 +2,8 @@
   <div class="min-h-screen flex flex-col bg-[#f7f9ff]">
 
     <header class="px-6 py-4 flex items-center justify-between max-w-[1280px] mx-auto w-full">
-      <RouterLink to="/" class="flex items-center gap-2">
+      <RouterLink to="/" class="flex items-center">
         <img src="/logoentier.png" class="h-10 w-auto" :alt="t('public.layout.logoAlt')" />
-        <span class="font-jakarta font-extrabold text-[#006d35] text-2xl tracking-[-0.025em]">UpcycleConnect</span>
       </RouterLink>
       <button class="text-[#40617f] text-base font-medium px-4 py-2 rounded-xl hover:bg-[#edf4ff] transition">
         {{ t('public.register.headerHelp') }}
@@ -343,11 +342,45 @@
                     <div>
                       <label class="block text-xs font-medium text-[#001d32] mb-1">{{ t('public.register.fieldAddress') }}</label>
                       <AddressAutocomplete
-                        v-model="form.address"
-                        :placeholder="t('public.register.fieldAddressPlaceholder')"
+                        :model-value="[form.streetNumber, form.streetName, form.postalCode, form.city].filter(Boolean).join(' ')"
+                        @update:model-value="() => {}"
+                        @select="handleAddressSelect"
+                        :placeholder="t('public.register.fieldAddressSearch')"
                         class="w-full px-3 py-2.5 border rounded-xl text-sm focus:outline-none transition-colors pr-10"
                         :class="companyData ? 'border-green-300 bg-green-50/40' : 'border-[#e2e8f0] bg-white focus:border-[#006d35]'"
                       />
+                    </div>
+                    <div class="grid grid-cols-[80px_1fr] gap-2">
+                      <div>
+                        <label class="block text-xs font-medium text-[#001d32] mb-1">{{ t('public.register.fieldStreetNumber') }}</label>
+                        <input v-model="form.streetNumber" type="text"
+                          class="w-full px-3 py-2.5 border rounded-xl text-sm focus:outline-none transition-colors"
+                          :class="companyData ? 'border-green-300 bg-green-50/40' : 'border-[#e2e8f0] bg-white focus:border-[#006d35]'"
+                          :placeholder="t('public.register.fieldStreetNumberPlaceholder')" />
+                      </div>
+                      <div>
+                        <label class="block text-xs font-medium text-[#001d32] mb-1">{{ t('public.register.fieldStreetName') }}</label>
+                        <input v-model="form.streetName" type="text"
+                          class="w-full px-3 py-2.5 border rounded-xl text-sm focus:outline-none transition-colors"
+                          :class="companyData ? 'border-green-300 bg-green-50/40' : 'border-[#e2e8f0] bg-white focus:border-[#006d35]'"
+                          :placeholder="t('public.register.fieldStreetNamePlaceholder')" />
+                      </div>
+                    </div>
+                    <div class="grid grid-cols-[120px_1fr] gap-2">
+                      <div>
+                        <label class="block text-xs font-medium text-[#001d32] mb-1">{{ t('public.register.fieldPostalCode') }}</label>
+                        <input v-model="form.postalCode" type="text" maxlength="5"
+                          class="w-full px-3 py-2.5 border rounded-xl text-sm focus:outline-none transition-colors font-mono"
+                          :class="companyData ? 'border-green-300 bg-green-50/40' : 'border-[#e2e8f0] bg-white focus:border-[#006d35]'"
+                          :placeholder="t('public.register.fieldPostalCodePlaceholder')" />
+                      </div>
+                      <div>
+                        <label class="block text-xs font-medium text-[#001d32] mb-1">{{ t('public.register.fieldCity') }}</label>
+                        <input v-model="form.city" type="text"
+                          class="w-full px-3 py-2.5 border rounded-xl text-sm focus:outline-none transition-colors"
+                          :class="companyData ? 'border-green-300 bg-green-50/40' : 'border-[#e2e8f0] bg-white focus:border-[#006d35]'"
+                          :placeholder="t('public.register.fieldCityPlaceholder')" />
+                      </div>
                     </div>
                   </div>
                 </template>
@@ -382,10 +415,40 @@
                   <div>
                     <label class="block text-xs font-medium text-[#001d32] mb-1">{{ t('public.register.fieldAddress') }}</label>
                     <AddressAutocomplete
-                      v-model="form.address"
-                      :placeholder="t('public.register.fieldAddressPlaceholder')"
+                      :model-value="[form.streetNumber, form.streetName, form.postalCode, form.city].filter(Boolean).join(' ')"
+                      @update:model-value="() => {}"
+                      @select="handleAddressSelect"
+                      :placeholder="t('public.register.fieldAddressSearch')"
                       class="w-full px-3 py-2.5 border border-[#e2e8f0] rounded-xl text-sm focus:outline-none focus:border-[#006d35] transition-colors bg-white pr-10"
                     />
+                  </div>
+                  <div class="grid grid-cols-[80px_1fr] gap-2">
+                    <div>
+                      <label class="block text-xs font-medium text-[#001d32] mb-1">{{ t('public.register.fieldStreetNumber') }}</label>
+                      <input v-model="form.streetNumber" type="text"
+                        class="w-full px-3 py-2.5 border border-[#e2e8f0] rounded-xl text-sm focus:outline-none focus:border-[#006d35] transition-colors bg-white"
+                        :placeholder="t('public.register.fieldStreetNumberPlaceholder')" />
+                    </div>
+                    <div>
+                      <label class="block text-xs font-medium text-[#001d32] mb-1">{{ t('public.register.fieldStreetName') }}</label>
+                      <input v-model="form.streetName" type="text"
+                        class="w-full px-3 py-2.5 border border-[#e2e8f0] rounded-xl text-sm focus:outline-none focus:border-[#006d35] transition-colors bg-white"
+                        :placeholder="t('public.register.fieldStreetNamePlaceholder')" />
+                    </div>
+                  </div>
+                  <div class="grid grid-cols-[120px_1fr] gap-2">
+                    <div>
+                      <label class="block text-xs font-medium text-[#001d32] mb-1">{{ t('public.register.fieldPostalCode') }}</label>
+                      <input v-model="form.postalCode" type="text" maxlength="5"
+                        class="w-full px-3 py-2.5 border border-[#e2e8f0] rounded-xl text-sm focus:outline-none focus:border-[#006d35] transition-colors bg-white font-mono"
+                        :placeholder="t('public.register.fieldPostalCodePlaceholder')" />
+                    </div>
+                    <div>
+                      <label class="block text-xs font-medium text-[#001d32] mb-1">{{ t('public.register.fieldCity') }}</label>
+                      <input v-model="form.city" type="text"
+                        class="w-full px-3 py-2.5 border border-[#e2e8f0] rounded-xl text-sm focus:outline-none focus:border-[#006d35] transition-colors bg-white"
+                        :placeholder="t('public.register.fieldCityPlaceholder')" />
+                    </div>
                   </div>
                   <div>
                     <label class="block text-xs font-medium text-[#001d32] mb-1">{{ t('public.register.fieldPassword') }} <span class="text-red-400">*</span></label>
@@ -517,7 +580,10 @@ const form = ref({
   companyName: '',
   siret: '',
   activity: '',
-  address: '',
+  streetNumber: '',
+  streetName: '',
+  postalCode: '',
+  city: '',
 })
 
 const stepIndex = computed(() => ({ type: 0, siret: 1, 'siret-confirm': 1, form: accountType.value === 'provider' ? 2 : 1 }[step.value] ?? 0))
@@ -572,14 +638,26 @@ async function fetchSiret(siret) {
   }
 }
 
+function handleAddressSelect(props) {
+  form.value.streetNumber = props.housenumber || ''
+  form.value.streetName   = props.street || props.name || ''
+  form.value.postalCode   = props.postcode || ''
+  form.value.city         = props.city || ''
+}
+
 function useCompanyData() {
   const d = companyData.value?.infolegales
   if (!d) return
   if (step.value === 'siret-confirm') {
-    form.value.companyName = d.nomcommercialrne || d.nomcommercialinsee || d.denorne || d.denoinsee || ''
-    form.value.siret       = siretInput.value
-    form.value.activity    = d.naflibinsee || d.nafinsee || ''
-    form.value.address     = [d.voieadressageinsee, d.codepostalinsee, d.villeinsee].filter(Boolean).join(', ')
+    form.value.companyName  = d.nomcommercialrne || d.nomcommercialinsee || d.denorne || d.denoinsee || ''
+    form.value.siret        = siretInput.value
+    form.value.activity     = d.naflibinsee || d.nafinsee || ''
+    const rawAddress        = (d.voieadressageinsee || '').trim()
+    const numMatch          = rawAddress.match(/^(\d+[A-Za-z]?)\s+(.+)$/)
+    form.value.streetNumber = numMatch ? numMatch[1] : ''
+    form.value.streetName   = numMatch ? numMatch[2] : rawAddress
+    form.value.postalCode   = d.codepostalinsee || ''
+    form.value.city         = d.villeinsee || ''
     step.value = 'form'
   } else {
     step.value = 'siret-confirm'
@@ -610,6 +688,14 @@ async function handleRegister() {
   loading.value = true
   error.value = ''
   try {
+    const addressParts = [
+      form.value.streetNumber,
+      form.value.streetName,
+      form.value.postalCode,
+      form.value.city,
+    ].map(s => s.trim()).filter(Boolean)
+    const fullAddress = addressParts.length ? addressParts.join(' ') : null
+
     await userAuth.register({
       first_name:   form.value.firstName,
       last_name:    form.value.lastName,
@@ -620,7 +706,7 @@ async function handleRegister() {
       company_name: form.value.companyName || null,
       siret:        form.value.siret || null,
       activity:     form.value.activity || null,
-      address:      form.value.address || null,
+      address:      fullAddress,
     })
     step.value = 'done'
   } catch (e) {
