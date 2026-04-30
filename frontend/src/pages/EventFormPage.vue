@@ -37,11 +37,11 @@
         <div class="grid grid-cols-2 gap-4">
           <div>
             <label class="label">{{ t('events.fieldStartDate') }} <span class="text-red-500">*</span></label>
-            <input v-model="form.start_date" type="datetime-local" class="input" required />
+            <input v-model="form.start_date" type="datetime-local" class="input" required :min="isEditing ? undefined : todayMin" />
           </div>
           <div>
             <label class="label">{{ t('events.fieldEndDate') }} <span class="text-red-500">*</span></label>
-            <input v-model="form.end_date" type="datetime-local" class="input" required />
+            <input v-model="form.end_date" type="datetime-local" class="input" required :min="isEditing ? undefined : todayMin" />
           </div>
         </div>
 
@@ -121,7 +121,16 @@ const form = reactive({
   status: 'draft',
 })
 
+const todayMin = computed(() => {
+  const now = new Date()
+  now.setSeconds(0, 0)
+  return now.toISOString().slice(0, 16)
+})
+
 const dateError = computed(() => {
+  if (!isEditing.value && form.start_date && form.start_date < todayMin.value) {
+    return t('events.datePastError')
+  }
   if (form.start_date && form.end_date && form.end_date <= form.start_date) {
     return t('events.dateError')
   }
