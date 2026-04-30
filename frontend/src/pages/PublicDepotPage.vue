@@ -10,7 +10,7 @@
           </p>
         </div>
         <button
-          @click="showTutorial = true"
+          @click="openTutorial"
           class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white text-[#006d35] border-2 border-[#006d35]/15 hover:border-[#006d35]/40 font-semibold text-sm transition shrink-0"
         >
           <QuestionMarkCircleIcon class="w-5 h-5" />
@@ -31,7 +31,7 @@
 
       <div class="grid grid-cols-12 gap-4 sm:gap-6">
 
-        <div class="col-span-12 lg:col-span-8 bg-white rounded-[24px] p-6 sm:p-8 shadow-[0_12px_40px_0_rgba(0,29,50,0.06)] flex flex-col gap-6">
+        <div ref="photosCard" class="col-span-12 lg:col-span-8 bg-white rounded-[24px] p-6 sm:p-8 shadow-[0_12px_40px_0_rgba(0,29,50,0.06)] flex flex-col gap-6">
           <div class="flex items-center justify-between">
             <h2 class="font-jakarta font-bold text-[#001d32] text-xl">{{ t('public.depot.photosTitle') }}</h2>
             <span class="text-[#40617f] text-xs uppercase tracking-wide">{{ t('public.depot.photosMin') }}</span>
@@ -60,7 +60,7 @@
           </p>
         </div>
 
-        <div class="col-span-12 lg:col-span-4 bg-white rounded-[24px] p-6 sm:p-8 shadow-[0_12px_40px_0_rgba(0,29,50,0.06)] flex flex-col gap-6">
+        <div ref="descCard" class="col-span-12 lg:col-span-4 bg-white rounded-[24px] p-6 sm:p-8 shadow-[0_12px_40px_0_rgba(0,29,50,0.06)] flex flex-col gap-6">
           <h2 class="font-jakarta font-bold text-[#001d32] text-xl">{{ t('public.depot.descTitle') }}</h2>
 
           <div class="flex flex-col gap-5">
@@ -98,7 +98,7 @@
           </div>
         </div>
 
-        <div class="col-span-12 lg:col-span-5 bg-white rounded-[24px] p-6 sm:p-8 shadow-[0_12px_40px_0_rgba(0,29,50,0.06)] flex flex-col gap-6">
+        <div ref="categoryCard" class="col-span-12 lg:col-span-5 bg-white rounded-[24px] p-6 sm:p-8 shadow-[0_12px_40px_0_rgba(0,29,50,0.06)] flex flex-col gap-6">
           <h2 class="font-jakarta font-bold text-[#001d32] text-xl">{{ t('public.depot.classificationTitle') }}</h2>
 
           <div class="flex flex-col gap-3">
@@ -121,7 +121,7 @@
           </div>
         </div>
 
-        <div class="col-span-12 lg:col-span-7 bg-white rounded-[24px] p-6 sm:p-8 shadow-[0_12px_40px_0_rgba(0,29,50,0.06)] flex flex-col gap-6">
+        <div ref="conditionCard" class="col-span-12 lg:col-span-7 bg-white rounded-[24px] p-6 sm:p-8 shadow-[0_12px_40px_0_rgba(0,29,50,0.06)] flex flex-col gap-6">
           <h2 class="font-jakarta font-bold text-[#001d32] text-xl">{{ t('public.depot.conditionTitle') }}</h2>
 
           <div class="flex flex-wrap gap-3">
@@ -174,53 +174,113 @@
       </div>
     </div>
 
-    <div
-      v-if="showTutorial"
-      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#001d32]/60"
-      @click.self="showTutorial = false"
-    >
-      <div class="bg-white rounded-[24px] max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
-        <div class="sticky top-0 bg-white border-b border-[#f1f5f9] px-6 sm:px-8 py-5 flex items-center justify-between rounded-t-[24px]">
-          <h2 class="font-jakarta font-extrabold text-[#001d32] text-2xl">{{ t('public.depot.tutorialTitle') }}</h2>
-          <button @click="showTutorial = false" class="p-2 rounded-lg hover:bg-gray-100 transition">
-            <XMarkIcon class="w-5 h-5 text-[#40617f]" />
-          </button>
-        </div>
+    <!-- ── Interactive Tutorial Overlay ── -->
+    <Teleport to="body">
+      <Transition name="tut-fade">
+        <div v-if="showTutorial" class="fixed inset-0 z-50" @keydown.esc="closeTutorial" tabindex="-1">
 
-        <div class="p-6 sm:p-8 flex flex-col gap-6">
-          <p class="text-[#40617f] leading-relaxed">{{ t('public.depot.tutorialIntro') }}</p>
+          <!-- Dark backdrop — click anywhere dark to close -->
+          <div class="absolute inset-0" @click="closeTutorial" />
 
-          <div v-for="(step, i) in tutorialSteps" :key="i" class="flex gap-4">
-            <div class="w-10 h-10 shrink-0 rounded-full bg-gradient-to-br from-[#006d35] to-[#1b8848] text-white font-bold flex items-center justify-center">
-              {{ i + 1 }}
+          <!-- Spotlight: box-shadow creates the dark overlay, slides between sections -->
+          <div
+            v-if="spotlightRect"
+            class="fixed rounded-[28px] pointer-events-none z-[51]"
+            :style="{
+              top: (spotlightRect.top - 12) + 'px',
+              left: (spotlightRect.left - 12) + 'px',
+              width: (spotlightRect.width + 24) + 'px',
+              height: (spotlightRect.height + 24) + 'px',
+              boxShadow: '0 0 0 9999px rgba(0,29,50,0.82), 0 0 0 2px rgba(27,136,72,0.9), 0 0 0 6px rgba(27,136,72,0.2), 0 8px 40px rgba(0,0,0,0.4)',
+              transition: 'top 0.55s cubic-bezier(0.4,0,0.2,1), left 0.55s cubic-bezier(0.4,0,0.2,1), width 0.55s cubic-bezier(0.4,0,0.2,1), height 0.55s cubic-bezier(0.4,0,0.2,1)',
+            }"
+          />
+
+          <!-- Tooltip card — new one mounts per step (triggers enter animation) -->
+          <Transition name="tut-tooltip">
+            <div
+              v-if="spotlightRect"
+              :key="tutorialStep"
+              class="fixed z-[52] bg-white rounded-2xl shadow-2xl p-6 w-80 max-w-[calc(100vw-2rem)]"
+              :style="tooltipStyle"
+              @click.stop
+            >
+              <!-- Progress bar -->
+              <div class="flex gap-1.5 mb-5">
+                <div
+                  v-for="(_, i) in tutorialSteps"
+                  :key="i"
+                  class="h-1.5 rounded-full transition-all duration-500"
+                  :class="i < tutorialStep ? 'bg-[#006d35]/40' : i === tutorialStep ? 'bg-[#006d35]' : 'bg-gray-200'"
+                  :style="{ flexGrow: i === tutorialStep ? 2 : 1 }"
+                />
+              </div>
+
+              <!-- Icon -->
+              <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#006d35] to-[#1b8848] flex items-center justify-center mb-4 shadow-lg shadow-[#006d35]/20">
+                <component :is="tutorialSteps[tutorialStep].icon" class="w-6 h-6 text-white" />
+              </div>
+
+              <!-- Step label -->
+              <p class="text-xs font-bold text-[#006d35] uppercase tracking-widest mb-1">
+                Étape {{ tutorialStep + 1 }} / {{ tutorialSteps.length }}
+              </p>
+
+              <!-- Content -->
+              <h3 class="font-jakarta font-bold text-[#001d32] text-lg leading-snug mb-2">
+                {{ tutorialSteps[tutorialStep].title }}
+              </h3>
+              <p class="text-[#40617f] text-sm leading-relaxed">
+                {{ tutorialSteps[tutorialStep].desc }}
+              </p>
+
+              <!-- Tip -->
+              <div v-if="tutorialSteps[tutorialStep].tip" class="mt-4 bg-[#edf4ff] rounded-xl px-3 py-2.5 flex items-start gap-2">
+                <SparklesIcon class="w-4 h-4 text-[#006d35] shrink-0 mt-0.5" />
+                <p class="text-xs text-[#001d32] leading-relaxed">{{ tutorialSteps[tutorialStep].tip }}</p>
+              </div>
+
+              <!-- Navigation -->
+              <div class="mt-5 flex items-center justify-between gap-3 pt-4 border-t border-gray-100">
+                <button
+                  @click="prevTutorialStep"
+                  class="flex items-center gap-1 text-sm text-[#40617f] hover:text-[#001d32] font-medium transition"
+                  :class="tutorialStep === 0 ? 'opacity-0 pointer-events-none' : ''"
+                >
+                  <ArrowLeftIcon class="w-4 h-4" />
+                  Précédent
+                </button>
+
+                <div class="flex gap-2 items-center">
+                  <button
+                    @click="closeTutorial"
+                    class="px-3 py-1.5 rounded-lg text-sm text-[#40617f] hover:bg-gray-100 transition font-medium"
+                  >
+                    Passer
+                  </button>
+                  <button
+                    @click="nextTutorialStep"
+                    class="flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-sm font-semibold text-white transition hover:opacity-90"
+                    style="background: linear-gradient(135deg, #006d35 0%, #1b8848 100%);"
+                  >
+                    <span>{{ tutorialStep === tutorialSteps.length - 1 ? 'Terminer' : 'Suivant' }}</span>
+                    <CheckCircleIcon v-if="tutorialStep === tutorialSteps.length - 1" class="w-4 h-4" />
+                    <ArrowRightIcon v-else class="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
             </div>
-            <div class="flex-1">
-              <h3 class="font-jakarta font-bold text-[#001d32] text-base">{{ step.title }}</h3>
-              <p class="text-[#40617f] text-sm leading-relaxed mt-1">{{ step.desc }}</p>
-            </div>
-          </div>
+          </Transition>
 
-          <div class="bg-[#edf4ff] rounded-xl p-4 flex items-start gap-3">
-            <SparklesIcon class="w-5 h-5 text-[#006d35] shrink-0 mt-0.5" />
-            <p class="text-sm text-[#001d32]">{{ t('public.depot.tutorialTip') }}</p>
-          </div>
-
-          <button
-            @click="showTutorial = false"
-            class="w-full py-3 rounded-xl text-white font-semibold transition hover:opacity-90"
-            style="background: linear-gradient(135deg, #006d35 0%, #1b8848 100%);"
-          >
-            {{ t('public.depot.tutorialClose') }}
-          </button>
         </div>
-      </div>
-    </div>
+      </Transition>
+    </Teleport>
 
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import { useRouter, RouterLink } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import {
@@ -230,6 +290,10 @@ import {
   ExclamationCircleIcon,
   XMarkIcon,
   SparklesIcon,
+  PencilSquareIcon,
+  TagIcon,
+  ArrowLeftIcon,
+  ArrowRightIcon,
 } from '@heroicons/vue/24/outline'
 import { publicGet, userApi } from '@/services/publicApi'
 import { useUserAuthStore } from '@/stores/userAuth'
@@ -258,8 +322,108 @@ const categories = ref([])
 const categoriesLoading = ref(true)
 const submitting = ref(false)
 const submitError = ref('')
-const showTutorial = ref(false)
 
+// ── Tutorial state ──
+const showTutorial = ref(false)
+const tutorialStep = ref(0)
+const spotlightRect = ref(null)
+
+// Section refs
+const photosCard    = ref(null)
+const descCard      = ref(null)
+const categoryCard  = ref(null)
+const conditionCard = ref(null)
+
+const sectionRefs = [photosCard, descCard, categoryCard, conditionCard]
+
+const tutorialSteps = computed(() => [
+  {
+    title: t('public.depot.tutorialStep1Title'),
+    desc:  t('public.depot.tutorialStep1Desc'),
+    tip:   t('public.depot.tutorialStep1Tip'),
+    icon:  PhotoIcon,
+  },
+  {
+    title: t('public.depot.tutorialStep2Title'),
+    desc:  t('public.depot.tutorialStep2Desc'),
+    tip:   t('public.depot.tutorialStep2Tip'),
+    icon:  PencilSquareIcon,
+  },
+  {
+    title: t('public.depot.tutorialStep3Title'),
+    desc:  t('public.depot.tutorialStep3Desc'),
+    icon:  TagIcon,
+  },
+  {
+    title: t('public.depot.tutorialStep4Title'),
+    desc:  t('public.depot.tutorialStep4Desc'),
+    tip:   t('public.depot.tutorialStep4Tip'),
+    icon:  SparklesIcon,
+  },
+])
+
+function updateSpotlight() {
+  const el = sectionRefs[tutorialStep.value]?.value
+  if (!el) return
+  el.scrollIntoView({ behavior: 'instant', block: 'center' })
+  const rect = el.getBoundingClientRect()
+  spotlightRect.value = { top: rect.top, left: rect.left, width: rect.width, height: rect.height }
+}
+
+const tooltipStyle = computed(() => {
+  if (!spotlightRect.value) return { display: 'none' }
+  const r   = spotlightRect.value
+  const pad = 16
+  const tw  = 320
+  const th  = 360
+  const vw  = window.innerWidth
+  const vh  = window.innerHeight
+
+  let top
+  if (r.top + r.height + pad + th < vh) {
+    top = r.top + r.height + pad
+  } else if (r.top - pad - th > 0) {
+    top = r.top - th - pad
+  } else {
+    top = Math.max(pad, Math.min(r.top, vh - th - pad))
+  }
+
+  const left = Math.max(pad, Math.min(r.left + r.width / 2 - tw / 2, vw - tw - pad))
+  return { top: top + 'px', left: left + 'px' }
+})
+
+function openTutorial() {
+  tutorialStep.value = 0
+  showTutorial.value = true
+  document.body.style.overflow = 'hidden'
+  nextTick(updateSpotlight)
+}
+
+function closeTutorial() {
+  showTutorial.value = false
+  document.body.style.overflow = ''
+  spotlightRect.value = null
+}
+
+function nextTutorialStep() {
+  if (tutorialStep.value < tutorialSteps.value.length - 1) {
+    tutorialStep.value++
+  } else {
+    closeTutorial()
+  }
+}
+
+function prevTutorialStep() {
+  if (tutorialStep.value > 0) tutorialStep.value--
+}
+
+watch(tutorialStep, () => nextTick(updateSpotlight))
+
+function onResize() {
+  if (showTutorial.value) nextTick(updateSpotlight)
+}
+
+// ── Form helpers ──
 function slotLabel(id) {
   return {
     1: t('public.depot.photoMain'),
@@ -269,23 +433,16 @@ function slotLabel(id) {
 }
 
 const conditions = computed(() => [
-  { key: 'good', label: t('public.depot.condGood') },
-  { key: 'fair', label: t('public.depot.condUsed') },
-  { key: 'poor', label: t('public.depot.condBroken') },
+  { key: 'good',  label: t('public.depot.condGood') },
+  { key: 'fair',  label: t('public.depot.condUsed') },
+  { key: 'poor',  label: t('public.depot.condBroken') },
 ])
 
-const tutorialSteps = computed(() => [
-  { title: t('public.depot.tutorialStep1Title'), desc: t('public.depot.tutorialStep1Desc') },
-  { title: t('public.depot.tutorialStep2Title'), desc: t('public.depot.tutorialStep2Desc') },
-  { title: t('public.depot.tutorialStep3Title'), desc: t('public.depot.tutorialStep3Desc') },
-  { title: t('public.depot.tutorialStep4Title'), desc: t('public.depot.tutorialStep4Desc') },
-])
-
-const canSubmit = computed(() => {
-  return isLoggedIn.value
-    && form.value.name.trim().length > 0
-    && form.value.details.trim().length > 0
-})
+const canSubmit = computed(() =>
+  isLoggedIn.value
+  && form.value.name.trim().length > 0
+  && form.value.details.trim().length > 0
+)
 
 const estimatedImpact = computed(() => {
   const w = parseFloat(form.value.weight)
@@ -320,19 +477,16 @@ async function submitForm() {
     return
   }
   submitError.value = ''
-  submitting.value = true
+  submitting.value  = true
   try {
     const payload = {
-      title: form.value.name.trim(),
-      description: form.value.details.trim(),
-      condition: form.value.condition,
-      category_id: form.value.categoryId || null,
+      title:            form.value.name.trim(),
+      description:      form.value.details.trim(),
+      condition:        form.value.condition,
+      category_id:      form.value.categoryId || null,
       estimated_weight: form.value.weight && form.value.weight > 0 ? Number(form.value.weight) : null,
     }
-    const res = await userApi('/deposits', {
-      method: 'POST',
-      body: JSON.stringify(payload),
-    })
+    const res = await userApi('/deposits', { method: 'POST', body: JSON.stringify(payload) })
     router.push({ path: '/confirmation-depot', query: { id: res.id } })
   } catch (e) {
     submitError.value = e?.message || t('public.depot.errorGeneric')
@@ -341,5 +495,27 @@ async function submitForm() {
   }
 }
 
-onMounted(loadCategories)
+onMounted(() => {
+  loadCategories()
+  window.addEventListener('resize', onResize)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', onResize)
+  document.body.style.overflow = ''
+})
 </script>
+
+<style scoped>
+/* Overlay fade */
+.tut-fade-enter-active { transition: opacity 0.3s ease; }
+.tut-fade-leave-active { transition: opacity 0.25s ease; }
+.tut-fade-enter-from,
+.tut-fade-leave-to    { opacity: 0; }
+
+/* Tooltip pop per step */
+.tut-tooltip-enter-active { transition: opacity 0.22s ease, transform 0.22s ease; }
+.tut-tooltip-leave-active { transition: opacity 0.15s ease, transform 0.15s ease; }
+.tut-tooltip-enter-from   { opacity: 0; transform: translateY(10px) scale(0.96); }
+.tut-tooltip-leave-to     { opacity: 0; transform: translateY(-6px) scale(0.97); }
+</style>
