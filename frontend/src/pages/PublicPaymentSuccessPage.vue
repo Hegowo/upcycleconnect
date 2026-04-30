@@ -5,18 +5,17 @@
         <CheckCircleIcon class="w-12 h-12 text-[#006d35]" />
       </div>
       <h1 class="font-jakarta font-extrabold text-[#001d32] text-3xl mb-3">
-        Paiement confirmé !
+        {{ t('public.paymentSuccess.title') }}
       </h1>
       <p class="text-[#40617f] text-base leading-7 mb-6">
-        Merci pour votre confiance. Votre facture vous a été envoyée par email et est également
-        disponible dans votre espace personnel.
+        {{ t('public.paymentSuccess.subtitle') }}
       </p>
 
-      <div v-if="loading" class="text-[#40617f] text-sm mb-6">Chargement...</div>
+      <div v-if="loading" class="text-[#40617f] text-sm mb-6">{{ t('public.paymentSuccess.loading') }}</div>
       <div v-else-if="reservation" class="bg-[#edf4ff] rounded-2xl p-5 text-left text-sm mb-6">
-        <p class="text-[#40617f] mb-1">Prestation</p>
+        <p class="text-[#40617f] mb-1">{{ t('public.paymentSuccess.labelPrestation') }}</p>
         <p class="font-bold text-[#001d32] mb-3">{{ reservation.prestation?.title }}</p>
-        <p class="text-[#40617f] mb-1">Montant réglé</p>
+        <p class="text-[#40617f] mb-1">{{ t('public.paymentSuccess.labelAmount') }}</p>
         <p class="font-bold text-[#006d35]">{{ formatAmount(reservation.amount_cents) }}</p>
       </div>
 
@@ -26,13 +25,13 @@
           class="px-6 py-3 rounded-xl text-white font-bold transition hover:opacity-90"
           style="background: linear-gradient(134deg, #006d35 0%, #1b8848 100%);"
         >
-          Voir mes factures
+          {{ t('public.paymentSuccess.ctaInvoices') }}
         </router-link>
         <router-link
           to="/prestations"
           class="px-6 py-3 rounded-xl bg-[#cee5ff] text-[#001d32] font-bold hover:bg-[#b8d8ff]"
         >
-          Retour aux prestations
+          {{ t('public.paymentSuccess.ctaBack') }}
         </router-link>
       </div>
     </div>
@@ -42,9 +41,11 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { CheckCircleIcon } from '@heroicons/vue/24/outline'
 import { userApi } from '@/services/publicApi'
 
+const { t } = useI18n()
 const route = useRoute()
 const reservation = ref(null)
 const loading = ref(false)

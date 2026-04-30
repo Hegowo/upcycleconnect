@@ -5,12 +5,11 @@
       <div class="flex flex-col md:flex-row items-start gap-8 md:gap-16">
         <div class="flex-1 flex flex-col gap-6">
           <h1 class="font-jakarta font-extrabold text-[#001d32] text-4xl sm:text-5xl md:text-[64px] md:leading-[72px] leading-tight tracking-[-0.025em]">
-            Nos Prestations<br />
-            <span class="text-[#006d35]">d'Upcycling</span>
+            {{ t('public.prestations.heroTitlePart1') }}<br />
+            <span class="text-[#006d35]">{{ t('public.prestations.heroTitleHighlight') }}</span>
           </h1>
           <p class="text-[#40617f] text-xl leading-[32px] max-w-[672px]">
-            Transformez vos objets du quotidien en pièces uniques avec l'aide de nos artisans locaux.
-            Donnez une seconde vie à votre intérieur tout en préservant la planète.
+            {{ t('public.prestations.heroSubtitle') }}
           </p>
         </div>
 
@@ -32,7 +31,7 @@
               v-model="searchQuery"
               @keyup.enter="refresh"
               type="text"
-              placeholder="Rechercher une prestation (ex: canapé, robe, bijoux...)"
+              :placeholder="t('public.prestations.searchPlaceholder')"
               class="w-full bg-white pl-12 pr-4 py-[18px] rounded-xl text-base text-gray-600 outline-none shadow-sm focus:ring-2 focus:ring-[#006d35]/20 placeholder-gray-400"
             />
             <MagnifyingGlassIcon class="w-[18px] h-[18px] absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -43,7 +42,7 @@
             style="background: linear-gradient(134deg, #006d35 0%, #1b8848 100%);"
           >
             <AdjustmentsHorizontalIcon class="w-[18px] h-[18px]" />
-            Filtrer
+            {{ t('public.prestations.btnFilter') }}
           </button>
         </div>
 
@@ -55,7 +54,7 @@
               ? 'bg-[#006d35] text-white'
               : 'bg-white text-[#40617f] hover:bg-[#006d35]/5'"
           >
-            Tous
+            {{ t('public.prestations.filterAll') }}
           </button>
           <button
             v-for="cat in categories"
@@ -74,10 +73,10 @@
     </section>
 
     <section class="px-4 sm:px-6 pb-12 sm:pb-16 max-w-[1280px] mx-auto">
-      <div v-if="loading" class="text-center py-16 text-[#40617f]">Chargement...</div>
+      <div v-if="loading" class="text-center py-16 text-[#40617f]">{{ t('public.prestations.loading') }}</div>
       <div v-else-if="error" class="text-center py-16 text-red-600">{{ error }}</div>
       <div v-else-if="prestations.length === 0" class="text-center py-16 text-[#40617f]">
-        Aucune prestation ne correspond à votre recherche.
+        {{ t('public.prestations.emptyResults') }}
       </div>
       <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 
@@ -106,7 +105,7 @@
               {{ prestation.title }}
             </h3>
             <p class="text-[#40617f] text-sm leading-[22px] flex-1 line-clamp-4">
-              {{ prestation.description || 'Prestation proposée par un artisan partenaire.' }}
+              {{ prestation.description || t('public.prestations.fallbackDescription') }}
             </p>
 
             <div class="border-t border-gray-100/50 mt-6 pt-5 flex items-center justify-between">
@@ -118,7 +117,7 @@
                 @click.stop="goToDetail(prestation.id)"
                 class="bg-[#cee5ff] text-[#001d32] font-bold text-base px-5 py-3 rounded-xl hover:bg-[#b8d8ff] transition-colors"
               >
-                {{ prestation.price_type === 'quote' ? 'Demander un devis' : 'Réserver' }}
+                {{ prestation.price_type === 'quote' ? t('public.prestations.ctaQuote') : t('public.prestations.ctaReserve') }}
               </button>
             </div>
           </div>
@@ -130,13 +129,13 @@
     <section class="bg-[#edf4ff] px-4 sm:px-8 py-12 sm:py-20">
       <div class="max-w-[896px] mx-auto flex flex-col items-center gap-8 text-center px-6">
         <span class="flex items-center gap-2 bg-[rgba(0,109,53,0.1)] text-[#006d35] font-bold text-sm px-4 py-2 rounded-full">
-          LE SAVIEZ-VOUS ?
+          {{ t('public.prestations.didYouKnowTag') }}
         </span>
         <h2 class="font-jakarta font-extrabold text-[#001d32] text-[36px] leading-[40px]">
-          L'upcycling réduit de 70% l'empreinte carbone par rapport au recyclage traditionnel.
+          {{ t('public.prestations.didYouKnowTitle') }}
         </h2>
         <p class="text-[#40617f] text-base leading-[24px]">
-          Rejoignez 12 000 passionnés et recevez nos meilleurs conseils chaque mois.
+          {{ t('public.prestations.didYouKnowSubtitle') }}
         </p>
       </div>
     </section>
@@ -147,6 +146,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import {
   MagnifyingGlassIcon,
   AdjustmentsHorizontalIcon,
@@ -158,6 +158,7 @@ import {
 } from '@heroicons/vue/24/outline'
 import { publicGet } from '@/services/publicApi'
 
+const { t } = useI18n()
 const router = useRouter()
 
 const categories = ref([])
@@ -177,21 +178,21 @@ const palettes = [
 function palette(idx) { return palettes[idx % palettes.length] }
 
 function priceValue(p) {
-  if (p.price_type === 'quote') return 'Sur devis'
-  if (!p.price) return '—'
+  if (p.price_type === 'quote') return t('public.prestations.priceQuoteValue')
+  if (!p.price) return t('public.prestations.priceMissing')
   const amount = parseFloat(p.price)
   if (Number.isNaN(amount)) return p.price
   return `${amount.toFixed(2)} €${p.price_type === 'hourly' ? ' / h' : ''}`
 }
 function priceLabel(p) {
-  if (p.price_type === 'quote') return 'Tarification'
-  if (p.price_type === 'hourly') return 'Tarif horaire'
-  return 'À partir de'
+  if (p.price_type === 'quote') return t('public.prestations.priceQuoteLabel')
+  if (p.price_type === 'hourly') return t('public.prestations.priceHourlyLabel')
+  return t('public.prestations.priceFixedLabel')
 }
 function priceBadgeLabel(p) {
-  if (p.price_type === 'quote') return 'Devis personnalisé'
-  if (p.price_type === 'hourly') return 'À l\'heure'
-  return 'Paiement en ligne'
+  if (p.price_type === 'quote') return t('public.prestations.badgeQuote')
+  if (p.price_type === 'hourly') return t('public.prestations.badgeHourly')
+  return t('public.prestations.badgeFixed')
 }
 function priceBadgeClass(p) {
   if (p.price_type === 'quote') return 'text-orange-600'
@@ -217,7 +218,7 @@ async function refresh() {
     const res = await publicGet('/prestations', params)
     prestations.value = res.data || []
   } catch (e) {
-    error.value = e.message || 'Erreur de chargement'
+    error.value = e.message || t('public.common.loadError')
   } finally {
     loading.value = false
   }
