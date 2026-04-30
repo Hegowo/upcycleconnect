@@ -383,6 +383,7 @@
     "fieldCategory": "Category (optional)",
     "fieldStatus": "Status",
     "dateError": "End date must be after start date.",
+    "datePastError": "Start date cannot be in the past.",
     "selectCategory": "-- No category --",
     "toastCreated": "Event created.",
     "toastUpdated": "Event updated.",
