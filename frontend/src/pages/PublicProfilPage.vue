@@ -81,24 +81,27 @@
             {{ t('public.profile.depositsEmpty') }}
           </div>
           <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div
+            <button
               v-for="dep in depositsToShow"
               :key="dep.id"
-              class="flex flex-col"
+              class="flex flex-col text-left focus:outline-none focus:ring-2 focus:ring-[#006d35]/30 rounded-xl"
+              @click="router.push(`/confirmation-depot?id=${dep.id}`)"
             >
-              <div class="relative rounded-xl overflow-hidden h-40 flex items-center justify-center"
+              <div class="relative rounded-xl overflow-hidden h-40 w-full flex items-center justify-center group"
                 :style="`background: ${statusGradient(dep.status)};`"
               >
-                <ArchiveBoxIcon class="w-16 h-16 text-white/20" />
+                <img v-if="dep.photo1" :src="dep.photo1" class="w-full h-full object-cover" />
+                <ArchiveBoxIcon v-else class="w-16 h-16 text-white/20" />
                 <div class="absolute top-3 left-3">
                   <span class="text-xs font-bold uppercase tracking-tight px-2 py-1 rounded-lg" :class="statusClass(dep.status)">
                     {{ statusLabel(dep.status) }}
                   </span>
                 </div>
+                <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition rounded-xl" />
               </div>
               <h3 class="font-semibold text-[#001d32] text-sm mt-3 truncate">{{ dep.title }}</h3>
               <p class="text-[#40617f] text-xs mt-0.5">{{ formatDate(dep.created_at) }}</p>
-            </div>
+            </button>
           </div>
         </div>
 
@@ -268,6 +271,7 @@ function formatDate(iso) {
 function statusLabel(s) {
   return {
     pending:   t('public.profile.depositStatusPending'),
+    approved:  t('public.profile.depositStatusAccepted'),
     accepted:  t('public.profile.depositStatusAccepted'),
     validated: t('public.profile.depositStatusValidated'),
     rejected:  t('public.profile.depositStatusRejected'),
@@ -277,6 +281,7 @@ function statusLabel(s) {
 function statusGradient(s) {
   return {
     pending:   'linear-gradient(135deg, #fef3c7, #fde68a)',
+    approved:  'linear-gradient(135deg, #d1fae5, #bbf7d0)',
     accepted:  'linear-gradient(135deg, #d1fae5, #bbf7d0)',
     validated: 'linear-gradient(135deg, #d1fae5, #86efac)',
     rejected:  'linear-gradient(135deg, #fee2e2, #fecaca)',
@@ -342,6 +347,7 @@ function prestaStatusClass(s) {
 function statusClass(s) {
   return {
     pending:   'bg-yellow-100 text-yellow-700',
+    approved:  'bg-white/90 text-[#006d35]',
     accepted:  'bg-white/90 text-[#006d35]',
     validated: 'bg-white/90 text-[#006d35]',
     rejected:  'bg-white/90 text-red-500',

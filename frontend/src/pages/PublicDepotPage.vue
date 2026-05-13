@@ -351,7 +351,7 @@ const form = ref({
 })
 
 // ── Photos ──
-const photoSlots = ref([{ id: 1, file: null, preview: null }, { id: 2, file: null, preview: null }, { id: 3, file: null, preview: null }])
+const photoSlots = ref([{ id: 1, file: null, preview: null, base64: null }, { id: 2, file: null, preview: null, base64: null }, { id: 3, file: null, preview: null, base64: null }])
 const inputRefs = ref({})
 
 function triggerUpload(id) {
@@ -373,7 +373,30 @@ function removePhoto(id) {
   if (slot.preview) URL.revokeObjectURL(slot.preview)
   slot.file = null
   slot.preview = null
+  slot.base64 = null
   if (inputRefs.value[id]) inputRefs.value[id].value = ''
+}
+
+function resizeImage(file, maxDim = 1024, quality = 0.75) {
+  return new Promise((resolve) => {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const img = new Image()
+      img.onload = () => {
+        let { width, height } = img
+        if (width > maxDim || height > maxDim) {
+          if (width > height) { height = Math.round(height * maxDim / width); width = maxDim }
+          else { width = Math.round(width * maxDim / height); height = maxDim }
+        }
+        const canvas = document.createElement('canvas')
+        canvas.width = width; canvas.height = height
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height)
+        resolve(canvas.toDataURL('image/jpeg', quality))
+      }
+      img.src = e.target.result
+    }
+    reader.readAsDataURL(file)
+  })
 }
 
 function slotLabel(id) {
@@ -455,6 +478,10 @@ async function submitForm() {
   submitError.value = ''
   submitting.value = true
   try {
+    // Compress photos to base64 JPEG (max 1024px, 75% quality)
+    const photos = await Promise.all(
+      photoSlots.value.map(s => s.file ? resizeImage(s.file) : null)
+    )
     const payload = {
       title:               form.value.name.trim(),
       description:         form.value.details.trim(),
@@ -462,6 +489,9 @@ async function submitForm() {
       category_id:         form.value.categoryId || null,
       estimated_weight:    form.value.weight && form.value.weight > 0 ? Number(form.value.weight) : null,
       collection_point_id: form.value.collectionPointId || null,
+      photo1:              photos[0] || null,
+      photo2:              photos[1] || null,
+      photo3:              photos[2] || null,
     }
     const res = await userApi('/deposits', { method: 'POST', body: JSON.stringify(payload) })
     router.push({ path: '/confirmation-depot', query: { id: res.id } })

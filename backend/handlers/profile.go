@@ -64,6 +64,7 @@ func (h *ProfileHandler) Stats(c *gin.Context) {
 		Title     string  `json:"title"`
 		Status    string  `json:"status"`
 		Category  *string `json:"category"`
+		Photo1    *string `json:"photo1,omitempty"`
 		CreatedAt string  `json:"created_at"`
 	}
 	type regSummary struct {
@@ -96,6 +97,7 @@ func (h *ProfileHandler) Stats(c *gin.Context) {
 			Title:     d.Title,
 			Status:    d.Status,
 			Category:  cat,
+			Photo1:    d.Photo1,
 			CreatedAt: d.CreatedAt.UTC().Format("2006-01-02T15:04:05Z"),
 		}
 	}

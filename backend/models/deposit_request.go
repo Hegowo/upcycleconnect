@@ -18,6 +18,9 @@ type DepositRequest struct {
 	ValidatedBy       *uint      `gorm:"index" json:"validated_by"`
 	ValidatedAt       *time.Time `json:"validated_at"`
 	QRCode            *string    `gorm:"size:100" json:"qr_code"`
+	Photo1            *string    `gorm:"type:mediumtext" json:"photo1"`
+	Photo2            *string    `gorm:"type:mediumtext" json:"photo2"`
+	Photo3            *string    `gorm:"type:mediumtext" json:"photo3"`
 	CreatedAt         time.Time  `json:"created_at"`
 	UpdatedAt         time.Time  `json:"updated_at"`
 
@@ -41,6 +44,9 @@ type DepositRequestResponse struct {
 	Status            string                   `json:"status"`
 	ValidationNote    *string                  `json:"validation_note"`
 	QRCode            *string                  `json:"qr_code"`
+	Photo1            *string                  `json:"photo1"`
+	Photo2            *string                  `json:"photo2"`
+	Photo3            *string                  `json:"photo3"`
 	User              *UserResponse            `json:"user"`
 	Category          *CategoryResponse        `json:"category"`
 	CollectionPoint   *CollectionPointResponse `json:"collection_point"`
@@ -80,6 +86,9 @@ func ToDepositResponse(d *DepositRequest) DepositRequestResponse {
 		Status:          d.Status,
 		ValidationNote:  d.ValidationNote,
 		QRCode:          d.QRCode,
+		Photo1:          d.Photo1,
+		Photo2:          d.Photo2,
+		Photo3:          d.Photo3,
 		User:            user,
 		Category:        cat,
 		CollectionPoint: cp,
