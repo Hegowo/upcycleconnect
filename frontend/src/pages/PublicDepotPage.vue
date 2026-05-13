@@ -242,50 +242,72 @@
     <!-- Tutorial overlay -->
     <Teleport to="body">
       <Transition name="tut-fade">
-        <div v-if="showTutorial" class="fixed inset-0 z-50" @keydown.esc="closeTutorial" tabindex="-1">
+        <div v-if="showTutorial" class="fixed inset-0 z-50" tabindex="-1" @keydown.esc="closeTutorial">
+          <!-- Dark backdrop -->
           <div class="absolute inset-0" @click="closeTutorial" />
 
+          <!-- Spotlight cutout — never covers the bottom panel -->
           <div
             v-if="spotlightRect"
-            class="fixed rounded-[28px] pointer-events-none z-[51]"
+            class="fixed rounded-[20px] pointer-events-none z-[51]"
             :style="{
-              top: (spotlightRect.top - 12) + 'px',
-              left: (spotlightRect.left - 12) + 'px',
-              width: (spotlightRect.width + 24) + 'px',
-              height: (spotlightRect.height + 24) + 'px',
-              boxShadow: '0 0 0 9999px rgba(0,29,50,0.82), 0 0 0 2px rgba(27,136,72,0.9), 0 0 0 6px rgba(27,136,72,0.2), 0 8px 40px rgba(0,0,0,0.4)',
-              transition: 'top 0.55s cubic-bezier(0.4,0,0.2,1), left 0.55s cubic-bezier(0.4,0,0.2,1), width 0.55s cubic-bezier(0.4,0,0.2,1), height 0.55s cubic-bezier(0.4,0,0.2,1)',
+              top: (spotlightRect.top - 10) + 'px',
+              left: (spotlightRect.left - 10) + 'px',
+              width: (spotlightRect.width + 20) + 'px',
+              height: (spotlightRect.height + 20) + 'px',
+              boxShadow: '0 0 0 9999px rgba(0,29,50,0.80), 0 0 0 2px rgba(27,136,72,0.9), 0 0 0 6px rgba(27,136,72,0.20)',
+              transition: 'top 0.5s cubic-bezier(0.4,0,0.2,1), left 0.5s cubic-bezier(0.4,0,0.2,1), width 0.5s cubic-bezier(0.4,0,0.2,1), height 0.5s cubic-bezier(0.4,0,0.2,1)',
             }"
           />
 
-          <Transition name="tut-tooltip">
+          <!-- Fixed bottom drawer — always below the spotlight, never overlapping -->
+          <Transition name="tut-drawer">
             <div
-              v-if="spotlightRect"
               :key="tutorialStep"
-              class="fixed z-[52] bg-white rounded-2xl shadow-2xl p-6 w-80 max-w-[calc(100vw-2rem)]"
-              :style="tooltipStyle"
+              class="fixed bottom-0 left-0 right-0 z-[52] bg-white rounded-t-[28px] shadow-[0_-12px_48px_0_rgba(0,29,50,0.18)] pointer-events-auto"
               @click.stop
             >
-              <div class="flex gap-1.5 mb-5">
-                <div v-for="(_, i) in tutorialSteps" :key="i" class="h-1.5 rounded-full transition-all duration-500" :class="i < tutorialStep ? 'bg-[#006d35]/40' : i === tutorialStep ? 'bg-[#006d35]' : 'bg-gray-200'" :style="{ flexGrow: i === tutorialStep ? 2 : 1 }" />
+              <!-- Progress bar -->
+              <div class="flex gap-1.5 px-6 pt-5 pb-0">
+                <div
+                  v-for="(_, i) in tutorialSteps" :key="i"
+                  class="h-1 rounded-full flex-1 transition-all duration-500"
+                  :class="i < tutorialStep ? 'bg-[#006d35]/30' : i === tutorialStep ? 'bg-[#006d35]' : 'bg-[#e5e7eb]'"
+                />
               </div>
-              <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#006d35] to-[#1b8848] flex items-center justify-center mb-4 shadow-lg shadow-[#006d35]/20">
-                <component :is="tutorialSteps[tutorialStep].icon" class="w-6 h-6 text-white" />
+
+              <!-- Content row: icon + text -->
+              <div class="px-6 pt-4 pb-3 flex items-start gap-4">
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#006d35] to-[#1b8848] flex items-center justify-center shadow-md shadow-[#006d35]/20 shrink-0 mt-0.5">
+                  <component :is="tutorialSteps[tutorialStep].icon" class="w-5 h-5 text-white" />
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-[10px] font-bold text-[#006d35] uppercase tracking-widest mb-0.5">Étape {{ tutorialStep + 1 }} / {{ tutorialSteps.length }}</p>
+                  <h3 class="font-jakarta font-bold text-[#001d32] text-base leading-snug mb-1">{{ tutorialSteps[tutorialStep].title }}</h3>
+                  <p class="text-[#40617f] text-sm leading-relaxed">{{ tutorialSteps[tutorialStep].desc }}</p>
+                  <div v-if="tutorialSteps[tutorialStep].tip" class="mt-2 bg-[#edf4ff] rounded-xl px-3 py-2 flex items-start gap-1.5">
+                    <SparklesIcon class="w-3.5 h-3.5 text-[#006d35] shrink-0 mt-0.5" />
+                    <p class="text-xs text-[#001d32] leading-relaxed">{{ tutorialSteps[tutorialStep].tip }}</p>
+                  </div>
+                </div>
               </div>
-              <p class="text-xs font-bold text-[#006d35] uppercase tracking-widest mb-1">Étape {{ tutorialStep + 1 }} / {{ tutorialSteps.length }}</p>
-              <h3 class="font-jakarta font-bold text-[#001d32] text-lg leading-snug mb-2">{{ tutorialSteps[tutorialStep].title }}</h3>
-              <p class="text-[#40617f] text-sm leading-relaxed">{{ tutorialSteps[tutorialStep].desc }}</p>
-              <div v-if="tutorialSteps[tutorialStep].tip" class="mt-4 bg-[#edf4ff] rounded-xl px-3 py-2.5 flex items-start gap-2">
-                <SparklesIcon class="w-4 h-4 text-[#006d35] shrink-0 mt-0.5" />
-                <p class="text-xs text-[#001d32] leading-relaxed">{{ tutorialSteps[tutorialStep].tip }}</p>
-              </div>
-              <div class="mt-5 flex items-center justify-between gap-3 pt-4 border-t border-gray-100">
-                <button @click="prevTutorialStep" class="flex items-center gap-1 text-sm text-[#40617f] hover:text-[#001d32] font-medium transition" :class="tutorialStep === 0 ? 'opacity-0 pointer-events-none' : ''">
+
+              <!-- Navigation -->
+              <div class="flex items-center justify-between px-6 pb-8 pt-2 border-t border-[#f1f5f9]">
+                <button
+                  @click="prevTutorialStep"
+                  class="flex items-center gap-1 text-sm text-[#40617f] hover:text-[#001d32] font-medium transition"
+                  :class="tutorialStep === 0 ? 'opacity-0 pointer-events-none' : ''"
+                >
                   <ArrowLeftIcon class="w-4 h-4" /> Précédent
                 </button>
                 <div class="flex gap-2 items-center">
                   <button @click="closeTutorial" class="px-3 py-1.5 rounded-lg text-sm text-[#40617f] hover:bg-gray-100 transition font-medium">Passer</button>
-                  <button @click="nextTutorialStep" class="flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-sm font-semibold text-white transition hover:opacity-90" style="background: linear-gradient(135deg, #006d35 0%, #1b8848 100%);">
+                  <button
+                    @click="nextTutorialStep"
+                    class="flex items-center gap-1.5 px-5 py-2 rounded-xl text-sm font-semibold text-white transition hover:opacity-90"
+                    style="background: linear-gradient(135deg, #006d35 0%, #1b8848 100%);"
+                  >
                     <span>{{ tutorialStep === tutorialSteps.length - 1 ? 'Terminer' : 'Suivant' }}</span>
                     <CheckCircleIcon v-if="tutorialStep === tutorialSteps.length - 1" class="w-4 h-4" />
                     <ArrowRightIcon v-else class="w-4 h-4" />
@@ -467,24 +489,26 @@ const tutorialSteps = computed(() => [
   { title: t('public.depot.tutorialStep4Title'), desc: t('public.depot.tutorialStep4Desc'), tip: t('public.depot.tutorialStep4Tip'), icon: SparklesIcon },
 ])
 
+const TUTORIAL_CARD_H = 270 // estimated height of the fixed bottom tutorial panel
+
 function updateSpotlight() {
   const el = sectionRefs[tutorialStep.value]?.value
   if (!el) return
-  el.scrollIntoView({ behavior: 'instant', block: 'center' })
+  // Center the element in the viewport space above the tutorial panel
+  const availH = window.innerHeight - TUTORIAL_CARD_H - 16
   const r = el.getBoundingClientRect()
-  spotlightRect.value = { top: r.top, left: r.left, width: r.width, height: r.height }
+  const delta = (r.top + r.height / 2) - (availH / 2)
+  window.scrollBy({ top: delta, behavior: 'instant' })
+  const r2 = el.getBoundingClientRect()
+  spotlightRect.value = { top: r2.top, left: r2.left, width: r2.width, height: r2.height }
 }
 
-const tooltipStyle = computed(() => {
-  if (!spotlightRect.value) return { display: 'none' }
-  const r = spotlightRect.value, pad = 16, tw = 320, th = 360
-  const vw = window.innerWidth, vh = window.innerHeight
-  const top = r.top + r.height + pad + th < vh ? r.top + r.height + pad : r.top - th - pad > 0 ? r.top - th - pad : Math.max(pad, Math.min(r.top, vh - th - pad))
-  const left = Math.max(pad, Math.min(r.left + r.width / 2 - tw / 2, vw - tw - pad))
-  return { top: top + 'px', left: left + 'px' }
-})
-
-function openTutorial() { tutorialStep.value = 0; showTutorial.value = true; document.body.style.overflow = 'hidden'; nextTick(updateSpotlight) }
+function openTutorial() {
+  tutorialStep.value = 0
+  showTutorial.value = true
+  document.body.style.overflow = 'hidden'
+  nextTick(updateSpotlight)
+}
 function closeTutorial() { showTutorial.value = false; document.body.style.overflow = ''; spotlightRect.value = null }
 function nextTutorialStep() { tutorialStep.value < tutorialSteps.value.length - 1 ? tutorialStep.value++ : closeTutorial() }
 function prevTutorialStep() { if (tutorialStep.value > 0) tutorialStep.value-- }
@@ -523,8 +547,8 @@ onUnmounted(() => {
 .tut-fade-enter-active { transition: opacity 0.3s ease; }
 .tut-fade-leave-active { transition: opacity 0.25s ease; }
 .tut-fade-enter-from, .tut-fade-leave-to { opacity: 0; }
-.tut-tooltip-enter-active { transition: opacity 0.22s ease, transform 0.22s ease; }
-.tut-tooltip-leave-active { transition: opacity 0.15s ease, transform 0.15s ease; }
-.tut-tooltip-enter-from { opacity: 0; transform: translateY(10px) scale(0.96); }
-.tut-tooltip-leave-to { opacity: 0; transform: translateY(-6px) scale(0.97); }
+.tut-drawer-enter-active { transition: opacity 0.2s ease, transform 0.2s ease; }
+.tut-drawer-leave-active { transition: opacity 0.15s ease, transform 0.15s ease; }
+.tut-drawer-enter-from { opacity: 0; transform: translateY(20px); }
+.tut-drawer-leave-to { opacity: 0; transform: translateY(20px); }
 </style>
