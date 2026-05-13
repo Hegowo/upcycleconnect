@@ -17,7 +17,7 @@
           </div>
           <h1 class="font-jakarta font-extrabold text-[#001d32] text-5xl tracking-tight">{{ t('public.profileProfessionnel.demoName') }}</h1>
           <p class="font-jakarta font-semibold text-[#006d35] text-2xl">{{ t('public.profileProfessionnel.demoActivity') }}</p>
-          <div class="flex gap-4 mt-2">
+          <div class="flex gap-4 mt-2 flex-wrap">
             <button
               class="flex items-center gap-2 px-8 py-3 rounded-xl text-white font-bold text-sm transition hover:opacity-90"
               style="background: linear-gradient(168deg, #006d35 0%, #1b8848 100%);"
@@ -28,6 +28,11 @@
             <button class="flex items-center gap-2 bg-[#cee5ff] text-[#001d32] font-bold text-sm px-8 py-3 rounded-xl hover:bg-[#b8d8ff] transition">
               <ShareIcon class="w-4 h-4" />
               {{ t('public.profileProfessionnel.ctaShare') }}
+            </button>
+            <button @click="router.push('/profil/pro/evenements')"
+              class="flex items-center gap-2 bg-white text-[#006d35] border-2 border-[#006d35] font-bold text-sm px-8 py-3 rounded-xl hover:bg-[#edf4ff] transition">
+              <CalendarDaysIcon class="w-4 h-4" />
+              Gérer mes événements
             </button>
           </div>
         </div>
@@ -182,6 +187,7 @@
 
 <script setup>import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 import {
   BuildingStorefrontIcon,
   EnvelopeIcon,
@@ -198,9 +204,11 @@ import {
   GlobeAltIcon,
   SparklesIcon as LeafIcon,
   TrophyIcon,
+  CalendarDaysIcon,
 } from '@heroicons/vue/24/outline'
 
 const { t } = useI18n()
+const router = useRouter()
 
 const services = computed(() => [
   {

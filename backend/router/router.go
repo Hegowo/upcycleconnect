@@ -42,6 +42,7 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 	userDepositHandler := &handlers.UserDepositHandler{DB: db, Audit: audit}
 	userProviderHandler := &handlers.UserProviderHandler{DB: db, Audit: audit}
 	calendarHandler := &handlers.CalendarHandler{DB: db}
+	providerEventHandler := &handlers.ProviderEventHandler{DB: db, Audit: audit}
 
 	stripeService := services.NewStripeService(cfg)
 	pdfService, err := services.NewPDFService("/var/lib/upcycleconnect/invoices")
@@ -122,6 +123,14 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 
 			userProtected.GET("/calendar/token", calendarHandler.GetToken)
 			userProtected.POST("/calendar/token/regenerate", calendarHandler.RegenerateToken)
+
+			userProtected.GET("/events/:id/registration", profileHandler.CheckEventRegistration)
+
+			userProtected.GET("/provider/events", providerEventHandler.List)
+			userProtected.POST("/provider/events", providerEventHandler.Store)
+			userProtected.PUT("/provider/events/:id", providerEventHandler.Update)
+			userProtected.PUT("/provider/events/:id/submit", providerEventHandler.Submit)
+			userProtected.DELETE("/provider/events/:id", providerEventHandler.Destroy)
 
 			userProtected.POST("/provider/apply", userProviderHandler.Apply)
 			userProtected.GET("/provider/profile", userProviderHandler.GetProfile)
