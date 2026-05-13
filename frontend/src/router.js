@@ -26,6 +26,7 @@ const router = createRouter({
         { path: 'profil',               component: () => import('@/pages/PublicProfilPage.vue'),                  meta: { title: 'Mon Profil' } },
         { path: 'profil/modifier',      component: () => import('@/pages/PublicProfilEditPage.vue'),              meta: { title: 'Modifier mon profil' } },
         { path: 'profil/pro',           component: () => import('@/pages/PublicProfilProfessionnelPage.vue'),  meta: { title: 'Profil Professionnel' } },
+        { path: 'profil/planning',      component: () => import('@/pages/PublicPlanningPage.vue'),             meta: { title: 'Mon Planning' } },
         { path: 'depot',                component: () => import('@/pages/PublicDepotPage.vue'),                meta: { title: 'Déposer un objet' } },
         { path: 'confirmation-depot',   component: () => import('@/pages/PublicConfirmationDepotPage.vue'),    meta: { title: 'Confirmation de Dépôt' } },
         { path: 'communaute/categories-forum', component: () => import('@/pages/PublicCategoriesForumPage.vue'), meta: { title: 'Catégories Forum' } },

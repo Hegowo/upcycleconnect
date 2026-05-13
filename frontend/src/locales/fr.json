@@ -1205,6 +1205,36 @@
       "statusDescPaid": "Votre paiement a été validé. Une facture a été générée et envoyée par email.",
       "statusDescFailed": "Le paiement n'a pas abouti. Vous pouvez retenter une réservation depuis la fiche prestation.",
       "statusDescQuote": "Un devis vous a été envoyé par email. Le prestataire vous contactera pour la suite."
+    },
+    "planning": {
+      "title": "Mon Planning",
+      "subtitle": "Visualisez toutes vos réservations et participations à venir.",
+      "filterAll": "Tout",
+      "filterUpcoming": "À venir",
+      "filterPast": "Passés",
+      "emptyAll": "Aucune réservation pour l'instant.",
+      "emptyUpcoming": "Aucune réservation à venir.",
+      "emptyPast": "Aucune activité passée.",
+      "typeEvent": "Événement",
+      "typePrestation": "Prestation",
+      "statusPending": "En attente",
+      "statusPaid": "Payée",
+      "statusFailed": "Échoué",
+      "statusQuote": "Devis",
+      "seeDetail": "Voir le détail",
+      "calendarTitle": "Abonnement Calendrier",
+      "calendarDesc": "Ajoutez vos réservations à votre application calendrier préférée (Apple Calendar, Google Calendar, Outlook…).",
+      "calendarUrlLabel": "Lien d'abonnement",
+      "calendarCopy": "Copier le lien",
+      "calendarCopied": "Lien copié !",
+      "calendarOpenApple": "Ouvrir dans Apple Calendar",
+      "calendarHowTitle": "Comment s'abonner ?",
+      "calendarHowApple": "Apple Calendar : cliquez sur « Ouvrir dans Apple Calendar » ou allez dans Fichier → Nouvel abonnement calendrier.",
+      "calendarHowGoogle": "Google Calendar : allez dans Paramètres → Autres agendas → Depuis une URL, collez le lien HTTPS.",
+      "calendarHowOutlook": "Outlook : allez dans Ajouter un calendrier → S'abonner depuis le web.",
+      "calendarRegen": "Révoquer et régénérer le lien",
+      "calendarRegenConfirm": "Cela invalidera l'ancien lien. Continuer ?",
+      "loadError": "Impossible de charger le planning."
     }
   }
 }

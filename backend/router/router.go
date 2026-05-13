@@ -41,6 +41,7 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 	publicHandler   := &handlers.PublicHandler{DB: db}
 	userDepositHandler := &handlers.UserDepositHandler{DB: db, Audit: audit}
 	userProviderHandler := &handlers.UserProviderHandler{DB: db, Audit: audit}
+	calendarHandler := &handlers.CalendarHandler{DB: db}
 
 	stripeService := services.NewStripeService(cfg)
 	pdfService, err := services.NewPDFService("/var/lib/upcycleconnect/invoices")
@@ -76,6 +77,8 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 		public.GET("/collection-points", collectionPointHandler.PublicIndex)
 
 		public.POST("/payments/webhook", paymentHandler.Webhook)
+
+		public.GET("/calendar.ics", calendarHandler.Feed)
 	}
 
 	userAPI := r.Group("/api/v1")
@@ -116,6 +119,9 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 			userProtected.GET("/invoices", invoiceHandler.Index)
 			userProtected.GET("/invoices/:id", invoiceHandler.Show)
 			userProtected.GET("/invoices/:id/download", invoiceHandler.Download)
+
+			userProtected.GET("/calendar/token", calendarHandler.GetToken)
+			userProtected.POST("/calendar/token/regenerate", calendarHandler.RegenerateToken)
 
 			userProtected.POST("/provider/apply", userProviderHandler.Apply)
 			userProtected.GET("/provider/profile", userProviderHandler.GetProfile)

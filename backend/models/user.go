@@ -18,6 +18,7 @@ type User struct {
 	Status          string          `gorm:"size:20;default:active" json:"status"`
 	EmailVerifiedAt *time.Time      `json:"email_verified_at"`
 	RememberToken   *string         `gorm:"size:100" json:"-"`
+	CalendarToken   *string         `gorm:"size:64;uniqueIndex" json:"-"`
 	CreatedAt       time.Time       `json:"created_at"`
 	UpdatedAt       time.Time       `json:"updated_at"`
 	DeletedAt       gorm.DeletedAt  `gorm:"index" json:"-"`

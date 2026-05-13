@@ -1205,6 +1205,36 @@
       "statusDescPaid": "Your payment has been validated. An invoice has been generated and sent by email.",
       "statusDescFailed": "The payment failed. You can try booking again from the service page.",
       "statusDescQuote": "A quote has been sent to you by email. The provider will contact you about next steps."
+    },
+    "planning": {
+      "title": "My Planning",
+      "subtitle": "View all your upcoming reservations and participations.",
+      "filterAll": "All",
+      "filterUpcoming": "Upcoming",
+      "filterPast": "Past",
+      "emptyAll": "No bookings yet.",
+      "emptyUpcoming": "No upcoming bookings.",
+      "emptyPast": "No past activity.",
+      "typeEvent": "Event",
+      "typePrestation": "Service",
+      "statusPending": "Pending",
+      "statusPaid": "Paid",
+      "statusFailed": "Failed",
+      "statusQuote": "Quote",
+      "seeDetail": "View detail",
+      "calendarTitle": "Calendar Subscription",
+      "calendarDesc": "Add your bookings to your favourite calendar app (Apple Calendar, Google Calendar, Outlook…).",
+      "calendarUrlLabel": "Subscription link",
+      "calendarCopy": "Copy link",
+      "calendarCopied": "Link copied!",
+      "calendarOpenApple": "Open in Apple Calendar",
+      "calendarHowTitle": "How to subscribe?",
+      "calendarHowApple": "Apple Calendar: click \"Open in Apple Calendar\" or go to File → New Calendar Subscription.",
+      "calendarHowGoogle": "Google Calendar: go to Settings → Other calendars → From URL, paste the HTTPS link.",
+      "calendarHowOutlook": "Outlook: go to Add calendar → Subscribe from web.",
+      "calendarRegen": "Revoke and regenerate link",
+      "calendarRegenConfirm": "This will invalidate the old link. Continue?",
+      "loadError": "Unable to load planning."
     }
   }
 }
