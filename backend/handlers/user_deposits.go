@@ -86,12 +86,13 @@ func (h *UserDepositHandler) Store(c *gin.Context) {
 	user := middleware.GetAuthUser(c)
 
 	var req struct {
-		CategoryID      *uint    `json:"category_id"`
-		Title           string   `json:"title" binding:"required"`
-		Description     string   `json:"description" binding:"required"`
-		Condition       string   `json:"condition"`
-		History         *string  `json:"history"`
-		EstimatedWeight *float64 `json:"estimated_weight"`
+		CategoryID        *uint    `json:"category_id"`
+		CollectionPointID *uint    `json:"collection_point_id"`
+		Title             string   `json:"title" binding:"required"`
+		Description       string   `json:"description" binding:"required"`
+		Condition         string   `json:"condition"`
+		History           *string  `json:"history"`
+		EstimatedWeight   *float64 `json:"estimated_weight"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"message": "Données invalides. Titre et description requis."})
@@ -125,15 +126,16 @@ func (h *UserDepositHandler) Store(c *gin.Context) {
 	}
 
 	deposit := models.DepositRequest{
-		UserID:          user.ID,
-		CategoryID:      req.CategoryID,
-		Title:           req.Title,
-		Description:     req.Description,
-		Condition:       req.Condition,
-		History:         req.History,
-		EstimatedWeight: req.EstimatedWeight,
-		CarbonSavings:   carbon,
-		Status:          "pending",
+		UserID:            user.ID,
+		CategoryID:        req.CategoryID,
+		CollectionPointID: req.CollectionPointID,
+		Title:             req.Title,
+		Description:       req.Description,
+		Condition:         req.Condition,
+		History:           req.History,
+		EstimatedWeight:   req.EstimatedWeight,
+		CarbonSavings:     carbon,
+		Status:            "pending",
 	}
 	if err := h.DB.Create(&deposit).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Erreur lors de la création du dépôt."})
@@ -144,7 +146,7 @@ func (h *UserDepositHandler) Store(c *gin.Context) {
 		"title": deposit.Title,
 	})
 
-	h.DB.Preload("Category").First(&deposit, deposit.ID)
+	h.DB.Preload("Category").Preload("CollectionPoint").First(&deposit, deposit.ID)
 	c.JSON(http.StatusCreated, models.ToDepositResponse(&deposit))
 }
 

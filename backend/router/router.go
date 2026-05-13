@@ -33,8 +33,9 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 	adminHandler := &handlers.AdminHandler{DB: db, Audit: audit}
 	logsHandler := &handlers.LogsHandler{DB: db}
 	siretHandler    := &handlers.SiretHandler{Cfg: cfg}
-	depositHandler  := &handlers.DepositHandler{DB: db, Audit: audit}
-	mailer          := services.NewMailer(cfg)
+	depositHandler         := &handlers.DepositHandler{DB: db, Audit: audit}
+	collectionPointHandler := &handlers.CollectionPointHandler{DB: db, Audit: audit}
+	mailer                 := services.NewMailer(cfg)
 	userAuthHandler := &handlers.UserAuthHandler{DB: db, Cfg: cfg, Mailer: mailer}
 	profileHandler  := &handlers.ProfileHandler{DB: db, Mailer: mailer}
 	publicHandler   := &handlers.PublicHandler{DB: db}
@@ -72,6 +73,7 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 		public.GET("/events/:id", publicHandler.ShowEvent)
 		public.GET("/providers", publicHandler.Providers)
 		public.GET("/providers/:id", publicHandler.ShowProvider)
+		public.GET("/collection-points", collectionPointHandler.PublicIndex)
 
 		public.POST("/payments/webhook", paymentHandler.Webhook)
 	}
@@ -179,6 +181,11 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 			protected.GET("/deposits", depositHandler.Index)
 			protected.GET("/deposits/:id", depositHandler.Show)
 			protected.PUT("/deposits/:id/status", depositHandler.UpdateStatus)
+
+			protected.GET("/collection-points", collectionPointHandler.Index)
+			protected.POST("/collection-points", collectionPointHandler.Store)
+			protected.PUT("/collection-points/:id", collectionPointHandler.Update)
+			protected.DELETE("/collection-points/:id", collectionPointHandler.Destroy)
 
 			superAdmin := protected.Group("")
 			superAdmin.Use(middleware.IsSuperAdmin())

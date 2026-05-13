@@ -49,7 +49,7 @@ func (h *DepositHandler) Index(c *gin.Context) {
 	}
 
 	var items []models.DepositRequest
-	h.DB.Preload("User").Preload("Category").
+	h.DB.Preload("User").Preload("Category").Preload("CollectionPoint").
 		Where(query).
 		Order("created_at DESC").
 		Offset((page - 1) * perPage).
@@ -75,7 +75,7 @@ func (h *DepositHandler) Show(c *gin.Context) {
 	}
 
 	var item models.DepositRequest
-	if err := h.DB.Preload("User").Preload("Category").First(&item, id).Error; err != nil {
+	if err := h.DB.Preload("User").Preload("Category").Preload("CollectionPoint").First(&item, id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"message": "Ressource introuvable"})
 		return
 	}
@@ -91,7 +91,7 @@ func (h *DepositHandler) UpdateStatus(c *gin.Context) {
 	}
 
 	var item models.DepositRequest
-	if err := h.DB.Preload("User").Preload("Category").First(&item, id).Error; err != nil {
+	if err := h.DB.Preload("User").Preload("Category").Preload("CollectionPoint").First(&item, id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"message": "Ressource introuvable"})
 		return
 	}
@@ -134,7 +134,7 @@ func (h *DepositHandler) UpdateStatus(c *gin.Context) {
 		map[string]string{"status": req.Status},
 	)
 
-	h.DB.Preload("User").Preload("Category").First(&item, item.ID)
+	h.DB.Preload("User").Preload("Category").Preload("CollectionPoint").First(&item, item.ID)
 	c.JSON(http.StatusOK, models.ToDepositResponse(&item))
 }
 

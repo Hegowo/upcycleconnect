@@ -73,6 +73,7 @@ const router = createRouter({
         },
         { path: 'settings', component: () => import('@/pages/SettingsPage.vue'), meta: { title: 'Paramètres' } },
         { path: 'box-requests', component: () => import('@/pages/BoxRequestsPage.vue'), meta: { title: 'Demandes de Dépôt' } },
+        { path: 'collection-points', component: () => import('@/pages/CollectionPointsPage.vue'), meta: { title: 'Points de collecte' } },
         { path: 'docs', component: () => import('@/pages/SwaggerPage.vue'), meta: { title: 'Documentation API', fullscreen: true } },
       ],
     },
