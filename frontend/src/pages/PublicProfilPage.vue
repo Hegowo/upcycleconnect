@@ -106,7 +106,14 @@
         </div>
 
         <div class="col-span-12 lg:col-span-7 bg-[#edf4ff] rounded-[24px] p-6 sm:p-8">
-          <h2 class="font-jakarta font-bold text-[#001d32] text-xl mb-6">{{ t('public.profile.reservationsTitle') }}</h2>
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="font-jakarta font-bold text-[#001d32] text-xl">{{ t('public.profile.reservationsTitle') }}</h2>
+            <button @click="router.push('/profil/planning')"
+              class="flex items-center gap-1.5 text-xs font-semibold text-[#006d35] hover:underline">
+              <CalendarDaysIcon class="w-4 h-4" />
+              {{ t('common.seeAll') }}
+            </button>
+          </div>
 
           <div v-if="!profile.reservations?.length" class="text-center py-8 text-[#40617f] text-sm">
             {{ t('public.profile.reservationsEmpty') }}
