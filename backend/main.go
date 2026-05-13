@@ -31,6 +31,7 @@ func main() {
 		&models.Invoice{},
 		&models.CollectionPoint{},
 		&models.DepositRequest{},
+		&models.EventRegistration{},
 	); err != nil {
 		log.Fatalf("Failed to migrate database: %v", err)
 	}
