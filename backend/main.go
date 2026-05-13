@@ -29,6 +29,8 @@ func main() {
 		&models.User{},
 		&models.Reservation{},
 		&models.Invoice{},
+		&models.CollectionPoint{},
+		&models.DepositRequest{},
 	); err != nil {
 		log.Fatalf("Failed to migrate database: %v", err)
 	}

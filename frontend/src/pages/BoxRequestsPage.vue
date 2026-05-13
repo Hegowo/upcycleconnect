@@ -238,6 +238,11 @@ const { t } = useI18n()
 
 const BASE = import.meta.env.VITE_API_BASE_URL || '/api/admin/v1'
 
+function authHeaders() {
+  const token = localStorage.getItem('admin_token')
+  return token ? { Authorization: `Bearer ${token}` } : {}
+}
+
 const requests = ref([])
 const meta = ref({ current_page: 1, last_page: 1, per_page: 20, total: 0 })
 const loading = ref(false)
@@ -269,7 +274,7 @@ async function fetchRequests(page = 1) {
     if (statusFilter.value) params.set('status', statusFilter.value)
     if (search.value) params.set('search', search.value)
 
-    const res = await fetch(`${BASE}/deposits?${params}`, { credentials: 'include' })
+    const res = await fetch(`${BASE}/deposits?${params}`, { headers: authHeaders() })
     if (!res.ok) throw new Error('Erreur réseau')
     const json = await res.json()
     requests.value = json.data || []
@@ -285,7 +290,7 @@ async function selectRequest(req) {
   validationNote.value = ''
   actionError.value = ''
   try {
-    const res = await fetch(`${BASE}/deposits/${req.id}`, { credentials: 'include' })
+    const res = await fetch(`${BASE}/deposits/${req.id}`, { headers: authHeaders() })
     if (!res.ok) throw new Error()
     selectedRequest.value = await res.json()
   } catch {
@@ -300,8 +305,7 @@ async function updateStatus(status) {
   try {
     const res = await fetch(`${BASE}/deposits/${selectedRequest.value.id}/status`, {
       method: 'PUT',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...authHeaders() },
       body: JSON.stringify({ status, validation_note: validationNote.value || null }),
     })
     if (!res.ok) {

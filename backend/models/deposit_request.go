@@ -3,25 +3,27 @@ package models
 import "time"
 
 type DepositRequest struct {
-	ID              uint       `gorm:"primaryKey" json:"id"`
-	UserID          uint       `gorm:"index;not null" json:"user_id"`
-	CategoryID      *uint      `gorm:"index" json:"category_id"`
-	Title           string     `gorm:"size:255;not null" json:"title"`
-	Description     string     `gorm:"type:text;not null" json:"description"`
-	Condition       string     `gorm:"size:20;default:good" json:"condition"`
-	History         *string    `gorm:"size:255" json:"history"`
-	EstimatedWeight *float64   `gorm:"type:decimal(6,2)" json:"estimated_weight"`
-	CarbonSavings   *float64   `gorm:"type:decimal(8,2)" json:"carbon_savings"`
-	Status          string     `gorm:"size:20;default:pending" json:"status"`
-	ValidationNote  *string    `gorm:"type:text" json:"validation_note"`
-	ValidatedBy     *uint      `gorm:"index" json:"validated_by"`
-	ValidatedAt     *time.Time `json:"validated_at"`
-	QRCode          *string    `gorm:"size:100" json:"qr_code"`
-	CreatedAt       time.Time  `json:"created_at"`
-	UpdatedAt       time.Time  `json:"updated_at"`
+	ID                uint       `gorm:"primaryKey" json:"id"`
+	UserID            uint       `gorm:"index;not null" json:"user_id"`
+	CategoryID        *uint      `gorm:"index" json:"category_id"`
+	CollectionPointID *uint      `gorm:"index" json:"collection_point_id"`
+	Title             string     `gorm:"size:255;not null" json:"title"`
+	Description       string     `gorm:"type:text;not null" json:"description"`
+	Condition         string     `gorm:"size:20;default:good" json:"condition"`
+	History           *string    `gorm:"size:255" json:"history"`
+	EstimatedWeight   *float64   `gorm:"type:decimal(6,2)" json:"estimated_weight"`
+	CarbonSavings     *float64   `gorm:"type:decimal(8,2)" json:"carbon_savings"`
+	Status            string     `gorm:"size:20;default:pending" json:"status"`
+	ValidationNote    *string    `gorm:"type:text" json:"validation_note"`
+	ValidatedBy       *uint      `gorm:"index" json:"validated_by"`
+	ValidatedAt       *time.Time `json:"validated_at"`
+	QRCode            *string    `gorm:"size:100" json:"qr_code"`
+	CreatedAt         time.Time  `json:"created_at"`
+	UpdatedAt         time.Time  `json:"updated_at"`
 
-	User     *User               `gorm:"foreignKey:UserID" json:"-"`
-	Category *PrestationCategory `gorm:"foreignKey:CategoryID" json:"-"`
+	User            *User               `gorm:"foreignKey:UserID" json:"-"`
+	Category        *PrestationCategory `gorm:"foreignKey:CategoryID" json:"-"`
+	CollectionPoint *CollectionPoint    `gorm:"foreignKey:CollectionPointID" json:"-"`
 }
 
 func (DepositRequest) TableName() string {
@@ -29,20 +31,21 @@ func (DepositRequest) TableName() string {
 }
 
 type DepositRequestResponse struct {
-	ID              uint              `json:"id"`
-	Title           string            `json:"title"`
-	Description     string            `json:"description"`
-	Condition       string            `json:"condition"`
-	History         *string           `json:"history"`
-	EstimatedWeight *float64          `json:"estimated_weight"`
-	CarbonSavings   *float64          `json:"carbon_savings"`
-	Status          string            `json:"status"`
-	ValidationNote  *string           `json:"validation_note"`
-	QRCode          *string           `json:"qr_code"`
-	User            *UserResponse     `json:"user"`
-	Category        *CategoryResponse `json:"category"`
-	CreatedAt       string            `json:"created_at"`
-	ValidatedAt     *string           `json:"validated_at"`
+	ID                uint                     `json:"id"`
+	Title             string                   `json:"title"`
+	Description       string                   `json:"description"`
+	Condition         string                   `json:"condition"`
+	History           *string                  `json:"history"`
+	EstimatedWeight   *float64                 `json:"estimated_weight"`
+	CarbonSavings     *float64                 `json:"carbon_savings"`
+	Status            string                   `json:"status"`
+	ValidationNote    *string                  `json:"validation_note"`
+	QRCode            *string                  `json:"qr_code"`
+	User              *UserResponse            `json:"user"`
+	Category          *CategoryResponse        `json:"category"`
+	CollectionPoint   *CollectionPointResponse `json:"collection_point"`
+	CreatedAt         string                   `json:"created_at"`
+	ValidatedAt       *string                  `json:"validated_at"`
 }
 
 func ToDepositResponse(d *DepositRequest) DepositRequestResponse {
@@ -55,6 +58,11 @@ func ToDepositResponse(d *DepositRequest) DepositRequestResponse {
 	if d.Category != nil {
 		c := ToCategoryResponse(d.Category, 0)
 		cat = &c
+	}
+	var cp *CollectionPointResponse
+	if d.CollectionPoint != nil {
+		r := ToCollectionPointResponse(d.CollectionPoint)
+		cp = &r
 	}
 	var validatedAt *string
 	if d.ValidatedAt != nil {
@@ -74,6 +82,7 @@ func ToDepositResponse(d *DepositRequest) DepositRequestResponse {
 		QRCode:          d.QRCode,
 		User:            user,
 		Category:        cat,
+		CollectionPoint: cp,
 		CreatedAt:       d.CreatedAt.UTC().Format("2006-01-02T15:04:05.000000Z"),
 		ValidatedAt:     validatedAt,
 	}
