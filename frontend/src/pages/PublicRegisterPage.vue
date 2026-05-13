@@ -522,20 +522,6 @@
       </div>
     </main>
 
-    <footer class="border-t border-[#edf4ff]">
-      <div class="max-w-[1280px] mx-auto px-8 py-12 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div>
-          <p class="font-jakarta font-bold text-[#006d35] text-xl">UpcycleConnect</p>
-          <p class="text-[#40617f] text-sm mt-1">{{ t('public.register.footerCopyright') }}</p>
-        </div>
-        <div class="flex gap-8 text-sm text-[#40617f]">
-          <a href="#" class="hover:text-[#006d35] transition">{{ t('public.register.footerPrivacy') }}</a>
-          <a href="#" class="hover:text-[#006d35] transition">{{ t('public.register.footerTerms') }}</a>
-          <a href="#" class="hover:text-[#006d35] transition">{{ t('public.register.footerCommitment') }}</a>
-        </div>
-      </div>
-    </footer>
-
   </div>
 </template>
 

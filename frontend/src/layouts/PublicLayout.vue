@@ -168,7 +168,7 @@
       <RouterView />
     </main>
 
-    <footer v-if="!route.meta.hideNav" class="bg-white border-t border-[#e2e8f0]">
+    <footer class="bg-white border-t border-[#e2e8f0]">
       <div class="max-w-[1280px] mx-auto px-8 pt-16 pb-8">
 
         <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
