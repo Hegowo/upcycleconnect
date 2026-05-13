@@ -693,7 +693,16 @@
       "maxParticipants": "{n} spots maximum",
       "registeredCount": "{n} registered",
       "dateStart": "Start",
-      "dateEnd": "End"
+      "dateEnd": "End",
+      "chatTitle": "Event Chat",
+      "chatOrganizerBadge": "Organizer",
+      "chatPlaceholder": "Your message…",
+      "chatSend": "Send",
+      "chatEmpty": "No messages yet. Be the first to write!",
+      "chatLoginHint": "Log in to access the chat.",
+      "chatRegisterHint": "Register for the event to access the chat.",
+      "chatImageAlt": "Shared image",
+      "chatImageUpload": "Send an image"
     },
     "community": {
       "navTitle": "Navigation",
@@ -1238,7 +1247,8 @@
       "calendarHowOutlook": "Outlook: go to Add calendar → Subscribe from web.",
       "calendarRegen": "Revoke and regenerate link",
       "calendarRegenConfirm": "This will invalidate the old link. Continue?",
-      "loadError": "Unable to load planning."
+      "loadError": "Unable to load planning.",
+      "organizerBadge": "Organizer"
     },
     "providerEvents": {
       "title": "My Events",

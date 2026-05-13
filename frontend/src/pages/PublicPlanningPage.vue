@@ -58,6 +58,11 @@
                 ]">
                   {{ item.type === 'event' ? t('public.planning.typeEvent') : t('public.planning.typePrestation') }}
                 </span>
+                <span v-if="item.organizer"
+                  class="text-xs font-bold px-2 py-0.5 rounded-full bg-[#d1fae5] text-[#065f46] flex items-center gap-1">
+                  <CheckBadgeIcon class="w-3 h-3" />
+                  {{ t('public.planning.organizerBadge') }}
+                </span>
                 <span v-if="item.type === 'prestation' && item.status"
                   :class="['text-xs px-2 py-0.5 rounded-full font-medium', statusClass(item.status)]">
                   {{ statusLabel(item.status) }}
@@ -182,6 +187,7 @@ import {
   ArrowLeftIcon,
   MapPinIcon,
   CalendarDaysIcon,
+  CheckBadgeIcon,
 } from '@heroicons/vue/24/outline'
 
 const router = useRouter()
@@ -323,6 +329,7 @@ onMounted(async () => {
         endDate: null,
         location: r.location || null,
         past: r.past,
+        organizer: r.organizer || false,
       }))
 
     const prestations = (data.reservations || [])

@@ -75,6 +75,7 @@ func (h *ProfileHandler) Stats(c *gin.Context) {
 		StartDate   string  `json:"start_date"`
 		Location    *string `json:"location,omitempty"`
 		Past        bool    `json:"past"`
+		Organizer   bool    `json:"organizer,omitempty"`
 		Status      string  `json:"status,omitempty"`
 		AmountCents int64   `json:"amount_cents,omitempty"`
 		Currency    string  `json:"currency,omitempty"`
@@ -104,10 +105,13 @@ func (h *ProfileHandler) Stats(c *gin.Context) {
 
 	now := time.Now()
 	regSummaries := make([]regSummary, 0, len(regs)+len(prestaReservations))
+
+	registeredEventIDs := make(map[uint]bool)
 	for _, r := range regs {
 		if r.Event == nil {
 			continue
 		}
+		registeredEventIDs[r.EventID] = true
 		regSummaries = append(regSummaries, regSummary{
 			ID:        r.ID,
 			Type:      "event",
@@ -116,6 +120,25 @@ func (h *ProfileHandler) Stats(c *gin.Context) {
 			StartDate: r.Event.StartDate.UTC().Format("2006-01-02T15:04:05Z"),
 			Location:  r.Event.Location,
 			Past:      r.Event.EndDate.Before(now),
+		})
+	}
+
+	// Events where this user is the organizer (published only)
+	var organizedEvents []models.Event
+	h.DB.Where("created_by = ? AND deleted_at IS NULL AND status = 'published'", user.ID).Find(&organizedEvents)
+	for _, e := range organizedEvents {
+		if registeredEventIDs[e.ID] {
+			continue // already in list as registrant
+		}
+		regSummaries = append(regSummaries, regSummary{
+			ID:        e.ID,
+			Type:      "event",
+			EventID:   e.ID,
+			Title:     e.Title,
+			StartDate: e.StartDate.UTC().Format("2006-01-02T15:04:05Z"),
+			Location:  e.Location,
+			Past:      e.EndDate.Before(now),
+			Organizer: true,
 		})
 	}
 	for _, pr := range prestaReservations {
