@@ -68,7 +68,8 @@
               :class="selectedRequest?.id === req.id ? 'bg-[#f0fdf4] border-l-2 border-[#006d35]' : 'hover:bg-[#f8fafc] border-l-2 border-transparent'"
             >
               <div class="w-10 h-10 rounded-xl overflow-hidden shrink-0 bg-gray-100 flex items-center justify-center">
-                <PhotoIcon class="w-5 h-5 text-gray-400" />
+                <img v-if="req.photo1" :src="req.photo1" class="w-full h-full object-cover" />
+                <PhotoIcon v-else class="w-5 h-5 text-gray-400" />
               </div>
               <div class="flex-1 min-w-0">
                 <p class="text-sm font-semibold text-[#001d32] truncate">{{ req.title }}</p>
@@ -148,7 +149,20 @@
               </div>
             </div>
 
-            
+            <!-- Photos -->
+            <div v-if="selectedRequest.photo1 || selectedRequest.photo2 || selectedRequest.photo3">
+              <p class="text-xs font-semibold text-[#6b7280] uppercase tracking-wider mb-2">Photos</p>
+              <div class="flex gap-2">
+                <img
+                  v-for="src in [selectedRequest.photo1, selectedRequest.photo2, selectedRequest.photo3].filter(Boolean)"
+                  :key="src.slice(0,30)"
+                  :src="src"
+                  class="w-24 h-24 rounded-xl object-cover border border-[#e5e7eb] cursor-pointer hover:opacity-90 transition"
+                  @click="lightboxSrc = src"
+                />
+              </div>
+            </div>
+
             <div>
               <p class="text-xs font-semibold text-[#6b7280] uppercase tracking-wider mb-2">Description</p>
               <p class="text-sm text-gray-600 bg-[#f8fafc] rounded-xl p-3 leading-relaxed">{{ selectedRequest.description }}</p>
@@ -169,9 +183,8 @@
               </div>
             </div>
 
-            
-            <div v-if="selectedRequest.qr_code" class="bg-[#f0fdf4] rounded-xl p-3 flex items-center gap-3">
-              <QrCodeIcon class="w-5 h-5 text-[#006d35] shrink-0" />
+            <div v-if="selectedRequest.qr_code" class="bg-[#f0fdf4] rounded-xl p-3 flex items-center gap-4">
+              <img v-if="qrDataUrl" :src="qrDataUrl" class="w-16 h-16 rounded-lg border border-[#bbf7d0]" />
               <div>
                 <p class="text-xs font-semibold text-[#006d35]">Code QR généré</p>
                 <p class="text-sm font-mono text-[#001d32]">{{ selectedRequest.qr_code }}</p>
@@ -225,13 +238,24 @@
       </div>
     </div>
   </div>
+
+  <!-- Photo lightbox -->
+  <Teleport to="body">
+    <div v-if="lightboxSrc" class="fixed inset-0 z-50 bg-black/80 flex items-center justify-center" @click="lightboxSrc = null">
+      <img :src="lightboxSrc" class="max-w-[90vw] max-h-[90vh] rounded-2xl object-contain shadow-2xl" @click.stop />
+      <button @click="lightboxSrc = null" class="absolute top-4 right-4 p-2 rounded-full bg-white/20 hover:bg-white/40 transition text-white">
+        <XMarkIcon class="w-6 h-6" />
+      </button>
+    </div>
+  </Teleport>
 </template>
 
 <script setup>import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import {
   InboxIcon, PhotoIcon, CheckCircleIcon, XCircleIcon,
-  MagnifyingGlassIcon, QrCodeIcon,
+  MagnifyingGlassIcon, QrCodeIcon, XMarkIcon,
 } from '@heroicons/vue/24/outline'
+import QRCode from 'qrcode'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
@@ -253,6 +277,8 @@ const actionError = ref('')
 const search = ref('')
 const statusFilter = ref('')
 const detailPanel = ref(null)
+const lightboxSrc = ref(null)
+const qrDataUrl = ref(null)
 let searchTimer = null
 
 const statusFilters = [
@@ -362,6 +388,10 @@ function conditionText(condition) {
 }
 
 watch(() => selectedRequest.value, async (val) => {
+  qrDataUrl.value = null
+  if (val?.qr_code) {
+    qrDataUrl.value = await QRCode.toDataURL(val.qr_code, { width: 160, margin: 1, errorCorrectionLevel: 'M' })
+  }
   if (val && window.innerWidth < 1024) {
     await nextTick()
     detailPanel.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })

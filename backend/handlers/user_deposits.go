@@ -73,7 +73,7 @@ func (h *UserDepositHandler) Show(c *gin.Context) {
 	}
 
 	var item models.DepositRequest
-	if err := h.DB.Preload("Category").
+	if err := h.DB.Preload("Category").Preload("CollectionPoint").
 		Where("id = ? AND user_id = ?", id, user.ID).
 		First(&item).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"message": "Ressource introuvable"})
@@ -93,6 +93,9 @@ func (h *UserDepositHandler) Store(c *gin.Context) {
 		Condition         string   `json:"condition"`
 		History           *string  `json:"history"`
 		EstimatedWeight   *float64 `json:"estimated_weight"`
+		Photo1            *string  `json:"photo1"`
+		Photo2            *string  `json:"photo2"`
+		Photo3            *string  `json:"photo3"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"message": "Données invalides. Titre et description requis."})
@@ -136,6 +139,9 @@ func (h *UserDepositHandler) Store(c *gin.Context) {
 		EstimatedWeight:   req.EstimatedWeight,
 		CarbonSavings:     carbon,
 		Status:            "pending",
+		Photo1:            req.Photo1,
+		Photo2:            req.Photo2,
+		Photo3:            req.Photo3,
 	}
 	if err := h.DB.Create(&deposit).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Erreur lors de la création du dépôt."})
