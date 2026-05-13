@@ -391,6 +391,18 @@ func (h *ProfileHandler) UnregisterFromEvent(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Désinscription effectuée."})
 }
 
+func (h *ProfileHandler) CheckEventRegistration(c *gin.Context) {
+	user := middleware.GetAuthUser(c)
+	eventID := c.Param("id")
+
+	var count int64
+	h.DB.Model(&models.EventRegistration{}).
+		Where("user_id = ? AND event_id = ?", user.ID, eventID).
+		Count(&count)
+
+	c.JSON(http.StatusOK, gin.H{"registered": count > 0})
+}
+
 func randCode() string {
 	b := make([]byte, 4)
 	rand.Read(b)

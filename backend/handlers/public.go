@@ -193,7 +193,7 @@ func (h *PublicHandler) ShowEvent(c *gin.Context) {
 		return
 	}
 	var e models.Event
-	if err := h.DB.Preload("Category").
+	if err := h.DB.Preload("Category").Preload("Creator").
 		Where("id = ? AND status = ? AND deleted_at IS NULL", id, "published").
 		First(&e).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"message": "Ressource introuvable"})
