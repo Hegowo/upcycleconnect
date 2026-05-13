@@ -693,7 +693,16 @@
       "maxParticipants": "{n} places maximum",
       "registeredCount": "{n} inscrit | {n} inscrits",
       "dateStart": "Début",
-      "dateEnd": "Fin"
+      "dateEnd": "Fin",
+      "chatTitle": "Chat de l'événement",
+      "chatOrganizerBadge": "Organisateur",
+      "chatPlaceholder": "Votre message…",
+      "chatSend": "Envoyer",
+      "chatEmpty": "Aucun message pour l'instant. Soyez le premier à écrire !",
+      "chatLoginHint": "Connectez-vous pour accéder au chat.",
+      "chatRegisterHint": "Inscrivez-vous à l'événement pour accéder au chat.",
+      "chatImageAlt": "Image partagée",
+      "chatImageUpload": "Envoyer une image"
     },
     "community": {
       "navTitle": "Navigation",
@@ -1238,7 +1247,8 @@
       "calendarHowOutlook": "Outlook : allez dans Ajouter un calendrier → S'abonner depuis le web.",
       "calendarRegen": "Révoquer et régénérer le lien",
       "calendarRegenConfirm": "Cela invalidera l'ancien lien. Continuer ?",
-      "loadError": "Impossible de charger le planning."
+      "loadError": "Impossible de charger le planning.",
+      "organizerBadge": "Organisateur"
     },
     "providerEvents": {
       "title": "Mes Événements",
