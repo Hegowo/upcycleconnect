@@ -279,11 +279,25 @@ const expiryDate = computed(() => {
   return formatDate(d.toISOString())
 })
 
-const steps = computed(() => [
-  { num: 1, title: t('public.depotConfirmation.step1Title'), desc: t('public.depotConfirmation.step1Desc') },
-  { num: 2, title: t('public.depotConfirmation.step2Title'), desc: t('public.depotConfirmation.step2Desc') },
-  { num: 3, title: t('public.depotConfirmation.step3Title'), desc: t('public.depotConfirmation.step3Desc') },
-])
+const steps = computed(() => {
+  const cp = deposit.value?.collection_point
+  const qrCode = deposit.value?.qr_code || '—'
+  return [
+    { num: 1, title: t('public.depotConfirmation.step1Title'), desc: t('public.depotConfirmation.step1Desc') },
+    {
+      num: 2,
+      title: t('public.depotConfirmation.step2Title'),
+      desc: cp
+        ? t('public.depotConfirmation.step2Desc', { name: cp.name, address: cp.address, postalCode: cp.postal_code, city: cp.city })
+        : t('public.depotConfirmation.step2Desc', { name: '—', address: '', postalCode: '', city: '' }),
+    },
+    {
+      num: 3,
+      title: t('public.depotConfirmation.step3Title'),
+      desc: t('public.depotConfirmation.step3Desc', { qrCode }),
+    },
+  ]
+})
 
 function formatDate(iso) {
   if (!iso) return ''
