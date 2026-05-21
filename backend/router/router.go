@@ -44,6 +44,7 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 	calendarHandler := &handlers.CalendarHandler{DB: db}
 	providerEventHandler := &handlers.ProviderEventHandler{DB: db, Audit: audit}
 	eventMessageHandler := &handlers.EventMessageHandler{DB: db, Audit: audit}
+	forumHandler := &handlers.ForumHandler{DB: db, Audit: audit}
 
 	stripeService := services.NewStripeService(cfg)
 	pdfService, err := services.NewPDFService("/var/lib/upcycleconnect/invoices")
@@ -81,6 +82,10 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 		public.POST("/payments/webhook", paymentHandler.Webhook)
 
 		public.GET("/calendar.ics", calendarHandler.Feed)
+
+		public.GET("/forum/categories", forumHandler.ListCategories)
+		public.GET("/forum/categories/:slug", forumHandler.ShowCategory)
+		public.GET("/forum/threads/:id", forumHandler.ShowThread)
 	}
 
 	userAPI := r.Group("/api/v1")
@@ -129,6 +134,11 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 			userProtected.GET("/events/:id/messages", eventMessageHandler.Index)
 			userProtected.POST("/events/:id/messages", eventMessageHandler.Store)
 			userProtected.POST("/events/:id/messages/image", eventMessageHandler.UploadImage)
+
+			userProtected.POST("/forum/threads", forumHandler.CreateThread)
+			userProtected.DELETE("/forum/threads/:id", forumHandler.DeleteThread)
+			userProtected.POST("/forum/threads/:id/replies", forumHandler.CreateReply)
+			userProtected.DELETE("/forum/replies/:id", forumHandler.DeleteReply)
 
 			userProtected.GET("/provider/events", providerEventHandler.List)
 			userProtected.POST("/provider/events", providerEventHandler.Store)
@@ -196,6 +206,16 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 			protected.PUT("/events/:id", eventHandler.Update)
 			protected.DELETE("/events/:id", eventHandler.Destroy)
 			protected.PUT("/events/:id/status", eventHandler.UpdateStatus)
+
+			protected.GET("/forum/categories", forumHandler.ListCategories)
+			protected.POST("/forum/categories", forumHandler.AdminCreateCategory)
+			protected.PUT("/forum/categories/:id", forumHandler.AdminUpdateCategory)
+			protected.DELETE("/forum/categories/:id", forumHandler.AdminDeleteCategory)
+			protected.GET("/forum/threads", forumHandler.AdminListThreads)
+			protected.DELETE("/forum/threads/:id", forumHandler.AdminDeleteThread)
+			protected.PUT("/forum/threads/:id/pin", forumHandler.AdminPinThread)
+			protected.PUT("/forum/threads/:id/lock", forumHandler.AdminLockThread)
+			protected.DELETE("/forum/replies/:id", forumHandler.AdminDeleteReply)
 
 			protected.GET("/deposits", depositHandler.Index)
 			protected.GET("/deposits/:id", depositHandler.Show)

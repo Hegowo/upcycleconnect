@@ -1,294 +1,308 @@
 <template>
-  <div class="bg-[#f7f9ff] min-h-screen">
-    <div class="max-w-[1280px] mx-auto px-6 py-8 flex gap-8 items-start">
+  <div class="bg-[#f7f9ff] min-h-screen pb-16">
+    <div class="max-w-[1100px] mx-auto px-4 sm:px-6 py-10">
 
-      <aside class="bg-[#edf4ff] rounded-[24px] p-4 w-[256px] shrink-0 flex flex-col gap-2 sticky top-24">
-        <div class="px-2 pb-6">
-          <p class="font-jakarta font-bold text-[#001d32] text-lg">{{ t('public.community.navTitle') }}</p>
-          <p class="text-[#64748b] text-xs font-medium mt-0.5">{{ t('public.community.navSubtitle') }}</p>
-        </div>
+      <!-- Header -->
+      <div class="mb-8">
+        <h1 class="font-jakarta font-extrabold text-[#001d32] text-3xl tracking-tight">
+          {{ t('public.community.title') }}
+        </h1>
+        <p class="text-[#40617f] text-sm mt-1">{{ t('public.community.subtitle') }}</p>
+      </div>
 
-        <nav class="flex flex-col gap-2">
-          <button
-            v-for="item in navItems"
-            :key="item.key"
-            @click="activeNav = item.key"
-            class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all"
-            :class="activeNav === item.key
-              ? 'bg-white text-[#006d35] shadow-sm'
-              : 'text-[#475569] hover:bg-white/60'"
-          >
-            <component :is="item.icon" class="w-5 h-5 shrink-0" />
-            {{ item.label }}
-          </button>
-        </nav>
+      <!-- Loading -->
+      <div v-if="loading" class="flex items-center justify-center py-24">
+        <div class="w-8 h-8 border-4 border-[#006d35] border-t-transparent rounded-full animate-spin" />
+      </div>
 
-        <div class="pt-8">
-          <button
-            class="w-full py-3 rounded-xl text-white font-semibold text-sm transition hover:opacity-90"
-            style="background: linear-gradient(135deg, #006d35 0%, #1b8848 100%);"
-          >
-            {{ t('public.community.newPost') }}
-          </button>
-        </div>
-      </aside>
+      <template v-else>
 
-      <div class="flex-1 min-w-0 flex flex-col gap-10">
-
-        <section
-          class="relative h-64 rounded-[24px] overflow-hidden"
-          style="background: #b9dbfe;"
-        >
-          <div class="absolute inset-0 bg-gradient-to-r from-[rgba(185,219,254,0.9)] to-[rgba(185,219,254,0.1)] flex flex-col justify-center p-12">
-            <h1 class="font-jakarta font-extrabold text-[#3f607e] text-5xl leading-[1.1] tracking-tight">
-              {{ t('public.community.heroTitle1') }}<br />{{ t('public.community.heroTitle2') }}
-            </h1>
-            <p class="text-[#3f607e] text-lg mt-4 max-w-md">
-              {{ t('public.community.heroSubtitle') }}
-            </p>
+        <!-- Hero banner -->
+        <section class="relative rounded-2xl overflow-hidden mb-10 bg-gradient-to-br from-[#001d32] to-[#003060] p-8 sm:p-12">
+          <div class="relative z-10">
+            <p class="text-[#7dd3b0] text-xs font-bold uppercase tracking-widest mb-2">{{ t('public.community.heroTag') }}</p>
+            <h2 class="font-jakarta font-extrabold text-white text-3xl sm:text-4xl leading-tight max-w-lg">
+              {{ t('public.community.heroTitle') }}
+            </h2>
+            <p class="text-[#94a3b8] text-base mt-3 max-w-md">{{ t('public.community.heroSubtitle') }}</p>
+            <button
+              v-if="userAuth.isLoggedIn"
+              @click="openNewThread(null)"
+              class="mt-6 inline-flex items-center gap-2 px-5 py-2.5 bg-[#006d35] hover:bg-[#1b8848] text-white text-sm font-semibold rounded-xl transition">
+              <PencilSquareIcon class="w-4 h-4" />
+              {{ t('public.community.newThread') }}
+            </button>
+            <RouterLink v-else to="/connexion" class="mt-6 inline-flex items-center gap-2 px-5 py-2.5 bg-[#006d35] hover:bg-[#1b8848] text-white text-sm font-semibold rounded-xl transition">
+              {{ t('public.community.loginToPost') }}
+            </RouterLink>
           </div>
-
-          <div class="absolute right-12 top-8 w-40 h-40 rounded-full bg-[rgba(185,219,254,0.5)] blur-2xl" />
-          <div class="absolute right-32 bottom-4 w-24 h-24 rounded-full bg-[rgba(0,109,53,0.1)] blur-xl" />
+          <div class="absolute right-8 top-8 w-40 h-40 rounded-full bg-[#006d35]/20 blur-2xl pointer-events-none" />
         </section>
 
-        <section>
-          <div class="flex items-end justify-between mb-6">
-            <div>
-              <h2 class="font-jakarta font-bold text-[#001d32] text-2xl">{{ t('public.community.projectsTitle') }}</h2>
-              <p class="text-[#64748b] text-base">{{ t('public.community.projectsSubtitle') }}</p>
-            </div>
-            <button class="text-[#006d35] font-semibold text-sm hover:underline">{{ t('public.community.seeAll') }}</button>
+        <!-- Categories -->
+        <section class="mb-10">
+          <div class="flex items-center justify-between mb-5">
+            <h2 class="font-jakarta font-bold text-[#001d32] text-xl">{{ t('public.community.categoriesTitle') }}</h2>
           </div>
 
-          <div class="grid grid-cols-12 gap-6">
+          <div v-if="categories.length === 0" class="text-center py-10 text-[#40617f] text-sm">
+            {{ t('public.community.noCategories') }}
+          </div>
 
-            <div class="col-span-8 bg-white rounded-[24px] shadow-sm p-6 flex gap-6">
-              <div class="w-[280px] h-[280px] rounded-xl overflow-hidden shrink-0 bg-gradient-to-br from-[#d1fae5] to-[#a7f3d0] flex items-center justify-center">
-                <HomeModernIcon class="w-24 h-24 text-[#006d35]/30" />
-              </div>
-              <div class="flex flex-col justify-between flex-1">
-                <div>
-                  <span class="inline-block bg-[#b0f2bd] text-[#0f522b] text-[10px] font-bold uppercase tracking-wide px-3 py-1 rounded-full mb-3">
-                    {{ t('public.community.tagSustainable') }}
-                  </span>
-                  <h3 class="font-jakarta font-bold text-[#001d32] text-2xl mb-3">{{ t('public.community.demoProjectTitle') }}</h3>
-                  <p class="text-[#475569] text-sm leading-relaxed">
-                    {{ t('public.community.demoProjectDesc') }}
-                  </p>
+          <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <RouterLink
+              v-for="cat in categories"
+              :key="cat.id"
+              :to="`/communaute/forum/${cat.slug}`"
+              class="bg-white rounded-2xl p-5 shadow-sm hover:shadow-md transition flex flex-col gap-3 group">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                  :style="`background: ${cat.color || '#edf4ff'}`">
+                  <ChatBubbleLeftEllipsisIcon class="w-5 h-5 text-[#006d35]" />
                 </div>
-                <div class="bg-[#edf4ff] rounded-xl p-4 mt-4">
-                  <div class="flex justify-between text-xs font-semibold mb-2">
-                    <span class="text-[#006d35]">{{ t('public.community.impactLabel') }}</span>
-                    <span class="text-[#001d32]">{{ t('public.community.impactValue') }}</span>
-                  </div>
-                  <div class="bg-white h-2 rounded-full overflow-hidden">
-                    <div class="h-full bg-[#006d35] rounded-full" style="width: 85%;" />
-                  </div>
+                <div class="flex-1 min-w-0">
+                  <p class="font-jakarta font-bold text-[#001d32] text-sm truncate group-hover:text-[#006d35] transition">{{ cat.name }}</p>
                 </div>
               </div>
-            </div>
-
-            <div class="col-span-4 bg-white rounded-[24px] shadow-sm p-6 flex flex-col justify-between">
-              <div class="w-full h-36 rounded-xl overflow-hidden bg-gradient-to-br from-[#d1fae5] to-[#bbf7d0] flex items-center justify-center mb-4">
-                <SparklesIcon class="w-16 h-16 text-[#006d35]/30" />
-              </div>
-              <div>
-                <h3 class="font-jakarta font-bold text-[#001d32] text-lg mb-1">{{ t('public.community.demoSecondaryTitle') }}</h3>
-                <p class="text-[#475569] text-sm leading-relaxed">{{ t('public.community.demoSecondaryDesc') }}</p>
-              </div>
-              <div class="flex items-center justify-between pt-4 border-t border-gray-100 mt-4">
-                <div class="flex items-center gap-1.5 text-[#94a3b8] text-xs">
-                  <HeartIcon class="w-3.5 h-3.5" />
-                  <span>124</span>
-                </div>
-                <div class="flex items-center gap-1.5 text-[#94a3b8] text-xs">
+              <p v-if="cat.description" class="text-[#64748b] text-xs leading-relaxed line-clamp-2">{{ cat.description }}</p>
+              <div class="flex items-center gap-4 text-xs text-[#94a3b8] mt-auto pt-2 border-t border-[#f1f5f9]">
+                <span class="flex items-center gap-1">
+                  <DocumentTextIcon class="w-3.5 h-3.5" />
+                  {{ cat.thread_count }} {{ t('public.community.threads') }}
+                </span>
+                <span class="flex items-center gap-1">
                   <ChatBubbleLeftIcon class="w-3.5 h-3.5" />
-                  <span>18</span>
-                </div>
+                  {{ cat.reply_count }} {{ t('public.community.replies') }}
+                </span>
               </div>
-            </div>
+            </RouterLink>
           </div>
         </section>
 
-        <section class="bg-[#edf4ff] rounded-[24px] p-8">
-          <div class="flex items-center justify-between mb-8">
-            <div>
-              <h2 class="font-jakarta font-bold text-[#001d32] text-2xl">{{ t('public.community.forumTitle') }}</h2>
-              <p class="text-[#64748b] text-sm">{{ t('public.community.forumSubtitle') }}</p>
-            </div>
-            <button class="bg-white border border-[rgba(0,109,53,0.1)] text-[#006d35] font-semibold text-sm px-4 py-2 rounded-xl shadow-sm hover:bg-[#edf4ff] transition">
-              {{ t('public.community.viewCategories') }}
+        <!-- Recent threads -->
+        <section>
+          <div class="flex items-center justify-between mb-5">
+            <h2 class="font-jakarta font-bold text-[#001d32] text-xl">{{ t('public.community.recentTitle') }}</h2>
+          </div>
+
+          <div v-if="recentThreads.length === 0" class="text-center py-10 text-[#40617f] text-sm">
+            {{ t('public.community.noThreads') }}
+          </div>
+
+          <div v-else class="flex flex-col gap-3">
+            <RouterLink
+              v-for="thread in recentThreads"
+              :key="thread.id"
+              :to="`/communaute/forum/${thread.category?.slug}/${thread.id}`"
+              class="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition flex items-center gap-4 group">
+
+              <!-- Author avatar -->
+              <div class="w-9 h-9 rounded-full bg-[#edf4ff] flex items-center justify-center shrink-0 text-sm font-bold text-[#40617f]">
+                {{ authorInitial(thread.author) }}
+              </div>
+
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 flex-wrap mb-1">
+                  <span v-if="thread.pinned" class="text-xs font-bold text-[#006d35] flex items-center gap-0.5">
+                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M9.75 3A.75.75 0 0 1 10 3c.414 0 .75.336.75.75v.693l3.18 1.272A.75.75 0 0 1 14.5 6.5v.25a.75.75 0 0 1-.75.75H6.25A.75.75 0 0 1 5.5 6.75V6.5a.75.75 0 0 1 .57-.727l3.18-1.272V3.75A.75.75 0 0 1 9.75 3zM6 9.5h8l-1 7H7L6 9.5z"/></svg>
+                  </span>
+                  <span v-if="thread.locked" class="text-xs font-bold text-[#ef4444] flex items-center gap-0.5">
+                    <LockClosedIcon class="w-3 h-3" />
+                  </span>
+                  <span class="text-xs px-2 py-0.5 rounded-full bg-[#edf4ff] text-[#40617f] font-medium">
+                    {{ thread.category?.name }}
+                  </span>
+                </div>
+                <p class="font-semibold text-[#001d32] text-sm truncate group-hover:text-[#006d35] transition">{{ thread.title }}</p>
+                <p class="text-[#94a3b8] text-xs mt-0.5">
+                  {{ thread.author?.first_name || thread.author?.email?.split('@')[0] }}
+                  · {{ formatDate(thread.created_at) }}
+                </p>
+              </div>
+
+              <div class="shrink-0 text-center">
+                <p class="font-bold text-[#001d32] text-sm">{{ thread.reply_count }}</p>
+                <p class="text-[#94a3b8] text-[10px] uppercase tracking-wide">{{ t('public.community.repliesLabel') }}</p>
+              </div>
+
+              <ChevronRightIcon class="w-4 h-4 text-[#94a3b8] shrink-0" />
+            </RouterLink>
+          </div>
+        </section>
+
+      </template>
+    </div>
+
+    <!-- New Thread Modal -->
+    <div v-if="showModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" @click.self="showModal = false">
+      <div class="bg-white rounded-2xl p-6 w-full max-w-lg shadow-xl">
+        <div class="flex items-center justify-between mb-5">
+          <h3 class="font-jakarta font-bold text-[#001d32] text-lg">{{ t('public.community.modalTitle') }}</h3>
+          <button @click="showModal = false" class="text-[#94a3b8] hover:text-[#001d32]">
+            <XMarkIcon class="w-5 h-5" />
+          </button>
+        </div>
+
+        <div class="flex flex-col gap-4">
+          <div>
+            <label class="text-xs font-semibold text-[#40617f] uppercase tracking-wide mb-1 block">{{ t('public.community.modalCategory') }}</label>
+            <select v-model="form.categoryId" class="w-full border border-[#e5e7eb] rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#006d35]/30 bg-white">
+              <option value="">{{ t('public.community.modalCategoryPlaceholder') }}</option>
+              <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="text-xs font-semibold text-[#40617f] uppercase tracking-wide mb-1 block">{{ t('public.community.modalThreadTitle') }}</label>
+            <input v-model="form.title" type="text"
+              :placeholder="t('public.community.modalTitlePlaceholder')"
+              class="w-full border border-[#e5e7eb] rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#006d35]/30" />
+          </div>
+
+          <div>
+            <label class="text-xs font-semibold text-[#40617f] uppercase tracking-wide mb-1 block">{{ t('public.community.modalContent') }}</label>
+            <textarea v-model="form.content" rows="5"
+              :placeholder="t('public.community.modalContentPlaceholder')"
+              class="w-full border border-[#e5e7eb] rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#006d35]/30 resize-none" />
+          </div>
+
+          <p v-if="formError" class="text-red-500 text-xs">{{ formError }}</p>
+
+          <div class="flex gap-3 justify-end">
+            <button @click="showModal = false"
+              class="px-4 py-2 text-sm text-[#40617f] hover:text-[#001d32] font-medium">
+              {{ t('common.cancel') }}
+            </button>
+            <button @click="submitThread" :disabled="submitting"
+              class="px-5 py-2 bg-[#006d35] text-white text-sm font-semibold rounded-xl hover:bg-[#1b8848] transition disabled:opacity-50">
+              {{ submitting ? t('common.loading') : t('public.community.modalSubmit') }}
             </button>
           </div>
-
-          <div class="flex flex-col gap-3">
-            <div
-              v-for="thread in forumThreads"
-              :key="thread.id"
-              class="bg-white rounded-xl shadow-sm pl-6 pr-5 py-5 flex items-center justify-between cursor-pointer hover:shadow-md transition-shadow"
-              :style="`border-left-color: ${thread.color};`"
-              style="border-left-width: 4px; border-left-style: solid;"
-            >
-              <div class="flex items-center gap-4 flex-1 min-w-0">
-                <div
-                  class="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
-                  :style="`background: ${thread.avatarBg};`"
-                >
-                  <UserCircleIcon class="w-5 h-5 text-[#40617f]" />
-                </div>
-                <div class="min-w-0">
-                  <p class="font-semibold text-[#001d32] text-base leading-snug truncate">{{ thread.title }}</p>
-                  <p class="text-[#94a3b8] text-xs mt-0.5">
-                    {{ t('public.community.postedBy') }}
-                    <span class="font-semibold text-[#475569]">{{ thread.author }}</span>
-                    {{ t('public.community.postedIn') }}
-                    <span class="font-medium text-[#40617f]">{{ thread.category }}</span>
-                  </p>
-                </div>
-              </div>
-              <div class="flex items-center gap-6 shrink-0 ml-4">
-                <div class="text-center">
-                  <p class="font-semibold text-[#001d32] text-sm text-center">{{ thread.replies }}</p>
-                  <p class="text-[#94a3b8] text-[10px] uppercase tracking-wide font-semibold">{{ t('public.community.repliesLabel') }}</p>
-                </div>
-                <ChevronRightIcon class="w-4 h-4 text-[#94a3b8]" />
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section>
-          <div class="flex items-center gap-4 mb-8">
-            <h2 class="font-jakarta font-bold text-[#001d32] text-2xl shrink-0">{{ t('public.community.newsTitle') }}</h2>
-            <div class="flex-1 h-0.5 bg-[#d8eaff]" />
-          </div>
-
-          <div class="grid grid-cols-2 gap-6">
-            <article
-              v-for="article in articles"
-              :key="article.id"
-              class="bg-white rounded-[24px] shadow-sm p-4 flex gap-4 hover:shadow-md transition-shadow cursor-pointer"
-            >
-              <div
-                class="w-32 h-32 rounded-xl flex items-center justify-center shrink-0"
-                :style="`background: linear-gradient(135deg, ${article.colorFrom}, ${article.colorTo});`"
-              >
-                <component :is="article.icon" class="w-10 h-10 text-white/40" />
-              </div>
-              <div class="flex flex-col justify-center flex-1 min-w-0">
-                <p class="text-[10px] font-semibold uppercase tracking-wider mb-1" :style="`color: ${article.tagColor};`">
-                  {{ article.tag }}
-                </p>
-                <h3 class="font-jakarta font-bold text-[#001d32] text-base leading-snug mb-2">{{ article.title }}</h3>
-                <p class="text-[#64748b] text-xs leading-relaxed line-clamp-2">{{ article.excerpt }}</p>
-              </div>
-            </article>
-          </div>
-        </section>
-
+        </div>
       </div>
     </div>
   </div>
 </template>
 
-<script setup>import {
-  ChatBubbleLeftEllipsisIcon,
-  FolderOpenIcon,
-  NewspaperIcon,
-  LightBulbIcon,
-  HomeModernIcon,
-  SparklesIcon,
-  HeartIcon,
-  ChatBubbleLeftIcon,
-  UserCircleIcon,
-  ChevronRightIcon,
-  ScissorsIcon,
-  AcademicCapIcon,
-} from '@heroicons/vue/24/outline'
-import { ref, computed } from 'vue'
+<script setup>
+import { ref, onMounted } from 'vue'
+import { RouterLink, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { useUserAuthStore } from '@/stores/userAuth'
+import {
+  ChatBubbleLeftEllipsisIcon,
+  ChatBubbleLeftIcon,
+  DocumentTextIcon,
+  ChevronRightIcon,
+  PencilSquareIcon,
+  XMarkIcon,
+  LockClosedIcon,
+} from '@heroicons/vue/24/outline'
 
-const { t } = useI18n()
-const activeNav = ref('forum')
+const { t, locale } = useI18n()
+const router = useRouter()
+const userAuth = useUserAuthStore()
 
-const navItems = computed(() => [
-  { key: 'forum',    label: t('public.community.navForum'),    icon: ChatBubbleLeftEllipsisIcon },
-  { key: 'projects', label: t('public.community.navProjects'), icon: FolderOpenIcon },
-  { key: 'news',     label: t('public.community.navNews'),     icon: NewspaperIcon },
-  { key: 'tips',     label: t('public.community.navTips'),     icon: LightBulbIcon },
-])
+const loading = ref(true)
+const categories = ref([])
+const recentThreads = ref([])
 
-const forumThreads = computed(() => [
-  {
-    id: 1,
-    title: t('public.community.threadTitle1'),
-    author: 'Marc_B',
-    category: t('public.community.threadCategory1'),
-    replies: 42,
-    color: '#006d35',
-    avatarBg: '#b9dbfe',
-  },
-  {
-    id: 2,
-    title: t('public.community.threadTitle2'),
-    author: 'Sarah_Art',
-    category: t('public.community.threadCategory2'),
-    replies: 15,
-    color: '#40617f',
-    avatarBg: '#cee5ff',
-  },
-  {
-    id: 3,
-    title: t('public.community.threadTitle3'),
-    author: 'EcoWarrior',
-    category: t('public.community.threadCategory3'),
-    replies: 128,
-    color: '#006d35',
-    avatarBg: '#b9dbfe',
-  },
-])
+const showModal = ref(false)
+const submitting = ref(false)
+const formError = ref('')
+const form = ref({ categoryId: '', title: '', content: '' })
 
-const articles = computed(() => [
-  {
-    id: 1,
-    tag: t('public.community.tagTrend'),
-    tagColor: '#006d35',
-    title: t('public.community.articleTitle1'),
-    excerpt: t('public.community.articleExcerpt1'),
-    colorFrom: '#dbeafe',
-    colorTo: '#bfdbfe',
-    icon: SparklesIcon,
-  },
-  {
-    id: 2,
-    tag: t('public.community.tagPractical'),
-    tagColor: '#40617f',
-    title: t('public.community.articleTitle2'),
-    excerpt: t('public.community.articleExcerpt2'),
-    colorFrom: '#d1fae5',
-    colorTo: '#a7f3d0',
-    icon: LightBulbIcon,
-  },
-  {
-    id: 3,
-    tag: t('public.community.tagInspiration'),
-    tagColor: '#7c3aed',
-    title: t('public.community.articleTitle3'),
-    excerpt: t('public.community.articleExcerpt3'),
-    colorFrom: '#f3e8ff',
-    colorTo: '#e9d5ff',
-    icon: AcademicCapIcon,
-  },
-  {
-    id: 4,
-    tag: t('public.community.tagTechnique'),
-    tagColor: '#b45309',
-    title: t('public.community.articleTitle4'),
-    excerpt: t('public.community.articleExcerpt4'),
-    colorFrom: '#fef3c7',
-    colorTo: '#fde68a',
-    icon: ScissorsIcon,
-  },
-])
+function authorInitial(author) {
+  if (!author) return '?'
+  const n = author.first_name || author.email || '?'
+  return n[0].toUpperCase()
+}
+
+function formatDate(iso) {
+  if (!iso) return ''
+  const d = new Date(iso)
+  const now = new Date()
+  const diff = now - d
+  const mins = Math.floor(diff / 60000)
+  if (mins < 1) return t('public.community.justNow')
+  if (mins < 60) return t('public.community.minutesAgo', { n: mins })
+  const hours = Math.floor(mins / 60)
+  if (hours < 24) return t('public.community.hoursAgo', { n: hours })
+  const days = Math.floor(hours / 24)
+  if (days < 7) return t('public.community.daysAgo', { n: days })
+  const loc = locale.value === 'en' ? 'en-US' : 'fr-FR'
+  return d.toLocaleDateString(loc, { day: 'numeric', month: 'short', year: 'numeric' })
+}
+
+function openNewThread(categoryId) {
+  form.value = { categoryId: categoryId || '', title: '', content: '' }
+  formError.value = ''
+  showModal.value = true
+}
+
+async function submitThread() {
+  formError.value = ''
+  if (!form.value.categoryId) { formError.value = t('public.community.errorCategory'); return }
+  if (form.value.title.length < 5) { formError.value = t('public.community.errorTitle'); return }
+  if (form.value.content.length < 10) { formError.value = t('public.community.errorContent'); return }
+
+  submitting.value = true
+  try {
+    const res = await fetch('/api/v1/forum/threads', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${userAuth.token}`,
+      },
+      body: JSON.stringify({
+        category_id: Number(form.value.categoryId),
+        title: form.value.title,
+        content: form.value.content,
+      }),
+    })
+    if (res.ok) {
+      const data = await res.json()
+      const cat = categories.value.find(c => c.id === data.thread.category_id)
+      showModal.value = false
+      if (cat) {
+        router.push(`/communaute/forum/${cat.slug}/${data.thread.id}`)
+      } else {
+        await loadData()
+      }
+    } else {
+      formError.value = t('public.community.errorSubmit')
+    }
+  } finally {
+    submitting.value = false
+  }
+}
+
+async function loadData() {
+  const [catRes, threadRes] = await Promise.all([
+    fetch('/api/public/v1/forum/categories').catch(() => null),
+    fetch('/api/public/v1/forum/categories').catch(() => null),
+  ])
+
+  if (catRes?.ok) {
+    const data = await catRes.json()
+    categories.value = data.data || []
+  }
+
+  // Load recent threads from all categories
+  const threads = []
+  for (const cat of categories.value) {
+    const r = await fetch(`/api/public/v1/forum/categories/${cat.slug}?page=1`).catch(() => null)
+    if (r?.ok) {
+      const d = await r.json()
+      threads.push(...(d.threads || []).slice(0, 3).map(t => ({ ...t, category: cat })))
+    }
+  }
+  threads.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
+  recentThreads.value = threads.slice(0, 10)
+}
+
+onMounted(async () => {
+  await loadData()
+  loading.value = false
+})
 </script>

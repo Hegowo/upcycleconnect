@@ -33,6 +33,9 @@ func main() {
 		&models.DepositRequest{},
 		&models.EventRegistration{},
 		&models.EventMessage{},
+		&models.ForumCategory{},
+		&models.ForumThread{},
+		&models.ForumReply{},
 	); err != nil {
 		log.Fatalf("Failed to migrate database: %v", err)
 	}
