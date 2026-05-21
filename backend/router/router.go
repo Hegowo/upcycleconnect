@@ -136,9 +136,16 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 			userProtected.POST("/events/:id/messages/image", eventMessageHandler.UploadImage)
 
 			userProtected.POST("/forum/threads", forumHandler.CreateThread)
+			userProtected.PUT("/forum/threads/:id", forumHandler.UpdateThread)
 			userProtected.DELETE("/forum/threads/:id", forumHandler.DeleteThread)
+			userProtected.POST("/forum/threads/:id/close", forumHandler.CloseThread)
+			userProtected.POST("/forum/threads/:id/ban/:userId", forumHandler.BanUser)
+			userProtected.DELETE("/forum/threads/:id/ban/:userId", forumHandler.UnbanUser)
 			userProtected.POST("/forum/threads/:id/replies", forumHandler.CreateReply)
+			userProtected.PUT("/forum/replies/:id", forumHandler.UpdateReply)
 			userProtected.DELETE("/forum/replies/:id", forumHandler.DeleteReply)
+			userProtected.POST("/forum/reports", forumHandler.CreateReport)
+			userProtected.POST("/forum/media", forumHandler.UploadMedia)
 
 			userProtected.GET("/provider/events", providerEventHandler.List)
 			userProtected.POST("/provider/events", providerEventHandler.Store)
@@ -216,6 +223,8 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 			protected.PUT("/forum/threads/:id/pin", forumHandler.AdminPinThread)
 			protected.PUT("/forum/threads/:id/lock", forumHandler.AdminLockThread)
 			protected.DELETE("/forum/replies/:id", forumHandler.AdminDeleteReply)
+			protected.GET("/forum/reports", forumHandler.AdminListReports)
+			protected.PUT("/forum/reports/:id/resolve", forumHandler.AdminResolveReport)
 
 			protected.GET("/deposits", depositHandler.Index)
 			protected.GET("/deposits/:id", depositHandler.Show)

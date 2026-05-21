@@ -751,7 +751,20 @@
       "errorTitle": "Le titre doit faire au moins 5 caractères.",
       "errorContent": "Le contenu doit faire au moins 10 caractères.",
       "errorReplyContent": "La réponse doit faire au moins 2 caractères.",
-      "errorSubmit": "Une erreur est survenue. Veuillez réessayer."
+      "errorSubmit": "Une erreur est survenue. Veuillez réessayer.",
+      "edit": "Modifier",
+      "close": "Fermer la discussion",
+      "unlock": "Rouvrir la discussion",
+      "report": "Signaler",
+      "ban": "Bannir",
+      "bannedLabel": "Banni",
+      "bannedUsers": "Utilisateurs bannis",
+      "youAreBanned": "Vous avez été banni de cette discussion.",
+      "confirmBan": "Bannir cet utilisateur de la discussion ?",
+      "reportTitle": "Signaler ce contenu",
+      "reportPlaceholder": "Décrivez la raison du signalement...",
+      "reportSend": "Envoyer le signalement",
+      "reportSent": "Signalement envoyé. L'équipe va examiner ce contenu."
     },
     "depot": {
       "title": "Déposer un objet",

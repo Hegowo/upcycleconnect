@@ -36,6 +36,8 @@ func main() {
 		&models.ForumCategory{},
 		&models.ForumThread{},
 		&models.ForumReply{},
+		&models.ForumReport{},
+		&models.ForumBan{},
 	); err != nil {
 		log.Fatalf("Failed to migrate database: %v", err)
 	}

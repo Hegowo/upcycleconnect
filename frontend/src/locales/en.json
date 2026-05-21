@@ -751,7 +751,20 @@
       "errorTitle": "Title must be at least 5 characters.",
       "errorContent": "Content must be at least 10 characters.",
       "errorReplyContent": "Reply must be at least 2 characters.",
-      "errorSubmit": "An error occurred. Please try again."
+      "errorSubmit": "An error occurred. Please try again.",
+      "edit": "Edit",
+      "close": "Close discussion",
+      "unlock": "Reopen discussion",
+      "report": "Report",
+      "ban": "Ban",
+      "bannedLabel": "Banned",
+      "bannedUsers": "Banned users",
+      "youAreBanned": "You have been banned from this discussion.",
+      "confirmBan": "Ban this user from the discussion?",
+      "reportTitle": "Report this content",
+      "reportPlaceholder": "Describe the reason for the report...",
+      "reportSend": "Send report",
+      "reportSent": "Report sent. The team will review this content."
     },
     "depot": {
       "title": "Drop off an item",

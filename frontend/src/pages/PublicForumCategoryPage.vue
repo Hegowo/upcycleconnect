@@ -117,9 +117,7 @@
 
           <div>
             <label class="text-xs font-semibold text-[#40617f] uppercase tracking-wide mb-1 block">{{ t('public.community.modalContent') }}</label>
-            <textarea v-model="form.content" rows="5"
-              :placeholder="t('public.community.modalContentPlaceholder')"
-              class="w-full border border-[#e5e7eb] rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#006d35]/30 resize-none" />
+            <TiptapEditor v-model="form.content" :placeholder="t('public.community.modalContentPlaceholder')" minHeight="160px" />
           </div>
 
           <p v-if="formError" class="text-red-500 text-xs">{{ formError }}</p>
@@ -144,6 +142,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { RouterLink, useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useUserAuthStore } from '@/stores/userAuth'
+import TiptapEditor from '@/components/TiptapEditor.vue'
 import {
   ArrowLeftIcon,
   ChatBubbleLeftEllipsisIcon,
@@ -204,7 +203,8 @@ function openNewThread() {
 async function submitThread() {
   formError.value = ''
   if (form.value.title.length < 5) { formError.value = t('public.community.errorTitle'); return }
-  if (form.value.content.length < 10) { formError.value = t('public.community.errorContent'); return }
+  const stripped = form.value.content.replace(/<[^>]*>/g, '').trim()
+  if (stripped.length < 10) { formError.value = t('public.community.errorContent'); return }
 
   submitting.value = true
   try {
