@@ -32,11 +32,11 @@ func (h *UserHandler) Export(c *gin.Context) {
 	var logs []models.AuditLog
 	h.DB.Where("resource_type = 'User' AND resource_id = ?", id).Order("created_at desc").Limit(50).Find(&logs)
 
-	pdf := buildUserPDF(user, deposits, logs)
+	doc := buildUserPDF(user, deposits, logs)
 
 	var buf bytes.Buffer
-	if err := pdf.Output(&buf); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Erreur lors de la génération du PDF."})
+	if err := doc.Output(&buf); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Erreur lors de la generation du PDF."})
 		return
 	}
 
@@ -53,6 +53,9 @@ func buildUserPDF(user models.User, deposits []models.DepositRequest, logs []mod
 	pdf.SetAutoPageBreak(true, 20)
 	pdf.AddPage()
 
+	// UTF-8 → Latin-1 (required by built-in Helvetica font)
+	tr := pdf.UnicodeTranslatorFromDescriptor("")
+
 	// ─── Logo + header ───────────────────────────────────────────────────────
 	if len(logoBytes) > 0 {
 		pdf.RegisterImageOptionsReader("logo", fpdf.ImageOptions{ImageType: "PNG"}, bytes.NewReader(logoBytes))
@@ -67,54 +70,51 @@ func buildUserPDF(user models.User, deposits []models.DepositRequest, logs []mod
 	pdf.SetFont("Helvetica", "", 9)
 	pdf.SetTextColor(64, 97, 127)
 	pdf.SetXY(54, 26)
-	pdf.CellFormat(130, 5, "Fiche utilisateur — exportée le "+time.Now().Format("02/01/2006 à 15:04"), "", 0, "L", false, 0, "")
+	pdf.CellFormat(130, 5, tr("Fiche utilisateur — exportée le "+time.Now().Format("02/01/2006")), "", 0, "L", false, 0, "")
 
-	// Separator line
 	pdf.SetDrawColor(230, 234, 241)
 	pdf.SetLineWidth(0.5)
 	pdf.Line(20, 40, 190, 40)
 
 	y := 48.0
 
-	// ─── Section : Informations personnelles ──────────────────────────────────
-	y = pdfSectionTitle(pdf, y, "Informations personnelles")
+	// ─── Informations personnelles ───────────────────────────────────────────
+	y = pdfSectionTitle(pdf, y, tr("Informations personnelles"))
 
-	phone := "—"
+	phone := "-"
 	if user.Phone != nil && *user.Phone != "" {
 		phone = *user.Phone
 	}
-	address := "—"
+	address := "-"
 	if user.Address != nil && *user.Address != "" {
-		address = *user.Address
+		address = tr(*user.Address)
 	}
-	verified := "Non vérifié"
+	verified := tr("Non vérifié")
 	if user.EmailVerifiedAt != nil {
-		verified = "Vérifié le " + user.EmailVerifiedAt.Format("02/01/2006")
+		verified = tr("Vérifié le ") + user.EmailVerifiedAt.Format("02/01/2006")
 	}
-	joined := user.CreatedAt.Format("02/01/2006 à 15:04")
 
 	rows := [][2]string{
-		{"Prénom", user.FirstName},
-		{"Nom", user.LastName},
+		{tr("Prénom"), tr(user.FirstName)},
+		{"Nom", tr(user.LastName)},
 		{"Email", user.Email},
-		{"Téléphone", phone},
+		{tr("Téléphone"), phone},
 		{"Adresse", address},
-		{"Statut", statusLabel(user.Status)},
-		{"Email vérifié", verified},
-		{"Membre depuis", joined},
+		{"Statut", tr(statusLabel(user.Status))},
+		{tr("Email vérifié"), verified},
+		{"Membre depuis", user.CreatedAt.Format("02/01/2006")},
 	}
 	for _, row := range rows {
 		y = pdfRow(pdf, y, row[0], row[1])
 	}
 
-	// ─── Section : Dépôts d'objets ────────────────────────────────────────────
+	// ─── Dépôts d'objets ─────────────────────────────────────────────────────
 	y += 8
-	y = pdfSectionTitle(pdf, y, fmt.Sprintf("Dépôts d'objets (%d)", len(deposits)))
+	y = pdfSectionTitle(pdf, y, tr(fmt.Sprintf("Dépôts d'objets (%d)", len(deposits))))
 
 	if len(deposits) == 0 {
-		y = pdfEmpty(pdf, y, "Aucun dépôt enregistré.")
+		y = pdfEmpty(pdf, y, tr("Aucun dépôt enregistré."))
 	} else {
-		// Table header
 		pdf.SetFillColor(245, 248, 252)
 		pdf.SetFont("Helvetica", "B", 8)
 		pdf.SetTextColor(100, 116, 139)
@@ -122,7 +122,7 @@ func buildUserPDF(user models.User, deposits []models.DepositRequest, logs []mod
 		pdf.CellFormat(10, 7, "#", "B", 0, "C", true, 0, "")
 		pdf.CellFormat(70, 7, "Titre", "B", 0, "L", true, 0, "")
 		pdf.CellFormat(25, 7, "Statut", "B", 0, "C", true, 0, "")
-		pdf.CellFormat(30, 7, "Catégorie", "B", 0, "L", true, 0, "")
+		pdf.CellFormat(30, 7, tr("Catégorie"), "B", 0, "L", true, 0, "")
 		pdf.CellFormat(35, 7, "Date", "B", 0, "C", true, 0, "")
 		y += 7
 
@@ -141,29 +141,29 @@ func buildUserPDF(user models.User, deposits []models.DepositRequest, logs []mod
 			pdf.SetTextColor(30, 41, 59)
 			pdf.SetXY(20, y)
 
-			cat := "—"
+			cat := "-"
 			if d.Category != nil {
-				cat = truncate(d.Category.Name, 15)
+				cat = tr(truncate(d.Category.Name, 15))
 			}
 			pdf.CellFormat(10, 6, fmt.Sprintf("%d", d.ID), "", 0, "C", fill, 0, "")
-			pdf.CellFormat(70, 6, truncate(d.Title, 42), "", 0, "L", fill, 0, "")
-			pdf.CellFormat(25, 6, depositStatusLabel(d.Status), "", 0, "C", fill, 0, "")
+			pdf.CellFormat(70, 6, tr(truncate(d.Title, 42)), "", 0, "L", fill, 0, "")
+			pdf.CellFormat(25, 6, tr(depositStatusLabel(d.Status)), "", 0, "C", fill, 0, "")
 			pdf.CellFormat(30, 6, cat, "", 0, "L", fill, 0, "")
 			pdf.CellFormat(35, 6, d.CreatedAt.Format("02/01/2006"), "", 0, "C", fill, 0, "")
 			y += 6
 		}
 	}
 
-	// ─── Section : Journaux d'activité ───────────────────────────────────────
+	// ─── Journaux d'activité ─────────────────────────────────────────────────
 	y += 8
 	if y > 240 {
 		pdf.AddPage()
 		y = 20
 	}
-	y = pdfSectionTitle(pdf, y, fmt.Sprintf("Journaux d'activité (%d)", len(logs)))
+	y = pdfSectionTitle(pdf, y, tr(fmt.Sprintf("Journaux d'activité (%d)", len(logs))))
 
 	if len(logs) == 0 {
-		pdfEmpty(pdf, y, "Aucun log enregistré.")
+		pdfEmpty(pdf, y, tr("Aucun log enregistré."))
 	} else {
 		pdf.SetFillColor(245, 248, 252)
 		pdf.SetFont("Helvetica", "B", 8)
@@ -189,7 +189,7 @@ func buildUserPDF(user models.User, deposits []models.DepositRequest, logs []mod
 			pdf.SetTextColor(30, 41, 59)
 			pdf.SetXY(20, y)
 
-			ip := "—"
+			ip := "-"
 			if l.IPAddress != nil {
 				ip = *l.IPAddress
 			}
@@ -204,12 +204,12 @@ func buildUserPDF(user models.User, deposits []models.DepositRequest, logs []mod
 	pdf.SetFont("Helvetica", "I", 7)
 	pdf.SetTextColor(160, 174, 192)
 	pdf.SetXY(20, 285)
-	pdf.CellFormat(170, 5, "Document confidentiel — UpcycleConnect — "+time.Now().Format("02/01/2006"), "", 0, "C", false, 0, "")
+	pdf.CellFormat(170, 5, tr("Document confidentiel — UpcycleConnect — "+time.Now().Format("02/01/2006")), "", 0, "C", false, 0, "")
 
 	return pdf
 }
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+// ─── Helpers (reçoivent des chaînes déjà converties en Latin-1) ──────────────
 
 func pdfSectionTitle(pdf *fpdf.Fpdf, y float64, title string) float64 {
 	pdf.SetFillColor(0, 109, 53)
@@ -279,5 +279,5 @@ func truncate(s string, n int) string {
 	if len(r) <= n {
 		return s
 	}
-	return string(r[:n-1]) + "…"
+	return string(r[:n-1]) + "..."
 }
