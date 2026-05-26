@@ -23,14 +23,14 @@
         </nav>
 
         <div class="flex items-center gap-2">
-          <div class="relative hidden lg:block">
-            <input
-              type="text"
-              :placeholder="t('public.layout.searchPlaceholder')"
-              class="bg-[#edf4ff] pl-10 pr-4 py-2.5 rounded-xl text-sm text-gray-500 w-56 outline-none focus:ring-2 focus:ring-[#006d35]/20"
-            />
-            <MagnifyingGlassIcon class="w-[18px] h-[18px] absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-          </div>
+          <button
+            @click="searchRef?.open()"
+            class="relative hidden lg:flex items-center gap-2 bg-[#edf4ff] hover:bg-[#e0eeff] pl-3 pr-3 py-2 rounded-xl text-sm text-gray-400 w-56 transition group"
+          >
+            <MagnifyingGlassIcon class="w-[18px] h-[18px] shrink-0 text-gray-400" />
+            <span class="flex-1 text-left text-[13px]">{{ t('public.layout.searchPlaceholder') }}</span>
+            <kbd class="hidden group-hover:flex items-center gap-0.5 text-[10px] bg-white/80 text-[#64748b] px-1.5 py-0.5 rounded-md font-mono border border-[#dde4f0] shadow-sm">⌘K</kbd>
+          </button>
 
           <RouterLink
             to="/depot"
@@ -126,6 +126,14 @@
         </div>
 
         <button
+          @click="searchRef?.open()"
+          class="lg:hidden p-2 rounded-lg text-[#40617f] hover:bg-[#edf4ff] transition"
+          :aria-label="t('public.layout.searchPlaceholder')"
+        >
+          <MagnifyingGlassIcon class="w-5 h-5" />
+        </button>
+
+        <button
           @click="mobileMenuOpen = !mobileMenuOpen"
           class="md:hidden p-2 rounded-lg text-[#40617f] hover:bg-[#edf4ff] transition"
         >
@@ -167,6 +175,8 @@
     <main class="flex-1">
       <RouterView />
     </main>
+
+    <GlobalSearch ref="searchRef" />
 
     <footer class="bg-white border-t border-[#e2e8f0]">
       <div class="max-w-[1280px] mx-auto px-8 pt-16 pb-8">
@@ -243,6 +253,7 @@ import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { MagnifyingGlassIcon, BellIcon, UserCircleIcon, DocumentTextIcon, PlusCircleIcon } from '@heroicons/vue/24/outline'
 import { useUserAuthStore } from '@/stores/userAuth'
+import GlobalSearch from '@/components/GlobalSearch.vue'
 
 const { t } = useI18n()
 const route    = useRoute()
@@ -251,6 +262,7 @@ const userAuth = useUserAuthStore()
 
 const profileMenuOpen = ref(false)
 const mobileMenuOpen = ref(false)
+const searchRef = ref(null)
 
 onMounted(() => userAuth.init())
 

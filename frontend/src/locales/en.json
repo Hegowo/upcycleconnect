@@ -566,6 +566,24 @@
       "footerMadeWith": "Made with",
       "footerForPlanet": "for the planet."
     },
+    "search": {
+      "placeholder": "Search events, services, discussions...",
+      "recentTitle": "Recent searches",
+      "clearRecent": "Clear",
+      "quickNav": "Quick navigation",
+      "shortcutHint": "to open search",
+      "sectionEvents": "Events",
+      "sectionPrestations": "Services",
+      "sectionForum": "Forum",
+      "sectionProviders": "Providers",
+      "qaEvents": "Discover workshops",
+      "qaPrestations": "Find a craftsperson",
+      "qaForum": "Join the community",
+      "qaDeposit": "Drop off an item to upcycle",
+      "noResults": "No results",
+      "noResultsSub": "No results for « {q} »",
+      "typeMore": "Keep typing to search..."
+    },
     "home": {
       "heroTitlePart1": "Give your items",
       "heroTitleHighlight": "a second life",

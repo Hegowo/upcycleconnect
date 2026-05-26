@@ -566,6 +566,24 @@
       "footerMadeWith": "Fait avec",
       "footerForPlanet": "pour la planète."
     },
+    "search": {
+      "placeholder": "Rechercher des événements, prestations, discussions...",
+      "recentTitle": "Recherches récentes",
+      "clearRecent": "Effacer",
+      "quickNav": "Navigation rapide",
+      "shortcutHint": "pour ouvrir la recherche",
+      "sectionEvents": "Événements",
+      "sectionPrestations": "Prestations",
+      "sectionForum": "Forum",
+      "sectionProviders": "Prestataires",
+      "qaEvents": "Découvrir les ateliers",
+      "qaPrestations": "Trouver un artisan",
+      "qaForum": "Rejoindre la communauté",
+      "qaDeposit": "Déposer un objet à upcycler",
+      "noResults": "Aucun résultat",
+      "noResultsSub": "Aucun résultat pour « {q} »",
+      "typeMore": "Continuez à taper pour rechercher..."
+    },
     "home": {
       "heroTitlePart1": "Donnez une",
       "heroTitleHighlight": "seconde vie",

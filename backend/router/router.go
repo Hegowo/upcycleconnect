@@ -45,6 +45,7 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 	providerEventHandler := &handlers.ProviderEventHandler{DB: db, Audit: audit}
 	eventMessageHandler := &handlers.EventMessageHandler{DB: db, Audit: audit}
 	forumHandler := &handlers.ForumHandler{DB: db, Audit: audit}
+	searchHandler := &handlers.SearchHandler{DB: db}
 
 	stripeService := services.NewStripeService(cfg)
 	pdfService, err := services.NewPDFService("/var/lib/upcycleconnect/invoices")
@@ -82,6 +83,7 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 		public.POST("/payments/webhook", paymentHandler.Webhook)
 
 		public.GET("/calendar.ics", calendarHandler.Feed)
+		public.GET("/search", searchHandler.Search)
 
 		public.GET("/forum/categories", forumHandler.ListCategories)
 		public.GET("/forum/categories/:slug", forumHandler.ShowCategory)

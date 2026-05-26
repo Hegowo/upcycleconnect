@@ -44,6 +44,9 @@ func (h *PublicHandler) Prestations(c *gin.Context) {
 	if search := c.Query("search"); search != "" {
 		query = query.Where("title LIKE ?", "%"+search+"%")
 	}
+	if providerID := c.Query("provider"); providerID != "" {
+		query = query.Where("provider_id = ?", providerID)
+	}
 
 	var total int64
 	query.Count(&total)
@@ -69,6 +72,9 @@ func (h *PublicHandler) Prestations(c *gin.Context) {
 	}
 	if search := c.Query("search"); search != "" {
 		fetch = fetch.Where("title LIKE ?", "%"+search+"%")
+	}
+	if providerID := c.Query("provider"); providerID != "" {
+		fetch = fetch.Where("provider_id = ?", providerID)
 	}
 	fetch.Order("created_at DESC").
 		Offset((page - 1) * perPage).

@@ -72,6 +72,18 @@
       </div>
     </section>
 
+    <section v-if="providerFilter" class="px-4 sm:px-6 pb-4 max-w-[1280px] mx-auto">
+      <div class="flex items-center gap-2">
+        <span class="text-sm text-[#40617f]">Filtré par prestataire :</span>
+        <span class="inline-flex items-center gap-1.5 bg-[#006d35]/10 text-[#006d35] text-sm font-semibold px-3 py-1 rounded-full">
+          {{ providerName || 'Prestataire #' + providerFilter }}
+          <button @click="clearProviderFilter" class="hover:text-red-500 transition">
+            <XMarkIcon class="w-3.5 h-3.5" />
+          </button>
+        </span>
+      </div>
+    </section>
+
     <section class="px-4 sm:px-6 pb-12 sm:pb-16 max-w-[1280px] mx-auto">
       <div v-if="loading" class="text-center py-16 text-[#40617f]">{{ t('public.prestations.loading') }}</div>
       <div v-else-if="error" class="text-center py-16 text-red-600">{{ error }}</div>
@@ -145,7 +157,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import {
   MagnifyingGlassIcon,
@@ -155,11 +167,13 @@ import {
   SparklesIcon,
   LightBulbIcon,
   ArchiveBoxIcon,
+  XMarkIcon,
 } from '@heroicons/vue/24/outline'
 import { publicGet } from '@/services/publicApi'
 
 const { t } = useI18n()
 const router = useRouter()
+const route = useRoute()
 
 const categories = ref([])
 const prestations = ref([])
@@ -167,6 +181,8 @@ const activeCategoryId = ref(null)
 const searchQuery = ref('')
 const loading = ref(false)
 const error = ref('')
+const providerFilter = ref(null)
+const providerName = ref('')
 
 const palettes = [
   { from: '#d1fae5', to: '#bbf7d0', icon: HomeModernIcon },
@@ -215,13 +231,25 @@ async function refresh() {
     const params = {}
     if (activeCategoryId.value) params.category_id = activeCategoryId.value
     if (searchQuery.value) params.search = searchQuery.value
+    if (providerFilter.value) params.provider = providerFilter.value
     const res = await publicGet('/prestations', params)
     prestations.value = res.data || []
+    if (providerFilter.value && prestations.value.length > 0 && !providerName.value) {
+      const p = prestations.value.find(p => p.provider)
+      if (p?.provider) providerName.value = p.provider.first_name + ' ' + p.provider.last_name
+    }
   } catch (e) {
     error.value = e.message || t('public.common.loadError')
   } finally {
     loading.value = false
   }
+}
+
+function clearProviderFilter() {
+  providerFilter.value = null
+  providerName.value = ''
+  router.replace({ path: '/prestations', query: {} })
+  refresh()
 }
 
 function selectCategory(id) {
@@ -234,6 +262,9 @@ function goToDetail(id) {
 }
 
 onMounted(async () => {
+  if (route.query.provider) {
+    providerFilter.value = route.query.provider
+  }
   await loadCategories()
   await refresh()
 })
