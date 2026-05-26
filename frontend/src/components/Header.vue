@@ -1,46 +1,83 @@
 <template>
-  <header class="h-14 lg:h-16 bg-white border-b border-[#e5e7eb] flex items-center justify-between px-4 md:px-6 shrink-0">
-    
-    <h1 class="text-sm lg:text-base font-semibold text-gray-900 truncate">{{ title }}</h1>
+  <header :class="[
+    'h-14 lg:h-16 border-b flex items-center justify-between px-4 md:px-6 shrink-0 transition-colors duration-200',
+    theme.isDark
+      ? 'bg-[#1e293b] border-[#334155]'
+      : 'bg-white border-[#e5e7eb]'
+  ]">
 
-    
+    <!-- Page title -->
+    <h1 :class="['text-sm lg:text-base font-semibold truncate', theme.isDark ? 'text-[#f1f5f9]' : 'text-gray-900']">
+      {{ title }}
+    </h1>
+
+    <!-- Search bar -->
     <div class="hidden md:flex items-center flex-1 max-w-md mx-8">
       <div class="relative w-full">
-        <MagnifyingGlassIcon class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+        <MagnifyingGlassIcon :class="['absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4', theme.isDark ? 'text-[#475569]' : 'text-gray-400']" />
         <input
           type="text"
           :placeholder="t('common.search')"
-          class="w-full pl-9 pr-4 py-2 text-sm bg-[#f8fafc] border border-[#e5e7eb] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#006d35]/30 focus:border-[#006d35] transition"
+          :class="[
+            'w-full pl-9 pr-4 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#006d35]/30 focus:border-[#006d35] transition',
+            theme.isDark
+              ? 'bg-[#0f172a] border-[#334155] text-[#f1f5f9] placeholder-[#475569]'
+              : 'bg-[#f8fafc] border-[#e5e7eb] text-gray-900'
+          ]"
         />
       </div>
     </div>
 
-    
+    <!-- Right actions -->
     <div class="flex items-center gap-2 md:gap-3">
-      
-      <button class="relative p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition">
+
+      <!-- Dark mode toggle -->
+      <button
+        @click="theme.toggle()"
+        :class="[
+          'p-2 rounded-lg transition',
+          theme.isDark
+            ? 'text-yellow-400 hover:text-yellow-300 hover:bg-[#263244]'
+            : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'
+        ]"
+        :title="theme.isDark ? 'Passer en mode clair' : 'Passer en mode sombre'"
+      >
+        <SunIcon v-if="theme.isDark" class="w-5 h-5" />
+        <MoonIcon v-else class="w-5 h-5" />
+      </button>
+
+      <!-- Notifications -->
+      <button :class="[
+        'relative p-2 rounded-lg transition',
+        theme.isDark ? 'text-[#64748b] hover:text-[#94a3b8] hover:bg-[#263244]' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'
+      ]">
         <BellIcon class="w-5 h-5" />
         <span v-if="pendingCount > 0" class="absolute top-1 right-1 w-2 h-2 rounded-full bg-red-500"></span>
       </button>
 
-      <div class="h-6 w-px bg-[#e5e7eb] hidden sm:block"></div>
+      <div :class="['h-6 w-px hidden sm:block', theme.isDark ? 'bg-[#334155]' : 'bg-[#e5e7eb]']"></div>
 
-      
+      <!-- User -->
       <div class="flex items-center gap-2.5">
         <div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0" style="background-color:#001d32;">
           {{ initials }}
         </div>
         <div class="hidden md:block">
-          <p class="text-sm font-semibold text-gray-800 leading-none">{{ auth.fullName }}</p>
+          <p :class="['text-sm font-semibold leading-none', theme.isDark ? 'text-[#f1f5f9]' : 'text-gray-800']">{{ auth.fullName }}</p>
           <p class="text-xs capitalize mt-0.5 font-medium" style="color:#006d35;">{{ auth.role?.replace('_', ' ') }}</p>
         </div>
       </div>
 
-      
+      <!-- Logout -->
       <button
         @click="handleLogout"
         :disabled="loading"
-        class="p-2 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition"
+        :class="[
+          'p-2 rounded-lg transition',
+          theme.isDark
+            ? 'text-[#64748b] hover:text-red-400 hover:bg-red-900/20'
+            : 'text-gray-400 hover:text-red-500 hover:bg-red-50'
+        ]"
         :title="t('nav.logout')"
       >
         <ArrowRightOnRectangleIcon class="w-5 h-5" />
@@ -49,20 +86,25 @@
   </header>
 </template>
 
-<script setup>import { ref, computed } from 'vue'
+<script setup>
+import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth'
+import { useThemeStore } from '@/stores/theme'
 import {
   BellIcon,
   MagnifyingGlassIcon,
   ArrowRightOnRectangleIcon,
+  SunIcon,
+  MoonIcon,
 } from '@heroicons/vue/24/outline'
 
 const { t } = useI18n()
-const route  = useRoute()
-const router = useRouter()
-const auth   = useAuthStore()
+const route   = useRoute()
+const router  = useRouter()
+const auth    = useAuthStore()
+const theme   = useThemeStore()
 const loading = ref(false)
 const pendingCount = ref(0)
 

@@ -47,3 +47,237 @@
     @apply bg-white rounded-lg border border-gray-200 shadow-sm;
   }
 }
+
+/* ─── Admin Dark Mode ────────────────────────────────────────────────────────
+   Scoped to .admin-dark (applied on the AdminLayout root element).
+   This avoids touching the public site even when html.dark is set.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* Page bg */
+.admin-dark {
+  background-color: #0f172a !important;
+}
+
+/* Cards & white surfaces */
+.admin-dark .card,
+.admin-dark .bg-white {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+}
+.admin-dark .bg-white.rounded-2xl,
+.admin-dark .bg-white.rounded-xl,
+.admin-dark .bg-white.rounded-lg {
+  background-color: #1e293b !important;
+}
+
+/* Subtle / input backgrounds */
+.admin-dark .bg-\[\#f8fafc\],
+.admin-dark .bg-gray-50,
+.admin-dark .bg-\[\#f7f9ff\] {
+  background-color: #0f172a !important;
+}
+.admin-dark .bg-\[\#f1f5f9\],
+.admin-dark .bg-gray-100 {
+  background-color: #1e293b !important;
+}
+
+/* Borders */
+.admin-dark .border-gray-200,
+.admin-dark .border-\[\#e5e7eb\],
+.admin-dark .border-\[\#f1f5f9\],
+.admin-dark .border-\[\#e2e8f0\] {
+  border-color: #334155 !important;
+}
+.admin-dark .divide-gray-200 > * + * {
+  border-color: #334155 !important;
+}
+
+/* Text — primary */
+.admin-dark .text-gray-900,
+.admin-dark .text-\[\#001d32\] {
+  color: #f1f5f9 !important;
+}
+.admin-dark .text-gray-800 {
+  color: #e2e8f0 !important;
+}
+.admin-dark .text-gray-700,
+.admin-dark .text-\[\#374151\] {
+  color: #cbd5e1 !important;
+}
+.admin-dark .text-gray-600 {
+  color: #94a3b8 !important;
+}
+.admin-dark .text-gray-500,
+.admin-dark .text-\[\#40617f\] {
+  color: #64748b !important;
+}
+.admin-dark .text-gray-400 {
+  color: #475569 !important;
+}
+/* Keep green accent as-is */
+.admin-dark .text-\[\#006d35\],
+.admin-dark .text-green-600,
+.admin-dark .text-green-700 {
+  color: #4ade80 !important;
+}
+.admin-dark .text-\[\#1B8848\] { color: #4ade80 !important; }
+
+/* Stat / badge backgrounds */
+.admin-dark .bg-green-50,  .admin-dark .bg-\[\#dcfce7\], .admin-dark .bg-\[\#f0fdf4\] { background-color: rgba(0,109,53,0.18) !important; }
+.admin-dark .bg-blue-50,   .admin-dark .bg-\[\#dbeafe\] { background-color: rgba(37,99,235,0.18) !important; }
+.admin-dark .bg-red-50     { background-color: rgba(220,38,38,0.18) !important; }
+.admin-dark .bg-yellow-50, .admin-dark .bg-\[\#fef9c3\] { background-color: rgba(202,138,4,0.18) !important; }
+.admin-dark .bg-gray-50    { background-color: #0f172a !important; }
+.admin-dark .bg-\[\#f0fdf4\] { background-color: rgba(0,109,53,0.18) !important; }
+.admin-dark .bg-\[\#edf4ff\] { background-color: rgba(30,58,138,0.18) !important; }
+.admin-dark .bg-\[\#fef9c3\] { background-color: rgba(202,138,4,0.18) !important; }
+
+/* Badge text */
+.admin-dark .text-green-700 { color: #86efac !important; }
+.admin-dark .text-blue-600  { color: #93c5fd !important; }
+.admin-dark .text-red-500, .admin-dark .text-red-600, .admin-dark .text-red-700 { color: #fca5a5 !important; }
+.admin-dark .text-yellow-700, .admin-dark .text-\[\#854d0e\] { color: #fde047 !important; }
+
+/* Hover states on rows / buttons */
+.admin-dark .hover\:bg-\[\#f8fafc\]:hover,
+.admin-dark .hover\:bg-gray-50:hover,
+.admin-dark .hover\:bg-\[\#f9fafb\]:hover {
+  background-color: #263244 !important;
+}
+.admin-dark .hover\:bg-gray-100:hover { background-color: #334155 !important; }
+.admin-dark .hover\:bg-red-50:hover   { background-color: rgba(220,38,38,0.18) !important; }
+
+/* Inputs & selects */
+.admin-dark input:not([type="checkbox"]):not([type="radio"]),
+.admin-dark select,
+.admin-dark textarea {
+  background-color: #0f172a !important;
+  border-color: #334155 !important;
+  color: #f1f5f9 !important;
+}
+.admin-dark input::placeholder,
+.admin-dark textarea::placeholder {
+  color: #475569 !important;
+}
+.admin-dark .input {
+  background-color: #0f172a !important;
+  border-color: #334155 !important;
+  color: #f1f5f9 !important;
+}
+.admin-dark .label { color: #cbd5e1 !important; }
+
+/* .btn-secondary in dark */
+.admin-dark .btn-secondary {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  color: #94a3b8 !important;
+}
+.admin-dark .btn-secondary:hover { background-color: #263244 !important; }
+
+/* Table */
+.admin-dark table  { background-color: #1e293b !important; }
+.admin-dark thead  { background-color: #263244 !important; }
+.admin-dark th     { color: #94a3b8 !important; border-color: #334155 !important; }
+.admin-dark td     { color: #cbd5e1 !important; border-color: #334155 !important; }
+.admin-dark tbody tr:hover { background-color: #263244 !important; }
+
+/* Shadows softened */
+.admin-dark .shadow-sm  { box-shadow: 0 1px 2px 0 rgba(0,0,0,0.4) !important; }
+.admin-dark .shadow     { box-shadow: 0 1px 3px 0 rgba(0,0,0,0.5) !important; }
+.admin-dark .shadow-xl  { box-shadow: 0 20px 25px -5px rgba(0,0,0,0.6) !important; }
+
+/* Scrollbars */
+.admin-dark ::-webkit-scrollbar        { width: 6px; height: 6px; }
+.admin-dark ::-webkit-scrollbar-track  { background: #0f172a; }
+.admin-dark ::-webkit-scrollbar-thumb  { background: #334155; border-radius: 3px; }
+.admin-dark ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+/* ── Additional specific classes ─────────────────────────────────────────── */
+
+/* bg-[#edf4ff] — card-blue used in some panels */
+.admin-dark .bg-\[\#edf4ff\] { background-color: rgba(30,58,138,0.2) !important; }
+
+/* bg-[#374151] — rarely used as bg */
+.admin-dark .bg-\[\#374151\] { background-color: #334155 !important; }
+
+/* text-[#1B5B88] */
+.admin-dark .text-\[\#1B5B88\] { color: #93c5fd !important; }
+
+/* hover:bg-[#f0fdf4] */
+.admin-dark .hover\:bg-\[\#f0fdf4\]:hover { background-color: rgba(0,109,53,0.2) !important; }
+
+/* AppBadge — badge colors in dark */
+.admin-dark .bg-green-100  { background-color: rgba(0,109,53,0.25)    !important; }
+.admin-dark .text-green-800 { color: #86efac !important; }
+.admin-dark .bg-yellow-100 { background-color: rgba(202,138,4,0.25)   !important; }
+.admin-dark .text-yellow-800 { color: #fde047 !important; }
+.admin-dark .bg-red-100    { background-color: rgba(220,38,38,0.25)   !important; }
+.admin-dark .text-red-800  { color: #fca5a5 !important; }
+.admin-dark .bg-blue-100   { background-color: rgba(37,99,235,0.25)   !important; }
+.admin-dark .text-blue-800 { color: #93c5fd !important; }
+.admin-dark .bg-gray-100   { background-color: #334155 !important; }
+.admin-dark .text-gray-800 { color: #e2e8f0 !important; }
+
+/* Inline style= overrides — light icon-container backgrounds */
+.admin-dark [style*="background-color:#dcfce7"],
+.admin-dark [style*="background-color: #dcfce7"] { background-color: rgba(0,109,53,0.2)   !important; }
+.admin-dark [style*="background-color:#dbeafe"],
+.admin-dark [style*="background-color:#DBEAFE"],
+.admin-dark [style*="background-color: #dbeafe"] { background-color: rgba(37,99,235,0.2)  !important; }
+.admin-dark [style*="background-color:#f0fdf4"],
+.admin-dark [style*="background-color: #f0fdf4"] { background-color: rgba(0,109,53,0.12)  !important; }
+.admin-dark [style*="background-color:#fef9c3"],
+.admin-dark [style*="background-color: #fef9c3"] { background-color: rgba(202,138,4,0.2)  !important; }
+.admin-dark [style*="background-color:#fee2e2"],
+.admin-dark [style*="background-color:#FEE2E2"],
+.admin-dark [style*="background-color: #fee2e2"] { background-color: rgba(220,38,38,0.2)  !important; }
+.admin-dark [style*="background:#DBEAFE"]         { background-color: rgba(37,99,235,0.25) !important; }
+.admin-dark [style*="background:#FEE2E2"]         { background-color: rgba(220,38,38,0.25) !important; }
+.admin-dark [style*="background-color:#f8fafc"],
+.admin-dark [style*="background-color: #f8fafc"]  { background-color: #0f172a !important; }
+
+/* Inline style= icon color overrides */
+.admin-dark [style*="color:#006d35"]  { color: #4ade80 !important; }
+.admin-dark [style*="color:#1B8848"]  { color: #4ade80 !important; }
+.admin-dark [style*="color:#001d32"]  { color: #f1f5f9 !important; }
+.admin-dark [style*="color:#40617f"]  { color: #94a3b8 !important; }
+.admin-dark [style*="color:#1d4ed8"]  { color: #93c5fd !important; }
+.admin-dark [style*="color:#dc2626"]  { color: #fca5a5 !important; }
+.admin-dark [style*="color:#374151"]  { color: #cbd5e1 !important; }
+
+/* Inline border-color */
+.admin-dark [style*="border-color:#e5e7eb"],
+.admin-dark [style*="border-color:#e2e8f0"],
+.admin-dark [style*="border-color:#f1f5f9"]  { border-color: #334155 !important; }
+
+/* AppConfirmDialog (teleported outside .admin-dark) — extended coverage */
+html.dark .fixed.inset-0.z-50 .bg-white {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+}
+html.dark .fixed.inset-0.z-50 .text-gray-900  { color: #f1f5f9 !important; }
+html.dark .fixed.inset-0.z-50 .text-gray-500  { color: #94a3b8 !important; }
+html.dark .fixed.inset-0.z-50 .bg-gray-100    { background-color: #334155 !important; }
+html.dark .fixed.inset-0.z-50 .btn-secondary  {
+  background-color: #263244 !important;
+  border-color: #334155 !important;
+  color: #94a3b8 !important;
+}
+
+/* Select option legibility */
+.admin-dark select option { background-color: #1e293b; color: #f1f5f9; }
+
+/* Tab / pill active states with green bg */
+.admin-dark .bg-\[\#006d35\]  { background-color: #15803d !important; }
+.admin-dark .bg-\[\#1B8848\]  { background-color: #15803d !important; }
+.admin-dark .bg-\[\#10522b\]  { background-color: #166534 !important; }
+
+/* border-[#bbf7d0], border-[#fde047] — success/warning border in light alerts */
+.admin-dark .border-\[\#bbf7d0\] { border-color: rgba(0,109,53,0.4)  !important; }
+.admin-dark .border-\[\#fde047\] { border-color: rgba(202,138,4,0.4) !important; }
+.admin-dark .border-red-200      { border-color: rgba(220,38,38,0.4) !important; }
+.admin-dark .border-green-200    { border-color: rgba(0,109,53,0.4)  !important; }
+
+/* ring / focus */
+.admin-dark .focus\:ring-\[\#006d35\]\/20:focus,
+.admin-dark .focus\:ring-\[\#006d35\]\/30:focus { --tw-ring-color: rgba(74,222,128,0.25) !important; }

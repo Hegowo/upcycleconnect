@@ -1,5 +1,8 @@
 <template>
-  <div class="flex h-[100dvh] overflow-hidden" style="background-color:#f8fafc;">
+  <div
+    :class="['flex h-[100dvh] overflow-hidden transition-colors duration-200', theme.isDark ? 'admin-dark' : '']"
+    :style="{ backgroundColor: theme.isDark ? '#0f172a' : '#f8fafc' }"
+  >
     <TheSidebar />
     <div class="flex-1 flex flex-col overflow-hidden min-w-0">
       <TheHeader />
@@ -14,12 +17,15 @@
   </div>
 </template>
 
-<script setup>import { useRoute } from 'vue-router'
+<script setup>
+import { useRoute } from 'vue-router'
+import { useThemeStore } from '@/stores/theme'
 import TheSidebar from '@/components/Sidebar.vue'
 import TheHeader from '@/components/Header.vue'
 import AdminBottomNav from '@/components/AdminBottomNav.vue'
 
 const route = useRoute()
+const theme = useThemeStore()
 </script>
 
 <style scoped>
