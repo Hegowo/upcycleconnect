@@ -24,6 +24,8 @@ type Config struct {
 
 	GoogleClientID     string
 	GoogleClientSecret string
+
+	AppleServicesID string
 }
 
 func Load() *Config {
@@ -49,6 +51,8 @@ func Load() *Config {
 
 		GoogleClientID:     getEnv("GOOGLE_CLIENT_ID", ""),
 		GoogleClientSecret: getEnv("GOOGLE_CLIENT_SECRET", ""),
+
+		AppleServicesID: getEnv("APPLE_SERVICES_ID", ""),
 	}
 }
 

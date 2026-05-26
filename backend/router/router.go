@@ -96,6 +96,7 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 		userAPI.POST("/auth/register", userAuthHandler.Register)
 		userAPI.POST("/auth/login", userAuthHandler.Login)
 		userAPI.POST("/auth/google", oauthHandler.GoogleAuth)
+		userAPI.POST("/auth/apple", oauthHandler.AppleAuth)
 		userAPI.GET("/auth/verify-email", userAuthHandler.VerifyEmail)
 		userAPI.GET("/auth/verify-login", userAuthHandler.VerifyLogin)
 

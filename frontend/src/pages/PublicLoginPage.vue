@@ -86,6 +86,7 @@
         </div>
 
         <GoogleSignInButton />
+        <AppleSignInButton />
 
         <RouterLink
           to="/inscription"
@@ -111,6 +112,7 @@ import { useI18n } from 'vue-i18n'
 import { EyeIcon, EyeSlashIcon, ExclamationTriangleIcon, ArrowRightCircleIcon, CheckCircleIcon, ShieldCheckIcon } from '@heroicons/vue/24/outline'
 import { useUserAuthStore } from '@/stores/userAuth'
 import GoogleSignInButton from '@/components/GoogleSignInButton.vue'
+import AppleSignInButton from '@/components/AppleSignInButton.vue'
 
 const { t } = useI18n()
 const router   = useRouter()
