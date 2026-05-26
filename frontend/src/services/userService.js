@@ -29,6 +29,21 @@ export const userService = {
   async remove(id) {
     await api.delete(`/users/${id}`)
   },
+
+  async updateEmail(id, email) {
+    const { data } = await api.put(`/users/${id}/email`, { email })
+    return data
+  },
+
+  async sendPasswordReset(id) {
+    const { data } = await api.post(`/users/${id}/send-reset`)
+    return data
+  },
+
+  async exportPdf(id) {
+    const response = await api.get(`/users/${id}/export`, { responseType: 'blob' })
+    return response.data
+  },
 }
 
 export const providerService = {

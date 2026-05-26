@@ -279,6 +279,49 @@ func (h *UserAuthHandler) Logout(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Déconnexion réussie."})
 }
 
+func (h *UserAuthHandler) ResetPassword(c *gin.Context) {
+	var req struct {
+		Token    string `json:"token" binding:"required"`
+		Password string `json:"password" binding:"required,min=8"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"message": "Données invalides (mot de passe de 8 caractères minimum)."})
+		return
+	}
+
+	var ev models.EmailVerification
+	if err := h.DB.Where("token = ? AND type = ?", req.Token, "password_reset").First(&ev).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Lien invalide ou expiré."})
+		return
+	}
+	if ev.UsedAt != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Ce lien a déjà été utilisé."})
+		return
+	}
+	if time.Now().After(ev.ExpiresAt) {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Ce lien a expiré."})
+		return
+	}
+
+	var user models.User
+	if err := h.DB.First(&user, ev.UserID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": "Utilisateur introuvable."})
+		return
+	}
+
+	hash, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Erreur interne."})
+		return
+	}
+
+	now := time.Now()
+	h.DB.Model(&user).Updates(map[string]interface{}{"password": string(hash)})
+	h.DB.Model(&ev).Update("used_at", now)
+
+	c.JSON(http.StatusOK, gin.H{"message": "Mot de passe réinitialisé avec succès."})
+}
+
 func (h *UserAuthHandler) issueJWT(userID uint) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"sub": fmt.Sprintf("%d", userID),

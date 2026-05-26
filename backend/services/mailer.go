@@ -148,6 +148,24 @@ Si vous n'êtes pas à l'origine de cette inscription, vous pouvez ignorer cet e
 	return m.Send(to, "Activez votre compte UpcycleConnect", body)
 }
 
+func (m *Mailer) SendPasswordReset(to, firstName, link string) error {
+	body := fmt.Sprintf(`Bonjour %s,
+
+Un administrateur a demandé la réinitialisation de votre mot de passe UpcycleConnect.
+
+Cliquez sur le lien ci-dessous pour définir un nouveau mot de passe :
+
+  %s
+
+Ce lien est valable 1 heure. Après expiration, vous devrez contacter à nouveau un administrateur.
+
+Si vous n'étiez pas au courant de cette demande, ignorez cet email — votre mot de passe actuel reste inchangé.
+
+— L'équipe UpcycleConnect`, firstName, link)
+
+	return m.Send(to, "Réinitialisation de votre mot de passe — UpcycleConnect", body)
+}
+
 func (m *Mailer) SendEmailChangeCode(to, firstName, code string) error {
 	body := fmt.Sprintf(`Bonjour %s,
 

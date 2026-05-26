@@ -22,10 +22,12 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 
 	audit := services.NewAuditService(db)
 
+	mailer := services.NewMailer(cfg)
+
 	authHandler := &handlers.AuthHandler{DB: db, Cfg: cfg}
 	dashHandler := &handlers.DashboardHandler{DB: db}
 	swaggerHandler := &handlers.SwaggerHandler{}
-	userHandler := &handlers.UserHandler{DB: db, Audit: audit}
+	userHandler := &handlers.UserHandler{DB: db, Audit: audit, Mailer: mailer, Cfg: cfg}
 	providerHandler := &handlers.ProviderHandler{DB: db, Audit: audit}
 	categoryHandler := &handlers.CategoryHandler{DB: db, Audit: audit}
 	prestationHandler := &handlers.PrestationHandler{DB: db, Audit: audit}
@@ -35,7 +37,6 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 	siretHandler    := &handlers.SiretHandler{Cfg: cfg}
 	depositHandler         := &handlers.DepositHandler{DB: db, Audit: audit}
 	collectionPointHandler := &handlers.CollectionPointHandler{DB: db, Audit: audit}
-	mailer                 := services.NewMailer(cfg)
 	userAuthHandler := &handlers.UserAuthHandler{DB: db, Cfg: cfg, Mailer: mailer}
 	profileHandler  := &handlers.ProfileHandler{DB: db, Mailer: mailer}
 	publicHandler   := &handlers.PublicHandler{DB: db}
@@ -104,6 +105,7 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 		userAPI.POST("/auth/apple", oauthHandler.AppleAuth)
 		userAPI.POST("/auth/oauth/link", oauthHandler.OAuthLink)
 		userAPI.GET("/auth/verify-email", userAuthHandler.VerifyEmail)
+		userAPI.POST("/auth/reset-password", userAuthHandler.ResetPassword)
 
 		userAPI.POST("/passkeys/authenticate/begin", passkeyHandler.AuthBegin)
 		userAPI.POST("/passkeys/authenticate/complete", passkeyHandler.AuthComplete)
@@ -205,8 +207,11 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 			protected.GET("/users", userHandler.Index)
 			protected.GET("/users/:id", userHandler.Show)
 			protected.PUT("/users/:id", userHandler.Update)
+			protected.PUT("/users/:id/email", userHandler.UpdateEmail)
 			protected.POST("/users/:id/ban", userHandler.Ban)
 			protected.POST("/users/:id/activate", userHandler.Activate)
+			protected.POST("/users/:id/send-reset", userHandler.SendPasswordReset)
+			protected.GET("/users/:id/export", userHandler.Export)
 			protected.DELETE("/users/:id", userHandler.Destroy)
 
 			protected.GET("/providers", providerHandler.Index)

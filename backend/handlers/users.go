@@ -4,7 +4,9 @@ import (
 	"math"
 	"net/http"
 	"strconv"
+	"strings"
 
+	"upcycleconnect/backend/config"
 	"upcycleconnect/backend/models"
 	"upcycleconnect/backend/services"
 
@@ -13,8 +15,10 @@ import (
 )
 
 type UserHandler struct {
-	DB    *gorm.DB
-	Audit *services.AuditService
+	DB     *gorm.DB
+	Audit  *services.AuditService
+	Mailer *services.Mailer
+	Cfg    *config.Config
 }
 
 func (h *UserHandler) Index(c *gin.Context) {
@@ -184,4 +188,91 @@ func (h *UserHandler) Destroy(c *gin.Context) {
 	h.DB.Delete(&user)
 
 	c.Status(http.StatusNoContent)
+}
+
+func (h *UserHandler) UpdateEmail(c *gin.Context) {
+	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": "Ressource introuvable"})
+		return
+	}
+
+	var user models.User
+	if err := h.DB.Where("id = ? AND deleted_at IS NULL", id).First(&user).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": "Ressource introuvable"})
+		return
+	}
+
+	var req struct {
+		Email string `json:"email" binding:"required,email"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"message": "Adresse email invalide."})
+		return
+	}
+
+	newEmail := strings.ToLower(strings.TrimSpace(req.Email))
+	if newEmail == user.Email {
+		c.JSON(http.StatusOK, models.ToUserResponse(&user))
+		return
+	}
+
+	var existing models.User
+	if h.DB.Where("email = ? AND id != ?", newEmail, id).First(&existing).Error == nil {
+		c.JSON(http.StatusConflict, gin.H{"message": "Cette adresse email est déjà utilisée."})
+		return
+	}
+
+	oldEmail := user.Email
+	h.DB.Model(&user).Updates(map[string]interface{}{
+		"email":             newEmail,
+		"email_verified_at": nil,
+	})
+
+	h.Audit.Log(c, "user.email_changed", "User", &user.ID,
+		map[string]string{"email": oldEmail},
+		map[string]string{"email": newEmail},
+	)
+
+	h.DB.First(&user, user.ID)
+	c.JSON(http.StatusOK, models.ToUserResponse(&user))
+}
+
+func (h *UserHandler) SendPasswordReset(c *gin.Context) {
+	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": "Ressource introuvable"})
+		return
+	}
+
+	var user models.User
+	if err := h.DB.Where("id = ? AND deleted_at IS NULL", id).First(&user).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": "Ressource introuvable"})
+		return
+	}
+
+	token := newToken()
+
+	h.DB.Where("user_id = ? AND type = ? AND used_at IS NULL", user.ID, "password_reset").Delete(&models.EmailVerification{})
+
+	ev := models.EmailVerification{
+		UserID:    user.ID,
+		Token:     token,
+		Type:      "password_reset",
+		ExpiresAt: timeNow().Add(oneHour),
+	}
+	if err := h.DB.Create(&ev).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Erreur interne."})
+		return
+	}
+
+	link := h.Cfg.AppURL + "/reset-password?token=" + token
+	if err := h.Mailer.SendPasswordReset(user.Email, user.FirstName, link); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Erreur lors de l'envoi de l'email."})
+		return
+	}
+
+	h.Audit.Log(c, "user.password_reset_sent", "User", &user.ID, nil, nil)
+
+	c.JSON(http.StatusOK, gin.H{"message": "Email de récupération envoyé."})
 }

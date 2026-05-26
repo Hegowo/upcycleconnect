@@ -18,6 +18,7 @@
     </div>
 
     <template v-else-if="user">
+      <!-- Profil card -->
       <div class="card p-8">
         <div class="flex items-start justify-between mb-6">
           <div class="flex items-center gap-4">
@@ -62,6 +63,7 @@
           </div>
         </dl>
 
+        <!-- Actions ban/activate -->
         <div class="mt-6 flex gap-3 pt-4 border-t border-gray-100">
           <button
             v-if="user.status !== 'banned'"
@@ -81,6 +83,74 @@
           </button>
         </div>
       </div>
+
+      <!-- Modifier l'email -->
+      <div class="card p-6 space-y-4">
+        <div class="flex items-center gap-2 mb-1">
+          <EnvelopeIcon class="w-4 h-4 text-[#006d35]" />
+          <h3 class="font-semibold text-gray-800 text-sm">Modifier l'adresse email</h3>
+        </div>
+        <div class="flex gap-3">
+          <input
+            v-model="newEmail"
+            type="email"
+            placeholder="nouvelle@email.com"
+            class="flex-1 px-4 py-2.5 border border-[#e2e8f0] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#006d35]/20 focus:border-[#006d35] transition bg-white"
+          />
+          <button
+            @click="doUpdateEmail"
+            :disabled="emailLoading || !newEmail || newEmail === user.email"
+            class="px-4 py-2.5 rounded-xl text-white text-sm font-semibold transition hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            style="background-color:#006d35;"
+          >
+            <div v-if="emailLoading" class="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            <CheckIcon v-else class="w-4 h-4" />
+            Enregistrer
+          </button>
+        </div>
+        <Transition name="fade">
+          <p v-if="emailSuccess" class="text-green-600 text-xs bg-green-50 p-2.5 rounded-xl border border-green-200">{{ emailSuccess }}</p>
+        </Transition>
+        <Transition name="fade">
+          <p v-if="emailError" class="text-red-600 text-xs bg-red-50 p-2.5 rounded-xl border border-red-200">{{ emailError }}</p>
+        </Transition>
+      </div>
+
+      <!-- Récupération de mot de passe + Export PDF -->
+      <div class="card p-6 space-y-4">
+        <h3 class="font-semibold text-gray-800 text-sm mb-2">Actions administrateur</h3>
+
+        <div class="flex flex-col sm:flex-row gap-3">
+          <!-- Send password reset -->
+          <button
+            @click="doSendReset"
+            :disabled="resetLoading"
+            class="flex-1 px-4 py-3 rounded-xl border border-[#e2e8f0] bg-white text-sm font-semibold text-gray-700 hover:bg-gray-50 transition flex items-center justify-center gap-2 disabled:opacity-50"
+          >
+            <div v-if="resetLoading" class="w-3 h-3 border-2 border-gray-500 border-t-transparent rounded-full animate-spin" />
+            <KeyIcon v-else class="w-4 h-4 text-[#40617f]" />
+            Envoyer un email de récupération
+          </button>
+
+          <!-- Export PDF -->
+          <button
+            @click="doExportPdf"
+            :disabled="exportLoading"
+            class="flex-1 px-4 py-3 rounded-xl border border-[#e2e8f0] bg-white text-sm font-semibold text-gray-700 hover:bg-gray-50 transition flex items-center justify-center gap-2 disabled:opacity-50"
+          >
+            <div v-if="exportLoading" class="w-3 h-3 border-2 border-gray-500 border-t-transparent rounded-full animate-spin" />
+            <ArrowDownTrayIcon v-else class="w-4 h-4 text-[#40617f]" />
+            Exporter en PDF
+          </button>
+        </div>
+
+        <Transition name="fade">
+          <p v-if="resetSuccess" class="text-green-600 text-xs bg-green-50 p-2.5 rounded-xl border border-green-200">{{ resetSuccess }}</p>
+        </Transition>
+        <Transition name="fade">
+          <p v-if="resetError" class="text-red-600 text-xs bg-red-50 p-2.5 rounded-xl border border-red-200">{{ resetError }}</p>
+        </Transition>
+      </div>
     </template>
 
     <AppConfirmDialog
@@ -96,9 +166,11 @@
   </div>
 </template>
 
-<script setup>import { ref, reactive, onMounted } from 'vue'
+<script setup>
+import { ref, reactive, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { EnvelopeIcon, CheckIcon, KeyIcon, ArrowDownTrayIcon } from '@heroicons/vue/24/outline'
 import { userService } from '@/services/userService'
 import { useToast } from '@/utils/useToast'
 import AppBadge from '@/components/AppBadge.vue'
@@ -113,10 +185,25 @@ const user    = ref(null)
 const loading = ref(true)
 const confirm = reactive({ show: false, action: '', loading: false })
 
+// Email edit
+const newEmail     = ref('')
+const emailLoading = ref(false)
+const emailSuccess = ref('')
+const emailError   = ref('')
+
+// Password reset
+const resetLoading = ref(false)
+const resetSuccess = ref('')
+const resetError   = ref('')
+
+// Export
+const exportLoading = ref(false)
+
 async function fetchUser() {
   try {
     const data = await userService.get(route.params.id)
-    user.value = data
+    user.value  = data
+    newEmail.value = data.email
   } catch {
     toast.showError(t('users.toastLoadError'))
     router.push('/admin/users')
@@ -150,9 +237,66 @@ async function executeAction() {
   }
 }
 
+async function doUpdateEmail() {
+  if (!newEmail.value || newEmail.value === user.value.email) return
+  emailLoading.value = true
+  emailSuccess.value = ''
+  emailError.value   = ''
+  try {
+    const updated = await userService.updateEmail(user.value.id, newEmail.value)
+    user.value.email = updated.email
+    user.value.email_verified_at = updated.email_verified_at
+    emailSuccess.value = 'Email mis à jour avec succès.'
+    setTimeout(() => { emailSuccess.value = '' }, 4000)
+  } catch (e) {
+    emailError.value = e?.response?.data?.message || 'Erreur lors de la mise à jour.'
+    setTimeout(() => { emailError.value = '' }, 5000)
+  } finally {
+    emailLoading.value = false
+  }
+}
+
+async function doSendReset() {
+  resetLoading.value = true
+  resetSuccess.value = ''
+  resetError.value   = ''
+  try {
+    await userService.sendPasswordReset(user.value.id)
+    resetSuccess.value = `Email de récupération envoyé à ${user.value.email}.`
+    setTimeout(() => { resetSuccess.value = '' }, 5000)
+  } catch (e) {
+    resetError.value = e?.response?.data?.message || "Erreur lors de l'envoi."
+    setTimeout(() => { resetError.value = '' }, 5000)
+  } finally {
+    resetLoading.value = false
+  }
+}
+
+async function doExportPdf() {
+  exportLoading.value = true
+  try {
+    const blob = await userService.exportPdf(user.value.id)
+    const url  = URL.createObjectURL(blob)
+    const a    = document.createElement('a')
+    a.href     = url
+    a.download = `utilisateur_${user.value.id}_${new Date().toISOString().slice(0,10)}.pdf`
+    a.click()
+    URL.revokeObjectURL(url)
+  } catch {
+    toast.showError('Erreur lors de la génération du PDF.')
+  } finally {
+    exportLoading.value = false
+  }
+}
+
 function formatDate(iso) {
   return new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })
 }
 
 onMounted(fetchUser)
 </script>
+
+<style scoped>
+.fade-enter-active, .fade-leave-active { transition: opacity 0.2s ease; }
+.fade-enter-from, .fade-leave-to { opacity: 0; }
+</style>
