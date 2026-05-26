@@ -108,6 +108,15 @@
                     {{ t('public.layout.menuMyInvoices') }}
                   </RouterLink>
 
+                  <RouterLink
+                    to="/profil/parametres"
+                    @click="closeMenu"
+                    class="flex items-center gap-3 px-4 py-2.5 text-sm text-[#334155] hover:bg-[#f8fafc] transition"
+                  >
+                    <Cog6ToothIcon class="w-4 h-4 text-[#40617f]" />
+                    Paramètres
+                  </RouterLink>
+
                   <div class="border-t border-[#f1f5f9] mt-1 pt-1">
                     <button
                       @click="handleLogout"
@@ -165,6 +174,7 @@
             <template v-else>
               <RouterLink to="/profil" @click="mobileMenuOpen = false" class="block py-2 text-sm font-medium text-[#334155]">{{ t('public.layout.menuMyProfile') }}</RouterLink>
               <RouterLink to="/profil/factures" @click="mobileMenuOpen = false" class="block py-2 text-sm font-medium text-[#334155]">{{ t('public.layout.menuMyInvoices') }}</RouterLink>
+              <RouterLink to="/profil/parametres" @click="mobileMenuOpen = false" class="block py-2 text-sm font-medium text-[#334155]">Paramètres</RouterLink>
               <button @click="handleLogout(); mobileMenuOpen = false" class="block py-2 text-sm font-medium text-red-500">{{ t('public.layout.menuLogout') }}</button>
             </template>
           </div>
@@ -251,7 +261,7 @@
 <script setup>import { ref, onMounted, computed } from 'vue'
 import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { MagnifyingGlassIcon, BellIcon, UserCircleIcon, DocumentTextIcon, PlusCircleIcon } from '@heroicons/vue/24/outline'
+import { MagnifyingGlassIcon, BellIcon, UserCircleIcon, DocumentTextIcon, PlusCircleIcon, Cog6ToothIcon } from '@heroicons/vue/24/outline'
 import { useUserAuthStore } from '@/stores/userAuth'
 import GlobalSearch from '@/components/GlobalSearch.vue'
 

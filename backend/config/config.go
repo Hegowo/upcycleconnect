@@ -26,6 +26,9 @@ type Config struct {
 	GoogleClientSecret string
 
 	AppleServicesID string
+
+	WebAuthnRPID   string
+	WebAuthnOrigin string
 }
 
 func Load() *Config {
@@ -53,6 +56,9 @@ func Load() *Config {
 		GoogleClientSecret: getEnv("GOOGLE_CLIENT_SECRET", ""),
 
 		AppleServicesID: getEnv("APPLE_SERVICES_ID", ""),
+
+		WebAuthnRPID:   getEnv("WEBAUTHN_RPID", "upcycleconnect.xyz"),
+		WebAuthnOrigin: getEnv("WEBAUTHN_ORIGIN", "https://upcycleconnect.xyz"),
 	}
 }
 

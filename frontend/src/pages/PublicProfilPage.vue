@@ -2,6 +2,15 @@
   <div class="bg-[#f7f9ff] pb-0">
     <div class="max-w-[1280px] mx-auto px-6 py-10">
 
+      <div class="flex gap-1 bg-white rounded-2xl p-1.5 shadow-sm border border-[#edf4ff] mb-6 max-w-sm">
+        <RouterLink to="/profil" class="flex-1 py-2.5 px-4 rounded-xl text-sm font-semibold text-center transition text-white shadow-sm" style="background:#006d35;">
+          Mon profil
+        </RouterLink>
+        <RouterLink to="/profil/parametres" class="flex-1 py-2.5 px-4 rounded-xl text-sm font-semibold text-center transition text-[#40617f] hover:bg-[#f8fafc]">
+          Paramètres
+        </RouterLink>
+      </div>
+
       <div v-if="loading" class="flex items-center justify-center py-24">
         <div class="w-8 h-8 border-4 border-[#006d35] border-t-transparent rounded-full animate-spin" />
       </div>
@@ -25,7 +34,7 @@
               <span class="bg-[rgba(27,136,72,0.1)] text-[#006d35] text-xs font-bold uppercase tracking-wide px-3 py-1 rounded-full">
                 {{ memberLabel }}
               </span>
-              <button @click="router.push('/profil/modifier')"
+              <button @click="router.push('/profil/parametres')"
                 class="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#e5e7eb] text-xs font-medium text-[#40617f] hover:bg-gray-50 transition shrink-0">
                 <PencilIcon class="w-3.5 h-3.5" /> {{ t('public.profile.edit') }}
               </button>
@@ -194,7 +203,7 @@
 </template>
 
 <script setup>import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { RouterLink, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useUserAuthStore } from '@/stores/userAuth'
 import {

@@ -88,6 +88,20 @@
         <GoogleSignInButton />
         <AppleSignInButton />
 
+        <button
+          @click="loginWithPasskey"
+          :disabled="passkeyLoading"
+          class="w-full py-[11px] px-4 rounded-xl font-semibold text-sm text-[#334155] border border-[#e2e8f0] bg-white hover:bg-[#f8fafc] transition flex items-center justify-center gap-2 disabled:opacity-60"
+        >
+          <div v-if="passkeyLoading" class="w-4 h-4 border-2 border-[#334155] border-t-transparent rounded-full animate-spin" />
+          <KeyIcon v-else class="w-4 h-4 text-[#40617f]" />
+          Se connecter avec une clé d'accès
+        </button>
+
+        <Transition name="fade">
+          <p v-if="passkeyError" class="text-red-600 text-xs bg-red-50 p-2.5 rounded-xl border border-red-200 text-center">{{ passkeyError }}</p>
+        </Transition>
+
         <RouterLink
           to="/inscription"
           class="w-full py-3 rounded-xl font-semibold text-[#006d35] text-sm border-2 border-[#006d35]/20 hover:bg-[#f0fdf4] transition flex items-center justify-center gap-2"
@@ -109,7 +123,7 @@
 <script setup>import { ref, computed } from 'vue'
 import { RouterLink, useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { EyeIcon, EyeSlashIcon, ExclamationTriangleIcon, ArrowRightCircleIcon, CheckCircleIcon, ShieldCheckIcon } from '@heroicons/vue/24/outline'
+import { EyeIcon, EyeSlashIcon, ExclamationTriangleIcon, ArrowRightCircleIcon, CheckCircleIcon, ShieldCheckIcon, KeyIcon } from '@heroicons/vue/24/outline'
 import { useUserAuthStore } from '@/stores/userAuth'
 import GoogleSignInButton from '@/components/GoogleSignInButton.vue'
 import AppleSignInButton from '@/components/AppleSignInButton.vue'
@@ -146,6 +160,82 @@ async function handleLogin() {
     error.value = e.message || t('public.login.errorInvalid')
   } finally {
     loading.value = false
+  }
+}
+
+// ─── Passkey login ─────────────────────────────────────────────────────────
+
+const passkeyLoading = ref(false)
+const passkeyError   = ref('')
+
+function b64urlToBuffer(s) {
+  const b = s.replace(/-/g, '+').replace(/_/g, '/')
+  const padded = b.padEnd(b.length + (4 - b.length % 4) % 4, '=')
+  const bin = atob(padded)
+  const buf = new ArrayBuffer(bin.length)
+  const view = new Uint8Array(buf)
+  for (let i = 0; i < bin.length; i++) view[i] = bin.charCodeAt(i)
+  return buf
+}
+
+function bufferToB64url(buf) {
+  const bytes = new Uint8Array(buf)
+  let s = ''
+  for (const b of bytes) s += String.fromCharCode(b)
+  return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')
+}
+
+async function loginWithPasskey() {
+  if (passkeyLoading.value) return
+  passkeyLoading.value = true
+  passkeyError.value   = ''
+  try {
+    const beginRes = await fetch('/api/v1/passkeys/authenticate/begin', { method: 'POST' })
+    if (!beginRes.ok) throw new Error('Erreur lors de la génération du challenge.')
+    const { options, session_key } = await beginRes.json()
+
+    options.publicKey.challenge = b64urlToBuffer(options.publicKey.challenge)
+    if (options.publicKey.allowCredentials?.length) {
+      options.publicKey.allowCredentials = options.publicKey.allowCredentials.map(c => ({
+        ...c, id: b64urlToBuffer(c.id),
+      }))
+    }
+
+    const cred = await navigator.credentials.get(options)
+
+    const body = {
+      id:    cred.id,
+      rawId: bufferToB64url(cred.rawId),
+      type:  cred.type,
+      response: {
+        authenticatorData: bufferToB64url(cred.response.authenticatorData),
+        clientDataJSON:    bufferToB64url(cred.response.clientDataJSON),
+        signature:         bufferToB64url(cred.response.signature),
+        userHandle: cred.response.userHandle ? bufferToB64url(cred.response.userHandle) : null,
+      },
+      clientExtensionResults: cred.getClientExtensionResults(),
+    }
+
+    const completeRes = await fetch(`/api/v1/passkeys/authenticate/complete?session_key=${encodeURIComponent(session_key)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    })
+    const json = await completeRes.json()
+    if (!completeRes.ok) throw new Error(json.message || 'Authentification échouée.')
+
+    userAuth.token = json.token
+    userAuth.user  = json.user
+    localStorage.setItem('user_token', json.token)
+    localStorage.setItem('user_data', JSON.stringify(json.user))
+
+    const redirect = route.query.redirect
+    router.push(redirect ? String(redirect) : '/')
+  } catch (e) {
+    if (e?.name === 'NotAllowedError') return
+    passkeyError.value = e.message || 'Connexion avec clé d\'accès échouée.'
+  } finally {
+    passkeyLoading.value = false
   }
 }
 </script>

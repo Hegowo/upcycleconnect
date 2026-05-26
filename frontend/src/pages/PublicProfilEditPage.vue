@@ -2,14 +2,13 @@
   <div class="bg-[#f7f9ff] min-h-screen py-10">
     <div class="max-w-2xl mx-auto px-6 space-y-6">
 
-      <div class="flex items-center gap-4">
-        <button @click="router.push('/profil')" class="p-2 rounded-xl hover:bg-white transition">
-          <ArrowLeftIcon class="w-5 h-5 text-[#40617f]" />
-        </button>
-        <div>
-          <h1 class="font-jakarta font-extrabold text-[#001d32] text-2xl">{{ t('public.profileEdit.title') }}</h1>
-          <p class="text-sm text-[#40617f]">{{ t('public.profileEdit.subtitle') }}</p>
-        </div>
+      <div class="flex gap-1 bg-white rounded-2xl p-1.5 shadow-sm border border-[#edf4ff]">
+        <RouterLink to="/profil" class="flex-1 py-2.5 px-4 rounded-xl text-sm font-semibold text-center transition text-[#40617f] hover:bg-[#f8fafc]">
+          Mon profil
+        </RouterLink>
+        <RouterLink to="/profil/parametres" class="flex-1 py-2.5 px-4 rounded-xl text-sm font-semibold text-center transition text-white shadow-sm" style="background:#006d35;">
+          Paramètres
+        </RouterLink>
       </div>
 
       <div class="bg-white rounded-2xl p-6 flex items-center gap-6">
@@ -158,20 +157,65 @@
         </div>
       </div>
 
+      <!-- Passkeys -->
+      <div class="bg-white rounded-2xl p-6 space-y-4">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <h2 class="font-semibold text-[#001d32]">Clés d'accès (Passkeys)</h2>
+            <p class="text-xs text-[#40617f] mt-0.5">Connectez-vous sans mot de passe avec votre empreinte digitale, Face ID ou PIN.</p>
+          </div>
+          <button
+            @click="registerPasskey"
+            :disabled="addingPasskey"
+            class="shrink-0 px-4 py-2 rounded-xl text-sm font-semibold text-white transition disabled:opacity-50 flex items-center gap-1.5"
+            style="background: linear-gradient(135deg, #006d35, #1b8848);"
+          >
+            <div v-if="addingPasskey" class="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            <PlusIcon v-else class="w-3.5 h-3.5" />
+            Ajouter
+          </button>
+        </div>
+
+        <Transition name="fade">
+          <p v-if="passkeyError" class="text-red-600 text-xs bg-red-50 p-2.5 rounded-lg border border-red-200">{{ passkeyError }}</p>
+        </Transition>
+
+        <div v-if="passkeys.length === 0" class="text-sm text-[#94a3b8] text-center py-6 border border-dashed border-[#e2e8f0] rounded-xl">
+          Aucune clé d'accès enregistrée.
+        </div>
+        <div v-else class="space-y-2">
+          <div v-for="pk in passkeys" :key="pk.id" class="flex items-center gap-3 p-3 rounded-xl bg-[#f8fafc] border border-[#e2e8f0]">
+            <KeyIcon class="w-4 h-4 text-[#006d35] shrink-0" />
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-[#001d32] truncate">{{ pk.name }}</p>
+              <p class="text-xs text-[#40617f]">
+                Ajoutée le {{ formatDate(pk.created_at) }}
+                <span v-if="pk.last_used_at"> · Dernière utilisation {{ formatDate(pk.last_used_at) }}</span>
+              </p>
+            </div>
+            <button @click="deletePasskey(pk.id)" class="p-1.5 rounded-lg hover:bg-red-50 text-[#94a3b8] hover:text-red-500 transition">
+              <TrashIcon class="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </template>
 
 <script setup>import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { RouterLink, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useUserAuthStore } from '@/stores/userAuth'
 import {
-  ArrowLeftIcon,
   CameraIcon,
   CheckIcon,
   CheckCircleIcon,
   EnvelopeIcon,
+  KeyIcon,
+  TrashIcon,
+  PlusIcon,
 } from '@heroicons/vue/24/outline'
 
 const { t } = useI18n()
@@ -180,13 +224,14 @@ const userAuth = useUserAuthStore()
 
 onMounted(() => {
   if (!userAuth.isLoggedIn) {
-    router.push('/connexion?redirect=/profil/modifier')
+    router.push('/connexion?redirect=/profil/parametres')
     return
   }
   infoForm.value.first_name = userAuth.user?.first_name || ''
   infoForm.value.last_name  = userAuth.user?.last_name  || ''
   infoForm.value.phone      = userAuth.user?.phone      || ''
   avatarPreview.value       = userAuth.user?.avatar_url || null
+  fetchPasskeys()
 })
 
 const avatarPreview = ref(null)
@@ -396,4 +441,107 @@ async function emailVerifyNew() {
     emailLoading.value = false
   }
 }
+
+// ─── Passkeys ─────────────────────────────────────────────────────────────────
+
+const passkeys      = ref([])
+const addingPasskey = ref(false)
+const passkeyError  = ref('')
+
+function b64urlToBuffer(s) {
+  const b = s.replace(/-/g, '+').replace(/_/g, '/')
+  const padded = b.padEnd(b.length + (4 - b.length % 4) % 4, '=')
+  const bin = atob(padded)
+  const buf = new ArrayBuffer(bin.length)
+  const view = new Uint8Array(buf)
+  for (let i = 0; i < bin.length; i++) view[i] = bin.charCodeAt(i)
+  return buf
+}
+
+function bufferToB64url(buf) {
+  const bytes = new Uint8Array(buf)
+  let s = ''
+  for (const b of bytes) s += String.fromCharCode(b)
+  return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')
+}
+
+async function fetchPasskeys() {
+  try {
+    const res = await fetch('/api/v1/passkeys', {
+      headers: { Authorization: `Bearer ${userAuth.token}` },
+    })
+    if (res.ok) passkeys.value = await res.json()
+  } catch {}
+}
+
+async function registerPasskey() {
+  if (addingPasskey.value) return
+  passkeyError.value = ''
+  addingPasskey.value = true
+  try {
+    const beginRes = await fetch('/api/v1/passkeys/register/begin', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${userAuth.token}` },
+    })
+    if (!beginRes.ok) throw new Error('Erreur lors de la génération du challenge.')
+    const opts = await beginRes.json()
+
+    opts.publicKey.challenge = b64urlToBuffer(opts.publicKey.challenge)
+    opts.publicKey.user.id   = b64urlToBuffer(opts.publicKey.user.id)
+    if (opts.publicKey.excludeCredentials) {
+      opts.publicKey.excludeCredentials = opts.publicKey.excludeCredentials.map(c => ({
+        ...c, id: b64urlToBuffer(c.id),
+      }))
+    }
+
+    const cred = await navigator.credentials.create(opts)
+
+    const body = {
+      id:    cred.id,
+      rawId: bufferToB64url(cred.rawId),
+      type:  cred.type,
+      response: {
+        attestationObject: bufferToB64url(cred.response.attestationObject),
+        clientDataJSON:    bufferToB64url(cred.response.clientDataJSON),
+      },
+      clientExtensionResults: cred.getClientExtensionResults(),
+    }
+
+    const name = `Clé du ${new Date().toLocaleDateString('fr-FR')}`
+    const completeRes = await fetch(`/api/v1/passkeys/register/complete?name=${encodeURIComponent(name)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${userAuth.token}` },
+      body: JSON.stringify(body),
+    })
+    if (!completeRes.ok) {
+      const json = await completeRes.json()
+      throw new Error(json.message || 'Enregistrement échoué.')
+    }
+    await fetchPasskeys()
+  } catch (e) {
+    if (e?.name === 'NotAllowedError') return
+    passkeyError.value = e.message || "Erreur lors de l'enregistrement."
+  } finally {
+    addingPasskey.value = false
+  }
+}
+
+async function deletePasskey(id) {
+  try {
+    const res = await fetch(`/api/v1/passkeys/${id}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${userAuth.token}` },
+    })
+    if (res.ok) passkeys.value = passkeys.value.filter(p => p.id !== id)
+  } catch {}
+}
+
+function formatDate(dateStr) {
+  return new Date(dateStr).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })
+}
 </script>
+
+<style scoped>
+.fade-enter-active, .fade-leave-active { transition: opacity 0.2s ease; }
+.fade-enter-from, .fade-leave-to { opacity: 0; }
+</style>

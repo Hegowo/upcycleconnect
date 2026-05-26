@@ -48,6 +48,11 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 	searchHandler := &handlers.SearchHandler{DB: db}
 	oauthHandler := &handlers.OAuthHandler{DB: db, Cfg: cfg}
 
+	passkeyHandler, err := handlers.NewPasskeyHandler(db, cfg)
+	if err != nil {
+		log.Fatalf("Failed to initialize WebAuthn: %v", err)
+	}
+
 	stripeService := services.NewStripeService(cfg)
 	pdfService, err := services.NewPDFService("/var/lib/upcycleconnect/invoices")
 	if err != nil {
@@ -99,6 +104,9 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 		userAPI.POST("/auth/apple", oauthHandler.AppleAuth)
 		userAPI.POST("/auth/oauth/link", oauthHandler.OAuthLink)
 		userAPI.GET("/auth/verify-email", userAuthHandler.VerifyEmail)
+
+		userAPI.POST("/passkeys/authenticate/begin", passkeyHandler.AuthBegin)
+		userAPI.POST("/passkeys/authenticate/complete", passkeyHandler.AuthComplete)
 		userAPI.GET("/auth/verify-login", userAuthHandler.VerifyLogin)
 
 		userProtected := userAPI.Group("")
@@ -152,6 +160,12 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 			userProtected.DELETE("/forum/replies/:id", forumHandler.DeleteReply)
 			userProtected.POST("/forum/reports", forumHandler.CreateReport)
 			userProtected.POST("/forum/media", forumHandler.UploadMedia)
+
+			userProtected.GET("/passkeys", passkeyHandler.List)
+			userProtected.POST("/passkeys/register/begin", passkeyHandler.RegisterBegin)
+			userProtected.POST("/passkeys/register/complete", passkeyHandler.RegisterComplete)
+			userProtected.PUT("/passkeys/:id", passkeyHandler.Rename)
+			userProtected.DELETE("/passkeys/:id", passkeyHandler.Delete)
 
 			userProtected.GET("/provider/events", providerEventHandler.List)
 			userProtected.POST("/provider/events", providerEventHandler.Store)
