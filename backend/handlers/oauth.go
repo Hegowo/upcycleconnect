@@ -17,6 +17,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -101,8 +102,25 @@ func (h *OAuthHandler) GoogleAuth(c *gin.Context) {
 			return
 		}
 		if user.GoogleID == nil {
-			googleID := info.Sub
-			h.DB.Model(&user).Update("google_id", googleID)
+			if user.Password == "" {
+				c.JSON(http.StatusConflict, gin.H{
+					"status":  "oauth_conflict",
+					"message": "Un compte existe déjà avec cet email via un autre fournisseur.",
+				})
+				return
+			}
+			linkToken, err := h.generateLinkToken("google", info.Sub, email)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"message": "Erreur interne."})
+				return
+			}
+			c.JSON(http.StatusConflict, gin.H{
+				"status":     "email_conflict",
+				"provider":   "google",
+				"email":      email,
+				"link_token": linkToken,
+			})
+			return
 		}
 	}
 
@@ -285,7 +303,25 @@ func (h *OAuthHandler) AppleAuth(c *gin.Context) {
 			return
 		}
 		if user.AppleID == nil {
-			h.DB.Model(&user).Update("apple_id", sub)
+			if user.Password == "" {
+				c.JSON(http.StatusConflict, gin.H{
+					"status":  "oauth_conflict",
+					"message": "Un compte existe déjà avec cet email via un autre fournisseur.",
+				})
+				return
+			}
+			linkToken, err := h.generateLinkToken("apple", sub, email)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"message": "Erreur interne."})
+				return
+			}
+			c.JSON(http.StatusConflict, gin.H{
+				"status":     "email_conflict",
+				"provider":   "apple",
+				"email":      email,
+				"link_token": linkToken,
+			})
+			return
 		}
 	}
 
@@ -298,6 +334,88 @@ func (h *OAuthHandler) AppleAuth(c *gin.Context) {
 }
 
 // ─── Shared ───────────────────────────────────────────────────────────────────
+
+func (h *OAuthHandler) generateLinkToken(provider, sub, email string) (string, error) {
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"purpose":  "oauth_link",
+		"provider": provider,
+		"sub":      sub,
+		"email":    email,
+		"exp":      time.Now().Add(15 * time.Minute).Unix(),
+	})
+	return token.SignedString([]byte(h.Cfg.AppKey))
+}
+
+func (h *OAuthHandler) OAuthLink(c *gin.Context) {
+	var req struct {
+		LinkToken string `json:"link_token" binding:"required"`
+		Password  string `json:"password" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Données invalides."})
+		return
+	}
+
+	token, err := jwt.Parse(req.LinkToken, func(t *jwt.Token) (interface{}, error) {
+		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("méthode inattendue")
+		}
+		return []byte(h.Cfg.AppKey), nil
+	})
+	if err != nil || !token.Valid {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Lien invalide ou expiré."})
+		return
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok || claims["purpose"] != "oauth_link" {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Lien invalide."})
+		return
+	}
+
+	provider, _ := claims["provider"].(string)
+	sub, _ := claims["sub"].(string)
+	email, _ := claims["email"].(string)
+
+	var user models.User
+	if err := h.DB.Where("email = ?", email).First(&user).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": "Utilisateur introuvable."})
+		return
+	}
+
+	if user.Password == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Ce compte ne possède pas de mot de passe."})
+		return
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Mot de passe incorrect."})
+		return
+	}
+
+	switch provider {
+	case "google":
+		if err := h.DB.Model(&user).Update("google_id", sub).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "Erreur lors de la liaison."})
+			return
+		}
+	case "apple":
+		if err := h.DB.Model(&user).Update("apple_id", sub).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "Erreur lors de la liaison."})
+			return
+		}
+	default:
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Fournisseur inconnu."})
+		return
+	}
+
+	tokenStr, err := h.oauthIssueJWT(user.ID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Erreur de génération du token."})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"token": tokenStr, "user": models.ToUserResponse(&user)})
+}
 
 func (h *OAuthHandler) oauthIssueJWT(userID uint) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{

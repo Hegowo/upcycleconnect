@@ -2,6 +2,13 @@
   <div>
     <div ref="buttonEl" class="w-full" />
     <p v-if="error" class="text-red-600 text-xs mt-2 text-center">{{ error }}</p>
+    <OAuthLinkModal
+      v-model="showLinkModal"
+      provider="google"
+      :email="linkData.email"
+      :link-token="linkData.linkToken"
+      @declined="onDeclined"
+    />
   </div>
 </template>
 
@@ -9,10 +16,13 @@
 import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useUserAuthStore } from '@/stores/userAuth'
+import OAuthLinkModal from '@/components/OAuthLinkModal.vue'
 
 const emit = defineEmits(['loading', 'done', 'error'])
 const buttonEl = ref(null)
 const error = ref('')
+const showLinkModal = ref(false)
+const linkData = ref({ email: '', linkToken: '' })
 const router = useRouter()
 const route = useRoute()
 const userAuth = useUserAuthStore()
@@ -31,6 +41,10 @@ function loadGIS() {
   })
 }
 
+function onDeclined() {
+  linkData.value = { email: '', linkToken: '' }
+}
+
 async function handleCredential(response) {
   error.value = ''
   emit('loading', true)
@@ -41,6 +55,17 @@ async function handleCredential(response) {
       body: JSON.stringify({ credential: response.credential }),
     })
     const json = await res.json()
+
+    if (res.status === 409) {
+      if (json.status === 'email_conflict') {
+        linkData.value = { email: json.email, linkToken: json.link_token }
+        showLinkModal.value = true
+        return
+      }
+      error.value = json.message || 'Un compte existe déjà avec cet email.'
+      return
+    }
+
     if (!res.ok) throw new Error(json.message || 'Erreur Google.')
 
     userAuth.token = json.token
