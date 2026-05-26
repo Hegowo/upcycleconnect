@@ -38,6 +38,7 @@ func main() {
 		&models.ForumReply{},
 		&models.ForumReport{},
 		&models.ForumBan{},
+		&models.EmailChangeRequest{},
 	); err != nil {
 		log.Fatalf("Failed to migrate database: %v", err)
 	}

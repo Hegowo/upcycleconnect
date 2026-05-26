@@ -281,7 +281,11 @@ func (h *ProfileHandler) EmailChangeStart(c *gin.Context) {
 		Code:      code,
 		ExpiresAt: time.Now().Add(10 * time.Minute),
 	}
-	h.DB.Create(&ecr)
+	if err := h.DB.Create(&ecr).Error; err != nil {
+		log.Printf("[profile] email change create: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Erreur interne. Veuillez réessayer."})
+		return
+	}
 
 	if err := h.Mailer.SendEmailChangeCode(user.Email, user.FirstName, code); err != nil {
 		log.Printf("[mailer] email change start to %s: %v", user.Email, err)
@@ -300,6 +304,7 @@ func (h *ProfileHandler) EmailVerifyCurrent(c *gin.Context) {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"message": "Données invalides."})
 		return
 	}
+	req.Code = strings.TrimSpace(req.Code)
 
 	var ecr models.EmailChangeRequest
 	if err := h.DB.Where("user_id = ? AND step = ? AND code = ?", user.ID, "verify_current", req.Code).
@@ -323,12 +328,16 @@ func (h *ProfileHandler) EmailVerifyCurrent(c *gin.Context) {
 
 	newCode := randCode()
 	newEmail := req.NewEmail
-	h.DB.Model(&ecr).Updates(map[string]interface{}{
+	if err := h.DB.Model(&ecr).Updates(map[string]interface{}{
 		"step":       "verify_new",
 		"code":       newCode,
 		"new_email":  newEmail,
 		"expires_at": time.Now().Add(10 * time.Minute),
-	})
+	}).Error; err != nil {
+		log.Printf("[profile] email change update: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Erreur interne. Veuillez réessayer."})
+		return
+	}
 
 	if err := h.Mailer.SendEmailChangeCode(newEmail, user.FirstName, newCode); err != nil {
 		log.Printf("[mailer] email change new to %s: %v", newEmail, err)
@@ -346,6 +355,7 @@ func (h *ProfileHandler) EmailVerifyNew(c *gin.Context) {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"message": "Données invalides."})
 		return
 	}
+	req.Code = strings.TrimSpace(req.Code)
 
 	var ecr models.EmailChangeRequest
 	if err := h.DB.Where("user_id = ? AND step = ? AND code = ?", user.ID, "verify_new", req.Code).

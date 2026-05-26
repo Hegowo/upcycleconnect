@@ -346,7 +346,7 @@ async function emailVerifyCurrent() {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${userAuth.token}`,
       },
-      body: JSON.stringify({ code: emailCode1.value, new_email: emailNew.value }),
+      body: JSON.stringify({ code: emailCode1.value.trim(), new_email: emailNew.value.trim() }),
     })
     const json = await res.json()
     if (!res.ok) throw new Error(json.message || t('public.profileEdit.errorGeneric'))
@@ -373,7 +373,7 @@ async function emailVerifyNew() {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${userAuth.token}`,
       },
-      body: JSON.stringify({ code: emailCode2.value }),
+      body: JSON.stringify({ code: emailCode2.value.trim() }),
     })
     const json = await res.json()
     if (!res.ok) throw new Error(json.message || t('public.profileEdit.errorGeneric'))
