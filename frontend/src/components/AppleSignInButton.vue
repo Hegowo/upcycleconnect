@@ -5,9 +5,8 @@
       :disabled="loading"
       class="w-full flex items-center justify-center gap-2.5 bg-black hover:bg-[#1a1a1a] active:bg-[#111] text-white font-semibold text-sm py-[11px] px-4 rounded-xl transition disabled:opacity-60 cursor-pointer disabled:cursor-not-allowed"
     >
-      <svg v-if="!loading" class="w-4 h-4 shrink-0" viewBox="0 0 814 1000" fill="currentColor">
-        <path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76 0-103.7 40.8-165.9 40.8s-105-57.8-155.5-127.4C46 702 0 562.4 0 426.2c0-227.1 148.4-347 294.3-347 74.8 0 136.9 49.2 184.3 49.2 45.2 0 116.5-52 201.4-52 32.4 0 134.9 2.9 209.6 103.3z"/>
-        <path d="M491.4 85.4C520.8 51.3 542 4.9 542 0c0-.6 0-1.3-.1-1.9-28.4 1-61.8 19.9-87.3 45.3-23.8 23.4-44.6 59.2-44.6 103.4 0 .6.1 1.3.1 1.9.3 0 .6.1.9.1 30.6 0 64.4-20.3 79.4-63.4z" transform="translate(0 0)"/>
+      <svg v-if="!loading" class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
       </svg>
       <span v-if="loading" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin shrink-0" />
       {{ loading ? 'Connexion...' : 'Continuer avec Apple' }}
