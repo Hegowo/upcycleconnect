@@ -46,6 +46,7 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 	eventMessageHandler := &handlers.EventMessageHandler{DB: db, Audit: audit}
 	forumHandler := &handlers.ForumHandler{DB: db, Audit: audit}
 	searchHandler := &handlers.SearchHandler{DB: db}
+	oauthHandler := &handlers.OAuthHandler{DB: db, Cfg: cfg}
 
 	stripeService := services.NewStripeService(cfg)
 	pdfService, err := services.NewPDFService("/var/lib/upcycleconnect/invoices")
@@ -94,6 +95,7 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 	{
 		userAPI.POST("/auth/register", userAuthHandler.Register)
 		userAPI.POST("/auth/login", userAuthHandler.Login)
+		userAPI.POST("/auth/google", oauthHandler.GoogleAuth)
 		userAPI.GET("/auth/verify-email", userAuthHandler.VerifyEmail)
 		userAPI.GET("/auth/verify-login", userAuthHandler.VerifyLogin)
 

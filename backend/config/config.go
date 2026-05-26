@@ -21,6 +21,9 @@ type Config struct {
 	StripeSecret        string
 	StripePublicKey     string
 	StripeWebhookSecret string
+
+	GoogleClientID     string
+	GoogleClientSecret string
 }
 
 func Load() *Config {
@@ -43,6 +46,9 @@ func Load() *Config {
 		StripeSecret:        getEnv("STRIPE_SECRET", ""),
 		StripePublicKey:     getEnv("STRIPE_PUBLIC_KEY", ""),
 		StripeWebhookSecret: getEnv("STRIPE_WEBHOOK_SECRET", ""),
+
+		GoogleClientID:     getEnv("GOOGLE_CLIENT_ID", ""),
+		GoogleClientSecret: getEnv("GOOGLE_CLIENT_SECRET", ""),
 	}
 }
 

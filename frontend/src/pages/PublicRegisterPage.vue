@@ -110,6 +110,18 @@
               >
                 {{ t('public.register.btnContinue') }}
               </button>
+
+              <div class="flex items-center gap-3 w-80">
+                <div class="flex-1 h-px bg-[#e2e8f0]"></div>
+                <span class="text-xs text-gray-400">ou</span>
+                <div class="flex-1 h-px bg-[#e2e8f0]"></div>
+              </div>
+
+              <div class="w-80">
+                <p class="text-xs text-[#94a3b8] text-center mb-2">Inscription rapide (compte particulier)</p>
+                <GoogleSignInButton />
+              </div>
+
               <div class="flex items-center gap-2 text-[#40617f] text-sm">
                 <LockClosedIcon class="w-3.5 h-3.5" />
                 {{ t('public.register.dataProtected') }}
@@ -530,6 +542,7 @@ import { RouterLink, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useUserAuthStore } from '@/stores/userAuth'
 import AddressAutocomplete from '@/components/AddressAutocomplete.vue'
+import GoogleSignInButton from '@/components/GoogleSignInButton.vue'
 import {
   UserIcon,
   WrenchScrewdriverIcon,

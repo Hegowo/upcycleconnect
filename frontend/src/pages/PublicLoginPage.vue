@@ -85,6 +85,8 @@
           <div class="flex-1 h-px bg-[#e2e8f0]"></div>
         </div>
 
+        <GoogleSignInButton />
+
         <RouterLink
           to="/inscription"
           class="w-full py-3 rounded-xl font-semibold text-[#006d35] text-sm border-2 border-[#006d35]/20 hover:bg-[#f0fdf4] transition flex items-center justify-center gap-2"
@@ -108,6 +110,7 @@ import { RouterLink, useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { EyeIcon, EyeSlashIcon, ExclamationTriangleIcon, ArrowRightCircleIcon, CheckCircleIcon, ShieldCheckIcon } from '@heroicons/vue/24/outline'
 import { useUserAuthStore } from '@/stores/userAuth'
+import GoogleSignInButton from '@/components/GoogleSignInButton.vue'
 
 const { t } = useI18n()
 const router   = useRouter()
