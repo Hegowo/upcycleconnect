@@ -4,12 +4,14 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"sync"
 	"time"
 
 	"upcycleconnect/backend/config"
+	"upcycleconnect/backend/middleware"
 	"upcycleconnect/backend/models"
 
 	"github.com/gin-gonic/gin"
@@ -114,8 +116,12 @@ func (h *PasskeyHandler) loadWAUser(userID uint) (*waUser, error) {
 // ─── Registration ─────────────────────────────────────────────────────────────
 
 func (h *PasskeyHandler) RegisterBegin(c *gin.Context) {
-	userID := c.GetUint("userID")
-	wu, err := h.loadWAUser(userID)
+	user := middleware.GetAuthUser(c)
+	if user == nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Non authentifié."})
+		return
+	}
+	wu, err := h.loadWAUser(user.ID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Utilisateur introuvable."})
 		return
@@ -128,37 +134,35 @@ func (h *PasskeyHandler) RegisterBegin(c *gin.Context) {
 		}),
 	)
 	if err != nil {
+		log.Printf("[passkey] BeginRegistration error: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Erreur lors de la génération du challenge."})
 		return
 	}
 
-	sessionKey := fmt.Sprintf("reg:%d", userID)
+	sessionKey := fmt.Sprintf("reg:%d", user.ID)
 	saveSession(sessionKey, sessionData)
 	c.JSON(http.StatusOK, options)
 }
 
 func (h *PasskeyHandler) RegisterComplete(c *gin.Context) {
-	userID := c.GetUint("userID")
+	user := middleware.GetAuthUser(c)
+	if user == nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Non authentifié."})
+		return
+	}
 
-	var body struct {
-		Name string `json:"name"`
-	}
-	// Parse name from query param (body is consumed by webauthn parser)
 	name := c.Query("name")
-	if name == "" {
-		name = body.Name
-	}
 	if name == "" {
 		name = "Ma clé d'accès"
 	}
 
-	wu, err := h.loadWAUser(userID)
+	wu, err := h.loadWAUser(user.ID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Utilisateur introuvable."})
 		return
 	}
 
-	sessionKey := fmt.Sprintf("reg:%d", userID)
+	sessionKey := fmt.Sprintf("reg:%d", user.ID)
 	sessionData, ok := loadSession(sessionKey)
 	if !ok {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Session expirée, veuillez réessayer."})
@@ -178,7 +182,7 @@ func (h *PasskeyHandler) RegisterComplete(c *gin.Context) {
 	}
 
 	passkey := models.Passkey{
-		UserID:       userID,
+		UserID:       user.ID,
 		CredentialID: base64.RawURLEncoding.EncodeToString(credential.ID),
 		Credential:   credJSON,
 		Name:         name,
@@ -194,21 +198,29 @@ func (h *PasskeyHandler) RegisterComplete(c *gin.Context) {
 // ─── List / Delete ────────────────────────────────────────────────────────────
 
 func (h *PasskeyHandler) List(c *gin.Context) {
-	userID := c.GetUint("userID")
+	user := middleware.GetAuthUser(c)
+	if user == nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Non authentifié."})
+		return
+	}
 	var passkeys []models.Passkey
-	h.DB.Where("user_id = ?", userID).Order("created_at desc").Find(&passkeys)
+	h.DB.Where("user_id = ?", user.ID).Order("created_at desc").Find(&passkeys)
 	c.JSON(http.StatusOK, passkeys)
 }
 
 func (h *PasskeyHandler) Delete(c *gin.Context) {
-	userID := c.GetUint("userID")
+	user := middleware.GetAuthUser(c)
+	if user == nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Non authentifié."})
+		return
+	}
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "ID invalide."})
 		return
 	}
 
-	result := h.DB.Where("id = ? AND user_id = ?", id, userID).Delete(&models.Passkey{})
+	result := h.DB.Where("id = ? AND user_id = ?", id, user.ID).Delete(&models.Passkey{})
 	if result.RowsAffected == 0 {
 		c.JSON(http.StatusNotFound, gin.H{"message": "Clé introuvable."})
 		return
@@ -217,7 +229,11 @@ func (h *PasskeyHandler) Delete(c *gin.Context) {
 }
 
 func (h *PasskeyHandler) Rename(c *gin.Context) {
-	userID := c.GetUint("userID")
+	user := middleware.GetAuthUser(c)
+	if user == nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Non authentifié."})
+		return
+	}
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "ID invalide."})
@@ -230,7 +246,7 @@ func (h *PasskeyHandler) Rename(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Nom requis."})
 		return
 	}
-	result := h.DB.Model(&models.Passkey{}).Where("id = ? AND user_id = ?", id, userID).Update("name", body.Name)
+	result := h.DB.Model(&models.Passkey{}).Where("id = ? AND user_id = ?", id, user.ID).Update("name", body.Name)
 	if result.RowsAffected == 0 {
 		c.JSON(http.StatusNotFound, gin.H{"message": "Clé introuvable."})
 		return

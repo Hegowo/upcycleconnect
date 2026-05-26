@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"math/big"
 	"net/http"
 	"strings"
@@ -231,12 +232,37 @@ func verifyAppleIDToken(idToken, servicesID string) (jwt.MapClaims, error) {
 		return pubKey, nil
 	},
 		jwt.WithValidMethods([]string{"RS256"}),
-		jwt.WithAudience(servicesID),
-		jwt.WithIssuer("https://appleid.apple.com"),
 	)
 	if err != nil || !token.Valid {
-		return nil, fmt.Errorf("token Apple invalide: %w", err)
+		log.Printf("[apple] ParseWithClaims error: %v", err)
+		return nil, fmt.Errorf("signature invalide: %w", err)
 	}
+
+	// Validate iss and aud manually — avoids jwt library version discrepancies
+	iss, _ := claims.GetIssuer()
+	if iss != "https://appleid.apple.com" {
+		log.Printf("[apple] unexpected issuer: %q", iss)
+		return nil, fmt.Errorf("issuer invalide: %q", iss)
+	}
+
+	// aud can be a string or []string depending on Apple's encoding
+	audOK := false
+	switch v := claims["aud"].(type) {
+	case string:
+		audOK = v == servicesID
+	case []interface{}:
+		for _, a := range v {
+			if s, ok := a.(string); ok && s == servicesID {
+				audOK = true
+				break
+			}
+		}
+	}
+	if !audOK {
+		log.Printf("[apple] unexpected aud: %v (expected %q)", claims["aud"], servicesID)
+		return nil, fmt.Errorf("audience invalide")
+	}
+
 	return claims, nil
 }
 
@@ -253,6 +279,7 @@ func (h *OAuthHandler) AppleAuth(c *gin.Context) {
 
 	claims, err := verifyAppleIDToken(req.IDToken, h.Cfg.AppleServicesID)
 	if err != nil {
+		log.Printf("[apple] verifyAppleIDToken failed (servicesID=%q): %v", h.Cfg.AppleServicesID, err)
 		c.JSON(http.StatusUnauthorized, gin.H{"message": "Token Apple invalide."})
 		return
 	}
