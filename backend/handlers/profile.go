@@ -301,10 +301,16 @@ func (h *ProfileHandler) EmailVerifyCurrent(c *gin.Context) {
 		NewEmail string `json:"new_email" binding:"required,email"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{"message": "Données invalides."})
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"message": "Adresse email invalide."})
 		return
 	}
 	req.Code = strings.TrimSpace(req.Code)
+	req.NewEmail = strings.ToLower(strings.TrimSpace(req.NewEmail))
+
+	if strings.EqualFold(req.NewEmail, user.Email) {
+		c.JSON(http.StatusConflict, gin.H{"message": "Cette adresse est identique à votre email actuel."})
+		return
+	}
 
 	var ecr models.EmailChangeRequest
 	if err := h.DB.Where("user_id = ? AND step = ? AND code = ?", user.ID, "verify_current", req.Code).

@@ -333,8 +333,18 @@ async function emailStart() {
 }
 
 async function emailVerifyCurrent() {
-  if (!emailCode1.value || !emailNew.value) {
+  const newEmail = emailNew.value.trim().toLowerCase()
+  if (!emailCode1.value.trim() || !newEmail) {
     emailError.value = t('public.profileEdit.missingFields')
+    return
+  }
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (!emailRegex.test(newEmail)) {
+    emailError.value = 'Adresse email invalide.'
+    return
+  }
+  if (newEmail === (userAuth.user?.email || '').toLowerCase()) {
+    emailError.value = 'Cette adresse est identique à votre email actuel.'
     return
   }
   emailLoading.value = true
