@@ -77,6 +77,14 @@
         </div>
       </div>
     </section>
+
+    <ContractSignatureModal
+      :show="showContractModal"
+      :prestation-id="route.params.id"
+      :notes="notes"
+      @close="showContractModal = false"
+      @signed="onContractSigned"
+    />
   </div>
 </template>
 
@@ -87,6 +95,7 @@ import { useI18n } from 'vue-i18n'
 import { ArrowLeftIcon, SparklesIcon } from '@heroicons/vue/24/outline'
 import { publicGet, userApi } from '@/services/publicApi'
 import { useUserAuthStore } from '@/stores/userAuth'
+import ContractSignatureModal from '@/components/ContractSignatureModal.vue'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -100,6 +109,7 @@ const notes = ref('')
 const reserving = ref(false)
 const feedback = ref('')
 const reserveError = ref('')
+const showContractModal = ref(false)
 
 const priceValue = computed(() => {
   const p = prestation.value
@@ -134,26 +144,37 @@ async function reserve() {
     router.push(`/connexion?redirect=/prestations/${route.params.id}`)
     return
   }
-  reserving.value = true
-  feedback.value = ''
   reserveError.value = ''
-  try {
-    const res = await userApi(`/prestations/${route.params.id}/reserve`, {
-      method: 'POST',
-      body: JSON.stringify({ notes: notes.value || null }),
-    })
-    if (res.type === 'quote') {
+  feedback.value = ''
+
+  // Quote flow: no contract, send directly
+  if (prestation.value?.price_type === 'quote') {
+    reserving.value = true
+    try {
+      const res = await userApi(`/prestations/${route.params.id}/reserve`, {
+        method: 'POST',
+        body: JSON.stringify({ notes: notes.value || null }),
+      })
       feedback.value = res.message || t('public.prestationDetail.feedbackQuoteSent')
       setTimeout(() => router.push('/profil/factures'), 2000)
-    } else if (res.checkout_url) {
-      window.location.href = res.checkout_url
-    } else {
-      reserveError.value = t('public.prestationDetail.errorUnexpected')
+    } catch (e) {
+      reserveError.value = e.message || t('public.prestationDetail.errorReserve')
+    } finally {
+      reserving.value = false
     }
-  } catch (e) {
-    reserveError.value = e.message || t('public.prestationDetail.errorReserve')
-  } finally {
-    reserving.value = false
+    return
+  }
+
+  // Paid flow: open contract modal — actual reserve call happens after signature
+  showContractModal.value = true
+}
+
+function onContractSigned(res) {
+  showContractModal.value = false
+  if (res?.checkout_url) {
+    window.location.href = res.checkout_url
+  } else {
+    reserveError.value = t('public.prestationDetail.errorUnexpected')
   }
 }
 

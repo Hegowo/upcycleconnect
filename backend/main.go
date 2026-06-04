@@ -40,6 +40,7 @@ func main() {
 		&models.ForumBan{},
 		&models.EmailChangeRequest{},
 		&models.Passkey{},
+		&models.Contract{},
 	); err != nil {
 		log.Fatalf("Failed to migrate database: %v", err)
 	}

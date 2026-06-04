@@ -144,6 +144,25 @@
             </router-link>
           </div>
 
+          <div v-if="contract" class="bg-white rounded-[24px] p-6 border border-[#edf4ff]">
+            <h3 class="font-jakarta font-bold text-[#001d32] text-base mb-3 flex items-center gap-2">
+              <PencilSquareIcon class="w-5 h-5 text-[#006d35]" />
+              Contrat de prestation
+            </h3>
+            <p class="text-[#40617f] text-xs mb-1">Numéro de contrat</p>
+            <p class="font-semibold text-[#001d32] text-sm mb-1 font-mono">{{ contract.number }}</p>
+            <p class="text-[#40617f] text-xs">Signé le {{ formatContractDate(contract.signed_at) }}</p>
+            <button
+              v-if="contract.has_pdf"
+              @click="downloadContract"
+              :disabled="downloadingContract"
+              class="w-full mt-4 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border-2 border-[#006d35] text-[#006d35] font-bold text-sm transition hover:bg-[#f0fdf4] disabled:opacity-60"
+            >
+              <ArrowDownTrayIcon class="w-4 h-4" />
+              {{ downloadingContract ? 'Téléchargement…' : 'Télécharger le contrat' }}
+            </button>
+          </div>
+
           <router-link
             v-if="reservation.prestation?.id"
             :to="`/prestations/${reservation.prestation.id}`"
@@ -177,6 +196,7 @@ import {
   ClockIcon,
   DocumentTextIcon,
   ExclamationTriangleIcon,
+  PencilSquareIcon,
   UserIcon,
   WrenchScrewdriverIcon,
 } from '@heroicons/vue/24/outline'
@@ -190,7 +210,9 @@ const loading     = ref(true)
 const error       = ref('')
 const reservation = ref(null)
 const invoice     = ref(null)
+const contract    = ref(null)
 const downloading = ref(false)
+const downloadingContract = ref(false)
 
 const localeCode = computed(() => locale.value === 'en' ? 'en-US' : 'fr-FR')
 
@@ -214,12 +236,46 @@ onMounted(async () => {
       const data = await res.json()
       reservation.value = data.reservation
       invoice.value     = data.invoice
+      // Best-effort contract fetch (404 = no contract, e.g. quote)
+      try {
+        const cRes = await fetch(`/api/v1/reservations/${route.params.id}/contract`, {
+          headers: { Authorization: `Bearer ${userAuth.token}` },
+        })
+        if (cRes.ok) contract.value = await cRes.json()
+      } catch {}
     }
   } catch (e) {
     error.value = t('public.reservation.networkError')
   }
   loading.value = false
 })
+
+async function downloadContract() {
+  if (!contract.value?.id) return
+  downloadingContract.value = true
+  try {
+    const res = await fetch(`/api/v1/contracts/${contract.value.id}/download`, {
+      headers: { Authorization: `Bearer ${userAuth.token}` },
+    })
+    if (!res.ok) throw new Error('download failed')
+    const blob = await res.blob()
+    const url  = URL.createObjectURL(blob)
+    const a    = document.createElement('a')
+    a.href     = url
+    a.download = `${contract.value.number}.pdf`
+    a.click()
+    URL.revokeObjectURL(url)
+  } catch {
+    // silent
+  } finally {
+    downloadingContract.value = false
+  }
+}
+
+function formatContractDate(iso) {
+  if (!iso) return ''
+  return new Date(iso).toLocaleDateString(localeCode.value, { day: '2-digit', month: 'long', year: 'numeric' })
+}
 
 async function downloadInvoice() {
   if (!invoice.value?.id) return

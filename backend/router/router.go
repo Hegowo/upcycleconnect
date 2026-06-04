@@ -67,6 +67,7 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 		Mailer: mailer,
 	}
 	invoiceHandler := &handlers.InvoiceHandler{DB: db}
+	contractHandler := &handlers.ContractHandler{DB: db, PDF: pdfService, Audit: audit}
 
 	r.Static("/uploads", "/uploads")
 
@@ -136,12 +137,15 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 			userProtected.GET("/upcycling-score", userDepositHandler.Score)
 
 			userProtected.POST("/prestations/:id/reserve", paymentHandler.Reserve)
+			userProtected.GET("/prestations/:id/contract-preview", contractHandler.Preview)
 			userProtected.GET("/payments/session", paymentHandler.SessionStatus)
 			userProtected.GET("/reservations/:id", paymentHandler.ShowReservation)
+			userProtected.GET("/reservations/:id/contract", contractHandler.ByReservation)
 
 			userProtected.GET("/invoices", invoiceHandler.Index)
 			userProtected.GET("/invoices/:id", invoiceHandler.Show)
 			userProtected.GET("/invoices/:id/download", invoiceHandler.Download)
+			userProtected.GET("/contracts/:id/download", contractHandler.Download)
 
 			userProtected.GET("/calendar/token", calendarHandler.GetToken)
 			userProtected.POST("/calendar/token/regenerate", calendarHandler.RegenerateToken)
