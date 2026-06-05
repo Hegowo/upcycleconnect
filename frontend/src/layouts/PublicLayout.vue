@@ -64,10 +64,17 @@
             <div class="relative">
               <button
                 @click="profileMenuOpen = !profileMenuOpen"
-                class="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold text-white transition hover:opacity-90 focus:outline-none"
+                class="w-9 h-9 rounded-full overflow-hidden flex items-center justify-center text-sm font-bold text-white transition hover:opacity-90 focus:outline-none"
                 style="background: linear-gradient(135deg, #006d35, #1b8848);"
               >
-                {{ userAuth.initials || '?' }}
+                <img
+                  v-if="userAuth.user?.avatar_url"
+                  :src="userAuth.user.avatar_url"
+                  alt=""
+                  class="w-full h-full object-cover"
+                  @error="onAvatarError"
+                />
+                <span v-else>{{ userAuth.initials || '?' }}</span>
               </button>
 
               <Transition name="dropdown">
@@ -287,6 +294,12 @@ const searchRef = ref(null)
 onMounted(() => userAuth.init())
 
 function closeMenu() { profileMenuOpen.value = false }
+
+// If the avatar file is missing (e.g. deleted server-side), clear the URL
+// locally so the initials fallback shows instead of a broken image icon.
+function onAvatarError() {
+  if (userAuth.user) userAuth.user.avatar_url = null
+}
 
 async function handleLogout() {
   profileMenuOpen.value = false

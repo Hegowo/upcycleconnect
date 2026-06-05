@@ -14,7 +14,12 @@
       <div class="bg-white rounded-2xl p-6 flex items-center gap-6">
         <div class="relative cursor-pointer group" @click="$refs.avatarInput.click()">
           <div class="w-24 h-24 rounded-2xl overflow-hidden bg-gradient-to-br from-[#006d35] to-[#1b8848] flex items-center justify-center shadow-sm">
-            <img v-if="avatarPreview" :src="avatarPreview" class="w-full h-full object-cover" />
+            <img
+              v-if="avatarPreview"
+              :src="avatarPreview"
+              class="w-full h-full object-cover"
+              @error="onAvatarLoadError"
+            />
             <span v-else class="text-white font-jakarta font-extrabold text-3xl">{{ userAuth.initials }}</span>
           </div>
           <div class="absolute inset-0 rounded-2xl bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
@@ -297,6 +302,11 @@ const avatarFile    = ref(null)
 const avatarLoading = ref(false)
 const avatarSuccess = ref(false)
 const avatarError   = ref('')
+
+function onAvatarLoadError() {
+  avatarPreview.value = null
+  if (userAuth.user) userAuth.user.avatar_url = null
+}
 
 function handleAvatarChange(e) {
   const file = e.target.files[0]

@@ -20,11 +20,20 @@
         <div class="col-span-12 lg:col-span-8 bg-white rounded-[24px] p-6 sm:p-8 flex gap-4 sm:gap-8 overflow-hidden relative">
           <div class="relative shrink-0">
             <div class="w-32 h-32 rounded-[24px] overflow-hidden shadow-sm bg-gradient-to-br from-[#006d35] to-[#1b8848] flex items-center justify-center">
-              <img v-if="userAuth.user?.avatar_url" :src="userAuth.user.avatar_url" class="w-full h-full object-cover" />
+              <img
+                v-if="userAuth.user?.avatar_url"
+                :src="userAuth.user.avatar_url"
+                class="w-full h-full object-cover"
+                @error="onAvatarError"
+              />
               <span v-else class="text-white font-jakarta font-extrabold text-4xl">{{ userAuth.initials }}</span>
             </div>
-            <div class="absolute bottom-0 right-0 w-6 h-6 bg-[#006d35] rounded-full flex items-center justify-center">
-              <CheckIcon class="w-3.5 h-3.5 text-white" />
+            <div
+              v-if="userAuth.user?.email_verified_at"
+              class="absolute -bottom-1.5 -right-1.5 w-7 h-7 bg-[#006d35] rounded-full flex items-center justify-center ring-[3px] ring-white shadow"
+              :title="t('public.profile.emailVerified') || 'Email vérifié'"
+            >
+              <CheckIcon class="w-4 h-4 text-white" />
             </div>
           </div>
 
@@ -226,6 +235,10 @@ import {
 const { t, locale } = useI18n()
 const router   = useRouter()
 const userAuth = useUserAuthStore()
+
+function onAvatarError() {
+  if (userAuth.user) userAuth.user.avatar_url = null
+}
 
 const loading = ref(true)
 const profile = ref({
