@@ -157,6 +157,35 @@
         </div>
       </div>
 
+      <!-- Push notifications -->
+      <div class="bg-white rounded-2xl p-6 space-y-3">
+        <div class="flex items-start justify-between gap-4">
+          <div class="flex-1">
+            <h2 class="font-semibold text-[#001d32]">Notifications push</h2>
+            <p class="text-xs text-[#40617f] mt-0.5">Recevez les alertes importantes (paiement, contrat, devis) directement sur votre appareil.</p>
+          </div>
+          <button
+            v-if="pushStatus !== 'granted'"
+            @click="enablePush"
+            :disabled="pushLoading"
+            class="shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-xl text-white font-bold text-sm transition hover:opacity-90 disabled:opacity-60"
+            style="background: linear-gradient(135deg, #006d35, #1b8848);"
+          >
+            <div v-if="pushLoading" class="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            <BellAlertIcon v-else class="w-4 h-4" />
+            Activer
+          </button>
+          <span v-else class="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#dcfce7] text-[#166534] text-xs font-bold">
+            <CheckCircleIcon class="w-3.5 h-3.5" />
+            Activées
+          </span>
+        </div>
+        <p v-if="pushError" class="text-red-600 text-xs bg-red-50 p-2.5 rounded-lg border border-red-200">{{ pushError }}</p>
+        <p v-if="pushStatus === 'denied'" class="text-amber-700 text-xs bg-amber-50 p-2.5 rounded-lg border border-amber-200">
+          Les notifications ont été bloquées dans votre navigateur. Pour les réactiver : icône cadenas dans la barre d'adresse → Autoriser les notifications.
+        </p>
+      </div>
+
       <!-- Passkeys -->
       <div class="bg-white rounded-2xl p-6 space-y-4">
         <div class="flex items-start justify-between gap-4">
@@ -216,11 +245,39 @@ import {
   KeyIcon,
   TrashIcon,
   PlusIcon,
+  BellAlertIcon,
 } from '@heroicons/vue/24/outline'
+import { enablePushNotifications } from '@/utils/onesignal'
 
 const { t } = useI18n()
 const router   = useRouter()
 const userAuth = useUserAuthStore()
+
+// Push notifications
+const pushLoading = ref(false)
+const pushError   = ref('')
+const pushStatus  = ref('default') // default | granted | denied
+
+function refreshPushStatus() {
+  if (typeof Notification === 'undefined') return
+  pushStatus.value = Notification.permission || 'default'
+}
+
+async function enablePush() {
+  pushLoading.value = true
+  pushError.value = ''
+  try {
+    const id = await enablePushNotifications()
+    refreshPushStatus()
+    if (!id && pushStatus.value !== 'granted') {
+      pushError.value = "Activation refusée ou impossible. Vérifiez que les notifications ne sont pas bloquées."
+    }
+  } catch (e) {
+    pushError.value = e.message || "Erreur lors de l'activation."
+  } finally {
+    pushLoading.value = false
+  }
+}
 
 onMounted(() => {
   if (!userAuth.isLoggedIn) {
@@ -232,6 +289,7 @@ onMounted(() => {
   infoForm.value.phone      = userAuth.user?.phone      || ''
   avatarPreview.value       = userAuth.user?.avatar_url || null
   fetchPasskeys()
+  refreshPushStatus()
 })
 
 const avatarPreview = ref(null)
