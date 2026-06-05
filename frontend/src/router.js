@@ -28,6 +28,7 @@ const router = createRouter({
         { path: 'communaute/forum/:slug/:id', component: () => import('@/pages/PublicForumThreadPage.vue'), meta: { title: 'Discussion' } },
         { path: 'profil',               component: () => import('@/pages/PublicProfilPage.vue'),                  meta: { title: 'Mon Profil' } },
         { path: 'profil/modifier',      redirect: '/profil/parametres' },
+        { path: 'profil/contrats-recus', component: () => import('@/pages/PublicProviderContractsPage.vue'), meta: { title: 'Contrats reçus' } },
         { path: 'profil/parametres',    component: () => import('@/pages/PublicProfilEditPage.vue'),              meta: { title: 'Paramètres' } },
         { path: 'profil/pro',           component: () => import('@/pages/PublicProfilProfessionnelPage.vue'),  meta: { title: 'Profil Professionnel' } },
         { path: 'profil/pro/evenements', component: () => import('@/pages/ProviderEventsPage.vue'), meta: { title: 'Mes Événements' } },

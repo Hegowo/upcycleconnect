@@ -15,8 +15,9 @@ import (
 )
 
 type UserProviderHandler struct {
-	DB    *gorm.DB
-	Audit *services.AuditService
+	DB            *gorm.DB
+	Audit         *services.AuditService
+	Notifications *services.NotificationService
 }
 
 var siretRegex = regexp.MustCompile(`^\d{14}$`)
@@ -65,6 +66,17 @@ func (h *UserProviderHandler) Apply(c *gin.Context) {
 	h.Audit.Log(c, "provider.applied", "ProviderProfile", &profile.ID, nil, map[string]interface{}{
 		"company_name": profile.CompanyName,
 	})
+
+	if h.Notifications != nil {
+		h.Notifications.NotifyAdmins("provider.applied",
+			"Nouvelle candidature prestataire",
+			profile.CompanyName+" a soumis une candidature à valider.",
+			"/admin/providers")
+		h.Notifications.MustNotify(user.ID, "provider.application_received",
+			"Candidature enregistrée",
+			"Votre candidature prestataire « "+profile.CompanyName+" » a bien été reçue. Elle sera examinée par un administrateur.",
+			"/profil/parametres")
+	}
 
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "Candidature prestataire enregistrée. Elle sera examinée par un administrateur.",
@@ -333,6 +345,13 @@ func (h *UserProviderHandler) SubmitPrestation(c *gin.Context) {
 	h.DB.Preload("Category").First(&p, p.ID)
 
 	h.Audit.Log(c, "provider.prestation_submitted", "Prestation", &p.ID, old, map[string]string{"status": "published"})
+
+	if h.Notifications != nil {
+		h.Notifications.MustNotify(user.ID, "prestation.published",
+			"Prestation publiée",
+			"Votre prestation « "+p.Title+" » est maintenant en ligne et visible par les clients.",
+			"/profil/parametres")
+	}
 
 	c.JSON(http.StatusOK, models.ToPrestationResponse(&p))
 }

@@ -57,9 +57,9 @@
           </template>
 
           <template v-else>
-            <button class="hidden sm:flex w-9 h-9 rounded-full items-center justify-center text-[#40617f] hover:bg-[#edf4ff] transition">
-              <BellIcon class="w-5 h-5" />
-            </button>
+            <div class="hidden sm:block">
+              <NotificationsDropdown variant="user" :is-dark="false" />
+            </div>
 
             <div class="relative">
               <button
@@ -106,6 +106,15 @@
                   >
                     <DocumentTextIcon class="w-4 h-4 text-[#40617f]" />
                     {{ t('public.layout.menuMyInvoices') }}
+                  </RouterLink>
+
+                  <RouterLink
+                    to="/profil/contrats-recus"
+                    @click="closeMenu"
+                    class="flex items-center gap-3 px-4 py-2.5 text-sm text-[#334155] hover:bg-[#f8fafc] transition"
+                  >
+                    <PencilSquareIcon class="w-4 h-4 text-[#40617f]" />
+                    Contrats reçus
                   </RouterLink>
 
                   <RouterLink
@@ -261,7 +270,8 @@
 <script setup>import { ref, onMounted, computed } from 'vue'
 import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { MagnifyingGlassIcon, BellIcon, UserCircleIcon, DocumentTextIcon, PlusCircleIcon, Cog6ToothIcon } from '@heroicons/vue/24/outline'
+import { MagnifyingGlassIcon, UserCircleIcon, DocumentTextIcon, PlusCircleIcon, Cog6ToothIcon, PencilSquareIcon } from '@heroicons/vue/24/outline'
+import NotificationsDropdown from '@/components/NotificationsDropdown.vue'
 import { useUserAuthStore } from '@/stores/userAuth'
 import GlobalSearch from '@/components/GlobalSearch.vue'
 

@@ -15,8 +15,9 @@ import (
 )
 
 type ProviderHandler struct {
-	DB    *gorm.DB
-	Audit *services.AuditService
+	DB            *gorm.DB
+	Audit         *services.AuditService
+	Notifications *services.NotificationService
 }
 
 func (h *ProviderHandler) Index(c *gin.Context) {
@@ -150,6 +151,21 @@ func (h *ProviderHandler) UpdateStatus(c *gin.Context) {
 	h.DB.Model(profile).Updates(updates)
 
 	h.Audit.Log(c, "provider.status_changed", "ProviderProfile", &profile.ID, old, map[string]string{"status": req.Status})
+
+	if h.Notifications != nil {
+		switch req.Status {
+		case "approved":
+			h.Notifications.MustNotify(user.ID, "provider.approved",
+				"Candidature prestataire validée",
+				"Félicitations ! Votre profil prestataire « "+profile.CompanyName+" » a été approuvé. Vous pouvez désormais publier des prestations.",
+				"/profil/parametres")
+		case "suspended":
+			h.Notifications.MustNotify(user.ID, "provider.suspended",
+				"Compte prestataire suspendu",
+				"Votre statut prestataire a été suspendu par un administrateur. Contactez contact@upcycleconnect.xyz pour plus d'informations.",
+				"")
+		}
+	}
 
 	h.DB.Preload("ProviderProfile").First(&user, user.ID)
 

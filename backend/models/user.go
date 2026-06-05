@@ -21,6 +21,7 @@ type User struct {
 	CalendarToken   *string         `gorm:"size:64;uniqueIndex" json:"-"`
 	GoogleID        *string         `gorm:"size:255;uniqueIndex" json:"-"`
 	AppleID         *string         `gorm:"size:255;uniqueIndex" json:"-"`
+	OneSignalPlayerID *string       `gorm:"size:100;index" json:"-"`
 	CreatedAt       time.Time       `json:"created_at"`
 	UpdatedAt       time.Time       `json:"updated_at"`
 	DeletedAt       gorm.DeletedAt  `gorm:"index" json:"-"`

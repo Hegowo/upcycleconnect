@@ -15,10 +15,11 @@ import (
 )
 
 type UserHandler struct {
-	DB     *gorm.DB
-	Audit  *services.AuditService
-	Mailer *services.Mailer
-	Cfg    *config.Config
+	DB            *gorm.DB
+	Audit         *services.AuditService
+	Mailer        *services.Mailer
+	Cfg           *config.Config
+	Notifications *services.NotificationService
 }
 
 func (h *UserHandler) Index(c *gin.Context) {
@@ -146,6 +147,13 @@ func (h *UserHandler) Ban(c *gin.Context) {
 
 	h.Audit.Log(c, "user.banned", "User", &user.ID, old, map[string]string{"status": "banned"})
 
+	if h.Notifications != nil {
+		h.Notifications.MustNotify(user.ID, "account.banned",
+			"Votre compte a été suspendu",
+			"Un administrateur a suspendu votre compte. Pour plus d'informations, contactez contact@upcycleconnect.xyz.",
+			"")
+	}
+
 	c.JSON(http.StatusOK, models.ToUserResponse(&user))
 }
 
@@ -167,6 +175,13 @@ func (h *UserHandler) Activate(c *gin.Context) {
 	user.Status = "active"
 
 	h.Audit.Log(c, "user.activated", "User", &user.ID, old, map[string]string{"status": "active"})
+
+	if h.Notifications != nil {
+		h.Notifications.MustNotify(user.ID, "account.activated",
+			"Votre compte a été réactivé",
+			"Bonne nouvelle ! Votre compte UpcycleConnect est de nouveau actif. Vous pouvez à nouveau vous connecter.",
+			"/connexion")
+	}
 
 	c.JSON(http.StatusOK, models.ToUserResponse(&user))
 }
@@ -273,6 +288,13 @@ func (h *UserHandler) SendPasswordReset(c *gin.Context) {
 	}
 
 	h.Audit.Log(c, "user.password_reset_sent", "User", &user.ID, nil, nil)
+
+	if h.Notifications != nil {
+		h.Notifications.MustNotify(user.ID, "password.reset_requested",
+			"Réinitialisation de mot de passe envoyée",
+			"Un administrateur vient de vous envoyer un lien pour réinitialiser votre mot de passe par email.",
+			"")
+	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Email de récupération envoyé."})
 }

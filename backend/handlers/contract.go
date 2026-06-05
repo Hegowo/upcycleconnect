@@ -102,7 +102,7 @@ func (h *ContractHandler) Download(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"message": "Contrat introuvable"})
 		return
 	}
-	if contract.UserID != user.ID && !user.IsAdmin() {
+	if !canAccessContract(h.DB, user, &contract) {
 		c.JSON(http.StatusForbidden, gin.H{"message": "Accès refusé"})
 		return
 	}
@@ -134,11 +134,65 @@ func (h *ContractHandler) ByReservation(c *gin.Context) {
 	}
 
 	var contract models.Contract
-	if err := h.DB.Where("reservation_id = ? AND user_id = ?", resID, user.ID).First(&contract).Error; err != nil {
+	if err := h.DB.Where("reservation_id = ?", resID).First(&contract).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"message": "Aucun contrat pour cette réservation"})
 		return
 	}
+	if !canAccessContract(h.DB, user, &contract) {
+		c.JSON(http.StatusForbidden, gin.H{"message": "Accès refusé"})
+		return
+	}
 	c.JSON(http.StatusOK, models.ToContractResponse(&contract))
+}
+
+// ProviderContracts lists every signed contract attached to a prestation owned by the connected provider.
+// Returns the same shape as the user-facing list so the front can reuse the components.
+func (h *ContractHandler) ProviderContracts(c *gin.Context) {
+	user := middleware.GetAuthUser(c)
+	if user == nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Non authentifié"})
+		return
+	}
+
+	var contracts []models.Contract
+	h.DB.
+		Joins("JOIN reservations ON reservations.id = contracts.reservation_id").
+		Joins("JOIN prestations ON prestations.id = reservations.prestation_id").
+		Where("prestations.provider_id = ?", user.ID).
+		Where("contracts.deleted_at IS NULL").
+		Order("contracts.signed_at DESC").
+		Find(&contracts)
+
+	resp := make([]models.ContractResponse, 0, len(contracts))
+	for i := range contracts {
+		resp = append(resp, models.ToContractResponse(&contracts[i]))
+	}
+	c.JSON(http.StatusOK, gin.H{"data": resp})
+}
+
+// canAccessContract grants access to: the client who signed, the provider of the prestation, and any admin.
+func canAccessContract(db *gorm.DB, user *models.User, contract *models.Contract) bool {
+	if user == nil {
+		return false
+	}
+	if user.IsAdmin() {
+		return true
+	}
+	if contract.UserID == user.ID {
+		return true
+	}
+	// provider check: walk reservation → prestation → provider_id
+	var providerID *uint
+	row := db.
+		Table("reservations").
+		Select("prestations.provider_id").
+		Joins("JOIN prestations ON prestations.id = reservations.prestation_id").
+		Where("reservations.id = ?", contract.ReservationID).
+		Row()
+	if row != nil {
+		_ = row.Scan(&providerID)
+	}
+	return providerID != nil && *providerID == user.ID
 }
 
 // ─── Helpers shared with PaymentHandler.Reserve ──────────────────────────────

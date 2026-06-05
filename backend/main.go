@@ -41,6 +41,7 @@ func main() {
 		&models.EmailChangeRequest{},
 		&models.Passkey{},
 		&models.Contract{},
+		&models.Notification{},
 	); err != nil {
 		log.Fatalf("Failed to migrate database: %v", err)
 	}

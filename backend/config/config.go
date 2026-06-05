@@ -29,6 +29,9 @@ type Config struct {
 
 	WebAuthnRPID   string
 	WebAuthnOrigin string
+
+	OneSignalAppID  string
+	OneSignalAPIKey string
 }
 
 func Load() *Config {
@@ -59,6 +62,9 @@ func Load() *Config {
 
 		WebAuthnRPID:   getEnv("WEBAUTHN_RPID", "upcycleconnect.xyz"),
 		WebAuthnOrigin: getEnv("WEBAUTHN_ORIGIN", "https://upcycleconnect.xyz"),
+
+		OneSignalAppID:  getEnv("ONESIGNAL_APP_ID", ""),
+		OneSignalAPIKey: getEnv("ONESIGNAL_API_KEY", ""),
 	}
 }
 

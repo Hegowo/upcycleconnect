@@ -21,14 +21,15 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 	r.Use(middleware.CORS())
 
 	audit := services.NewAuditService(db)
-
 	mailer := services.NewMailer(cfg)
+	notifications := services.NewNotificationService(db, cfg)
 
 	authHandler := &handlers.AuthHandler{DB: db, Cfg: cfg}
 	dashHandler := &handlers.DashboardHandler{DB: db}
 	swaggerHandler := &handlers.SwaggerHandler{}
-	userHandler := &handlers.UserHandler{DB: db, Audit: audit, Mailer: mailer, Cfg: cfg}
-	providerHandler := &handlers.ProviderHandler{DB: db, Audit: audit}
+	notificationHandler := &handlers.NotificationHandler{DB: db}
+	userHandler := &handlers.UserHandler{DB: db, Audit: audit, Mailer: mailer, Cfg: cfg, Notifications: notifications}
+	providerHandler := &handlers.ProviderHandler{DB: db, Audit: audit, Notifications: notifications}
 	categoryHandler := &handlers.CategoryHandler{DB: db, Audit: audit}
 	prestationHandler := &handlers.PrestationHandler{DB: db, Audit: audit}
 	eventHandler := &handlers.EventHandler{DB: db, Audit: audit}
@@ -41,7 +42,7 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 	profileHandler  := &handlers.ProfileHandler{DB: db, Mailer: mailer}
 	publicHandler   := &handlers.PublicHandler{DB: db}
 	userDepositHandler := &handlers.UserDepositHandler{DB: db, Audit: audit}
-	userProviderHandler := &handlers.UserProviderHandler{DB: db, Audit: audit}
+	userProviderHandler := &handlers.UserProviderHandler{DB: db, Audit: audit, Notifications: notifications}
 	calendarHandler := &handlers.CalendarHandler{DB: db}
 	providerEventHandler := &handlers.ProviderEventHandler{DB: db, Audit: audit}
 	eventMessageHandler := &handlers.EventMessageHandler{DB: db, Audit: audit}
@@ -60,11 +61,12 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 		log.Fatalf("Failed to initialize PDF service: %v", err)
 	}
 	paymentHandler := &handlers.PaymentHandler{
-		DB:     db,
-		Audit:  audit,
-		Stripe: stripeService,
-		PDF:    pdfService,
-		Mailer: mailer,
+		DB:            db,
+		Audit:         audit,
+		Stripe:        stripeService,
+		PDF:           pdfService,
+		Mailer:        mailer,
+		Notifications: notifications,
 	}
 	invoiceHandler := &handlers.InvoiceHandler{DB: db}
 	contractHandler := &handlers.ContractHandler{DB: db, PDF: pdfService, Audit: audit}
@@ -146,6 +148,14 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 			userProtected.GET("/invoices/:id", invoiceHandler.Show)
 			userProtected.GET("/invoices/:id/download", invoiceHandler.Download)
 			userProtected.GET("/contracts/:id/download", contractHandler.Download)
+			userProtected.GET("/provider/contracts", contractHandler.ProviderContracts)
+
+			userProtected.GET("/notifications", notificationHandler.Index)
+			userProtected.GET("/notifications/unread-count", notificationHandler.UnreadCount)
+			userProtected.POST("/notifications/:id/read", notificationHandler.MarkRead)
+			userProtected.POST("/notifications/read-all", notificationHandler.MarkAllRead)
+			userProtected.POST("/notifications/push-token", notificationHandler.RegisterPushToken)
+			userProtected.DELETE("/notifications/push-token", notificationHandler.UnregisterPushToken)
 
 			userProtected.GET("/calendar/token", calendarHandler.GetToken)
 			userProtected.POST("/calendar/token/regenerate", calendarHandler.RegenerateToken)
@@ -200,6 +210,11 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 		{
 			protected.POST("/auth/logout", authHandler.Logout)
 			protected.GET("/auth/me", authHandler.Me)
+
+			protected.GET("/notifications", notificationHandler.Index)
+			protected.GET("/notifications/unread-count", notificationHandler.UnreadCount)
+			protected.POST("/notifications/:id/read", notificationHandler.MarkRead)
+			protected.POST("/notifications/read-all", notificationHandler.MarkAllRead)
 
 			protected.GET("/docs/spec", swaggerHandler.Spec)
 

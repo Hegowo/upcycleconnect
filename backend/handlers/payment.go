@@ -22,11 +22,12 @@ import (
 )
 
 type PaymentHandler struct {
-	DB     *gorm.DB
-	Audit  *services.AuditService
-	Stripe *services.StripeService
-	PDF    *services.PDFService
-	Mailer *services.Mailer
+	DB            *gorm.DB
+	Audit         *services.AuditService
+	Stripe        *services.StripeService
+	PDF           *services.PDFService
+	Mailer        *services.Mailer
+	Notifications *services.NotificationService
 }
 
 
@@ -135,6 +136,15 @@ func (h *PaymentHandler) Reserve(c *gin.Context) {
 		"contract_id":   contract.ID,
 	})
 
+	// Notify the provider that a new reservation is incoming (pending payment).
+	if prestation.ProviderID != nil {
+		link := fmt.Sprintf("/profil/reservations/%d", reservation.ID)
+		h.Notifications.MustNotify(*prestation.ProviderID, "reservation.received",
+			"Nouvelle réservation en attente de paiement",
+			fmt.Sprintf("%s a signé un contrat pour « %s ».", user.FirstName+" "+user.LastName, prestation.Title),
+			link)
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"reservation_id": reservation.ID,
 		"contract_id":    contract.ID,
@@ -212,6 +222,17 @@ func (h *PaymentHandler) handleQuoteRequest(c *gin.Context, user *models.User, p
 		"number":        invoice.Number,
 		"prestation_id": prestation.ID,
 	})
+
+	h.Notifications.MustNotify(user.ID, "quote.issued",
+		"Votre devis est disponible",
+		fmt.Sprintf("Le devis %s pour « %s » a été émis et envoyé par email.", number, prestation.Title),
+		"/profil/factures")
+	if prestation.ProviderID != nil {
+		h.Notifications.MustNotify(*prestation.ProviderID, "quote.requested",
+			"Nouvelle demande de devis",
+			fmt.Sprintf("%s a demandé un devis pour « %s ».", user.FirstName+" "+user.LastName, prestation.Title),
+			"")
+	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"type":           "quote",
@@ -363,7 +384,30 @@ func (h *PaymentHandler) fulfillReservation(session *stripe.CheckoutSession) err
 		)
 	}()
 
+	// In-app notifications: client + provider
+	if h.Notifications != nil {
+		reservationLink := fmt.Sprintf("/profil/reservations/%d", reservation.ID)
+		h.Notifications.MustNotify(reservation.UserID, "payment.confirmed",
+			"Paiement confirmé",
+			fmt.Sprintf("Votre paiement de %s pour « %s » a bien été reçu. Votre facture %s est disponible.",
+				formatEUR(reservation.AmountCents), reservation.Prestation.Title, number),
+			reservationLink)
+		if reservation.Prestation.ProviderID != nil {
+			h.Notifications.MustNotify(*reservation.Prestation.ProviderID, "payment.received",
+				"Paiement reçu pour votre prestation",
+				fmt.Sprintf("Le client %s a payé %s pour « %s ».",
+					reservation.User.FirstName+" "+reservation.User.LastName,
+					formatEUR(reservation.AmountCents),
+					reservation.Prestation.Title),
+				reservationLink)
+		}
+	}
+
 	return nil
+}
+
+func formatEUR(cents int64) string {
+	return fmt.Sprintf("%.2f €", float64(cents)/100)
 }
 
 // lookupReservation finds the reservation for a Stripe checkout session. It

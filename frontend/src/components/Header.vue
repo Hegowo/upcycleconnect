@@ -47,13 +47,7 @@
       </button>
 
       <!-- Notifications -->
-      <button :class="[
-        'relative p-2 rounded-lg transition',
-        theme.isDark ? 'text-[#64748b] hover:text-[#94a3b8] hover:bg-[#263244]' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'
-      ]">
-        <BellIcon class="w-5 h-5" />
-        <span v-if="pendingCount > 0" class="absolute top-1 right-1 w-2 h-2 rounded-full bg-red-500"></span>
-      </button>
+      <NotificationsDropdown variant="admin" :is-dark="theme.isDark" />
 
       <div :class="['h-6 w-px hidden sm:block', theme.isDark ? 'bg-[#334155]' : 'bg-[#e5e7eb]']"></div>
 
@@ -93,12 +87,12 @@ import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth'
 import { useThemeStore } from '@/stores/theme'
 import {
-  BellIcon,
   MagnifyingGlassIcon,
   ArrowRightOnRectangleIcon,
   SunIcon,
   MoonIcon,
 } from '@heroicons/vue/24/outline'
+import NotificationsDropdown from '@/components/NotificationsDropdown.vue'
 
 const { t } = useI18n()
 const route   = useRoute()
@@ -106,7 +100,6 @@ const router  = useRouter()
 const auth    = useAuthStore()
 const theme   = useThemeStore()
 const loading = ref(false)
-const pendingCount = ref(0)
 
 const title = computed(() => route.meta.title || t('nav.administration'))
 
