@@ -184,9 +184,9 @@
             </div>
 
             <div v-if="selectedRequest.qr_code" class="bg-[#f0fdf4] rounded-xl p-3 flex items-center gap-4">
-              <img v-if="qrDataUrl" :src="qrDataUrl" class="w-16 h-16 rounded-lg border border-[#bbf7d0]" />
+              <img v-if="qrDataUrl" :src="qrDataUrl" class="h-12 w-auto rounded-lg border border-[#bbf7d0] bg-white p-1" alt="Code-barres" />
               <div>
-                <p class="text-xs font-semibold text-[#006d35]">Code QR généré</p>
+                <p class="text-xs font-semibold text-[#006d35]">Code-barres récupération pro</p>
                 <p class="text-sm font-mono text-[#001d32]">{{ selectedRequest.qr_code }}</p>
               </div>
             </div>
@@ -255,7 +255,7 @@ import {
   InboxIcon, PhotoIcon, CheckCircleIcon, XCircleIcon,
   MagnifyingGlassIcon, QrCodeIcon, XMarkIcon,
 } from '@heroicons/vue/24/outline'
-import QRCode from 'qrcode'
+import { barcodeDataUrl } from '@/utils/barcode'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
@@ -390,7 +390,7 @@ function conditionText(condition) {
 watch(() => selectedRequest.value, async (val) => {
   qrDataUrl.value = null
   if (val?.qr_code) {
-    qrDataUrl.value = await QRCode.toDataURL(val.qr_code, { width: 160, margin: 1, errorCorrectionLevel: 'M' })
+    qrDataUrl.value = barcodeDataUrl(val.qr_code, { height: 50 })
   }
   if (val && window.innerWidth < 1024) {
     await nextTick()

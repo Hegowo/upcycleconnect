@@ -119,6 +119,7 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 		{
 			userProtected.POST("/auth/logout", userAuthHandler.Logout)
 			userProtected.GET("/auth/me", userAuthHandler.Me)
+			userProtected.POST("/onboarding/complete", userAuthHandler.CompleteOnboarding)
 
 			userProtected.GET("/profile", profileHandler.Stats)
 			userProtected.PUT("/profile/info", profileHandler.UpdateInfo)

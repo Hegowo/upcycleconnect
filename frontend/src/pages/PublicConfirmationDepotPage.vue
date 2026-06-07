@@ -54,15 +54,13 @@
             </div>
 
             <div class="flex flex-col sm:flex-row gap-6 sm:gap-8 items-start">
-              <div class="w-full sm:w-40 shrink-0 flex flex-col items-center gap-2">
-                <div class="w-40 h-40 rounded-[20px] bg-[#edf4ff] border-2 border-[#d8eaff] flex flex-col items-center justify-center">
-                  <img v-if="qrDataUrl" :src="qrDataUrl" class="w-32 h-32" />
-                  <QrCodeIcon v-else class="w-20 h-20 text-[#001d32] opacity-30" />
+              <div class="w-full sm:w-64 shrink-0 flex flex-col items-center gap-2">
+                <div class="w-full rounded-[20px] bg-white border-2 border-[#d8eaff] flex items-center justify-center p-3">
+                  <img v-if="qrDataUrl" :src="qrDataUrl" class="w-full h-auto max-h-28 object-contain" alt="Code-barres" />
+                  <QrCodeIcon v-else class="w-16 h-16 text-[#001d32] opacity-30" />
                 </div>
-                <span v-if="deposit.qr_code" class="text-[#001d32] font-mono font-bold text-xs tracking-widest text-center">
-                  {{ deposit.qr_code }}
-                </span>
-                <span v-else class="text-[#40617f] text-[10px] uppercase tracking-wider">{{ t('public.depotConfirmation.qrPending') }}</span>
+                <span v-if="!deposit.qr_code" class="text-[#40617f] text-[10px] uppercase tracking-wider">{{ t('public.depotConfirmation.qrPending') }}</span>
+                <span v-else class="text-[10px] uppercase tracking-widest text-[#40617f]">Code-barres pour le pro</span>
               </div>
 
               <div class="flex-1 flex flex-col gap-4 w-full">
@@ -219,7 +217,7 @@ import {
   ExclamationCircleIcon,
   XMarkIcon,
 } from '@heroicons/vue/24/outline'
-import QRCode from 'qrcode'
+import { barcodeDataUrl } from '@/utils/barcode'
 import { userApi } from '@/services/publicApi'
 import { useUserAuthStore } from '@/stores/userAuth'
 
@@ -315,7 +313,7 @@ function conditionLabel(c) {
 async function printVoucher() {
   const d = deposit.value
   if (!d) return
-  const qrImg = qrDataUrl.value || await QRCode.toDataURL(d.qr_code || '', { width: 200, margin: 2 })
+  const qrImg = qrDataUrl.value || barcodeDataUrl(d.qr_code || '', { height: 80 })
   const cp = d.collection_point
   const photos = [d.photo1, d.photo2, d.photo3].filter(Boolean)
   const photoHtml = photos.map(p => `<img src="${p}" style="width:120px;height:120px;object-fit:cover;border-radius:10px;" />`).join('')
@@ -332,8 +330,9 @@ async function printVoucher() {
   h1 { font-size: 26px; font-weight: 900; margin-bottom: 6px; }
   .subtitle { color: #40617f; font-size: 13px; margin-bottom: 28px; }
   .qr-row { display: flex; gap: 28px; align-items: flex-start; margin-bottom: 28px; }
-  .qr-box { background: #edf4ff; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 168px; }
-  .qr-code-str { font-family: monospace; font-size: 11px; font-weight: 700; color: #001d32; letter-spacing: 2px; }
+  .qr-box { background: #fff; border: 2px solid #d8eaff; border-radius: 16px; padding: 14px; display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 260px; }
+  .qr-box img { width: 240px; height: auto; }
+  .qr-code-str { font-family: monospace; font-size: 11px; font-weight: 700; color: #40617f; text-transform: uppercase; letter-spacing: 1px; }
   .info-grid { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .info-cell { background: #f7f9ff; border-radius: 10px; padding: 10px 14px; }
   .info-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #40617f; margin-bottom: 4px; }
@@ -358,8 +357,8 @@ async function printVoucher() {
 <p class="subtitle">Présentez ce document au point de collecte pour déposer votre objet.</p>
 <div class="qr-row">
   <div class="qr-box">
-    <img src="${qrImg}" width="136" height="136" />
-    <span class="qr-code-str">${d.qr_code || ''}</span>
+    <img src="${qrImg}" />
+    <span class="qr-code-str">Code-barres pour le professionnel</span>
   </div>
   <div class="info-grid">
     <div class="info-cell"><div class="info-label">Référence</div><div class="info-value">#UP-${d.id}</div></div>
@@ -378,7 +377,7 @@ ${cp ? `<div class="section"><div class="section-title">Point de collecte</div><
 </div>
 </div>
 ${photos.length ? `<div class="section"><div class="section-title">Photos de l'objet</div><div class="photos">${photoHtml}</div></div>` : ''}
-<div class="instructions"><p><strong>Comment procéder ?</strong>1. Présentez ce bon (imprimé ou sur écran) au point de collecte.<br/>2. Un agent scannera le QR code pour valider votre dépôt.<br/>3. Vous recevrez une confirmation par e-mail.</p></div>
+<div class="instructions"><p><strong>Comment procéder ?</strong>1. Présentez ce bon (imprimé ou sur écran) au point de collecte.<br/>2. Le code affiché en haut vous permet d'ouvrir le conteneur. Le code-barres ci-contre sera scanné par le professionnel qui récupèrera votre objet.<br/>3. Vous recevrez une confirmation par e-mail.</p></div>
 <div class="footer">UpcycleConnect — Ensemble pour une économie circulaire · Bon valable 1 mois à compter de la validation</div>
 </body></html>`)
   win.document.close()
@@ -399,7 +398,7 @@ onMounted(async () => {
   try {
     deposit.value = await userApi(`/deposits/${id}`)
     if (deposit.value?.qr_code) {
-      qrDataUrl.value = await QRCode.toDataURL(deposit.value.qr_code, { width: 160, margin: 1, errorCorrectionLevel: 'M' })
+      qrDataUrl.value = barcodeDataUrl(deposit.value.qr_code, { height: 70 })
     }
   } catch {
     deposit.value = null

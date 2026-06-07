@@ -279,6 +279,27 @@ func (h *UserAuthHandler) Logout(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Déconnexion réussie."})
 }
 
+// CompleteOnboarding marks the user as having seen the first-login tutorial.
+// Called by the frontend when the user finishes the blocking overlay tour.
+func (h *UserAuthHandler) CompleteOnboarding(c *gin.Context) {
+	user := middleware.GetAuthUser(c)
+	if user == nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Non authentifié"})
+		return
+	}
+	if user.OnboardingCompletedAt != nil {
+		c.JSON(http.StatusOK, models.ToUserResponse(user))
+		return
+	}
+	now := time.Now()
+	if err := h.DB.Model(user).Update("onboarding_completed_at", now).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Erreur lors de l'enregistrement"})
+		return
+	}
+	user.OnboardingCompletedAt = &now
+	c.JSON(http.StatusOK, models.ToUserResponse(user))
+}
+
 func (h *UserAuthHandler) ResetPassword(c *gin.Context) {
 	var req struct {
 		Token    string `json:"token" binding:"required"`

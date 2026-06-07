@@ -271,6 +271,8 @@
       </div>
     </footer>
 
+    <OnboardingTutorial :show="showOnboarding" @done="showOnboarding = false" />
+
   </div>
 </template>
 
@@ -279,6 +281,7 @@ import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { MagnifyingGlassIcon, UserCircleIcon, DocumentTextIcon, PlusCircleIcon, Cog6ToothIcon, PencilSquareIcon } from '@heroicons/vue/24/outline'
 import NotificationsDropdown from '@/components/NotificationsDropdown.vue'
+import OnboardingTutorial from '@/components/OnboardingTutorial.vue'
 import { useUserAuthStore } from '@/stores/userAuth'
 import GlobalSearch from '@/components/GlobalSearch.vue'
 
@@ -290,8 +293,19 @@ const userAuth = useUserAuthStore()
 const profileMenuOpen = ref(false)
 const mobileMenuOpen = ref(false)
 const searchRef = ref(null)
+const showOnboarding = ref(false)
 
-onMounted(() => userAuth.init())
+onMounted(async () => {
+  await userAuth.init()
+  // Blocking tutorial on first login — admins are exempted because the tour is end-user oriented.
+  if (userAuth.isLoggedIn
+      && userAuth.user
+      && !userAuth.user.onboarding_completed_at
+      && userAuth.user.role !== 'admin'
+      && userAuth.user.role !== 'super_admin') {
+    showOnboarding.value = true
+  }
+})
 
 function closeMenu() { profileMenuOpen.value = false }
 

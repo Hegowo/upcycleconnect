@@ -22,6 +22,7 @@ type User struct {
 	GoogleID        *string         `gorm:"size:255;uniqueIndex" json:"-"`
 	AppleID         *string         `gorm:"size:255;uniqueIndex" json:"-"`
 	OneSignalPlayerID *string       `gorm:"size:100;index" json:"-"`
+	OnboardingCompletedAt *time.Time `json:"onboarding_completed_at"`
 	CreatedAt       time.Time       `json:"created_at"`
 	UpdatedAt       time.Time       `json:"updated_at"`
 	DeletedAt       gorm.DeletedAt  `gorm:"index" json:"-"`
@@ -81,6 +82,7 @@ type UserResponse struct {
 	Status          string  `json:"status"`
 	Role            *string `json:"role"`
 	EmailVerifiedAt *string `json:"email_verified_at"`
+	OnboardingCompletedAt *string `json:"onboarding_completed_at"`
 	CreatedAt       string  `json:"created_at"`
 	UpdatedAt       string  `json:"updated_at"`
 }
@@ -90,6 +92,11 @@ func ToUserResponse(u *User) UserResponse {
 	if u.EmailVerifiedAt != nil {
 		s := u.EmailVerifiedAt.UTC().Format(time.RFC3339Nano)
 		emailVerified = &s
+	}
+	var onboardingCompleted *string
+	if u.OnboardingCompletedAt != nil {
+		s := u.OnboardingCompletedAt.UTC().Format(time.RFC3339Nano)
+		onboardingCompleted = &s
 	}
 	return UserResponse{
 		ID:              u.ID,
@@ -102,6 +109,7 @@ func ToUserResponse(u *User) UserResponse {
 		Status:          u.Status,
 		Role:            u.PrimaryRole(),
 		EmailVerifiedAt: emailVerified,
+		OnboardingCompletedAt: onboardingCompleted,
 		CreatedAt:       u.CreatedAt.UTC().Format(time.RFC3339Nano),
 		UpdatedAt:       u.UpdatedAt.UTC().Format(time.RFC3339Nano),
 	}

@@ -88,5 +88,11 @@ export const useUserAuthStore = defineStore('userAuth', () => {
     }
   }
 
-  return { user, token, isLoggedIn, fullName, initials, register, login, logout, fetchMe, init }
+  async function completeOnboarding() {
+    const data = await apiFetch('/onboarding/complete', { method: 'POST' }, token.value)
+    user.value = data
+    localStorage.setItem('user_data', JSON.stringify(data))
+  }
+
+  return { user, token, isLoggedIn, fullName, initials, register, login, logout, fetchMe, init, completeOnboarding }
 })
