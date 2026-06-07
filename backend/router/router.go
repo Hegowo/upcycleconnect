@@ -143,6 +143,8 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 			userProtected.GET("/payments/session", paymentHandler.SessionStatus)
 			userProtected.GET("/reservations/:id", paymentHandler.ShowReservation)
 			userProtected.GET("/reservations/:id/contract", contractHandler.ByReservation)
+			userProtected.GET("/reservations/:id/quote-contract-preview", contractHandler.QuotePreview)
+			userProtected.POST("/reservations/:id/accept-quote", paymentHandler.AcceptQuote)
 
 			userProtected.GET("/invoices", invoiceHandler.Index)
 			userProtected.GET("/invoices/:id", invoiceHandler.Show)

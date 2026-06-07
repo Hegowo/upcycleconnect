@@ -154,6 +154,121 @@ func (h *PaymentHandler) Reserve(c *gin.Context) {
 	})
 }
 
+// AcceptQuote turns a quote_requested reservation into a signed contract + Stripe checkout.
+// The client signs the same legal text as a direct purchase; the amount is locked to the issued quote.
+func (h *PaymentHandler) AcceptQuote(c *gin.Context) {
+	user := middleware.GetAuthUser(c)
+	if user == nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Non authentifié"})
+		return
+	}
+
+	resID, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": "Réservation introuvable"})
+		return
+	}
+
+	var req reserveRequest
+	_ = c.ShouldBindJSON(&req)
+
+	var reservation models.Reservation
+	if err := h.DB.First(&reservation, resID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": "Réservation introuvable"})
+		return
+	}
+	if reservation.UserID != user.ID {
+		c.JSON(http.StatusForbidden, gin.H{"message": "Accès refusé"})
+		return
+	}
+	if reservation.Status != "quote_requested" && reservation.Status != "quote_issued" {
+		c.JSON(http.StatusConflict, gin.H{"message": "Ce devis ne peut plus être accepté"})
+		return
+	}
+
+	// Double-signature guard: refuse if a contract already exists for this reservation.
+	var existing models.Contract
+	if err := h.DB.Where("reservation_id = ?", reservation.ID).First(&existing).Error; err == nil {
+		c.JSON(http.StatusConflict, gin.H{"message": "Un contrat existe déjà pour ce devis", "contract_id": existing.ID})
+		return
+	}
+
+	var prestation models.Prestation
+	if err := h.DB.Preload("Provider").First(&prestation, reservation.PrestationID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": "Prestation introuvable"})
+		return
+	}
+
+	var quote models.Invoice
+	if err := h.DB.Where("reservation_id = ? AND type = ?", reservation.ID, "quote").
+		Order("created_at DESC").First(&quote).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": "Aucun devis émis pour cette réservation"})
+		return
+	}
+	amountCents := quote.AmountCents
+	if amountCents <= 0 {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"message": "Devis sans montant : impossible à signer"})
+		return
+	}
+
+	sigBytes, sigErr := decodeSignaturePNG(req.Signature)
+	if sigErr != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"message": "Signature requise : " + sigErr.Error()})
+		return
+	}
+
+	contract, cerr := createSignedContract(h.DB, h.PDF, user, &prestation,
+		reservation.ID, amountCents, quote.Currency, sigBytes, c.ClientIP())
+	if cerr != nil {
+		log.Printf("[accept-quote] contract creation failed: %v", cerr)
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Erreur lors de l'enregistrement du contrat"})
+		return
+	}
+
+	sess, err := h.Stripe.CreateCheckoutSession(services.CheckoutParams{
+		ReservationID:   reservation.ID,
+		UserEmail:       user.Email,
+		PrestationTitle: prestation.Title,
+		AmountCents:     amountCents,
+		Currency:        quote.Currency,
+	})
+	if err != nil {
+		c.JSON(http.StatusBadGateway, gin.H{"message": "Stripe indisponible", "error": err.Error()})
+		return
+	}
+	sessID := sess.ID
+	reservation.StripeSessionID = &sessID
+	reservation.Status = "pending"
+	reservation.AmountCents = amountCents
+	if err := h.DB.Save(&reservation).Error; err != nil {
+		log.Printf("[accept-quote] failed to persist stripe_session_id for reservation %d: %v", reservation.ID, err)
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Erreur lors de l'enregistrement de la réservation"})
+		return
+	}
+
+	h.Audit.Log(c, "quote.accepted", "Reservation", &reservation.ID, nil, map[string]interface{}{
+		"quote_id":     quote.ID,
+		"contract_id":  contract.ID,
+		"amount_cents": amountCents,
+	})
+
+	if prestation.ProviderID != nil {
+		h.Notifications.MustNotify(*prestation.ProviderID, "quote.accepted",
+			"Devis accepté et signé",
+			fmt.Sprintf("%s a accepté et signé le devis %s pour « %s ».",
+				user.FirstName+" "+user.LastName, quote.Number, prestation.Title),
+			fmt.Sprintf("/profil/reservations/%d", reservation.ID))
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"reservation_id":  reservation.ID,
+		"contract_id":     contract.ID,
+		"contract_number": contract.Number,
+		"checkout_url":    sess.URL,
+		"session_id":      sess.ID,
+	})
+}
+
 func (h *PaymentHandler) handleQuoteRequest(c *gin.Context, user *models.User, prestation *models.Prestation, notes *string) error {
 	reservation := models.Reservation{
 		UserID:       user.ID,

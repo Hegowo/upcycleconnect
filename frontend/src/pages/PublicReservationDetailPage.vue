@@ -136,6 +136,17 @@
               <ArrowDownTrayIcon class="w-4 h-4" />
               {{ downloading ? t('public.reservation.downloading') : t('public.reservation.downloadPdf') }}
             </button>
+
+            <button
+              v-if="canAcceptQuote"
+              @click="showQuoteSign = true"
+              class="w-full mt-3 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-white font-bold text-sm transition hover:opacity-90"
+              style="background: linear-gradient(134deg, #001d32 0%, #003e6b 100%);"
+            >
+              <PencilSquareIcon class="w-4 h-4" />
+              Accepter et signer ce devis
+            </button>
+
             <router-link
               to="/profil/factures"
               class="block text-center text-xs text-[#40617f] hover:text-[#006d35] mt-3"
@@ -143,6 +154,14 @@
               {{ t('public.reservation.seeAllInvoices') }}
             </router-link>
           </div>
+
+          <ContractSignatureModal
+            v-if="canAcceptQuote"
+            :show="showQuoteSign"
+            :reservation-id="reservation.id"
+            @close="showQuoteSign = false"
+            @signed="onQuoteSigned"
+          />
 
           <div v-if="contract" class="bg-white rounded-[24px] p-6 border border-[#edf4ff]">
             <h3 class="font-jakarta font-bold text-[#001d32] text-base mb-3 flex items-center gap-2">
@@ -186,6 +205,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useUserAuthStore } from '@/stores/userAuth'
+import ContractSignatureModal from '@/components/ContractSignatureModal.vue'
 import {
   ArrowLeftIcon,
   ArrowDownTrayIcon,
@@ -213,6 +233,21 @@ const invoice     = ref(null)
 const contract    = ref(null)
 const downloading = ref(false)
 const downloadingContract = ref(false)
+const showQuoteSign = ref(false)
+
+const canAcceptQuote = computed(() => {
+  if (!reservation.value || !invoice.value) return false
+  if (invoice.value.type !== 'quote') return false
+  if (contract.value) return false
+  const s = reservation.value.status
+  return s === 'quote_requested' || s === 'quote_issued'
+})
+
+function onQuoteSigned(res) {
+  if (res?.checkout_url) {
+    window.location.href = res.checkout_url
+  }
+}
 
 const localeCode = computed(() => locale.value === 'en' ? 'en-US' : 'fr-FR')
 

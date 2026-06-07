@@ -84,6 +84,84 @@ func (h *ContractHandler) Preview(c *gin.Context) {
 	})
 }
 
+// QuotePreview returns the data needed to populate the contract modal for accepting an existing quote.
+// The amount comes from the issued Invoice (type=quote), not from the prestation, so a price change
+// after the quote was emitted does not silently shift what the client signs.
+func (h *ContractHandler) QuotePreview(c *gin.Context) {
+	user := middleware.GetAuthUser(c)
+	if user == nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Non authentifié"})
+		return
+	}
+
+	resID, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": "Réservation introuvable"})
+		return
+	}
+
+	var reservation models.Reservation
+	if err := h.DB.First(&reservation, resID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": "Réservation introuvable"})
+		return
+	}
+	if reservation.UserID != user.ID {
+		c.JSON(http.StatusForbidden, gin.H{"message": "Accès refusé"})
+		return
+	}
+	if reservation.Status != "quote_requested" && reservation.Status != "quote_issued" {
+		c.JSON(http.StatusConflict, gin.H{"message": "Ce devis ne peut plus être accepté"})
+		return
+	}
+
+	var prestation models.Prestation
+	if err := h.DB.Preload("Provider").First(&prestation, reservation.PrestationID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": "Prestation introuvable"})
+		return
+	}
+
+	var quote models.Invoice
+	if err := h.DB.Where("reservation_id = ? AND type = ?", reservation.ID, "quote").
+		Order("created_at DESC").First(&quote).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": "Aucun devis émis pour cette réservation"})
+		return
+	}
+	if quote.AmountCents <= 0 {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"message": "Devis sans montant : impossible à signer"})
+		return
+	}
+
+	providerName := "UpcycleConnect"
+	providerEmail := "contact@upcycleconnect.xyz"
+	if prestation.Provider != nil {
+		providerName = strings.TrimSpace(prestation.Provider.FirstName + " " + prestation.Provider.LastName)
+		providerEmail = prestation.Provider.Email
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"prestation": gin.H{
+			"id":          prestation.ID,
+			"title":       prestation.Title,
+			"description": prestation.Description,
+			"price_type":  prestation.PriceType,
+		},
+		"amount_cents": quote.AmountCents,
+		"currency":     quote.Currency,
+		"quote_number": quote.Number,
+		"customer": gin.H{
+			"name":    strings.TrimSpace(user.FirstName + " " + user.LastName),
+			"email":   user.Email,
+			"phone":   user.Phone,
+			"address": user.Address,
+		},
+		"provider": gin.H{
+			"name":  providerName,
+			"email": providerEmail,
+		},
+		"generated_at": time.Now().UTC().Format(time.RFC3339),
+	})
+}
+
 // Download streams the signed contract PDF. Only the contract owner or an admin can fetch it.
 func (h *ContractHandler) Download(c *gin.Context) {
 	user := middleware.GetAuthUser(c)
