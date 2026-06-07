@@ -42,6 +42,7 @@ func main() {
 		&models.Passkey{},
 		&models.Contract{},
 		&models.Notification{},
+		&models.Tip{},
 	); err != nil {
 		log.Fatalf("Failed to migrate database: %v", err)
 	}

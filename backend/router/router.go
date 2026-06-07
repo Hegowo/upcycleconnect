@@ -70,6 +70,7 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 	}
 	invoiceHandler := &handlers.InvoiceHandler{DB: db}
 	contractHandler := &handlers.ContractHandler{DB: db, PDF: pdfService, Audit: audit}
+	tipHandler := &handlers.TipHandler{DB: db, Audit: audit}
 
 	r.Static("/uploads", "/uploads")
 
@@ -98,6 +99,9 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 		public.GET("/forum/categories", forumHandler.ListCategories)
 		public.GET("/forum/categories/:slug", forumHandler.ShowCategory)
 		public.GET("/forum/threads/:id", forumHandler.ShowThread)
+
+		public.GET("/tips", tipHandler.PublicIndex)
+		public.GET("/tips/:slug", tipHandler.PublicShow)
 	}
 
 	userAPI := r.Group("/api/v1")
@@ -260,6 +264,12 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 			protected.PUT("/events/:id", eventHandler.Update)
 			protected.DELETE("/events/:id", eventHandler.Destroy)
 			protected.PUT("/events/:id/status", eventHandler.UpdateStatus)
+
+			protected.GET("/tips", tipHandler.AdminIndex)
+			protected.POST("/tips", tipHandler.AdminStore)
+			protected.GET("/tips/:id", tipHandler.AdminShow)
+			protected.PUT("/tips/:id", tipHandler.AdminUpdate)
+			protected.DELETE("/tips/:id", tipHandler.AdminDestroy)
 
 			protected.GET("/forum/categories", forumHandler.ListCategories)
 			protected.POST("/forum/categories", forumHandler.AdminCreateCategory)
