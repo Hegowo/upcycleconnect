@@ -3,8 +3,8 @@
 
     <div class="flex items-center justify-between">
       <div>
-        <h2 class="text-xl sm:text-2xl font-bold text-[#001d32]">Forum Communauté</h2>
-        <p class="text-sm text-[#40617f] mt-0.5">Catégories, modération des discussions et signalements</p>
+        <h2 class="text-xl sm:text-2xl font-bold text-[#001d32]">Communauté</h2>
+        <p class="text-sm text-[#40617f] mt-0.5">Forum (catégories, discussions, signalements) et conseils publiés</p>
       </div>
     </div>
 
@@ -248,6 +248,11 @@
       </div>
     </div>
 
+    <!-- ===== CONSEILS TAB ===== -->
+    <div v-if="activeTab === 'tips'">
+      <TipsPage embedded />
+    </div>
+
   </div>
 </template>
 
@@ -255,6 +260,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import TipsPage from '@/pages/TipsPage.vue'
 import {
   ChatBubbleLeftEllipsisIcon,
   PlusIcon,
@@ -269,9 +275,10 @@ const router = useRouter()
 
 const activeTab = ref('categories')
 const tabs = [
-  { key: 'categories', label: 'Catégories' },
-  { key: 'threads',    label: 'Discussions' },
-  { key: 'reports',   label: 'Signalements' },
+  { key: 'categories', label: 'Forum — Catégories' },
+  { key: 'threads',    label: 'Forum — Discussions' },
+  { key: 'reports',    label: 'Forum — Signalements' },
+  { key: 'tips',       label: 'Conseils' },
 ]
 
 function formatDate(iso) {

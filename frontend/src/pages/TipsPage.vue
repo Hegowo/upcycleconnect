@@ -1,10 +1,13 @@
 <template>
-  <div class="max-w-6xl mx-auto py-8 px-4">
+  <div :class="embedded ? '' : 'max-w-6xl mx-auto py-8 px-4'">
 
     <div class="flex items-center justify-between flex-wrap gap-3 mb-6">
-      <div>
+      <div v-if="!embedded">
         <h1 class="font-jakarta font-extrabold text-[#001d32] text-2xl tracking-tight">Conseils</h1>
         <p class="text-[#40617f] text-sm mt-1">Articles publiés dans l'Espace Conseils côté adhérents.</p>
+      </div>
+      <div v-else>
+        <p class="text-sm text-[#64748b]">{{ tips.length }} conseil(s)</p>
       </div>
       <button
         @click="openForm(null)"
@@ -156,6 +159,10 @@ import {
   LightBulbIcon,
 } from '@heroicons/vue/24/outline'
 import TiptapEditor from '@/components/TiptapEditor.vue'
+
+defineProps({
+  embedded: { type: Boolean, default: false },
+})
 
 const BASE = '/api/admin/v1'
 function authHeaders() {
