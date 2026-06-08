@@ -10,6 +10,10 @@ upcyclevps
 upcyclemacos
 upcyclelocal
 
+# Binaire compilé par build.sh (embarque le payload, ne doit JAMAIS être pushé)
+uc
+uc.x.c
+
 # Front
 frontend/node_modules/
 frontend/dist/
