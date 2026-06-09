@@ -89,7 +89,7 @@
                   </div>
 
                   <RouterLink
-                    to="/profil"
+                    :to="userAuth.profilePath"
                     @click="closeMenu"
                     class="flex items-center gap-3 px-4 py-2.5 text-sm text-[#334155] hover:bg-[#f8fafc] transition"
                   >
@@ -97,25 +97,29 @@
                     {{ t('public.layout.menuMyProfile') }}
                   </RouterLink>
 
-                  <RouterLink
-                    to="/depot"
-                    @click="closeMenu"
-                    class="flex items-center gap-3 px-4 py-2.5 text-sm text-[#334155] hover:bg-[#f8fafc] transition"
-                  >
-                    <PlusCircleIcon class="w-4 h-4 text-[#006d35]" />
-                    {{ t('public.layout.menuDeposit') }}
-                  </RouterLink>
+                  <!-- Depot + factures uniquement pour les particuliers -->
+                  <template v-if="!userAuth.isProvider">
+                    <RouterLink
+                      to="/depot"
+                      @click="closeMenu"
+                      class="flex items-center gap-3 px-4 py-2.5 text-sm text-[#334155] hover:bg-[#f8fafc] transition"
+                    >
+                      <PlusCircleIcon class="w-4 h-4 text-[#006d35]" />
+                      {{ t('public.layout.menuDeposit') }}
+                    </RouterLink>
+
+                    <RouterLink
+                      to="/profil/factures"
+                      @click="closeMenu"
+                      class="flex items-center gap-3 px-4 py-2.5 text-sm text-[#334155] hover:bg-[#f8fafc] transition"
+                    >
+                      <DocumentTextIcon class="w-4 h-4 text-[#40617f]" />
+                      {{ t('public.layout.menuMyInvoices') }}
+                    </RouterLink>
+                  </template>
 
                   <RouterLink
-                    to="/profil/factures"
-                    @click="closeMenu"
-                    class="flex items-center gap-3 px-4 py-2.5 text-sm text-[#334155] hover:bg-[#f8fafc] transition"
-                  >
-                    <DocumentTextIcon class="w-4 h-4 text-[#40617f]" />
-                    {{ t('public.layout.menuMyInvoices') }}
-                  </RouterLink>
-
-                  <RouterLink
+                    v-if="userAuth.isProvider"
                     to="/profil/contrats-recus"
                     @click="closeMenu"
                     class="flex items-center gap-3 px-4 py-2.5 text-sm text-[#334155] hover:bg-[#f8fafc] transition"
@@ -188,7 +192,7 @@
               <RouterLink to="/inscription" @click="mobileMenuOpen = false" class="block py-2 text-sm font-bold text-[#006d35]">{{ t('public.layout.btnRegister') }}</RouterLink>
             </template>
             <template v-else>
-              <RouterLink to="/profil" @click="mobileMenuOpen = false" class="block py-2 text-sm font-medium text-[#334155]">{{ t('public.layout.menuMyProfile') }}</RouterLink>
+              <RouterLink :to="userAuth.profilePath" @click="mobileMenuOpen = false" class="block py-2 text-sm font-medium text-[#334155]">{{ t('public.layout.menuMyProfile') }}</RouterLink>
               <RouterLink to="/profil/factures" @click="mobileMenuOpen = false" class="block py-2 text-sm font-medium text-[#334155]">{{ t('public.layout.menuMyInvoices') }}</RouterLink>
               <RouterLink to="/profil/parametres" @click="mobileMenuOpen = false" class="block py-2 text-sm font-medium text-[#334155]">Paramètres</RouterLink>
               <button @click="handleLogout(); mobileMenuOpen = false" class="block py-2 text-sm font-medium text-red-500">{{ t('public.layout.menuLogout') }}</button>

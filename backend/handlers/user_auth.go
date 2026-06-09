@@ -272,7 +272,27 @@ func (h *UserAuthHandler) Me(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"message": "Non authentifié"})
 		return
 	}
-	c.JSON(http.StatusOK, models.ToUserResponse(user))
+	// Always load the provider profile so the frontend knows the user's pro status.
+	h.DB.Preload("ProviderProfile").First(user, user.ID)
+	resp := models.ToUserResponse(user)
+	// Inject provider_profile inline so the frontend gets it in /me without an extra request.
+	data := map[string]interface{}{
+		"id":                      resp.ID,
+		"email":                   resp.Email,
+		"first_name":              resp.FirstName,
+		"last_name":               resp.LastName,
+		"phone":                   resp.Phone,
+		"address":                 resp.Address,
+		"avatar_url":              resp.AvatarURL,
+		"status":                  resp.Status,
+		"role":                    resp.Role,
+		"email_verified_at":       resp.EmailVerifiedAt,
+		"onboarding_completed_at": resp.OnboardingCompletedAt,
+		"created_at":              resp.CreatedAt,
+		"updated_at":              resp.UpdatedAt,
+		"provider_profile":        models.ToProviderProfileResponse(user.ProviderProfile),
+	}
+	c.JSON(http.StatusOK, data)
 }
 
 func (h *UserAuthHandler) Logout(c *gin.Context) {

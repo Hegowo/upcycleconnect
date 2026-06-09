@@ -255,6 +255,11 @@ onMounted(async () => {
     router.push('/connexion?redirect=/profil')
     return
   }
+  // Pro accounts have their own space — redirect immediately.
+  if (userAuth.isProvider) {
+    router.replace('/profil/pro')
+    return
+  }
   try {
     const res = await fetch('/api/v1/profile', {
       headers: {

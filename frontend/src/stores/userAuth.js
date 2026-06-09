@@ -16,12 +16,21 @@ export const useUserAuthStore = defineStore('userAuth', () => {
   const user  = ref(null)
   const token = ref(localStorage.getItem('user_token') || null)
 
-  const isLoggedIn = computed(() => !!token.value)
-  const fullName   = computed(() => user.value ? `${user.value.first_name} ${user.value.last_name}` : '')
-  const initials   = computed(() => {
+  const isLoggedIn  = computed(() => !!token.value)
+  const fullName    = computed(() => user.value ? `${user.value.first_name} ${user.value.last_name}` : '')
+  const initials    = computed(() => {
     if (!user.value) return ''
     return ((user.value.first_name?.[0] || '') + (user.value.last_name?.[0] || '')).toUpperCase()
   })
+  // True when the user has a provider profile (any status).
+  const isProvider  = computed(() => !!user.value?.provider_profile)
+  // True when the provider profile is approved by an admin.
+  const isApprovedProvider = computed(() =>
+    user.value?.provider_profile?.status === 'approved'
+  )
+  const profilePath = computed(() =>
+    isProvider.value ? '/profil/pro' : '/profil'
+  )
 
   async function register(payload) {
     await apiFetch('/auth/register', { method: 'POST', body: JSON.stringify(payload) })
@@ -94,5 +103,5 @@ export const useUserAuthStore = defineStore('userAuth', () => {
     localStorage.setItem('user_data', JSON.stringify(data))
   }
 
-  return { user, token, isLoggedIn, fullName, initials, register, login, logout, fetchMe, init, completeOnboarding }
+  return { user, token, isLoggedIn, fullName, initials, isProvider, isApprovedProvider, profilePath, register, login, logout, fetchMe, init, completeOnboarding }
 })

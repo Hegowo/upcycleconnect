@@ -1,319 +1,339 @@
 <template>
-  <div class="bg-[#f7f9ff] pb-0">
+  <div class="bg-[#f7f9ff] min-h-screen pb-16">
 
-    <section class="bg-[#edf4ff] px-6 py-12 overflow-hidden relative">
-      <div class="max-w-[1280px] mx-auto flex items-center gap-8">
+    <!-- Loading -->
+    <div v-if="loading" class="flex items-center justify-center py-40">
+      <div class="w-10 h-10 border-4 border-[#006d35] border-t-transparent rounded-full animate-spin" />
+    </div>
 
-        <div class="bg-white rounded-[24px] p-4 w-48 h-48 flex items-center justify-center shrink-0 shadow-xl">
-          <BuildingStorefrontIcon class="w-24 h-24 text-[#006d35]/40" />
-        </div>
+    <template v-else>
 
-        <div class="flex-1 flex flex-col gap-3">
-          <div class="flex items-center gap-3">
-            <span class="bg-[#006d35] text-white text-xs font-bold uppercase tracking-wide px-3 py-1 rounded-full">
-              {{ t('public.profileProfessionnel.badgeCertified') }}
-            </span>
-            <span class="text-[#40617f] text-xs uppercase tracking-wider">{{ t('public.profileProfessionnel.siretLabel') }}</span>
+      <!-- Pending / no profile state -->
+      <div v-if="!profile" class="max-w-2xl mx-auto px-6 py-20 text-center">
+        <BuildingStorefrontIcon class="w-16 h-16 text-[#006d35]/30 mx-auto mb-4" />
+        <h1 class="font-jakarta font-extrabold text-[#001d32] text-2xl mb-2">Espace professionnel</h1>
+        <p class="text-[#40617f] text-sm mb-6">Votre demande de compte professionnel est en cours de traitement par l'équipe UpcycleConnect.</p>
+        <div class="bg-amber-50 border border-amber-200 rounded-2xl px-6 py-4 inline-flex items-start gap-3 text-left">
+          <ExclamationTriangleIcon class="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+          <div>
+            <p class="font-semibold text-amber-800 text-sm">Validation en attente</p>
+            <p class="text-amber-700 text-xs mt-0.5">Statut actuel : <strong>{{ statusLabel(profile?.status || 'pending') }}</strong>. Vous serez notifié par email dès qu'un administrateur aura examiné votre dossier.</p>
           </div>
-          <h1 class="font-jakarta font-extrabold text-[#001d32] text-5xl tracking-tight">{{ t('public.profileProfessionnel.demoName') }}</h1>
-          <p class="font-jakarta font-semibold text-[#006d35] text-2xl">{{ t('public.profileProfessionnel.demoActivity') }}</p>
-          <div class="flex gap-4 mt-2 flex-wrap">
-            <button
-              class="flex items-center gap-2 px-8 py-3 rounded-xl text-white font-bold text-sm transition hover:opacity-90"
-              style="background: linear-gradient(168deg, #006d35 0%, #1b8848 100%);"
-            >
-              <EnvelopeIcon class="w-4 h-4" />
-              {{ t('public.profileProfessionnel.ctaContact') }}
-            </button>
-            <button class="flex items-center gap-2 bg-[#cee5ff] text-[#001d32] font-bold text-sm px-8 py-3 rounded-xl hover:bg-[#b8d8ff] transition">
-              <ShareIcon class="w-4 h-4" />
-              {{ t('public.profileProfessionnel.ctaShare') }}
-            </button>
-            <button @click="router.push('/profil/pro/evenements')"
-              class="flex items-center gap-2 bg-white text-[#006d35] border-2 border-[#006d35] font-bold text-sm px-8 py-3 rounded-xl hover:bg-[#edf4ff] transition">
-              <CalendarDaysIcon class="w-4 h-4" />
-              Mes événements
-            </button>
-            <button @click="router.push('/profil/pro/projets')"
-              class="flex items-center gap-2 bg-white text-[#006d35] border-2 border-[#006d35] font-bold text-sm px-8 py-3 rounded-xl hover:bg-[#edf4ff] transition">
-              <WrenchScrewdriverIcon class="w-4 h-4" />
-              Mes projets
-            </button>
-            <button @click="router.push('/profil/pro/collecte')"
-              class="flex items-center gap-2 bg-white text-[#006d35] border-2 border-[#006d35] font-bold text-sm px-8 py-3 rounded-xl hover:bg-[#edf4ff] transition">
-              <QrCodeIcon class="w-4 h-4" />
-              Collecte
-            </button>
-            <button @click="router.push('/profil/pro/abonnement')"
-              class="flex items-center gap-2 bg-white text-[#006d35] border-2 border-[#006d35] font-bold text-sm px-8 py-3 rounded-xl hover:bg-[#edf4ff] transition">
-              <StarIcon class="w-4 h-4" />
-              Abonnement
-            </button>
-            <button @click="router.push('/profil/pro/campagnes')"
-              class="flex items-center gap-2 bg-white text-[#006d35] border-2 border-[#006d35] font-bold text-sm px-8 py-3 rounded-xl hover:bg-[#edf4ff] transition">
-              <MegaphoneIcon class="w-4 h-4" />
-              Campagnes pub
-            </button>
-          </div>
-        </div>
-
-        <div class="flex flex-col gap-4 w-60 shrink-0">
-          <div class="bg-white rounded-xl p-4 flex items-center gap-4 shadow-sm">
-            <div class="w-11 h-11 bg-[#d1fae5] rounded-xl flex items-center justify-center shrink-0">
-              <CheckBadgeIcon class="w-6 h-6 text-[#006d35]" />
-            </div>
-            <div>
-              <p class="font-jakarta font-bold text-[#001d32] text-2xl">142</p>
-              <p class="text-[#40617f] text-xs uppercase tracking-wide">{{ t('public.profileProfessionnel.statProjects') }}</p>
-            </div>
-          </div>
-          <div class="bg-white rounded-xl p-4 flex items-center gap-4 shadow-sm">
-            <div class="w-11 h-11 bg-[#fef3c7] rounded-xl flex items-center justify-center shrink-0">
-              <StarIcon class="w-6 h-6 text-[#d97706]" />
-            </div>
-            <div>
-              <p class="font-jakarta font-bold text-[#001d32] text-2xl">4.9/5</p>
-              <p class="text-[#40617f] text-xs uppercase tracking-wide">{{ t('public.profileProfessionnel.statRating') }}</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="absolute -right-0 -top-0 w-60 h-60 opacity-20 pointer-events-none">
-          <div class="w-full h-full rounded-full bg-gradient-to-br from-[#006d35] to-transparent blur-3xl" />
         </div>
       </div>
-    </section>
 
-    <div class="max-w-[1280px] mx-auto px-6 py-10">
-      <div class="grid grid-cols-12 gap-6">
+      <template v-else>
+        <!-- Header -->
+        <section class="bg-[#edf4ff] px-6 py-10 relative overflow-hidden">
+          <div class="max-w-5xl mx-auto flex items-start gap-8 flex-wrap">
 
-        <div class="col-span-4 flex flex-col gap-6">
+            <!-- Avatar / logo -->
+            <div class="bg-white rounded-[24px] p-3 w-28 h-28 flex items-center justify-center shrink-0 shadow-lg">
+              <img v-if="userAuth.user?.avatar_url" :src="userAuth.user.avatar_url" class="w-full h-full object-cover rounded-[20px]" />
+              <BuildingStorefrontIcon v-else class="w-14 h-14 text-[#006d35]/40" />
+            </div>
 
-          <div class="bg-white rounded-[24px] p-8 flex flex-col gap-6">
-            <h2 class="font-jakarta font-bold text-[#001d32] text-xl">{{ t('public.profileProfessionnel.servicesTitle') }}</h2>
-            <div class="flex flex-col gap-5">
-              <div
-                v-for="service in services"
-                :key="service.title"
-                class="flex gap-4"
-              >
-                <div class="w-5 h-5 mt-0.5 shrink-0">
-                  <component :is="service.icon" class="w-5 h-5 text-[#006d35]" />
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-3 mb-2 flex-wrap">
+                <span v-if="profile.status === 'approved'" class="bg-[#006d35] text-white text-xs font-bold uppercase tracking-wide px-3 py-1 rounded-full">
+                  Certifié
+                </span>
+                <span v-else class="bg-amber-100 text-amber-700 text-xs font-bold uppercase tracking-wide px-3 py-1 rounded-full">
+                  {{ statusLabel(profile.status) }}
+                </span>
+                <span v-if="profile.siret" class="text-[#40617f] text-xs font-mono">SIRET {{ profile.siret }}</span>
+              </div>
+
+              <h1 class="font-jakarta font-extrabold text-[#001d32] text-4xl sm:text-5xl tracking-tight leading-tight mb-1">
+                {{ profile.company_name }}
+              </h1>
+              <p v-if="userAuth.fullName" class="text-[#40617f] text-sm mb-3">{{ userAuth.fullName }}</p>
+              <p v-if="profile.description" class="text-[#001d32] text-sm leading-relaxed max-w-xl mb-4">{{ profile.description }}</p>
+
+              <!-- Action buttons -->
+              <div class="flex gap-2 flex-wrap">
+                <RouterLink to="/profil/pro/projets"
+                  class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-white text-sm font-bold hover:opacity-90 transition"
+                  style="background:linear-gradient(135deg,#006d35,#1b8848);">
+                  <WrenchScrewdriverIcon class="w-4 h-4" /> Mes projets
+                </RouterLink>
+                <RouterLink to="/profil/pro/evenements"
+                  class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border-2 border-[#006d35] text-[#006d35] text-sm font-bold hover:bg-[#edf4ff] transition bg-white">
+                  <CalendarDaysIcon class="w-4 h-4" /> Événements
+                </RouterLink>
+                <RouterLink to="/profil/pro/collecte"
+                  class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border-2 border-[#006d35] text-[#006d35] text-sm font-bold hover:bg-[#edf4ff] transition bg-white">
+                  <QrCodeIcon class="w-4 h-4" /> Collecte
+                </RouterLink>
+                <RouterLink to="/profil/pro/abonnement"
+                  class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border-2 border-[#006d35] text-[#006d35] text-sm font-bold hover:bg-[#edf4ff] transition bg-white">
+                  <StarIcon class="w-4 h-4" /> Abonnement
+                </RouterLink>
+                <RouterLink to="/profil/pro/campagnes"
+                  class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border-2 border-[#006d35] text-[#006d35] text-sm font-bold hover:bg-[#edf4ff] transition bg-white">
+                  <MegaphoneIcon class="w-4 h-4" /> Campagnes
+                </RouterLink>
+                <RouterLink to="/profil/parametres"
+                  class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-[#e5e7eb] text-[#40617f] text-sm font-semibold hover:bg-white transition bg-white">
+                  <Cog6ToothIcon class="w-4 h-4" /> Paramètres
+                </RouterLink>
+              </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="flex flex-col gap-3 shrink-0 w-52">
+              <div class="bg-white rounded-xl p-4 flex items-center gap-3 shadow-sm">
+                <div class="w-10 h-10 rounded-xl bg-[#d1fae5] flex items-center justify-center">
+                  <WrenchScrewdriverIcon class="w-5 h-5 text-[#006d35]" />
                 </div>
                 <div>
-                  <p class="font-jakarta font-bold text-[#001d32] text-sm">{{ service.title }}</p>
-                  <p class="text-[#3f4a3f] text-xs leading-relaxed mt-1">{{ service.desc }}</p>
+                  <p class="font-jakarta font-bold text-[#001d32] text-xl">{{ projectCount }}</p>
+                  <p class="text-[#40617f] text-xs">Projets</p>
+                </div>
+              </div>
+              <div class="bg-white rounded-xl p-4 flex items-center gap-3 shadow-sm">
+                <div class="w-10 h-10 rounded-xl bg-[#fef3c7] flex items-center justify-center">
+                  <CheckBadgeIcon class="w-5 h-5 text-[#d97706]" />
+                </div>
+                <div>
+                  <p class="font-jakarta font-bold text-[#001d32] text-xl">{{ prestationCount }}</p>
+                  <p class="text-[#40617f] text-xs">Prestations</p>
                 </div>
               </div>
             </div>
           </div>
+        </section>
 
-          <div class="bg-white rounded-[24px] p-8 flex flex-col gap-6">
-            <h2 class="font-jakarta font-bold text-[#001d32] text-xl">{{ t('public.profileProfessionnel.certsTitle') }}</h2>
-            <div class="grid grid-cols-2 gap-4">
-              <div
-                v-for="cert in certs"
-                :key="cert.label"
-                class="bg-[#edf4ff] rounded-xl p-4 flex flex-col items-center gap-2"
-                :class="cert.wide ? 'col-span-2' : ''"
-              >
-                <component :is="cert.icon" class="w-6 h-6 text-[#006d35]" />
-                <span class="text-[#001d32] text-xs font-bold uppercase tracking-wide text-center">{{ cert.label }}</span>
-              </div>
-            </div>
-          </div>
+        <!-- Body -->
+        <div class="max-w-5xl mx-auto px-6 py-10 grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-        </div>
-
-        <div class="col-span-8 flex flex-col gap-6">
-
-          <div class="bg-white rounded-[24px] p-8 flex flex-col gap-8">
-            <div class="flex items-end justify-between">
-              <div>
-                <h2 class="font-jakarta font-bold text-[#001d32] text-2xl">{{ t('public.profileProfessionnel.projectsTitle') }}</h2>
-                <p class="text-[#3f4a3f] text-sm mt-1">{{ t('public.profileProfessionnel.projectsSubtitle') }}</p>
-              </div>
-              <button class="flex items-center gap-1 text-[#006d35] font-bold text-sm hover:underline">
-                {{ t('public.profileProfessionnel.seeAll') }} <ChevronRightIcon class="w-3.5 h-3.5" />
+          <!-- Profil card (modifiable) -->
+          <div class="lg:col-span-1 bg-white rounded-[24px] border border-[#edf4ff] p-6 flex flex-col gap-5">
+            <div class="flex items-center justify-between">
+              <h2 class="font-jakarta font-bold text-[#001d32] text-lg">Informations</h2>
+              <button @click="editing = !editing" class="text-xs text-[#006d35] font-semibold hover:underline">
+                {{ editing ? 'Annuler' : 'Modifier' }}
               </button>
             </div>
 
-            <!-- Real projects from API -->
-            <div v-if="realProjects.length" class="grid grid-cols-2 gap-6">
-              <div v-for="p in realProjects.slice(0,4)" :key="p.id" class="flex flex-col">
-                <div class="relative h-64 rounded-xl overflow-hidden bg-gradient-to-br from-[#d1fae5] to-[#a7f3d0]">
-                  <img v-if="p.cover_image" :src="p.cover_image" class="w-full h-full object-cover" />
-                  <WrenchScrewdriverIcon v-else class="absolute inset-0 m-auto w-24 h-24 text-white/20" />
-                  <div class="absolute top-4 left-4">
-                    <span class="bg-white/90 backdrop-blur-sm text-[#006d35] text-xs font-semibold uppercase px-3 py-1 rounded-full">
-                      {{ p.category || 'Upcycling' }}
-                    </span>
+            <template v-if="!editing">
+              <dl class="space-y-3 text-sm">
+                <div>
+                  <dt class="text-[#94a3b8] text-xs uppercase tracking-wider mb-0.5">Société</dt>
+                  <dd class="font-semibold text-[#001d32]">{{ profile.company_name }}</dd>
+                </div>
+                <div v-if="profile.siret">
+                  <dt class="text-[#94a3b8] text-xs uppercase tracking-wider mb-0.5">SIRET</dt>
+                  <dd class="font-mono text-[#001d32]">{{ profile.siret }}</dd>
+                </div>
+                <div v-if="profile.website">
+                  <dt class="text-[#94a3b8] text-xs uppercase tracking-wider mb-0.5">Site web</dt>
+                  <dd><a :href="profile.website" target="_blank" class="text-[#006d35] hover:underline truncate block">{{ profile.website }}</a></dd>
+                </div>
+                <div>
+                  <dt class="text-[#94a3b8] text-xs uppercase tracking-wider mb-0.5">Email</dt>
+                  <dd class="text-[#001d32]">{{ userAuth.user?.email }}</dd>
+                </div>
+                <div v-if="userAuth.user?.phone">
+                  <dt class="text-[#94a3b8] text-xs uppercase tracking-wider mb-0.5">Téléphone</dt>
+                  <dd class="text-[#001d32]">{{ userAuth.user.phone }}</dd>
+                </div>
+              </dl>
+            </template>
+
+            <!-- Edit form -->
+            <form v-else @submit.prevent="saveProfile" class="space-y-3">
+              <div>
+                <label class="block text-xs font-semibold text-[#40617f] uppercase mb-1">Nom de l'entreprise *</label>
+                <input v-model="editForm.company_name" type="text" required
+                  class="w-full px-3 py-2.5 bg-[#f8fafc] border border-[#e5e7eb] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#006d35]/30" />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-[#40617f] uppercase mb-1">Description</label>
+                <textarea v-model="editForm.description" rows="3"
+                  class="w-full px-3 py-2.5 bg-[#f8fafc] border border-[#e5e7eb] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#006d35]/30 resize-none"
+                  placeholder="Décrivez votre activité..." />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-[#40617f] uppercase mb-1">Site web</label>
+                <input v-model="editForm.website" type="url" placeholder="https://"
+                  class="w-full px-3 py-2.5 bg-[#f8fafc] border border-[#e5e7eb] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#006d35]/30" />
+              </div>
+              <p v-if="saveError" class="text-red-600 text-xs">{{ saveError }}</p>
+              <button type="submit" :disabled="saving"
+                class="w-full py-2.5 rounded-xl text-white font-bold text-sm hover:opacity-90 disabled:opacity-50 transition"
+                style="background:linear-gradient(135deg,#006d35,#1b8848);">
+                {{ saving ? 'Enregistrement...' : 'Enregistrer' }}
+              </button>
+            </form>
+          </div>
+
+          <!-- Projects -->
+          <div class="lg:col-span-2 flex flex-col gap-6">
+            <div class="bg-white rounded-[24px] border border-[#edf4ff] p-6">
+              <div class="flex items-center justify-between mb-5">
+                <h2 class="font-jakarta font-bold text-[#001d32] text-xl">Projets d'upcycling</h2>
+                <RouterLink to="/profil/pro/projets" class="text-xs text-[#006d35] font-semibold hover:underline">
+                  Gérer mes projets →
+                </RouterLink>
+              </div>
+
+              <div v-if="!realProjects.length" class="text-center py-8">
+                <WrenchScrewdriverIcon class="w-10 h-10 text-gray-200 mx-auto mb-2" />
+                <p class="text-[#94a3b8] text-sm">Aucun projet pour l'instant.</p>
+                <RouterLink to="/profil/pro/projets" class="text-[#006d35] text-sm font-semibold hover:underline mt-1 inline-block">
+                  Créer mon premier projet
+                </RouterLink>
+              </div>
+
+              <div v-else class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div v-for="p in realProjects.slice(0,4)" :key="p.id"
+                  class="flex flex-col rounded-2xl overflow-hidden border border-[#f1f5f9] hover:border-[#006d35] transition">
+                  <div class="h-40 bg-gradient-to-br from-[#d1fae5] to-[#a7f3d0] relative overflow-hidden">
+                    <img v-if="p.cover_image" :src="p.cover_image" class="w-full h-full object-cover" />
+                    <WrenchScrewdriverIcon v-else class="absolute inset-0 m-auto w-14 h-14 text-white/30" />
+                    <span v-if="p.category" class="absolute top-3 left-3 bg-white/90 text-[#006d35] text-xs font-semibold px-2 py-0.5 rounded-full">{{ p.category }}</span>
+                    <span v-if="p.impact_label" class="absolute bottom-3 right-3 bg-[#006d35] text-white text-xs font-semibold px-2 py-0.5 rounded-full">{{ p.impact_label }}</span>
                   </div>
-                  <div v-if="p.impact_label" class="absolute bottom-4 right-4">
-                    <span class="bg-[#006d35] text-white text-xs font-semibold px-3 py-1 rounded-full">
-                      {{ p.impact_label }}
-                    </span>
+                  <div class="p-3 flex-1">
+                    <p class="font-jakarta font-bold text-[#001d32] text-sm line-clamp-1">{{ p.title }}</p>
+                    <p class="text-[#40617f] text-xs mt-0.5 line-clamp-2">{{ p.description }}</p>
+                    <p class="text-xs text-[#94a3b8] mt-1">{{ p.step_count }} étape{{ p.step_count !== 1 ? 's' : '' }}</p>
                   </div>
                 </div>
-                <h3 class="font-jakarta font-bold text-[#001d32] text-lg mt-3">{{ p.title }}</h3>
-                <p class="text-[#3f4a3f] text-sm leading-relaxed mt-1 line-clamp-3">{{ p.description }}</p>
               </div>
             </div>
-            <!-- Fallback mock projects when no real data yet -->
-            <div v-else class="grid grid-cols-2 gap-6">
-              <div v-for="project in projects" :key="project.id" class="flex flex-col">
-                <div class="relative h-64 rounded-xl overflow-hidden bg-gradient-to-br"
-                  :style="`background: linear-gradient(135deg, ${project.colorFrom}, ${project.colorTo});`"
-                >
-                  <div class="absolute inset-0 flex items-center justify-center">
-                    <component :is="project.icon" class="w-24 h-24 text-white/20" />
+
+            <!-- Prestations -->
+            <div class="bg-white rounded-[24px] border border-[#edf4ff] p-6">
+              <div class="flex items-center justify-between mb-5">
+                <h2 class="font-jakarta font-bold text-[#001d32] text-xl">Mes prestations</h2>
+                <RouterLink to="/prestations" class="text-xs text-[#006d35] font-semibold hover:underline">
+                  Voir tout →
+                </RouterLink>
+              </div>
+              <div v-if="!prestations.length" class="text-center py-8">
+                <p class="text-[#94a3b8] text-sm">Aucune prestation publiée.</p>
+              </div>
+              <div v-else class="divide-y divide-[#f1f5f9]">
+                <div v-for="s in prestations.slice(0,5)" :key="s.id" class="py-3 flex items-center justify-between gap-3">
+                  <div class="flex-1 min-w-0">
+                    <p class="font-semibold text-[#001d32] text-sm truncate">{{ s.title }}</p>
+                    <p class="text-[#40617f] text-xs">{{ s.category?.name || 'Sans catégorie' }}</p>
                   </div>
-                  <div class="absolute top-4 left-4">
-                    <span class="bg-white/90 backdrop-blur-sm text-[#006d35] text-xs font-semibold uppercase px-3 py-1 rounded-full">
-                      {{ project.badge }}
-                    </span>
-                  </div>
-                  <div class="absolute bottom-4 right-4">
-                    <span class="bg-[#006d35] text-white text-xs font-semibold px-3 py-1 rounded-full">
-                      {{ project.impact }}
-                    </span>
+                  <div class="text-right shrink-0">
+                    <p class="text-[#006d35] font-semibold text-sm">{{ s.price ? formatEUR(s.price) : 'Sur devis' }}</p>
+                    <span :class="prestationBadge(s.status)" class="text-xs font-semibold px-2 py-0.5 rounded-full">{{ prestationLabel(s.status) }}</span>
                   </div>
                 </div>
-                <h3 class="font-jakarta font-bold text-[#001d32] text-lg mt-3">{{ project.title }}</h3>
-                <p class="text-[#3f4a3f] text-sm leading-relaxed mt-1">{{ project.desc }}</p>
               </div>
             </div>
           </div>
-
-          <div class="bg-[#edf4ff] rounded-[24px] p-8 flex flex-col gap-8">
-            <div>
-              <h2 class="font-jakarta font-bold text-[#001d32] text-2xl">{{ t('public.profileProfessionnel.shopTitle') }}</h2>
-              <p class="text-[#3f4a3f] text-sm mt-1">{{ t('public.profileProfessionnel.shopSubtitle') }}</p>
-            </div>
-
-            <div class="grid grid-cols-3 gap-6">
-              <div
-                v-for="product in products"
-                :key="product.id"
-                class="bg-white rounded-xl overflow-hidden"
-              >
-                <div class="relative h-40 bg-gradient-to-br"
-                  :style="`background: linear-gradient(135deg, ${product.colorFrom}, ${product.colorTo});`"
-                >
-                  <div class="absolute inset-0 flex items-center justify-center">
-                    <component :is="product.icon" class="w-14 h-14 text-white/30" />
-                  </div>
-                  <button class="absolute top-2 right-2 w-7 h-7 bg-white/90 rounded-full flex items-center justify-center hover:bg-white transition">
-                    <HeartIcon class="w-3.5 h-3.5 text-[#40617f]" />
-                  </button>
-                </div>
-                <div class="p-3">
-                  <p class="font-jakarta font-bold text-[#001d32] text-sm">{{ product.title }}</p>
-                  <div class="flex items-center justify-between mt-2">
-                    <span class="text-[#006d35] font-semibold text-sm">{{ product.price }}</span>
-                    <button class="bg-[rgba(0,109,53,0.1)] p-2 rounded-lg hover:bg-[rgba(0,109,53,0.2)] transition">
-                      <ShoppingCartIcon class="w-4 h-4 text-[#006d35]" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
         </div>
-      </div>
-    </div>
-
+      </template>
+    </template>
   </div>
 </template>
 
-<script setup>import { ref, computed, onMounted } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
+<script setup>
+import { ref, onMounted } from 'vue'
+import { RouterLink, useRouter } from 'vue-router'
 import {
   BuildingStorefrontIcon,
-  EnvelopeIcon,
-  ShareIcon,
-  CheckBadgeIcon,
-  StarIcon,
-  ChevronRightIcon,
-  HomeModernIcon,
-  ScissorsIcon,
-  LightBulbIcon,
-  SparklesIcon,
-  HeartIcon,
-  ShoppingCartIcon,
-  GlobeAltIcon,
-  SparklesIcon as LeafIcon,
-  TrophyIcon,
-  CalendarDaysIcon,
   WrenchScrewdriverIcon,
+  CalendarDaysIcon,
   QrCodeIcon,
+  StarIcon,
   MegaphoneIcon,
+  Cog6ToothIcon,
+  CheckBadgeIcon,
+  ExclamationTriangleIcon,
 } from '@heroicons/vue/24/outline'
+import { useUserAuthStore } from '@/stores/userAuth'
 import { userApi } from '@/services/publicApi'
 
-const { t } = useI18n()
-const router = useRouter()
+const router   = useRouter()
+const userAuth = useUserAuthStore()
+
+const loading      = ref(true)
+const profile      = ref(null)
 const realProjects = ref([])
+const prestations  = ref([])
+const projectCount   = ref(0)
+const prestationCount = ref(0)
+const editing  = ref(false)
+const saving   = ref(false)
+const saveError = ref('')
+
+const editForm = ref({ company_name: '', description: '', website: '' })
+
+function statusLabel(s) {
+  return { pending: 'En attente', approved: 'Approuvé', suspended: 'Suspendu', rejected: 'Rejeté' }[s] || s
+}
+function formatEUR(price) {
+  const n = parseFloat(price)
+  return isNaN(n) ? price : new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(n)
+}
+function prestationLabel(s) {
+  return { draft: 'Brouillon', published: 'Publié', archived: 'Archivé' }[s] || s
+}
+function prestationBadge(s) {
+  if (s === 'published') return 'bg-green-100 text-green-800'
+  if (s === 'draft') return 'bg-yellow-100 text-yellow-800'
+  return 'bg-gray-100 text-gray-600'
+}
+
+async function loadData() {
+  loading.value = true
+  try {
+    const [profileData, projectsData, prestationsData] = await Promise.all([
+      userApi('/provider/profile').catch(() => null),
+      userApi('/projects').catch(() => ({ data: [] })),
+      userApi('/provider/prestations').catch(() => ({ data: [] })),
+    ])
+    profile.value      = profileData
+    realProjects.value = projectsData.data || []
+    prestations.value  = prestationsData.data || []
+    projectCount.value   = realProjects.value.length
+    prestationCount.value = prestations.value.length
+
+    if (profile.value) {
+      editForm.value = {
+        company_name: profile.value.company_name || '',
+        description:  profile.value.description  || '',
+        website:      profile.value.website       || '',
+      }
+    }
+  } catch {}
+  loading.value = false
+}
+
+async function saveProfile() {
+  saving.value   = true
+  saveError.value = ''
+  try {
+    const updated = await userApi('/provider/profile', {
+      method: 'PUT',
+      body: JSON.stringify({
+        company_name: editForm.value.company_name,
+        description:  editForm.value.description  || null,
+        website:      editForm.value.website       || null,
+      }),
+    })
+    profile.value = updated
+    editing.value = false
+  } catch (e) {
+    saveError.value = e.message || 'Erreur lors de l\'enregistrement.'
+  } finally {
+    saving.value = false
+  }
+}
 
 onMounted(async () => {
-  try {
-    const data = await userApi('/projects')
-    realProjects.value = data.data || []
-  } catch {}
+  if (!userAuth.isLoggedIn) {
+    router.replace('/connexion?redirect=/profil/pro')
+    return
+  }
+  await loadData()
 })
-
-const services = computed(() => [
-  {
-    icon: HomeModernIcon,
-    title: t('public.profileProfessionnel.service1Title'),
-    desc:  t('public.profileProfessionnel.service1Desc'),
-  },
-  {
-    icon: ScissorsIcon,
-    title: t('public.profileProfessionnel.service2Title'),
-    desc:  t('public.profileProfessionnel.service2Desc'),
-  },
-  {
-    icon: LightBulbIcon,
-    title: t('public.profileProfessionnel.service3Title'),
-    desc:  t('public.profileProfessionnel.service3Desc'),
-  },
-])
-
-const certs = computed(() => [
-  { icon: GlobeAltIcon, label: t('public.profileProfessionnel.certNetwork'),    wide: false },
-  { icon: LeafIcon,     label: t('public.profileProfessionnel.certZeroWaste'),  wide: false },
-  { icon: TrophyIcon,   label: t('public.profileProfessionnel.certArtisan'),    wide: true  },
-])
-
-const projects = computed(() => [
-  {
-    id: 1,
-    title: t('public.profileProfessionnel.project1Title'),
-    desc:  t('public.profileProfessionnel.project1Desc'),
-    badge: t('public.profileProfessionnel.project1Badge'),
-    impact: t('public.profileProfessionnel.project1Impact'),
-    colorFrom: '#d1fae5',
-    colorTo: '#a7f3d0',
-    icon: HomeModernIcon,
-  },
-  {
-    id: 2,
-    title: t('public.profileProfessionnel.project2Title'),
-    desc:  t('public.profileProfessionnel.project2Desc'),
-    badge: t('public.profileProfessionnel.project2Badge'),
-    impact: t('public.profileProfessionnel.project2Impact'),
-    colorFrom: '#fef3c7',
-    colorTo: '#fde68a',
-    icon: LightBulbIcon,
-  },
-])
-
-const products = computed(() => [
-  { id: 1, title: t('public.profileProfessionnel.product1Title'), price: '85,00 €',  colorFrom: '#fef3c7', colorTo: '#fde68a', icon: LightBulbIcon },
-  { id: 2, title: t('public.profileProfessionnel.product2Title'), price: '210,00 €', colorFrom: '#d1fae5', colorTo: '#a7f3d0', icon: HomeModernIcon },
-  { id: 3, title: t('public.profileProfessionnel.product3Title'), price: '45,00 €',  colorFrom: '#f3e8ff', colorTo: '#e9d5ff', icon: SparklesIcon },
-])
 </script>
