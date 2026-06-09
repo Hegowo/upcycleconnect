@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strconv"
+	"time"
 
 	"upcycleconnect/backend/middleware"
 	"upcycleconnect/backend/models"
@@ -498,4 +499,31 @@ func (h *UserProviderHandler) DownloadKbis(c *gin.Context) {
 	c.Header("Content-Disposition", fmt.Sprintf(`inline; filename="%s"`, filename))
 	c.Header("Content-Type", contentType)
 	c.File(path)
+}
+
+// CompleteOnboarding marks the provider's onboarding wizard as completed.
+// Called by the frontend when the pro finishes the interactive setup on /profil/pro.
+func (h *UserProviderHandler) CompleteOnboarding(c *gin.Context) {
+	user := middleware.GetAuthUser(c)
+	if user == nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Non authentifié"})
+		return
+	}
+	var profile models.ProviderProfile
+	if err := h.DB.Where("user_id = ?", user.ID).First(&profile).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": "Profil prestataire introuvable"})
+		return
+	}
+	if profile.OnboardingCompletedAt != nil {
+		c.JSON(http.StatusOK, models.ToProviderProfileResponse(&profile))
+		return
+	}
+	now := time.Now()
+	if err := h.DB.Model(&profile).Update("onboarding_completed_at", now).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Erreur lors de l'enregistrement"})
+		return
+	}
+	profile.OnboardingCompletedAt = &now
+	h.Audit.Log(c, "provider.onboarded", "ProviderProfile", &profile.ID, nil, nil)
+	c.JSON(http.StatusOK, models.ToProviderProfileResponse(&profile))
 }
