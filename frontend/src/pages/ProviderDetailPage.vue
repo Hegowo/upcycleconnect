@@ -50,6 +50,27 @@
             <dt class="text-xs text-gray-400 uppercase font-medium mb-1">{{ t('providers.fieldDescription') }}</dt>
             <dd class="text-gray-700 leading-relaxed">{{ provider.profile?.description || t('providers.noDescription') }}</dd>
           </div>
+
+          <!-- Kbis document -->
+          <div class="col-span-2">
+            <dt class="text-xs text-gray-400 uppercase font-medium mb-2">Document officiel (Kbis)</dt>
+            <dd>
+              <a
+                v-if="provider.profile?.has_kbis"
+                :href="`/api/admin/v1/providers/${provider.id}/kbis`"
+                target="_blank"
+                rel="noopener"
+                class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-[#006d35] text-[#006d35] text-sm font-semibold hover:bg-[#f0fdf4] transition"
+              >
+                <DocumentArrowDownIcon class="w-4 h-4" />
+                Consulter le Kbis
+              </a>
+              <span v-else class="inline-flex items-center gap-1.5 text-amber-600 text-sm">
+                <ExclamationTriangleIcon class="w-4 h-4" />
+                Aucun Kbis déposé
+              </span>
+            </dd>
+          </div>
         </dl>
 
         <div class="flex gap-3 pt-6 mt-2 border-t border-gray-100">
@@ -81,6 +102,7 @@ import { useI18n } from 'vue-i18n'
 import { providerService } from '@/services/userService'
 import { useToast } from '@/utils/useToast'
 import AppBadge from '@/components/AppBadge.vue'
+import { DocumentArrowDownIcon, ExclamationTriangleIcon } from '@heroicons/vue/24/outline'
 
 const { t } = useI18n()
 const route    = useRoute()

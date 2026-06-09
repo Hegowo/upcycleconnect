@@ -1,8 +1,11 @@
 package handlers
 
 import (
+	"fmt"
 	"math"
 	"net/http"
+	"os"
+	"path/filepath"
 	"regexp"
 	"strconv"
 
@@ -379,4 +382,120 @@ func (h *UserProviderHandler) DestroyPrestation(c *gin.Context) {
 	}, nil)
 	h.DB.Delete(&p)
 	c.Status(http.StatusNoContent)
+}
+
+// UploadKbis accepts a multipart PDF or image file as the provider's official Kbis document.
+// Replaces any previously uploaded file. The file is stored in /uploads/kbis/ and is never
+// deleted — admins can always retrieve it even after the provider is approved.
+func (h *UserProviderHandler) UploadKbis(c *gin.Context) {
+	user := middleware.GetAuthUser(c)
+	if user == nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Non authentifié"})
+		return
+	}
+
+	var profile models.ProviderProfile
+	if err := h.DB.Where("user_id = ?", user.ID).First(&profile).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": "Aucun profil prestataire trouvé. Soumets d'abord ta candidature."})
+		return
+	}
+
+	file, header, err := c.Request.FormFile("kbis")
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"message": "Fichier Kbis requis (champ 'kbis')"})
+		return
+	}
+	defer file.Close()
+
+	// Validate extension: accept PDF and common image formats.
+	ext := filepath.Ext(header.Filename)
+	allowed := map[string]bool{".pdf": true, ".jpg": true, ".jpeg": true, ".png": true}
+	if !allowed[ext] {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"message": "Format invalide. Acceptés : PDF, JPG, PNG"})
+		return
+	}
+
+	// Limit to 10 MB.
+	if header.Size > 10*1024*1024 {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"message": "Fichier trop volumineux (max 10 Mo)"})
+		return
+	}
+
+	dir := "/uploads/kbis"
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Impossible de créer le dossier de stockage"})
+		return
+	}
+
+	filename := fmt.Sprintf("kbis-%d%s", user.ID, ext)
+	destPath := filepath.Join(dir, filename)
+
+	buf := make([]byte, header.Size)
+	if _, err := file.Read(buf); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Erreur lors de la lecture du fichier"})
+		return
+	}
+	if err := os.WriteFile(destPath, buf, 0644); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Erreur lors de l'enregistrement du fichier"})
+		return
+	}
+
+	if err := h.DB.Model(&profile).Update("kbis_path", destPath).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Erreur lors de la mise à jour du profil"})
+		return
+	}
+	profile.KbisPath = &destPath
+
+	h.Audit.Log(c, "provider.kbis_uploaded", "ProviderProfile", &profile.ID, nil, map[string]interface{}{
+		"filename": filename,
+	})
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":  "Kbis enregistré avec succès.",
+		"has_kbis": true,
+		"profile":  models.ToProviderProfileResponse(&profile),
+	})
+}
+
+// DownloadKbis streams the Kbis file to the admin. Only admins can access this route.
+func (h *UserProviderHandler) DownloadKbis(c *gin.Context) {
+	providerID, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "ID invalide"})
+		return
+	}
+
+	// Load the provider's profile
+	var profile models.ProviderProfile
+	if err := h.DB.Where("user_id = ?", providerID).First(&profile).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": "Profil prestataire introuvable"})
+		return
+	}
+
+	if profile.KbisPath == nil || *profile.KbisPath == "" {
+		c.JSON(http.StatusNotFound, gin.H{"message": "Aucun Kbis déposé pour ce prestataire"})
+		return
+	}
+
+	path := *profile.KbisPath
+	if _, err := os.Stat(path); err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": "Fichier introuvable sur le serveur"})
+		return
+	}
+
+	ext := filepath.Ext(path)
+	contentType := "application/octet-stream"
+	switch ext {
+	case ".pdf":
+		contentType = "application/pdf"
+	case ".jpg", ".jpeg":
+		contentType = "image/jpeg"
+	case ".png":
+		contentType = "image/png"
+	}
+
+	filename := fmt.Sprintf("kbis-provider-%d%s", providerID, ext)
+	c.Header("Content-Disposition", fmt.Sprintf(`inline; filename="%s"`, filename))
+	c.Header("Content-Type", contentType)
+	c.File(path)
 }

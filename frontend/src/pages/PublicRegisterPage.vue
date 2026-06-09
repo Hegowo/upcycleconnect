@@ -398,6 +398,29 @@
                         </div>
                       </div>
                     </Transition>
+
+                    <!-- Kbis upload -->
+                    <div>
+                      <label class="block text-xs font-medium text-[#001d32] mb-1">
+                        Document officiel (Kbis, extrait RCS...) <span class="text-red-400">*</span>
+                      </label>
+                      <div
+                        class="w-full border-2 border-dashed rounded-xl p-4 text-center cursor-pointer transition-colors"
+                        :class="kbisFile ? 'border-[#006d35] bg-[#f0fdf4]' : 'border-[#e2e8f0] hover:border-[#006d35] bg-white'"
+                        @click="$refs.kbisInput.click()"
+                        @dragover.prevent
+                        @drop.prevent="onKbisDrop"
+                      >
+                        <input ref="kbisInput" type="file" accept=".pdf,.jpg,.jpeg,.png" class="hidden" @change="onKbisChange" />
+                        <DocumentArrowUpIcon v-if="!kbisFile" class="w-8 h-8 text-[#94a3b8] mx-auto mb-2" />
+                        <CheckCircleIcon v-else class="w-8 h-8 text-[#006d35] mx-auto mb-2" />
+                        <p class="text-sm font-medium" :class="kbisFile ? 'text-[#006d35]' : 'text-[#40617f]'">
+                          {{ kbisFile ? kbisFile.name : 'Glisse ton Kbis ici ou clique pour choisir' }}
+                        </p>
+                        <p class="text-xs text-[#94a3b8] mt-1">PDF, JPG ou PNG — max 10 Mo</p>
+                      </div>
+                      <p v-if="kbisError" class="text-red-500 text-xs mt-1">{{ kbisError }}</p>
+                    </div>
                   </div>
                 </template>
 
@@ -562,6 +585,7 @@ import {
   ChevronRightIcon,
   LockClosedIcon,
   EnvelopeIcon,
+  DocumentArrowUpIcon,
 } from '@heroicons/vue/24/outline'
 
 const { t } = useI18n()
@@ -575,8 +599,34 @@ const siretLoading = ref(false)
 const siretStatus = ref('')
 const companyData = ref(null)
 const showPassword = ref(false)
-const loading = ref(false)
-const error = ref('')
+const loading  = ref(false)
+const error    = ref('')
+const kbisFile  = ref(null)
+const kbisError = ref('')
+
+function onKbisChange(e) {
+  const file = e.target.files[0]
+  if (!file) return
+  validateKbis(file)
+}
+function onKbisDrop(e) {
+  const file = e.dataTransfer.files[0]
+  if (!file) return
+  validateKbis(file)
+}
+function validateKbis(file) {
+  kbisError.value = ''
+  const allowed = ['application/pdf', 'image/jpeg', 'image/png']
+  if (!allowed.includes(file.type)) {
+    kbisError.value = 'Format invalide. Acceptés : PDF, JPG, PNG.'
+    return
+  }
+  if (file.size > 10 * 1024 * 1024) {
+    kbisError.value = 'Fichier trop volumineux (max 10 Mo).'
+    return
+  }
+  kbisFile.value = file
+}
 const addressQuery = ref('')
 const showAddressFields = ref(false)
 
@@ -696,8 +746,13 @@ const strengthLabel = computed(() => [
 ][passwordStrength.value])
 
 async function handleRegister() {
+  // Validate Kbis for pro accounts
+  if (accountType.value === 'provider' && !kbisFile.value) {
+    kbisError.value = 'Le document officiel (Kbis) est obligatoire pour une inscription prestataire.'
+    return
+  }
   loading.value = true
-  error.value = ''
+  error.value   = ''
   try {
     const addressParts = [
       form.value.streetNumber,
@@ -719,6 +774,26 @@ async function handleRegister() {
       activity:     form.value.activity || null,
       address:      fullAddress,
     })
+
+    // For pro accounts: log in then upload the Kbis immediately after registration.
+    // The account is pending admin validation — the Kbis helps admins decide.
+    if (accountType.value === 'provider' && kbisFile.value) {
+      try {
+        await userAuth.login(form.value.email, form.value.password)
+      } catch {}
+      if (userAuth.token) {
+        const fd = new FormData()
+        fd.append('kbis', kbisFile.value)
+        await fetch('/api/v1/provider/kbis', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${userAuth.token}` },
+          body: fd,
+        })
+        // Log out again — the account needs email verification first.
+        await userAuth.logout()
+      }
+    }
+
     step.value = 'done'
   } catch (e) {
     error.value = e.message || t('public.register.errorGeneric')

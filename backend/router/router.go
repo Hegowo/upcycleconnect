@@ -231,6 +231,7 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 			userProtected.POST("/provider/apply", userProviderHandler.Apply)
 			userProtected.GET("/provider/profile", userProviderHandler.GetProfile)
 			userProtected.PUT("/provider/profile", userProviderHandler.UpdateProfile)
+			userProtected.POST("/provider/kbis", userProviderHandler.UploadKbis)
 			userProtected.GET("/provider/prestations", userProviderHandler.ListPrestations)
 			userProtected.POST("/provider/prestations", userProviderHandler.CreatePrestation)
 			userProtected.PUT("/provider/prestations/:id", userProviderHandler.UpdatePrestation)
@@ -275,6 +276,7 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 			protected.GET("/providers", providerHandler.Index)
 			protected.GET("/providers/:id", providerHandler.Show)
 			protected.PUT("/providers/:id/status", providerHandler.UpdateStatus)
+			protected.GET("/providers/:id/kbis", userProviderHandler.DownloadKbis)
 
 			protected.GET("/categories", categoryHandler.Index)
 			protected.POST("/categories", categoryHandler.Store)
