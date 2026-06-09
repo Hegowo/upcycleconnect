@@ -70,7 +70,10 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 	}
 	invoiceHandler := &handlers.InvoiceHandler{DB: db}
 	contractHandler := &handlers.ContractHandler{DB: db, PDF: pdfService, Audit: audit}
-	tipHandler := &handlers.TipHandler{DB: db, Audit: audit}
+	tipHandler          := &handlers.TipHandler{DB: db, Audit: audit}
+	subscriptionHandler := &handlers.SubscriptionHandler{DB: db, Stripe: stripeService, Audit: audit}
+	campaignHandler     := &handlers.CampaignHandler{DB: db, Stripe: stripeService, Audit: audit}
+	projectHandler      := &handlers.UpcyclingProjectHandler{DB: db, Audit: audit}
 
 	r.Static("/uploads", "/uploads")
 
@@ -102,6 +105,11 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 
 		public.GET("/tips", tipHandler.PublicIndex)
 		public.GET("/tips/:slug", tipHandler.PublicShow)
+
+		public.GET("/subscription/plans", subscriptionHandler.Plans)
+		public.GET("/campaigns/active", campaignHandler.ActiveCampaigns)
+		public.GET("/projects", projectHandler.PublicIndex)
+		public.GET("/projects/:id", projectHandler.PublicShow)
 	}
 
 	userAPI := r.Group("/api/v1")
@@ -156,6 +164,30 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 			userProtected.GET("/invoices/:id/download", invoiceHandler.Download)
 			userProtected.GET("/contracts/:id/download", contractHandler.Download)
 			userProtected.GET("/provider/contracts", contractHandler.ProviderContracts)
+
+			// Abonnements
+			userProtected.GET("/subscription", subscriptionHandler.MySubscription)
+			userProtected.POST("/subscription/checkout", subscriptionHandler.Checkout)
+			userProtected.POST("/subscription/cancel", subscriptionHandler.Cancel)
+
+			// Campagnes publicitaires
+			userProtected.GET("/campaigns", campaignHandler.MyCampaigns)
+			userProtected.POST("/campaigns", campaignHandler.CreateCampaign)
+			userProtected.PUT("/campaigns/:id", campaignHandler.UpdateCampaign)
+			userProtected.DELETE("/campaigns/:id", campaignHandler.DeleteCampaign)
+			userProtected.POST("/campaigns/:id/submit", campaignHandler.SubmitCampaign)
+
+			// Projets Upcycling
+			userProtected.GET("/projects", projectHandler.MyProjects)
+			userProtected.POST("/projects", projectHandler.CreateProject)
+			userProtected.PUT("/projects/:id", projectHandler.UpdateProject)
+			userProtected.DELETE("/projects/:id", projectHandler.DeleteProject)
+			userProtected.POST("/projects/:id/steps", projectHandler.AddStep)
+			userProtected.PUT("/projects/:id/steps/:step_id", projectHandler.UpdateStep)
+			userProtected.DELETE("/projects/:id/steps/:step_id", projectHandler.DeleteStep)
+
+			// Collecte code-barres (pro/artisan)
+			userProtected.POST("/deposits/collect", userDepositHandler.CollectDeposit)
 
 			userProtected.GET("/notifications", notificationHandler.Index)
 			userProtected.GET("/notifications/unread-count", notificationHandler.UnreadCount)
@@ -266,6 +298,10 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 			protected.PUT("/events/:id/status", eventHandler.UpdateStatus)
 
 			protected.GET("/tips", tipHandler.AdminIndex)
+			protected.GET("/subscriptions", subscriptionHandler.AdminIndex)
+			protected.GET("/campaigns", campaignHandler.AdminIndex)
+			protected.PUT("/campaigns/:id/status", campaignHandler.AdminUpdateStatus)
+			protected.GET("/projects", projectHandler.AdminIndex)
 			protected.POST("/tips", tipHandler.AdminStore)
 			protected.GET("/tips/:id", tipHandler.AdminShow)
 			protected.PUT("/tips/:id", tipHandler.AdminUpdate)

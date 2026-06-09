@@ -32,7 +32,27 @@
             <button @click="router.push('/profil/pro/evenements')"
               class="flex items-center gap-2 bg-white text-[#006d35] border-2 border-[#006d35] font-bold text-sm px-8 py-3 rounded-xl hover:bg-[#edf4ff] transition">
               <CalendarDaysIcon class="w-4 h-4" />
-              Gérer mes événements
+              Mes événements
+            </button>
+            <button @click="router.push('/profil/pro/projets')"
+              class="flex items-center gap-2 bg-white text-[#006d35] border-2 border-[#006d35] font-bold text-sm px-8 py-3 rounded-xl hover:bg-[#edf4ff] transition">
+              <WrenchScrewdriverIcon class="w-4 h-4" />
+              Mes projets
+            </button>
+            <button @click="router.push('/profil/pro/collecte')"
+              class="flex items-center gap-2 bg-white text-[#006d35] border-2 border-[#006d35] font-bold text-sm px-8 py-3 rounded-xl hover:bg-[#edf4ff] transition">
+              <QrCodeIcon class="w-4 h-4" />
+              Collecte
+            </button>
+            <button @click="router.push('/profil/pro/abonnement')"
+              class="flex items-center gap-2 bg-white text-[#006d35] border-2 border-[#006d35] font-bold text-sm px-8 py-3 rounded-xl hover:bg-[#edf4ff] transition">
+              <StarIcon class="w-4 h-4" />
+              Abonnement
+            </button>
+            <button @click="router.push('/profil/pro/campagnes')"
+              class="flex items-center gap-2 bg-white text-[#006d35] border-2 border-[#006d35] font-bold text-sm px-8 py-3 rounded-xl hover:bg-[#edf4ff] transition">
+              <MegaphoneIcon class="w-4 h-4" />
+              Campagnes pub
             </button>
           </div>
         </div>
@@ -118,7 +138,29 @@
               </button>
             </div>
 
-            <div class="grid grid-cols-2 gap-6">
+            <!-- Real projects from API -->
+            <div v-if="realProjects.length" class="grid grid-cols-2 gap-6">
+              <div v-for="p in realProjects.slice(0,4)" :key="p.id" class="flex flex-col">
+                <div class="relative h-64 rounded-xl overflow-hidden bg-gradient-to-br from-[#d1fae5] to-[#a7f3d0]">
+                  <img v-if="p.cover_image" :src="p.cover_image" class="w-full h-full object-cover" />
+                  <WrenchScrewdriverIcon v-else class="absolute inset-0 m-auto w-24 h-24 text-white/20" />
+                  <div class="absolute top-4 left-4">
+                    <span class="bg-white/90 backdrop-blur-sm text-[#006d35] text-xs font-semibold uppercase px-3 py-1 rounded-full">
+                      {{ p.category || 'Upcycling' }}
+                    </span>
+                  </div>
+                  <div v-if="p.impact_label" class="absolute bottom-4 right-4">
+                    <span class="bg-[#006d35] text-white text-xs font-semibold px-3 py-1 rounded-full">
+                      {{ p.impact_label }}
+                    </span>
+                  </div>
+                </div>
+                <h3 class="font-jakarta font-bold text-[#001d32] text-lg mt-3">{{ p.title }}</h3>
+                <p class="text-[#3f4a3f] text-sm leading-relaxed mt-1 line-clamp-3">{{ p.description }}</p>
+              </div>
+            </div>
+            <!-- Fallback mock projects when no real data yet -->
+            <div v-else class="grid grid-cols-2 gap-6">
               <div v-for="project in projects" :key="project.id" class="flex flex-col">
                 <div class="relative h-64 rounded-xl overflow-hidden bg-gradient-to-br"
                   :style="`background: linear-gradient(135deg, ${project.colorFrom}, ${project.colorTo});`"
@@ -185,7 +227,7 @@
   </div>
 </template>
 
-<script setup>import { computed } from 'vue'
+<script setup>import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import {
@@ -205,10 +247,22 @@ import {
   SparklesIcon as LeafIcon,
   TrophyIcon,
   CalendarDaysIcon,
+  WrenchScrewdriverIcon,
+  QrCodeIcon,
+  MegaphoneIcon,
 } from '@heroicons/vue/24/outline'
+import { userApi } from '@/services/publicApi'
 
 const { t } = useI18n()
 const router = useRouter()
+const realProjects = ref([])
+
+onMounted(async () => {
+  try {
+    const data = await userApi('/projects')
+    realProjects.value = data.data || []
+  } catch {}
+})
 
 const services = computed(() => [
   {

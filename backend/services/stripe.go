@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/stripe/stripe-go/v76"
+	stripeSub "github.com/stripe/stripe-go/v76/subscription"
 	"github.com/stripe/stripe-go/v76/checkout/session"
 	"github.com/stripe/stripe-go/v76/webhook"
 
@@ -62,6 +63,94 @@ func (s *StripeService) CreateCheckoutSession(p CheckoutParams) (*stripe.Checkou
 	}
 	params.AddMetadata("reservation_id", fmt.Sprintf("%d", p.ReservationID))
 
+	return session.New(params)
+}
+
+type SubscriptionCheckoutParams struct {
+	UserID    uint
+	UserEmail string
+	Plan      string // basic | premium
+	Label     string
+	AmountCents int64
+}
+
+// CreateSubscriptionCheckout creates a Stripe Checkout in subscription mode for a provider plan.
+func (s *StripeService) CreateSubscriptionCheckout(p SubscriptionCheckoutParams) (*stripe.CheckoutSession, error) {
+	if s.cfg.StripeSecret == "" || s.cfg.StripeSecret == "sk_test_local_dummy" {
+		return nil, fmt.Errorf("Stripe non configuré — ajoute ta clé dans le .env pour activer les abonnements")
+	}
+	stripe.Key = s.cfg.StripeSecret
+	successURL := fmt.Sprintf("%s/profil/pro/abonnement?success=1&session_id={CHECKOUT_SESSION_ID}", s.cfg.AppURL)
+	cancelURL  := fmt.Sprintf("%s/profil/pro/abonnement?cancelled=1", s.cfg.AppURL)
+	params := &stripe.CheckoutSessionParams{
+		Mode:          stripe.String(string(stripe.CheckoutSessionModeSubscription)),
+		SuccessURL:    stripe.String(successURL),
+		CancelURL:     stripe.String(cancelURL),
+		CustomerEmail: stripe.String(p.UserEmail),
+		LineItems: []*stripe.CheckoutSessionLineItemParams{
+			{
+				PriceData: &stripe.CheckoutSessionLineItemPriceDataParams{
+					Currency: stripe.String("eur"),
+					ProductData: &stripe.CheckoutSessionLineItemPriceDataProductDataParams{
+						Name:        stripe.String("UpcycleConnect " + p.Label),
+						Description: stripe.String("Abonnement mensuel professionnel/artisan"),
+					},
+					Recurring: &stripe.CheckoutSessionLineItemPriceDataRecurringParams{
+						Interval: stripe.String("month"),
+					},
+					UnitAmount: stripe.Int64(p.AmountCents),
+				},
+				Quantity: stripe.Int64(1),
+			},
+		},
+	}
+	params.AddMetadata("user_id", fmt.Sprintf("%d", p.UserID))
+	params.AddMetadata("plan", p.Plan)
+	params.AddMetadata("type", "subscription")
+	return session.New(params)
+}
+
+// CancelSubscription cancels a Stripe subscription immediately.
+func (s *StripeService) CancelSubscription(stripeSubID string) error {
+	if s.cfg.StripeSecret == "" || s.cfg.StripeSecret == "sk_test_local_dummy" {
+		return fmt.Errorf("Stripe non configuré")
+	}
+	stripe.Key = s.cfg.StripeSecret
+	params := &stripe.SubscriptionParams{}
+	params.AddExpand("latest_invoice")
+	_, err := stripeSub.Cancel(stripeSubID, nil)
+	return err
+}
+
+// CreateCampaignCheckout creates a one-time Stripe Checkout for a publicity campaign.
+func (s *StripeService) CreateCampaignCheckout(userID, campaignID uint, userEmail, title string, amountCents int64) (*stripe.CheckoutSession, error) {
+	if s.cfg.StripeSecret == "" || s.cfg.StripeSecret == "sk_test_local_dummy" {
+		return nil, fmt.Errorf("Stripe non configuré — ajoute ta clé dans le .env")
+	}
+	stripe.Key = s.cfg.StripeSecret
+	successURL := fmt.Sprintf("%s/profil/pro/campagnes?success=1&session_id={CHECKOUT_SESSION_ID}", s.cfg.AppURL)
+	cancelURL  := fmt.Sprintf("%s/profil/pro/campagnes?cancelled=1", s.cfg.AppURL)
+	params := &stripe.CheckoutSessionParams{
+		Mode:          stripe.String(string(stripe.CheckoutSessionModePayment)),
+		SuccessURL:    stripe.String(successURL),
+		CancelURL:     stripe.String(cancelURL),
+		CustomerEmail: stripe.String(userEmail),
+		LineItems: []*stripe.CheckoutSessionLineItemParams{
+			{
+				PriceData: &stripe.CheckoutSessionLineItemPriceDataParams{
+					Currency: stripe.String("eur"),
+					ProductData: &stripe.CheckoutSessionLineItemPriceDataProductDataParams{
+						Name: stripe.String("Campagne publicitaire : " + title),
+					},
+					UnitAmount: stripe.Int64(amountCents),
+				},
+				Quantity: stripe.Int64(1),
+			},
+		},
+	}
+	params.AddMetadata("user_id", fmt.Sprintf("%d", userID))
+	params.AddMetadata("campaign_id", fmt.Sprintf("%d", campaignID))
+	params.AddMetadata("type", "campaign")
 	return session.New(params)
 }
 

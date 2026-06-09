@@ -4,6 +4,7 @@ import (
 	"math"
 	"net/http"
 	"strconv"
+	"time"
 
 	"upcycleconnect/backend/middleware"
 	"upcycleconnect/backend/models"
@@ -235,5 +236,57 @@ func (h *UserDepositHandler) Score(c *gin.Context) {
 		"weight_saved_kg":     totalWeight,
 		"co2_saved_kg":        totalCarbon,
 		"events_attended":     regCount,
+	})
+}
+
+// CollectDeposit allows a provider/artisan to mark a deposit object as collected
+// by scanning/entering its barcode. Updates status to "collected" and records who collected it.
+func (h *UserDepositHandler) CollectDeposit(c *gin.Context) {
+	user := middleware.GetAuthUser(c)
+	if user == nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Non authentifié"})
+		return
+	}
+
+	var req struct {
+		Barcode string `json:"barcode" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"message": "Code-barres requis"})
+		return
+	}
+
+	var deposit models.DepositRequest
+	if err := h.DB.Preload("User").Preload("Category").Preload("CollectionPoint").
+		Where("qr_code = ? AND status = ?", req.Barcode, "approved").
+		First(&deposit).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": "Aucun objet validé trouvé pour ce code-barres. Vérifie que l'objet a bien été approuvé et que le code est correct."})
+		return
+	}
+
+	if deposit.CollectedAt != nil {
+		c.JSON(http.StatusConflict, gin.H{"message": "Cet objet a déjà été collecté.", "deposit": models.ToDepositResponse(&deposit)})
+		return
+	}
+
+	now := time.Now()
+	collectedBy := user.ID
+	h.DB.Model(&deposit).Updates(map[string]interface{}{
+		"collected_at": &now,
+		"collected_by": &collectedBy,
+		"status":       "collected",
+	})
+	deposit.CollectedAt = &now
+	deposit.CollectedBy = &collectedBy
+	deposit.Status = "collected"
+
+	h.Audit.Log(c, "deposit.collected", "DepositRequest", &deposit.ID, nil, map[string]interface{}{
+		"barcode":      req.Barcode,
+		"collected_by": user.ID,
+	})
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Objet collecté avec succès.",
+		"deposit": models.ToDepositResponse(&deposit),
 	})
 }

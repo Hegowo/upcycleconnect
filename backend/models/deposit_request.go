@@ -18,6 +18,8 @@ type DepositRequest struct {
 	ValidatedBy       *uint      `gorm:"index" json:"validated_by"`
 	ValidatedAt       *time.Time `json:"validated_at"`
 	QRCode            *string    `gorm:"size:100" json:"qr_code"`
+	CollectedAt       *time.Time `json:"collected_at"`
+	CollectedBy       *uint      `gorm:"index" json:"collected_by"`
 	Photo1            *string    `gorm:"type:mediumtext" json:"photo1"`
 	Photo2            *string    `gorm:"type:mediumtext" json:"photo2"`
 	Photo3            *string    `gorm:"type:mediumtext" json:"photo3"`
@@ -44,6 +46,8 @@ type DepositRequestResponse struct {
 	Status            string                   `json:"status"`
 	ValidationNote    *string                  `json:"validation_note"`
 	QRCode            *string                  `json:"qr_code"`
+	CollectedAt       *string                  `json:"collected_at"`
+	CollectedBy       *uint                    `json:"collected_by"`
 	Photo1            *string                  `json:"photo1"`
 	Photo2            *string                  `json:"photo2"`
 	Photo3            *string                  `json:"photo3"`
@@ -70,10 +74,10 @@ func ToDepositResponse(d *DepositRequest) DepositRequestResponse {
 		r := ToCollectionPointResponse(d.CollectionPoint)
 		cp = &r
 	}
-	var validatedAt *string
-	if d.ValidatedAt != nil {
-		s := d.ValidatedAt.UTC().Format("2006-01-02T15:04:05.000000Z")
-		validatedAt = &s
+	fmtTime := func(t *time.Time) *string {
+		if t == nil { return nil }
+		s := t.UTC().Format("2006-01-02T15:04:05.000000Z")
+		return &s
 	}
 	return DepositRequestResponse{
 		ID:              d.ID,
@@ -86,6 +90,8 @@ func ToDepositResponse(d *DepositRequest) DepositRequestResponse {
 		Status:          d.Status,
 		ValidationNote:  d.ValidationNote,
 		QRCode:          d.QRCode,
+		CollectedAt:     fmtTime(d.CollectedAt),
+		CollectedBy:     d.CollectedBy,
 		Photo1:          d.Photo1,
 		Photo2:          d.Photo2,
 		Photo3:          d.Photo3,
@@ -93,7 +99,7 @@ func ToDepositResponse(d *DepositRequest) DepositRequestResponse {
 		Category:        cat,
 		CollectionPoint: cp,
 		CreatedAt:       d.CreatedAt.UTC().Format("2006-01-02T15:04:05.000000Z"),
-		ValidatedAt:     validatedAt,
+		ValidatedAt:     fmtTime(d.ValidatedAt),
 	}
 }
 

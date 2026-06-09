@@ -43,6 +43,10 @@ func main() {
 		&models.Contract{},
 		&models.Notification{},
 		&models.Tip{},
+		&models.Subscription{},
+		&models.Campaign{},
+		&models.UpcyclingProject{},
+		&models.ProjectStep{},
 	); err != nil {
 		log.Fatalf("Failed to migrate database: %v", err)
 	}
