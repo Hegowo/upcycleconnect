@@ -299,9 +299,9 @@ const mobileMenuOpen = ref(false)
 const searchRef = ref(null)
 const showOnboarding = ref(false)
 
-onMounted(async () => {
-  await userAuth.init()
-  // Blocking tutorial on first login — admins are exempted because the tour is end-user oriented.
+onMounted(() => {
+  // init() is already called in main.js before mount — data is ready.
+  // We only check for the onboarding overlay here.
   if (userAuth.isLoggedIn
       && userAuth.user
       && !userAuth.user.onboarding_completed_at

@@ -27,6 +27,21 @@ type OAuthHandler struct {
 	Cfg *config.Config
 }
 
+func (h *OAuthHandler) buildUserWithProfile(user *models.User) map[string]interface{} {
+	h.DB.Preload("ProviderProfile").First(user, user.ID)
+	resp := models.ToUserResponse(user)
+	return map[string]interface{}{
+		"id": resp.ID, "email": resp.Email,
+		"first_name": resp.FirstName, "last_name": resp.LastName,
+		"phone": resp.Phone, "address": resp.Address,
+		"avatar_url": resp.AvatarURL, "status": resp.Status,
+		"role": resp.Role, "email_verified_at": resp.EmailVerifiedAt,
+		"onboarding_completed_at": resp.OnboardingCompletedAt,
+		"created_at": resp.CreatedAt, "updated_at": resp.UpdatedAt,
+		"provider_profile": models.ToProviderProfileResponse(user.ProviderProfile),
+	}
+}
+
 // ─── Google ───────────────────────────────────────────────────────────────────
 
 type googleTokenInfo struct {
@@ -130,7 +145,7 @@ func (h *OAuthHandler) GoogleAuth(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Erreur de génération du token."})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"token": tokenStr, "user": models.ToUserResponse(&user)})
+	c.JSON(http.StatusOK, gin.H{"token": tokenStr, "user": h.buildUserWithProfile(&user)})
 }
 
 // ─── Apple ────────────────────────────────────────────────────────────────────
@@ -357,7 +372,7 @@ func (h *OAuthHandler) AppleAuth(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Erreur de génération du token."})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"token": tokenStr, "user": models.ToUserResponse(&user)})
+	c.JSON(http.StatusOK, gin.H{"token": tokenStr, "user": h.buildUserWithProfile(&user)})
 }
 
 // ─── Shared ───────────────────────────────────────────────────────────────────
@@ -441,7 +456,7 @@ func (h *OAuthHandler) OAuthLink(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Erreur de génération du token."})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"token": tokenStr, "user": models.ToUserResponse(&user)})
+	c.JSON(http.StatusOK, gin.H{"token": tokenStr, "user": h.buildUserWithProfile(&user)})
 }
 
 func (h *OAuthHandler) oauthIssueJWT(userID uint) (string, error) {
