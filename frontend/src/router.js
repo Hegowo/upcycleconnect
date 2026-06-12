@@ -34,6 +34,7 @@ const router = createRouter({
         { path: 'profil/parametres',    component: () => import('@/pages/PublicProfilEditPage.vue'),              meta: { title: 'Paramètres' } },
         { path: 'profil/pro',           component: () => import('@/pages/PublicProfilProfessionnelPage.vue'),  meta: { title: 'Profil Professionnel' } },
         { path: 'profil/pro/evenements',   component: () => import('@/pages/ProviderEventsPage.vue'),     meta: { title: 'Mes Événements' } },
+        { path: 'profil/pro/dashboard',   component: () => import('@/pages/PublicProDashboardPage.vue'), meta: { title: 'Tableau de bord Pro' } },
         { path: 'profil/pro/abonnement',  component: () => import('@/pages/PublicAbonnementPage.vue'),   meta: { title: 'Abonnement Pro' } },
         { path: 'profil/pro/campagnes',   component: () => import('@/pages/PublicCampagnesPage.vue'),    meta: { title: 'Campagnes pub' } },
         { path: 'profil/pro/projets',     component: () => import('@/pages/PublicProjetsPage.vue'),      meta: { title: 'Mes Projets Upcycling' } },

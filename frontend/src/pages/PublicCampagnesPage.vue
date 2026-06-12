@@ -11,7 +11,8 @@
           <h1 class="font-jakarta font-extrabold text-[#001d32] text-3xl tracking-tight">Campagnes publicitaires</h1>
           <p class="text-[#40617f] text-sm mt-1">Mettez en avant vos projets auprès de la communauté (100–500 €/mois).</p>
         </div>
-        <button @click="openForm(null)" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-white font-bold text-sm hover:opacity-90 transition" style="background:linear-gradient(135deg,#006d35,#1b8848);">
+        <button @click="openForm(null)" :disabled="!hasPremium"
+          class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-white font-bold text-sm hover:opacity-90 transition disabled:opacity-40 disabled:cursor-not-allowed" style="background:linear-gradient(135deg,#006d35,#1b8848);">
           <PlusIcon class="w-4 h-4" /> Nouvelle campagne
         </button>
       </div>
@@ -19,6 +20,22 @@
       <div v-if="success" class="bg-green-50 border border-green-200 rounded-2xl p-4 mb-6 flex items-center gap-3">
         <CheckCircleIcon class="w-5 h-5 text-green-600 shrink-0" />
         <p class="text-green-800 text-sm font-medium">Campagne soumise et paiement confirmé ! Elle sera activée après validation par l'équipe.</p>
+      </div>
+
+      <!-- Premium required banner -->
+      <div v-if="!loading && !hasPremium" class="bg-white border-2 border-[#006d35] rounded-2xl p-5 mb-6 flex items-center justify-between gap-4 flex-wrap">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-xl flex items-center justify-center" style="background:linear-gradient(135deg,#006d35,#1b8848);">
+            <LockClosedIcon class="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <p class="font-jakarta font-bold text-[#001d32] text-sm">Fonctionnalité Premium</p>
+            <p class="text-[#40617f] text-xs mt-0.5">La création de campagnes publicitaires nécessite un abonnement Premium.</p>
+          </div>
+        </div>
+        <RouterLink to="/profil/pro/abonnement" class="px-4 py-2 rounded-xl text-white text-sm font-bold hover:opacity-90 transition shrink-0" style="background:linear-gradient(135deg,#006d35,#1b8848);">
+          Passer à Premium →
+        </RouterLink>
       </div>
 
       <div v-if="loading" class="py-20 text-center">
@@ -116,7 +133,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
-import { ArrowLeftIcon, PlusIcon, PencilSquareIcon, TrashIcon, XMarkIcon, CheckCircleIcon, MegaphoneIcon } from '@heroicons/vue/24/outline'
+import { ArrowLeftIcon, PlusIcon, PencilSquareIcon, TrashIcon, XMarkIcon, CheckCircleIcon, MegaphoneIcon, LockClosedIcon } from '@heroicons/vue/24/outline'
 import { userApi } from '@/services/publicApi'
 
 const route = useRoute()
@@ -129,11 +146,18 @@ const success = ref(route.query.success === '1')
 
 const emptyForm = () => ({ id: null, title: '', description: '', image_url: '', budget_euros: 100 })
 const form = ref(emptyForm())
+const hasPremium = ref(true)
 
 async function fetchCampaigns() {
   loading.value = true
-  try { campaigns.value = (await userApi('/campaigns')).data || [] }
-  finally { loading.value = false }
+  try {
+    const [campData, subData] = await Promise.all([
+      userApi('/campaigns'),
+      userApi('/subscription').catch(() => ({ subscription: null })),
+    ])
+    campaigns.value = campData.data || []
+    hasPremium.value = subData.subscription?.plan === 'premium' && subData.subscription?.status === 'active'
+  } finally { loading.value = false }
 }
 
 function openForm(c) {

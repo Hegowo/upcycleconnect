@@ -20,6 +20,9 @@ type Subscription struct {
 
 func (Subscription) TableName() string { return "subscriptions" }
 
+// SubscriptionPlans aligns with the project spec (Annexe 1): a freemium model where
+// base pro features are free and "outils avancés" are paid. The 4 advanced tools
+// listed in the spec are split across the two paid tiers.
 var SubscriptionPlans = map[string]struct {
 	Label      string
 	AmountCents int64
@@ -29,10 +32,8 @@ var SubscriptionPlans = map[string]struct {
 		Label:       "Basic",
 		AmountCents: 1500,
 		Features: []string{
-			"Accès aux annonces avec achats",
-			"Récupération d'objets en conteneurs",
-			"Gestion de vos projets d'upcycling",
-			"Tableau de bord basique",
+			"Tableaux de bord avancés (chiffre d'affaires, réservations)",
+			"Statistiques sur les matériaux disponibles",
 		},
 	},
 	"premium": {
@@ -40,12 +41,9 @@ var SubscriptionPlans = map[string]struct {
 		AmountCents: 3000,
 		Features: []string{
 			"Tout ce qui est inclus dans Basic",
-			"Tableaux de bord avancés",
 			"Analyse d'impact écologique détaillée",
-			"Statistiques sur les matériaux disponibles",
 			"Alertes priorisées pour la collecte",
-			"Mise en avant de vos projets",
-			"Gestion de campagnes publicitaires",
+			"Gestion de campagnes publicitaires (mise en avant)",
 		},
 	},
 }

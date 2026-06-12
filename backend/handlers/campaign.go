@@ -70,6 +70,14 @@ func (h *CampaignHandler) CreateCampaign(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"message": "Non authentifié"})
 		return
 	}
+	// Premium feature: campaigns (project highlighting) require an active Premium subscription.
+	if !h.hasPremiumSubscription(user.ID) {
+		c.JSON(http.StatusPaymentRequired, gin.H{
+			"message":  "La gestion de campagnes publicitaires nécessite un abonnement Premium.",
+			"upgrade":  "/profil/pro/abonnement",
+		})
+		return
+	}
 	var req campaignPayload
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"message": err.Error()})
@@ -244,4 +252,14 @@ func (h *CampaignHandler) AdminUpdateStatus(c *gin.Context) {
 	h.Audit.Log(c, "campaign.status_updated", "Campaign", &camp.ID, map[string]string{"status": camp.Status}, map[string]string{"status": req.Status})
 	h.DB.Preload("Provider").First(&camp, camp.ID)
 	c.JSON(http.StatusOK, models.ToCampaignResponse(&camp))
+}
+
+// hasPremiumSubscription returns true if the user has an active Premium subscription.
+func (h *CampaignHandler) hasPremiumSubscription(userID uint) bool {
+	var sub models.Subscription
+	if err := h.DB.Where("user_id = ? AND status = ? AND plan = ?", userID, "active", "premium").
+		First(&sub).Error; err != nil {
+		return false
+	}
+	return true
 }

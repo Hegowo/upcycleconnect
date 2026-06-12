@@ -74,6 +74,7 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 	subscriptionHandler := &handlers.SubscriptionHandler{DB: db, Stripe: stripeService, Audit: audit}
 	campaignHandler     := &handlers.CampaignHandler{DB: db, Stripe: stripeService, Audit: audit}
 	projectHandler      := &handlers.UpcyclingProjectHandler{DB: db, Audit: audit}
+	providerDashHandler := &handlers.ProviderDashboardHandler{DB: db}
 
 	r.Static("/uploads", "/uploads")
 
@@ -166,6 +167,7 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 			userProtected.GET("/provider/contracts", contractHandler.ProviderContracts)
 
 			// Abonnements
+			userProtected.GET("/provider/dashboard", providerDashHandler.Dashboard)
 			userProtected.GET("/subscription", subscriptionHandler.MySubscription)
 			userProtected.POST("/subscription/checkout", subscriptionHandler.Checkout)
 			userProtected.POST("/subscription/cancel", subscriptionHandler.Cancel)
