@@ -84,6 +84,9 @@
       </div>
     </section>
 
+    <!-- Campagnes sponsorisées — affichées seulement sans filtre prestataire -->
+    <SponsoredCampaigns v-if="!providerFilter" wrapper-class="pb-8" />
+
     <section class="px-4 sm:px-6 pb-12 sm:pb-16 max-w-[1280px] mx-auto">
       <div v-if="loading" class="text-center py-16 text-[#40617f]">{{ t('public.prestations.loading') }}</div>
       <div v-else-if="error" class="text-center py-16 text-red-600">{{ error }}</div>
@@ -170,6 +173,7 @@ import {
   XMarkIcon,
 } from '@heroicons/vue/24/outline'
 import { publicGet } from '@/services/publicApi'
+import SponsoredCampaigns from '@/components/SponsoredCampaigns.vue'
 
 const { t } = useI18n()
 const router = useRouter()
