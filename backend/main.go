@@ -45,6 +45,7 @@ func main() {
 		&models.Tip{},
 		&models.Subscription{},
 		&models.Campaign{},
+		&models.CampaignItem{},
 		&models.UpcyclingProject{},
 		&models.ProjectStep{},
 	); err != nil {

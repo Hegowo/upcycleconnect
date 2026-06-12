@@ -109,6 +109,7 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 
 		public.GET("/subscription/plans", subscriptionHandler.Plans)
 		public.GET("/campaigns/active", campaignHandler.ActiveCampaigns)
+		public.GET("/campaigns/:id", campaignHandler.PublicShow)
 		public.GET("/projects", projectHandler.PublicIndex)
 		public.GET("/projects/:id", projectHandler.PublicShow)
 	}

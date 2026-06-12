@@ -26,9 +26,32 @@ type campaignPayload struct {
 	Description string  `json:"description"`
 	ImageURL    *string `json:"image_url"`
 	// budget in euros, between 100 and 500
-	BudgetEuros float64 `json:"budget_euros" binding:"required,min=100,max=500"`
-	StartDate   *string `json:"start_date"`
-	EndDate     *string `json:"end_date"`
+	BudgetEuros   float64 `json:"budget_euros" binding:"required,min=100,max=500"`
+	StartDate     *string `json:"start_date"`
+	EndDate       *string `json:"end_date"`
+	PrestationIDs []uint  `json:"prestation_ids"`
+	EventIDs      []uint  `json:"event_ids"`
+}
+
+// syncCampaignItems replaces a campaign's linked prestations/events.
+// Only items genuinely owned by the provider are linked (security).
+func (h *CampaignHandler) syncCampaignItems(campaignID, providerID uint, prestationIDs, eventIDs []uint) {
+	h.DB.Where("campaign_id = ?", campaignID).Delete(&models.CampaignItem{})
+
+	for _, pid := range prestationIDs {
+		var cnt int64
+		h.DB.Model(&models.Prestation{}).Where("id = ? AND provider_id = ?", pid, providerID).Count(&cnt)
+		if cnt > 0 {
+			h.DB.Create(&models.CampaignItem{CampaignID: campaignID, ItemType: "prestation", ItemID: pid})
+		}
+	}
+	for _, eid := range eventIDs {
+		var cnt int64
+		h.DB.Model(&models.Event{}).Where("id = ? AND created_by = ?", eid, providerID).Count(&cnt)
+		if cnt > 0 {
+			h.DB.Create(&models.CampaignItem{CampaignID: campaignID, ItemType: "event", ItemID: eid})
+		}
+	}
 }
 
 func parseCampaignDate(raw *string) *time.Time {
@@ -55,7 +78,7 @@ func (h *CampaignHandler) MyCampaigns(c *gin.Context) {
 		return
 	}
 	var campaigns []models.Campaign
-	h.DB.Preload("Provider").Where("provider_id = ? AND deleted_at IS NULL", user.ID).
+	h.DB.Preload("Provider").Preload("Items").Where("provider_id = ? AND deleted_at IS NULL", user.ID).
 		Order("created_at DESC").Find(&campaigns)
 	resp := make([]models.CampaignResponse, 0, len(campaigns))
 	for i := range campaigns {
@@ -98,8 +121,9 @@ func (h *CampaignHandler) CreateCampaign(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Erreur lors de la création"})
 		return
 	}
+	h.syncCampaignItems(camp.ID, user.ID, req.PrestationIDs, req.EventIDs)
 	h.Audit.Log(c, "campaign.created", "Campaign", &camp.ID, nil, map[string]interface{}{"title": camp.Title})
-	h.DB.Preload("Provider").First(&camp, camp.ID)
+	h.DB.Preload("Provider").Preload("Items").First(&camp, camp.ID)
 	c.JSON(http.StatusCreated, models.ToCampaignResponse(&camp))
 }
 
@@ -131,7 +155,8 @@ func (h *CampaignHandler) UpdateCampaign(c *gin.Context) {
 	camp.StartDate = parseCampaignDate(req.StartDate)
 	camp.EndDate = parseCampaignDate(req.EndDate)
 	h.DB.Save(&camp)
-	h.DB.Preload("Provider").First(&camp, camp.ID)
+	h.syncCampaignItems(camp.ID, user.ID, req.PrestationIDs, req.EventIDs)
+	h.DB.Preload("Provider").Preload("Items").First(&camp, camp.ID)
 	c.JSON(http.StatusOK, models.ToCampaignResponse(&camp))
 }
 
@@ -196,7 +221,7 @@ func (h *CampaignHandler) SubmitCampaign(c *gin.Context) {
 func (h *CampaignHandler) ActiveCampaigns(c *gin.Context) {
 	var campaigns []models.Campaign
 	now := time.Now()
-	h.DB.Preload("Provider").
+	h.DB.Preload("Provider").Preload("Items").
 		Where("status = ? AND (start_date IS NULL OR start_date <= ?) AND (end_date IS NULL OR end_date >= ?)",
 			"active", now, now).
 		Order("created_at DESC").
@@ -209,11 +234,48 @@ func (h *CampaignHandler) ActiveCampaigns(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": resp})
 }
 
+// PublicShow returns one active campaign with its promoted prestations and events resolved,
+// so the public detail page can render them. Only active campaigns are visible.
+func (h *CampaignHandler) PublicShow(c *gin.Context) {
+	id, _ := strconv.ParseUint(c.Param("id"), 10, 64)
+	var camp models.Campaign
+	if err := h.DB.Preload("Provider").Preload("Items").
+		Where("status = ?", "active").First(&camp, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": "Campagne introuvable ou inactive"})
+		return
+	}
+
+	prestationIDs := []uint{}
+	eventIDs := []uint{}
+	for _, it := range camp.Items {
+		if it.ItemType == "prestation" {
+			prestationIDs = append(prestationIDs, it.ItemID)
+		} else if it.ItemType == "event" {
+			eventIDs = append(eventIDs, it.ItemID)
+		}
+	}
+
+	var prestations []models.Prestation
+	if len(prestationIDs) > 0 {
+		h.DB.Preload("Category").Where("id IN ? AND status = ?", prestationIDs, "published").Find(&prestations)
+	}
+	var events []models.Event
+	if len(eventIDs) > 0 {
+		h.DB.Where("id IN ? AND status = ?", eventIDs, "published").Find(&events)
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"campaign":    models.ToCampaignResponse(&camp),
+		"prestations": models.ToPrestationResponses(prestations),
+		"events":      models.ToEventResponses(events),
+	})
+}
+
 // ─── Admin ──────────────────────────────────────────────────────────────────
 
 func (h *CampaignHandler) AdminIndex(c *gin.Context) {
 	var campaigns []models.Campaign
-	q := h.DB.Preload("Provider").Order("created_at DESC")
+	q := h.DB.Preload("Provider").Preload("Items").Order("created_at DESC")
 	if status := c.Query("status"); status != "" {
 		q = q.Where("status = ?", status)
 	}

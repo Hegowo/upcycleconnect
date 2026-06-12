@@ -8,9 +8,10 @@
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        <article
+        <RouterLink
           v-for="c in campaigns"
           :key="c.id"
+          :to="`/campagnes/${c.id}`"
           class="group bg-white rounded-2xl border border-[#edf4ff] overflow-hidden hover:border-[#006d35] hover:shadow-md transition flex flex-col"
         >
           <div class="aspect-[16/9] bg-gradient-to-br from-[#d1fae5] to-[#a7f3d0] overflow-hidden relative">
@@ -28,7 +29,7 @@
               Proposé par {{ c.provider_name || 'un artisan UpcycleConnect' }}
             </p>
           </div>
-        </article>
+        </RouterLink>
       </div>
     </div>
   </section>
@@ -36,6 +37,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { RouterLink } from 'vue-router'
 import { SparklesIcon, MegaphoneIcon, UserIcon } from '@heroicons/vue/24/outline'
 import { publicGet } from '@/services/publicApi'
 

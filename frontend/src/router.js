@@ -23,6 +23,7 @@ const router = createRouter({
         { path: 'profil/reservations/:id', component: () => import('@/pages/PublicReservationDetailPage.vue'), meta: { title: 'Détail Réservation' } },
         { path: 'evenements',       component: () => import('@/pages/PublicEvenementsPage.vue'),      meta: { title: 'Événements' } },
         { path: 'evenements/:id',   component: () => import('@/pages/PublicEvenementDetailPage.vue'), meta: { title: 'Détail Événement' } },
+        { path: 'campagnes/:id',    component: () => import('@/pages/PublicCampagneDetailPage.vue'),   meta: { title: 'Campagne' } },
         { path: 'communaute',       component: () => import('@/pages/PublicCommunautePage.vue'),      meta: { title: 'Communauté' } },
         { path: 'communaute/forum/:slug', component: () => import('@/pages/PublicForumCategoryPage.vue'), meta: { title: 'Forum' } },
         { path: 'communaute/forum/:slug/:id', component: () => import('@/pages/PublicForumThreadPage.vue'), meta: { title: 'Discussion' } },

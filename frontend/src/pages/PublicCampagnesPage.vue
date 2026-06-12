@@ -113,6 +113,32 @@
                 <input v-model.number="form.budget_euros" type="number" min="100" max="500"
                   class="w-full px-3 py-2.5 bg-[#f8fafc] border border-[#e5e7eb] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#006d35]/30" />
               </div>
+
+              <!-- Prestations à mettre en avant -->
+              <div v-if="myPrestations.length">
+                <label class="block text-xs font-semibold text-[#40617f] uppercase mb-1.5">Prestations à mettre en avant</label>
+                <div class="space-y-1.5 max-h-36 overflow-y-auto bg-[#f8fafc] rounded-xl p-3 border border-[#e5e7eb]">
+                  <label v-for="p in myPrestations" :key="p.id" class="flex items-center gap-2.5 text-sm cursor-pointer hover:bg-white rounded-lg px-2 py-1 transition">
+                    <input type="checkbox" :value="p.id" v-model="form.prestation_ids" class="w-4 h-4 accent-[#006d35]" />
+                    <span class="text-[#001d32] truncate">{{ p.title }}</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Événements à mettre en avant -->
+              <div v-if="myEvents.length">
+                <label class="block text-xs font-semibold text-[#40617f] uppercase mb-1.5">Événements à mettre en avant</label>
+                <div class="space-y-1.5 max-h-36 overflow-y-auto bg-[#f8fafc] rounded-xl p-3 border border-[#e5e7eb]">
+                  <label v-for="e in myEvents" :key="e.id" class="flex items-center gap-2.5 text-sm cursor-pointer hover:bg-white rounded-lg px-2 py-1 transition">
+                    <input type="checkbox" :value="e.id" v-model="form.event_ids" class="w-4 h-4 accent-[#006d35]" />
+                    <span class="text-[#001d32] truncate">{{ e.title }}</span>
+                  </label>
+                </div>
+              </div>
+
+              <p v-if="!myPrestations.length && !myEvents.length" class="text-xs text-[#94a3b8]">
+                Crée d'abord des prestations ou événements publiés pour pouvoir les mettre en avant dans cette campagne.
+              </p>
               <p v-if="formError" class="text-red-600 text-sm">{{ formError }}</p>
             </div>
             <div class="px-6 py-4 border-t bg-[#f8fafc] flex items-center justify-between gap-3 shrink-0">
@@ -144,19 +170,25 @@ const saving = ref(false)
 const formError = ref('')
 const success = ref(route.query.success === '1')
 
-const emptyForm = () => ({ id: null, title: '', description: '', image_url: '', budget_euros: 100 })
+const emptyForm = () => ({ id: null, title: '', description: '', image_url: '', budget_euros: 100, prestation_ids: [], event_ids: [] })
 const form = ref(emptyForm())
 const hasPremium = ref(true)
+const myPrestations = ref([])
+const myEvents = ref([])
 
 async function fetchCampaigns() {
   loading.value = true
   try {
-    const [campData, subData] = await Promise.all([
+    const [campData, subData, prestaData, eventData] = await Promise.all([
       userApi('/campaigns'),
       userApi('/subscription').catch(() => ({ subscription: null })),
+      userApi('/provider/prestations?status=published').catch(() => ({ data: [] })),
+      userApi('/provider/events?status=published').catch(() => ({ data: [] })),
     ])
     campaigns.value = campData.data || []
     hasPremium.value = subData.subscription?.plan === 'premium' && subData.subscription?.status === 'active'
+    myPrestations.value = prestaData.data || []
+    myEvents.value = eventData.data || []
   } finally { loading.value = false }
 }
 
@@ -165,6 +197,8 @@ function openForm(c) {
   form.value = c ? {
     id: c.id, title: c.title, description: c.description || '',
     image_url: c.image_url || '', budget_euros: c.budget_cents / 100,
+    prestation_ids: (c.items || []).filter(i => i.type === 'prestation').map(i => i.id),
+    event_ids: (c.items || []).filter(i => i.type === 'event').map(i => i.id),
   } : emptyForm()
   showForm.value = true
 }
