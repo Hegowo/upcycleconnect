@@ -95,7 +95,7 @@ const router = createRouter({
       ],
     },
 
-    { path: '/:pathMatch(.*)*', redirect: '/' },
+    { path: '/:pathMatch(.*)*', component: () => import('@/pages/NotFoundPage.vue'), meta: { title: 'Page introuvable' } },
   ],
 })
 

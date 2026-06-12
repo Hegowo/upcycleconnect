@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"upcycleconnect/backend/config"
@@ -79,7 +80,13 @@ func (s *NotificationService) sendPush(in NotifyInput) {
 		"contents":           map[string]string{"en": in.Body, "fr": in.Body},
 	}
 	if in.Link != "" {
-		payload["url"] = in.Link
+		// OneSignal requires an absolute URL. A relative path like "/admin/monetization"
+		// is not resolved and the click falls back to the site root (home page).
+		url := in.Link
+		if strings.HasPrefix(url, "/") {
+			url = strings.TrimRight(s.cfg.AppURL, "/") + url
+		}
+		payload["url"] = url
 	}
 
 	body, _ := json.Marshal(payload)

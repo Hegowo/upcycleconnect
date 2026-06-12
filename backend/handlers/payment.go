@@ -583,7 +583,7 @@ func (h *PaymentHandler) fulfillCampaign(session *stripe.CheckoutSession) error 
 		h.Notifications.NotifyAdmins("campaign.paid",
 			"Campagne publicitaire à valider",
 			fmt.Sprintf("%s a payé la campagne « %s ». À valider.", user.FirstName+" "+user.LastName, camp.Title),
-			"/admin/campaigns")
+			"/admin/monetization")
 	}
 	return nil
 }
