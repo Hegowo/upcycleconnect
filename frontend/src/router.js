@@ -72,6 +72,7 @@ const router = createRouter({
         { path: 'prestations/create',  component: () => import('@/pages/PrestationFormPage.vue'),  meta: { title: 'Nouvelle prestation' } },
         { path: 'prestations/:id/edit', component: () => import('@/pages/PrestationFormPage.vue'), meta: { title: 'Modifier la prestation' } },
         { path: 'tips',          redirect: '/admin/forum' },
+        { path: 'monetization',  component: () => import('@/pages/MonetizationPage.vue'), meta: { title: 'Monétisation' } },
         { path: 'events',        component: () => import('@/pages/EventListPage.vue'),  meta: { title: 'Événements' } },
         { path: 'events/create', component: () => import('@/pages/EventFormPage.vue'),  meta: { title: 'Nouvel événement' } },
         { path: 'events/:id/edit', component: () => import('@/pages/EventFormPage.vue'), meta: { title: 'Modifier l\'événement' } },

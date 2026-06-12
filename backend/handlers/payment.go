@@ -382,10 +382,30 @@ func (h *PaymentHandler) Webhook(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{"message": "Payload session invalide"})
 			return
 		}
-		if err := h.fulfillReservation(&session); err != nil {
-			log.Printf("[webhook] fulfill failed for session=%s: %v", session.ID, err)
-			c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
-			return
+		// Route based on the metadata.type set when the checkout was created.
+		switch session.Metadata["type"] {
+		case "subscription":
+			if err := h.fulfillSubscription(&session); err != nil {
+				log.Printf("[webhook] subscription fulfill failed for session=%s: %v", session.ID, err)
+			}
+		case "campaign":
+			if err := h.fulfillCampaign(&session); err != nil {
+				log.Printf("[webhook] campaign fulfill failed for session=%s: %v", session.ID, err)
+			}
+		default:
+			if err := h.fulfillReservation(&session); err != nil {
+				log.Printf("[webhook] fulfill failed for session=%s: %v", session.ID, err)
+				c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+				return
+			}
+		}
+	case "customer.subscription.deleted":
+		// Subscription cancelled on Stripe's side — mark inactive locally.
+		var sub stripe.Subscription
+		if err := json.Unmarshal(event.Data.Raw, &sub); err == nil {
+			h.DB.Model(&models.Subscription{}).
+				Where("stripe_subscription_id = ?", sub.ID).
+				Update("status", "cancelled")
 		}
 	case "checkout.session.expired", "checkout.session.async_payment_failed":
 		var session stripe.CheckoutSession
@@ -397,6 +417,175 @@ func (h *PaymentHandler) Webhook(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"received": true})
+}
+
+// fulfillSubscription activates a provider's subscription after a successful Stripe Checkout
+// and generates the first monthly invoice PDF.
+func (h *PaymentHandler) fulfillSubscription(session *stripe.CheckoutSession) error {
+	if session.PaymentStatus != "" &&
+		session.PaymentStatus != stripe.CheckoutSessionPaymentStatusPaid &&
+		session.PaymentStatus != stripe.CheckoutSessionPaymentStatusNoPaymentRequired {
+		return nil
+	}
+	userID, _ := strconv.ParseUint(session.Metadata["user_id"], 10, 64)
+	plan := session.Metadata["plan"]
+	if userID == 0 || plan == "" {
+		return fmt.Errorf("metadata abonnement incomplète")
+	}
+
+	planDef, ok := models.SubscriptionPlans[plan]
+	if !ok {
+		return fmt.Errorf("plan inconnu: %s", plan)
+	}
+
+	var user models.User
+	if err := h.DB.First(&user, userID).Error; err != nil {
+		return fmt.Errorf("user introuvable: %w", err)
+	}
+
+	subID := ""
+	if session.Subscription != nil {
+		subID = session.Subscription.ID
+	}
+	custID := ""
+	if session.Customer != nil {
+		custID = session.Customer.ID
+	}
+
+	// Idempotency: if a subscription already exists for this stripe sub, do nothing.
+	var existing models.Subscription
+	if subID != "" && h.DB.Where("stripe_subscription_id = ?", subID).First(&existing).Error == nil {
+		return nil
+	}
+
+	periodEnd := time.Now().AddDate(0, 1, 0)
+	// Upsert: one subscription row per user.
+	var sub models.Subscription
+	if h.DB.Where("user_id = ?", userID).First(&sub).Error == nil {
+		h.DB.Model(&sub).Updates(map[string]interface{}{
+			"stripe_customer_id":     custID,
+			"stripe_subscription_id": subID,
+			"plan":                   plan,
+			"status":                 "active",
+			"current_period_end":     &periodEnd,
+		})
+	} else {
+		sub = models.Subscription{
+			UserID:               uint(userID),
+			StripeCustomerID:     custID,
+			StripeSubscriptionID: subID,
+			Plan:                 plan,
+			Status:               "active",
+			CurrentPeriodEnd:     &periodEnd,
+		}
+		h.DB.Create(&sub)
+	}
+
+	// Generate the subscription invoice PDF.
+	number := fmt.Sprintf("ABO-%d-%06d", time.Now().Year(), sub.ID)
+	pdfPath, perr := h.PDF.Generate(services.InvoiceData{
+		Number:          number,
+		Type:            "invoice",
+		IssuedAt:        time.Now(),
+		CustomerName:    strings.TrimSpace(user.FirstName + " " + user.LastName),
+		CustomerEmail:   user.Email,
+		PrestationTitle: "Abonnement professionnel " + planDef.Label + " (mensuel)",
+		AmountCents:     planDef.AmountCents,
+		TVAPercent:      20.0,
+		Currency:        "eur",
+		Notes:           "Abonnement mensuel renouvelé automatiquement. Résiliable à tout moment depuis votre espace.",
+	})
+	if perr != nil {
+		log.Printf("[webhook] subscription invoice PDF failed: %v", perr)
+	} else {
+		inv := models.Invoice{
+			UserID:          uint(userID),
+			Type:            "invoice",
+			Number:          number,
+			PrestationTitle: "Abonnement professionnel " + planDef.Label,
+			AmountCents:     planDef.AmountCents,
+			TVAPercent:      20.0,
+			Currency:        "eur",
+			PDFPath:         &pdfPath,
+			Status:          "paid",
+			IssuedAt:        time.Now(),
+		}
+		h.DB.Create(&inv)
+	}
+
+	if h.Notifications != nil {
+		h.Notifications.MustNotify(uint(userID), "subscription.activated",
+			"Abonnement activé",
+			fmt.Sprintf("Votre abonnement %s est désormais actif. Profitez de toutes les fonctionnalités pro !", planDef.Label),
+			"/profil/pro/abonnement")
+	}
+	return nil
+}
+
+// fulfillCampaign records the campaign payment. The campaign stays "pending"
+// until an admin validates it (it then becomes "active").
+func (h *PaymentHandler) fulfillCampaign(session *stripe.CheckoutSession) error {
+	if session.PaymentStatus != "" &&
+		session.PaymentStatus != stripe.CheckoutSessionPaymentStatusPaid &&
+		session.PaymentStatus != stripe.CheckoutSessionPaymentStatusNoPaymentRequired {
+		return nil
+	}
+	campaignID, _ := strconv.ParseUint(session.Metadata["campaign_id"], 10, 64)
+	if campaignID == 0 {
+		return fmt.Errorf("metadata campagne incomplète")
+	}
+	var camp models.Campaign
+	if err := h.DB.First(&camp, campaignID).Error; err != nil {
+		return fmt.Errorf("campagne introuvable: %w", err)
+	}
+	if camp.PaidAt != nil {
+		return nil // already processed
+	}
+	now := time.Now()
+	h.DB.Model(&camp).Updates(map[string]interface{}{
+		"paid_at": &now,
+		"status":  "pending", // awaiting admin validation
+	})
+
+	// Generate an invoice for the campaign payment.
+	var user models.User
+	h.DB.First(&user, camp.ProviderID)
+	number := fmt.Sprintf("PUB-%d-%06d", time.Now().Year(), camp.ID)
+	pdfPath, perr := h.PDF.Generate(services.InvoiceData{
+		Number:          number,
+		Type:            "invoice",
+		IssuedAt:        time.Now(),
+		CustomerName:    strings.TrimSpace(user.FirstName + " " + user.LastName),
+		CustomerEmail:   user.Email,
+		PrestationTitle: "Campagne publicitaire : " + camp.Title,
+		AmountCents:     camp.BudgetCents,
+		TVAPercent:      20.0,
+		Currency:        "eur",
+		Notes:           "Campagne soumise à validation par l'équipe UpcycleConnect avant diffusion.",
+	})
+	if perr == nil {
+		inv := models.Invoice{
+			UserID:          camp.ProviderID,
+			Type:            "invoice",
+			Number:          number,
+			PrestationTitle: "Campagne publicitaire : " + camp.Title,
+			AmountCents:     camp.BudgetCents,
+			TVAPercent:      20.0,
+			Currency:        "eur",
+			PDFPath:         &pdfPath,
+			Status:          "paid",
+			IssuedAt:        time.Now(),
+		}
+		h.DB.Create(&inv)
+	}
+
+	if h.Notifications != nil {
+		h.Notifications.NotifyAdmins("campaign.paid",
+			"Campagne publicitaire à valider",
+			fmt.Sprintf("%s a payé la campagne « %s ». À valider.", user.FirstName+" "+user.LastName, camp.Title),
+			"/admin/campaigns")
+	}
+	return nil
 }
 
 func (h *PaymentHandler) fulfillReservation(session *stripe.CheckoutSession) error {
