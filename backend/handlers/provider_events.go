@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"math"
 	"net/http"
 	"strconv"
@@ -14,8 +15,9 @@ import (
 )
 
 type ProviderEventHandler struct {
-	DB    *gorm.DB
-	Audit *services.AuditService
+	DB            *gorm.DB
+	Audit         *services.AuditService
+	Notifications *services.NotificationService
 }
 
 func (h *ProviderEventHandler) ensureApproved(c *gin.Context, user *models.User) bool {
@@ -273,6 +275,15 @@ func (h *ProviderEventHandler) Submit(c *gin.Context) {
 	h.DB.Model(&event).Update("status", "pending")
 	h.Audit.Log(c, "provider.event_submitted", "Event", &event.ID,
 		map[string]string{"status": "draft"}, map[string]string{"status": "pending"})
+
+	// Notify the responsable (admins) that a formation/event awaits validation.
+	if h.Notifications != nil {
+		h.Notifications.NotifyAdmins("event.pending_validation",
+			"Formation à valider",
+			fmt.Sprintf("%s a soumis « %s » pour validation.",
+				user.FirstName+" "+user.LastName, event.Title),
+			"/admin/events")
+	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Événement soumis pour validation par un administrateur.", "status": "pending"})
 }

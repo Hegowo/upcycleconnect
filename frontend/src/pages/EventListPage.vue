@@ -102,6 +102,7 @@
       <select v-model="filters.status" @change="fetchEvents" class="text-sm border border-[#e5e7eb] rounded-lg px-3 py-2 bg-[#f8fafc] text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#006d35]/30">
         <option value="">{{ t('events.allStatuses') }}</option>
         <option value="draft">{{ t('events.statusDraft') }}</option>
+        <option value="pending">À valider</option>
         <option value="published">{{ t('events.statusPublished') }}</option>
         <option value="cancelled">{{ t('events.statusCancelled') }}</option>
       </select>
@@ -149,6 +150,22 @@
       </div>
       
       <div class="flex items-center gap-2 pt-2 border-t border-[#f8fafc]">
+        <button
+          v-if="e.status === 'pending'"
+          @click="changeStatus(e, 'published')"
+          class="flex-1 py-1.5 rounded-lg text-xs font-semibold text-center transition"
+          style="background:#dcfce7; color:#166534;"
+        >
+          Valider
+        </button>
+        <button
+          v-if="e.status === 'pending'"
+          @click="changeStatus(e, 'draft')"
+          class="flex-1 py-1.5 rounded-lg text-xs font-semibold text-center transition"
+          style="background:#fef2f2; color:#b91c1c;"
+        >
+          Rejeter
+        </button>
         <button
           v-if="e.status === 'draft'"
           @click="changeStatus(e, 'published')"
@@ -236,6 +253,22 @@
               </td>
               <td class="px-6 py-4 text-right">
                 <div class="flex justify-end gap-1.5">
+                  <button
+                    v-if="e.status === 'pending'"
+                    @click="changeStatus(e, 'published')"
+                    class="px-3 py-1 rounded-lg text-xs font-semibold transition"
+                    style="background:#dcfce7; color:#166534;"
+                  >
+                    Valider
+                  </button>
+                  <button
+                    v-if="e.status === 'pending'"
+                    @click="changeStatus(e, 'draft')"
+                    class="px-3 py-1 rounded-lg text-xs font-semibold transition"
+                    style="background:#fef2f2; color:#b91c1c;"
+                  >
+                    Rejeter
+                  </button>
                   <button
                     v-if="e.status === 'draft'"
                     @click="changeStatus(e, 'published')"
@@ -369,6 +402,7 @@ async function executeDelete() {
 
 function eventStatusBadge(status) {
   if (status === 'published') return 'bg-[#dcfce7] text-[#166534]'
+  if (status === 'pending')   return 'bg-[#fef9c3] text-[#854d0e]'
   if (status === 'cancelled') return 'bg-[#fee2e2] text-[#991b1b]'
   if (status === 'draft')     return 'bg-[#f1f5f9] text-[#475569]'
   return 'bg-[#f1f5f9] text-[#475569]'
@@ -376,6 +410,7 @@ function eventStatusBadge(status) {
 function eventStatusText(status) {
   const map = {
     published: t('events.statusPublished'),
+    pending:   'À valider',
     draft:     t('events.statusDraft'),
     cancelled: t('events.statusCancelled'),
   }

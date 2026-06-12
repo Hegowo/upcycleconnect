@@ -16,8 +16,9 @@ import (
 )
 
 type EventHandler struct {
-	DB    *gorm.DB
-	Audit *services.AuditService
+	DB            *gorm.DB
+	Audit         *services.AuditService
+	Notifications *services.NotificationService
 }
 
 func (h *EventHandler) Index(c *gin.Context) {
@@ -306,9 +307,25 @@ func (h *EventHandler) UpdateStatus(c *gin.Context) {
 	}
 
 	old := map[string]string{"status": event.Status}
+	wasPending := event.Status == "pending"
 	h.DB.Model(&event).Update("status", req.Status)
 
 	h.Audit.Log(c, "event.status_changed", "Event", &event.ID, old, map[string]string{"status": req.Status})
+
+	// Notify the creator (animateur/formateur) of the responsable's decision.
+	if h.Notifications != nil && event.CreatedBy != nil && wasPending {
+		if req.Status == "published" {
+			h.Notifications.MustNotify(*event.CreatedBy, "event.approved",
+				"Formation validée",
+				fmt.Sprintf("Votre formation « %s » a été validée et publiée.", event.Title),
+				"/profil/pro/evenements")
+		} else if req.Status == "draft" {
+			h.Notifications.MustNotify(*event.CreatedBy, "event.rejected",
+				"Formation renvoyée en brouillon",
+				fmt.Sprintf("Votre formation « %s » nécessite des modifications avant publication.", event.Title),
+				"/profil/pro/evenements")
+		}
+	}
 
 	h.DB.Preload("Category").Preload("Creator.Roles").First(&event, event.ID)
 
