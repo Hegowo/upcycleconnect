@@ -76,6 +76,14 @@
       </div>
 
       <div class="bg-white rounded-2xl p-6 space-y-4">
+        <h2 class="font-semibold text-[#001d32]">{{ t('public.profileEdit.languageTitle') }}</h2>
+        <p class="text-xs text-[#40617f] -mt-2">{{ t('public.profileEdit.languageHint') }}</p>
+        <div class="max-w-xs">
+          <LanguageSwitcher />
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl p-6 space-y-4">
         <h2 class="font-semibold text-[#001d32]">{{ t('public.profileEdit.passwordTitle') }}</h2>
         <div class="space-y-3">
           <div>
@@ -253,6 +261,7 @@ import {
   BellAlertIcon,
 } from '@heroicons/vue/24/outline'
 import { enablePushNotifications } from '@/utils/onesignal'
+import LanguageSwitcher from '@/components/LanguageSwitcher.vue'
 
 const { t } = useI18n()
 const router   = useRouter()

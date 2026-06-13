@@ -322,6 +322,8 @@
 
               <form @submit.prevent="handleRegister" class="space-y-4">
 
+                <LanguageSwitcher :label="t('public.register.fieldLanguage')" />
+
                 <template v-if="accountType === 'provider'">
                   <div class="rounded-2xl border border-[#e2e8f0] p-4 space-y-3 bg-[#f7f9ff]">
                     <p class="text-xs font-bold text-[#40617f] uppercase tracking-wider flex items-center gap-1.5">
@@ -568,6 +570,7 @@ import { useUserAuthStore } from '@/stores/userAuth'
 import AddressAutocomplete from '@/components/AddressAutocomplete.vue'
 import GoogleSignInButton from '@/components/GoogleSignInButton.vue'
 import AppleSignInButton from '@/components/AppleSignInButton.vue'
+import LanguageSwitcher from '@/components/LanguageSwitcher.vue'
 import {
   UserIcon,
   WrenchScrewdriverIcon,

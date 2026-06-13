@@ -1006,7 +1006,8 @@
       "footerCopyright": "© 2024 UpcycleConnect. The Curated Ecosystem.",
       "footerPrivacy": "Privacy Policy",
       "footerTerms": "Terms of Service",
-      "footerCommitment": "Eco-Commitment"
+      "footerCommitment": "Eco-Commitment",
+      "fieldLanguage": "Langue"
     },
     "verifyEmail": {
       "loading": "Vérification en cours...",
@@ -1120,7 +1121,9 @@
       "doneEmailChange1": "Email modifié avec succès. Vous utilisez maintenant",
       "missingFields": "Veuillez remplir tous les champs.",
       "missingCode": "Veuillez saisir le code.",
-      "errorGeneric": "Erreur"
+      "errorGeneric": "Erreur",
+      "languageTitle": "Langue",
+      "languageHint": "Choisissez la langue d'affichage du site."
     },
     "profileProfessionnel": {
       "badgeCertified": "Artisan Certifié",
