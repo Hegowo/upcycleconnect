@@ -27,6 +27,7 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 	authHandler := &handlers.AuthHandler{DB: db, Cfg: cfg}
 	dashHandler := &handlers.DashboardHandler{DB: db}
 	financeHandler := &handlers.FinanceHandler{DB: db}
+	localeHandler := &handlers.LocaleHandler{DB: db, Audit: audit}
 	swaggerHandler := &handlers.SwaggerHandler{}
 	notificationHandler := &handlers.NotificationHandler{DB: db}
 	userHandler := &handlers.UserHandler{DB: db, Audit: audit, Mailer: mailer, Cfg: cfg, Notifications: notifications}
@@ -107,6 +108,9 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 
 		public.GET("/tips", tipHandler.PublicIndex)
 		public.GET("/tips/:slug", tipHandler.PublicShow)
+
+		public.GET("/locales", localeHandler.PublicList)
+		public.GET("/locales/:code", localeHandler.PublicMessages)
 
 		public.GET("/subscription/plans", subscriptionHandler.Plans)
 		public.GET("/campaigns/active", campaignHandler.ActiveCampaigns)
@@ -266,6 +270,12 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 			protected.GET("/dashboard/stats", dashHandler.Stats)
 			protected.GET("/finance/overview", financeHandler.Overview)
 			protected.GET("/finance/transactions", financeHandler.Transactions)
+
+			protected.GET("/locales", localeHandler.AdminList)
+			protected.GET("/locales/:code", localeHandler.AdminGet)
+			protected.POST("/locales", localeHandler.AdminCreate)
+			protected.PUT("/locales/:code", localeHandler.AdminUpdate)
+			protected.DELETE("/locales/:code", localeHandler.AdminDelete)
 
 			protected.GET("/logs", logsHandler.Index)
 			protected.GET("/logs/activity", logsHandler.Activity)

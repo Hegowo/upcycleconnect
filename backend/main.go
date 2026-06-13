@@ -43,6 +43,7 @@ func main() {
 		&models.Contract{},
 		&models.Notification{},
 		&models.Tip{},
+		&models.Locale{},
 		&models.Subscription{},
 		&models.Campaign{},
 		&models.CampaignItem{},
@@ -51,6 +52,9 @@ func main() {
 	); err != nil {
 		log.Fatalf("Failed to migrate database: %v", err)
 	}
+
+	// Idempotent seed: roles, built-in locales, optional default super-admin.
+	database.Seed(db)
 
 	r := router.Setup(db, cfg)
 

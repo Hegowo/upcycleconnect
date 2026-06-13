@@ -2,7 +2,7 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
-import i18n from '@/utils/i18n.js'
+import i18n, { loadDynamicLocales } from '@/utils/i18n.js'
 import './assets/main.css'
 import { useUserAuthStore } from '@/stores/userAuth'
 
@@ -18,9 +18,8 @@ app.use(pinia)
 app.use(router)
 app.use(i18n)
 
-// Initialize auth BEFORE mounting so that isProvider / profilePath are correct
-// on the very first render — avoids the "menu briefly shows /profil for pros" race.
+// Initialize auth + dynamic locales BEFORE mounting so the first render is correct.
 const authStore = useUserAuthStore()
-authStore.init().finally(() => {
+Promise.allSettled([authStore.init(), loadDynamicLocales()]).finally(() => {
   app.mount('#app')
 })

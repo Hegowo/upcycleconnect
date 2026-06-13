@@ -63,20 +63,15 @@
       
       <div class="py-3">
         <p class="text-sm font-medium text-[#001d32] mb-3">{{ t('settings.adminLang') }}</p>
-        <div class="flex gap-3">
+        <div class="flex gap-3 flex-wrap">
           <button
-            @click="setLang('fr')"
+            v-for="loc in availableLocales"
+            :key="loc.code"
+            @click="setLang(loc.code)"
             class="flex items-center gap-2 px-5 py-3 rounded-xl transition text-sm font-medium border-2"
-            :style="currentLang === 'fr' ? 'border-color:#006d35; color:#006d35; background:#f0fdf4;' : 'border-color:#e5e7eb; color:#6b7280;'"
+            :style="currentLang === loc.code ? 'border-color:#006d35; color:#006d35; background:#f0fdf4;' : 'border-color:#e5e7eb; color:#6b7280;'"
           >
-            🇫🇷 {{ t('settings.langFr') }}
-          </button>
-          <button
-            @click="setLang('en')"
-            class="flex items-center gap-2 px-5 py-3 rounded-xl transition text-sm font-medium border-2"
-            :style="currentLang === 'en' ? 'border-color:#006d35; color:#006d35; background:#f0fdf4;' : 'border-color:#e5e7eb; color:#6b7280;'"
-          >
-            🇬🇧 {{ t('settings.langEn') }}
+            {{ loc.name }}
           </button>
         </div>
       </div>
@@ -122,6 +117,7 @@
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from '@/utils/useToast'
+import { availableLocales, setLocale } from '@/utils/i18n.js'
 
 const { t, locale } = useI18n()
 const auth = useAuthStore()
@@ -135,9 +131,8 @@ function toggleAutoValidation() {
   autoValidation.value = !autoValidation.value
 }
 
-function setLang(lang) {
-  locale.value = lang
-  localStorage.setItem('admin_lang', lang)
+async function setLang(lang) {
+  await setLocale(lang) // loads dynamic locale messages on demand
   toast.showSuccess(t('settings.toastLangUpdated'))
 }
 
