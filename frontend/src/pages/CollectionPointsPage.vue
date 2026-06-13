@@ -15,57 +15,91 @@
       </button>
     </div>
 
+    <!-- Toolbar: search + filters + stats -->
+    <div class="card p-4 flex flex-wrap items-center gap-3">
+      <div class="relative flex-1 min-w-[200px]">
+        <MagnifyingGlassIcon class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#94a3b8]" />
+        <input v-model="search" type="search" placeholder="Rechercher par nom, ville, code postal…"
+          class="w-full pl-9 pr-3 py-2 bg-[#f8fafc] border border-[#e5e7eb] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#006d35]/30" />
+      </div>
+      <select v-model="deptFilter" class="text-sm border border-[#e5e7eb] rounded-lg px-3 py-2 bg-[#f8fafc] text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#006d35]/30">
+        <option value="">Tous les départements</option>
+        <option v-for="d in departments" :key="d" :value="d">{{ d }} — {{ deptName(d) }}</option>
+      </select>
+      <div class="flex gap-1.5">
+        <button v-for="f in statusFilters" :key="f.value" @click="statusFilter = f.value; page = 1"
+          :class="['px-3 py-1.5 rounded-full text-xs font-semibold border transition',
+            statusFilter === f.value ? 'bg-[#006d35] text-white border-[#006d35]' : 'bg-white text-[#40617f] border-[#e5e7eb] hover:border-[#006d35]']">
+          {{ f.label }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Stats line -->
+    <div class="flex items-center gap-4 text-xs text-[#64748b] px-1">
+      <span><strong class="text-[#001d32]">{{ filtered.length }}</strong> résultat(s)</span>
+      <span><strong class="text-[#16a34a]">{{ activeCount }}</strong> actifs</span>
+      <span><strong class="text-[#6b7280]">{{ points.length - activeCount }}</strong> inactifs</span>
+    </div>
+
     <div v-if="loading" class="flex justify-center py-16">
       <div class="w-6 h-6 border-2 border-[#006d35] border-t-transparent rounded-full animate-spin" />
     </div>
 
-    <div v-else-if="points.length === 0" class="bg-white rounded-2xl border border-[#f1f5f9] p-12 text-center text-gray-400">
+    <div v-else-if="!filtered.length" class="bg-white rounded-2xl border border-[#f1f5f9] p-12 text-center text-gray-400">
       <MapPinIcon class="w-12 h-12 mx-auto mb-3 text-gray-300" />
       <p class="font-medium">Aucun point de collecte</p>
-      <p class="text-sm mt-1">Ajoutez votre premier point de collecte</p>
+      <p class="text-sm mt-1">Aucun résultat pour ces filtres</p>
     </div>
 
-    <div v-else class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-      <div
-        v-for="pt in points"
-        :key="pt.id"
-        class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm p-5 flex flex-col gap-3"
-      >
-        <div class="flex items-start justify-between gap-2">
-          <div class="flex items-start gap-3">
-            <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" :style="pt.is_active ? 'background:#f0fdf4' : 'background:#f1f5f9'">
-              <MapPinIcon class="w-5 h-5" :style="pt.is_active ? 'color:#006d35' : 'color:#9ca3af'" />
-            </div>
-            <div>
-              <p class="font-semibold text-[#001d32] text-sm">{{ pt.name }}</p>
-              <p class="text-xs text-gray-400 mt-0.5">{{ pt.address }}, {{ pt.postal_code }} {{ pt.city }}</p>
-            </div>
-          </div>
-          <span
-            class="text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0"
-            :class="pt.is_active ? 'bg-[#dcfce7] text-[#166534]' : 'bg-[#f1f5f9] text-[#6b7280]'"
-          >
-            {{ pt.is_active ? 'Actif' : 'Inactif' }}
-          </span>
-        </div>
+    <!-- Table -->
+    <div v-else class="card overflow-hidden">
+      <table class="w-full text-sm">
+        <thead class="bg-[#f8fafc] text-[#64748b] text-xs uppercase">
+          <tr>
+            <th class="text-left px-4 py-3">Nom</th>
+            <th class="text-left px-4 py-3 hidden md:table-cell">Adresse</th>
+            <th class="text-left px-4 py-3">Ville</th>
+            <th class="text-left px-4 py-3 hidden lg:table-cell">Horaires</th>
+            <th class="text-left px-4 py-3">Statut</th>
+            <th class="text-right px-4 py-3">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="pt in paginated" :key="pt.id" class="border-t border-[#f1f5f9] hover:bg-[#f8fafc]">
+            <td class="px-4 py-2.5">
+              <div class="flex items-center gap-2.5">
+                <MapPinIcon class="w-4 h-4 shrink-0" :style="pt.is_active ? 'color:#006d35' : 'color:#cbd5e1'" />
+                <span class="font-medium text-[#001d32]">{{ pt.name }}</span>
+              </div>
+            </td>
+            <td class="px-4 py-2.5 text-[#40617f] hidden md:table-cell">{{ pt.address }}</td>
+            <td class="px-4 py-2.5 text-[#40617f]"><span class="font-mono text-xs text-[#94a3b8]">{{ pt.postal_code }}</span> {{ pt.city }}</td>
+            <td class="px-4 py-2.5 text-[#64748b] text-xs hidden lg:table-cell">{{ pt.opening_hours || '—' }}</td>
+            <td class="px-4 py-2.5">
+              <button @click="toggleActive(pt)"
+                class="text-[10px] font-bold px-2 py-0.5 rounded-full transition"
+                :class="pt.is_active ? 'bg-[#dcfce7] text-[#166534] hover:bg-[#bbf7d0]' : 'bg-[#f1f5f9] text-[#6b7280] hover:bg-[#e5e7eb]'">
+                {{ pt.is_active ? 'Actif' : 'Inactif' }}
+              </button>
+            </td>
+            <td class="px-4 py-2.5 text-right whitespace-nowrap">
+              <button @click="openEdit(pt)" class="p-1.5 rounded-lg text-gray-400 hover:text-[#006d35] hover:bg-[#f0fdf4] transition" title="Modifier">
+                <PencilSquareIcon class="w-4 h-4" />
+              </button>
+              <button @click="confirmDelete(pt)" class="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition" title="Supprimer">
+                <TrashIcon class="w-4 h-4" />
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
-        <div v-if="pt.opening_hours" class="text-xs text-[#40617f] bg-[#f8fafc] rounded-lg px-3 py-2 flex items-start gap-1.5">
-          <ClockIcon class="w-3.5 h-3.5 shrink-0 mt-0.5" />
-          <span>{{ pt.opening_hours }}</span>
-        </div>
-        <div v-if="pt.phone" class="text-xs text-[#40617f] flex items-center gap-1.5">
-          <PhoneIcon class="w-3.5 h-3.5 shrink-0" />
-          {{ pt.phone }}
-        </div>
-
-        <div class="flex gap-2 pt-1 border-t border-[#f1f5f9]">
-          <button @click="openEdit(pt)" class="flex-1 py-1.5 rounded-lg text-xs font-semibold text-[#40617f] bg-[#f8fafc] hover:bg-[#edf4ff] transition">
-            Modifier
-          </button>
-          <button @click="confirmDelete(pt)" class="flex-1 py-1.5 rounded-lg text-xs font-semibold text-red-500 bg-red-50 hover:bg-red-100 transition">
-            Supprimer
-          </button>
-        </div>
+      <!-- Pagination -->
+      <div v-if="lastPage > 1" class="flex items-center justify-between px-4 py-3 border-t border-[#f1f5f9]">
+        <button @click="page--" :disabled="page <= 1" class="text-sm text-[#40617f] disabled:opacity-40 hover:text-[#006d35]">← Précédent</button>
+        <span class="text-xs text-[#94a3b8]">Page {{ page }} / {{ lastPage }} · {{ filtered.length }} points</span>
+        <button @click="page++" :disabled="page >= lastPage" class="text-sm text-[#40617f] disabled:opacity-40 hover:text-[#006d35]">Suivant →</button>
       </div>
     </div>
 
@@ -179,8 +213,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { PlusIcon, MapPinIcon, ClockIcon, PhoneIcon, XMarkIcon } from '@heroicons/vue/24/outline'
+import { ref, computed, watch, onMounted } from 'vue'
+import { PlusIcon, MapPinIcon, ClockIcon, PhoneIcon, XMarkIcon, MagnifyingGlassIcon, PencilSquareIcon, TrashIcon } from '@heroicons/vue/24/outline'
 
 const BASE = import.meta.env.VITE_API_BASE_URL || '/api/admin/v1'
 
@@ -205,6 +239,57 @@ const addressSuggestions = ref([])
 let addressTimer = null
 
 const form = ref(emptyForm())
+
+// ── Search / filter / pagination ──
+const search = ref('')
+const statusFilter = ref('')   // '' | 'active' | 'inactive'
+const deptFilter = ref('')
+const page = ref(1)
+const perPage = 20
+
+const statusFilters = [
+  { value: '', label: 'Tous' },
+  { value: 'active', label: 'Actifs' },
+  { value: 'inactive', label: 'Inactifs' },
+]
+
+const DEPT_NAMES = {
+  '75': 'Paris', '77': 'Seine-et-Marne', '78': 'Yvelines', '91': 'Essonne',
+  '92': 'Hauts-de-Seine', '93': 'Seine-Saint-Denis', '94': 'Val-de-Marne', '95': "Val-d'Oise",
+}
+function deptName(d) { return DEPT_NAMES[d] || 'Province' }
+
+const departments = computed(() => {
+  const set = new Set(points.value.map(p => (p.postal_code || '').slice(0, 2)).filter(Boolean))
+  return [...set].sort()
+})
+
+const activeCount = computed(() => points.value.filter(p => p.is_active).length)
+
+const filtered = computed(() => {
+  const q = search.value.trim().toLowerCase()
+  return points.value.filter(p => {
+    if (statusFilter.value === 'active' && !p.is_active) return false
+    if (statusFilter.value === 'inactive' && p.is_active) return false
+    if (deptFilter.value && !(p.postal_code || '').startsWith(deptFilter.value)) return false
+    if (q) {
+      const hay = `${p.name} ${p.city} ${p.postal_code} ${p.address}`.toLowerCase()
+      if (!hay.includes(q)) return false
+    }
+    return true
+  })
+})
+
+const lastPage = computed(() => Math.max(1, Math.ceil(filtered.value.length / perPage)))
+const paginated = computed(() => filtered.value.slice((page.value - 1) * perPage, page.value * perPage))
+
+watch([search, deptFilter, statusFilter], () => { page.value = 1 })
+
+async function toggleActive(pt) {
+  const updated = { ...pt, is_active: !pt.is_active }
+  await fetch(`${BASE}/collection-points/${pt.id}`, { method: 'PUT', headers: authHeaders(true), body: JSON.stringify(updated) })
+  pt.is_active = !pt.is_active
+}
 
 function emptyForm() {
   return { name: '', address: '', city: '', postal_code: '', latitude: 0, longitude: 0, phone: '', opening_hours: '', is_active: true }
