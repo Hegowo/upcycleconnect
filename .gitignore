@@ -14,6 +14,9 @@ upcyclelocal
 uc
 uc.x.c
 
+# Rapport PDF — local uniquement, ne doit pas être poussé
+UpcycleConnect-Rapport.pdf
+
 # Front
 frontend/node_modules/
 frontend/dist/
