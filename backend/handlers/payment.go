@@ -668,6 +668,10 @@ func (h *PaymentHandler) fulfillReservation(session *stripe.CheckoutSession) err
 	// Flip the reservation to paid only after the invoice is safely persisted.
 	// If this Save fails, the next Stripe retry finds the invoice row and early-returns above.
 	reservation.Status = "paid"
+	// Freeze the platform commission (5-10%) and the provider's net share at payment time.
+	commission, net := models.ComputeCommission(reservation.AmountCents)
+	reservation.CommissionCents = commission
+	reservation.NetCents = net
 	if session.PaymentIntent != nil {
 		pi := session.PaymentIntent.ID
 		reservation.StripePaymentIntentID = &pi

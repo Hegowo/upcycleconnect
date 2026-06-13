@@ -1,8 +1,8 @@
 <template>
   <div class="space-y-6">
     <div>
-      <h2 class="text-xl sm:text-2xl font-bold text-[#001d32]">Monétisation</h2>
-      <p class="text-sm text-[#40617f] mt-0.5">Validation des campagnes publicitaires et suivi des abonnements pro.</p>
+      <h2 class="text-xl sm:text-2xl font-bold text-[#001d32]">Monétisation & Finances</h2>
+      <p class="text-sm text-[#40617f] mt-0.5">Revenus de la plateforme, commissions, campagnes et abonnements pro.</p>
     </div>
 
     <!-- Tabs -->
@@ -16,6 +16,85 @@
           {{ pendingCount }}
         </span>
       </button>
+    </div>
+
+    <!-- ===== FINANCE ===== -->
+    <div v-if="activeTab === 'finance'">
+      <div v-if="loadingFinance" class="py-16 text-center">
+        <div class="w-8 h-8 border-4 border-[#006d35] border-t-transparent rounded-full animate-spin mx-auto" />
+      </div>
+      <template v-else-if="finance">
+        <!-- KPI cards -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div class="card p-5">
+            <BanknotesIcon class="w-6 h-6 text-[#006d35] mb-2" />
+            <p class="font-jakarta font-extrabold text-[#001d32] text-2xl">{{ formatEUR(finance.platform_revenue_cents) }}</p>
+            <p class="text-[#64748b] text-xs">Revenus plateforme</p>
+          </div>
+          <div class="card p-5">
+            <ReceiptPercentIcon class="w-6 h-6 text-[#006d35] mb-2" />
+            <p class="font-jakarta font-extrabold text-[#001d32] text-2xl">{{ formatEUR(finance.transactions.commission_cents) }}</p>
+            <p class="text-[#64748b] text-xs">Commissions ({{ finance.commission_rate_percent }}%) · {{ finance.transactions.count }} ventes</p>
+          </div>
+          <div class="card p-5">
+            <StarIcon class="w-6 h-6 text-[#006d35] mb-2" />
+            <p class="font-jakarta font-extrabold text-[#001d32] text-2xl">{{ formatEUR(finance.subscriptions.mrr_cents) }}</p>
+            <p class="text-[#64748b] text-xs">Abonnements / mois · {{ finance.subscriptions.active_count }} actifs</p>
+          </div>
+          <div class="card p-5">
+            <MegaphoneIcon class="w-6 h-6 text-[#006d35] mb-2" />
+            <p class="font-jakarta font-extrabold text-[#001d32] text-2xl">{{ formatEUR(finance.campaigns.total_cents) }}</p>
+            <p class="text-[#64748b] text-xs">Campagnes · {{ finance.campaigns.paid_count }} payées</p>
+          </div>
+        </div>
+
+        <!-- GMV breakdown -->
+        <div class="card p-5 mb-6">
+          <h3 class="font-bold text-[#001d32] mb-4">Volume de transactions (prestations)</h3>
+          <div class="grid grid-cols-3 gap-4 text-center">
+            <div>
+              <p class="font-jakarta font-extrabold text-[#001d32] text-xl">{{ formatEUR(finance.transactions.gross_cents) }}</p>
+              <p class="text-[#64748b] text-xs mt-1">Montant brut encaissé</p>
+            </div>
+            <div>
+              <p class="font-jakarta font-extrabold text-[#006d35] text-xl">{{ formatEUR(finance.transactions.commission_cents) }}</p>
+              <p class="text-[#64748b] text-xs mt-1">Commission UpcycleConnect</p>
+            </div>
+            <div>
+              <p class="font-jakarta font-extrabold text-[#40617f] text-xl">{{ formatEUR(finance.transactions.net_to_providers_cents) }}</p>
+              <p class="text-[#64748b] text-xs mt-1">Reversé aux prestataires</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent transactions -->
+        <div class="card overflow-hidden">
+          <div class="px-5 py-3 border-b border-[#f1f5f9]">
+            <h3 class="font-bold text-[#001d32] text-sm">Dernières transactions</h3>
+          </div>
+          <div v-if="!transactions.length" class="p-8 text-center text-[#64748b] text-sm">Aucune transaction payée.</div>
+          <table v-else class="w-full text-sm">
+            <thead class="bg-[#f8fafc] text-[#64748b] text-xs uppercase">
+              <tr>
+                <th class="text-left px-5 py-2.5">Prestation</th>
+                <th class="text-left px-5 py-2.5 hidden sm:table-cell">Client</th>
+                <th class="text-right px-5 py-2.5">Montant</th>
+                <th class="text-right px-5 py-2.5">Commission</th>
+                <th class="text-right px-5 py-2.5 hidden md:table-cell">Net pro</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="t in transactions" :key="t.id" class="border-t border-[#f1f5f9]">
+                <td class="px-5 py-2.5 font-medium text-[#001d32]">{{ t.title }}</td>
+                <td class="px-5 py-2.5 text-[#40617f] hidden sm:table-cell">{{ t.customer }}</td>
+                <td class="px-5 py-2.5 text-right">{{ formatEUR(t.amount_cents) }}</td>
+                <td class="px-5 py-2.5 text-right text-[#006d35] font-semibold">{{ formatEUR(t.commission_cents) }}</td>
+                <td class="px-5 py-2.5 text-right text-[#40617f] hidden md:table-cell">{{ formatEUR(t.net_cents) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </template>
     </div>
 
     <!-- ===== CAMPAIGNS ===== -->
@@ -135,6 +214,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { BanknotesIcon, ReceiptPercentIcon, StarIcon, MegaphoneIcon } from '@heroicons/vue/24/outline'
 
 const BASE = '/api/admin/v1'
 function authHeaders() {
@@ -142,8 +222,24 @@ function authHeaders() {
   return token ? { Authorization: `Bearer ${token}` } : {}
 }
 
-const activeTab = ref('campaigns')
+const finance = ref(null)
+const transactions = ref([])
+const loadingFinance = ref(true)
+async function fetchFinance() {
+  loadingFinance.value = true
+  try {
+    const [ov, tx] = await Promise.all([
+      fetch(`${BASE}/finance/overview`, { headers: authHeaders() }).then(r => r.json()),
+      fetch(`${BASE}/finance/transactions`, { headers: authHeaders() }).then(r => r.json()),
+    ])
+    finance.value = ov
+    transactions.value = tx.data || []
+  } catch { finance.value = null } finally { loadingFinance.value = false }
+}
+
+const activeTab = ref('finance')
 const tabs = [
+  { key: 'finance', label: 'Finances' },
   { key: 'campaigns', label: 'Campagnes pub' },
   { key: 'subscriptions', label: 'Abonnements' },
 ]
@@ -230,5 +326,5 @@ function subBadge(s) {
   return 'bg-yellow-100 text-yellow-800'
 }
 
-onMounted(() => { fetchCampaigns(); fetchSubs() })
+onMounted(() => { fetchFinance(); fetchCampaigns(); fetchSubs() })
 </script>

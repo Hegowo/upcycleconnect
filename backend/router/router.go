@@ -26,6 +26,7 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 
 	authHandler := &handlers.AuthHandler{DB: db, Cfg: cfg}
 	dashHandler := &handlers.DashboardHandler{DB: db}
+	financeHandler := &handlers.FinanceHandler{DB: db}
 	swaggerHandler := &handlers.SwaggerHandler{}
 	notificationHandler := &handlers.NotificationHandler{DB: db}
 	userHandler := &handlers.UserHandler{DB: db, Audit: audit, Mailer: mailer, Cfg: cfg, Notifications: notifications}
@@ -263,6 +264,8 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 			protected.GET("/docs/spec", swaggerHandler.Spec)
 
 			protected.GET("/dashboard/stats", dashHandler.Stats)
+			protected.GET("/finance/overview", financeHandler.Overview)
+			protected.GET("/finance/transactions", financeHandler.Transactions)
 
 			protected.GET("/logs", logsHandler.Index)
 			protected.GET("/logs/activity", logsHandler.Activity)
