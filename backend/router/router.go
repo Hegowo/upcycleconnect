@@ -352,6 +352,7 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 			protected.GET("/collection-points", collectionPointHandler.Index)
 			protected.POST("/collection-points", collectionPointHandler.Store)
 			protected.PUT("/collection-points/:id", collectionPointHandler.Update)
+			protected.PUT("/collection-points/:id/out-of-service", collectionPointHandler.SetOutOfService)
 			protected.DELETE("/collection-points/:id", collectionPointHandler.Destroy)
 
 			superAdmin := protected.Group("")

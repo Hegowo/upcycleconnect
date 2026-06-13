@@ -13,8 +13,24 @@ type CollectionPoint struct {
 	Phone        *string    `gorm:"size:30" json:"phone"`
 	OpeningHours *string    `gorm:"size:512" json:"opening_hours"`
 	IsActive     bool       `gorm:"default:true" json:"is_active"`
+	// OutOfService marks a box as temporarily unavailable. OutOfServiceUntil is optional:
+	// NULL = indefinite; otherwise the box auto-returns to service once the date passes.
+	OutOfService      bool       `gorm:"default:false" json:"out_of_service"`
+	OutOfServiceUntil *time.Time `json:"out_of_service_until"`
 	CreatedAt    time.Time  `json:"created_at"`
 	UpdatedAt    time.Time  `json:"updated_at"`
+}
+
+// IsOutOfService reports whether the box is currently out of service (taking the
+// optional end date into account — an expired window means it's back in service).
+func (cp *CollectionPoint) IsOutOfService() bool {
+	if !cp.OutOfService {
+		return false
+	}
+	if cp.OutOfServiceUntil != nil && cp.OutOfServiceUntil.Before(time.Now()) {
+		return false
+	}
+	return true
 }
 
 func (CollectionPoint) TableName() string {
@@ -32,10 +48,17 @@ type CollectionPointResponse struct {
 	Phone        *string `json:"phone"`
 	OpeningHours *string `json:"opening_hours"`
 	IsActive     bool    `json:"is_active"`
+	OutOfService      bool    `json:"out_of_service"`
+	OutOfServiceUntil *string `json:"out_of_service_until"`
 	CreatedAt    string  `json:"created_at"`
 }
 
 func ToCollectionPointResponse(cp *CollectionPoint) CollectionPointResponse {
+	var oosUntil *string
+	if cp.OutOfServiceUntil != nil {
+		s := cp.OutOfServiceUntil.UTC().Format("2006-01-02T15:04:05Z")
+		oosUntil = &s
+	}
 	return CollectionPointResponse{
 		ID:           cp.ID,
 		Name:         cp.Name,
@@ -47,6 +70,8 @@ func ToCollectionPointResponse(cp *CollectionPoint) CollectionPointResponse {
 		Phone:        cp.Phone,
 		OpeningHours: cp.OpeningHours,
 		IsActive:     cp.IsActive,
+		OutOfService:      cp.IsOutOfService(),
+		OutOfServiceUntil: oosUntil,
 		CreatedAt:    cp.CreatedAt.UTC().Format("2006-01-02T15:04:05Z"),
 	}
 }

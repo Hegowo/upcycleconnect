@@ -77,13 +77,28 @@
             <td class="px-4 py-2.5 text-[#40617f]"><span class="font-mono text-xs text-[#94a3b8]">{{ pt.postal_code }}</span> {{ pt.city }}</td>
             <td class="px-4 py-2.5 text-[#64748b] text-xs hidden lg:table-cell">{{ pt.opening_hours || '—' }}</td>
             <td class="px-4 py-2.5">
-              <button @click="toggleActive(pt)"
-                class="text-[10px] font-bold px-2 py-0.5 rounded-full transition"
-                :class="pt.is_active ? 'bg-[#dcfce7] text-[#166534] hover:bg-[#bbf7d0]' : 'bg-[#f1f5f9] text-[#6b7280] hover:bg-[#e5e7eb]'">
-                {{ pt.is_active ? 'Actif' : 'Inactif' }}
-              </button>
+              <div class="flex flex-col gap-1 items-start">
+                <span v-if="pt.out_of_service" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#fef2f2] text-[#b91c1c]">
+                  Hors service
+                </span>
+                <button v-else @click="toggleActive(pt)"
+                  class="text-[10px] font-bold px-2 py-0.5 rounded-full transition"
+                  :class="pt.is_active ? 'bg-[#dcfce7] text-[#166534] hover:bg-[#bbf7d0]' : 'bg-[#f1f5f9] text-[#6b7280] hover:bg-[#e5e7eb]'">
+                  {{ pt.is_active ? 'Actif' : 'Inactif' }}
+                </button>
+                <span v-if="pt.out_of_service && pt.out_of_service_until" class="text-[10px] text-[#94a3b8]">
+                  jusqu'au {{ formatDate(pt.out_of_service_until) }}
+                </span>
+                <span v-else-if="pt.out_of_service" class="text-[10px] text-[#94a3b8]">durée indéterminée</span>
+              </div>
             </td>
             <td class="px-4 py-2.5 text-right whitespace-nowrap">
+              <button v-if="!pt.out_of_service" @click="openOOS(pt)" class="p-1.5 rounded-lg text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition" title="Déclarer hors service">
+                <NoSymbolIcon class="w-4 h-4" />
+              </button>
+              <button v-else @click="restore(pt)" class="p-1.5 rounded-lg text-gray-400 hover:text-[#006d35] hover:bg-[#f0fdf4] transition" title="Remettre en service">
+                <ArrowPathIcon class="w-4 h-4" />
+              </button>
               <button @click="openEdit(pt)" class="p-1.5 rounded-lg text-gray-400 hover:text-[#006d35] hover:bg-[#f0fdf4] transition" title="Modifier">
                 <PencilSquareIcon class="w-4 h-4" />
               </button>
@@ -209,12 +224,35 @@
         </div>
       </Transition>
     </Teleport>
+
+    <!-- Out-of-service modal -->
+    <Teleport to="body">
+      <Transition name="modal-fade">
+        <div v-if="oosTarget" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#001d32]/60" @click.self="oosTarget = null">
+          <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
+            <h3 class="font-bold text-[#001d32]">Déclarer hors service</h3>
+            <p class="text-sm text-[#40617f]">Le box <strong>{{ oosTarget.name }}</strong> ne pourra plus être choisi par les utilisateurs pour un dépôt.</p>
+            <div>
+              <label class="block text-xs font-semibold text-[#40617f] uppercase mb-1.5">Jusqu'au (facultatif)</label>
+              <input v-model="oosUntil" type="date" :min="todayStr" class="w-full px-3 py-2.5 text-sm border border-[#e5e7eb] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#006d35]/30" />
+              <p class="text-xs text-[#94a3b8] mt-1.5">Laissez vide pour une durée indéterminée. Le box redeviendra disponible automatiquement à la date choisie.</p>
+            </div>
+            <div class="flex gap-3">
+              <button @click="oosTarget = null" class="flex-1 py-2.5 rounded-xl text-sm font-semibold text-[#40617f] bg-[#f8fafc] hover:bg-[#edf4ff] transition">Annuler</button>
+              <button @click="doOOS" :disabled="submitting" class="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white transition disabled:opacity-50" style="background-color:#d97706;">
+                {{ submitting ? '...' : 'Mettre hors service' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
-import { PlusIcon, MapPinIcon, ClockIcon, PhoneIcon, XMarkIcon, MagnifyingGlassIcon, PencilSquareIcon, TrashIcon } from '@heroicons/vue/24/outline'
+import { PlusIcon, MapPinIcon, ClockIcon, PhoneIcon, XMarkIcon, MagnifyingGlassIcon, PencilSquareIcon, TrashIcon, NoSymbolIcon, ArrowPathIcon } from '@heroicons/vue/24/outline'
 
 const BASE = import.meta.env.VITE_API_BASE_URL || '/api/admin/v1'
 
@@ -254,10 +292,26 @@ const statusFilters = [
 ]
 
 const DEPT_NAMES = {
-  '75': 'Paris', '77': 'Seine-et-Marne', '78': 'Yvelines', '91': 'Essonne',
-  '92': 'Hauts-de-Seine', '93': 'Seine-Saint-Denis', '94': 'Val-de-Marne', '95': "Val-d'Oise",
+  '01':'Ain','02':'Aisne','03':'Allier','04':'Alpes-de-Haute-Provence','05':'Hautes-Alpes',
+  '06':'Alpes-Maritimes','07':'Ardèche','08':'Ardennes','09':'Ariège','10':'Aube','11':'Aude',
+  '12':'Aveyron','13':'Bouches-du-Rhône','14':'Calvados','15':'Cantal','16':'Charente',
+  '17':'Charente-Maritime','18':'Cher','19':'Corrèze','21':"Côte-d'Or",'22':"Côtes-d'Armor",
+  '23':'Creuse','24':'Dordogne','25':'Doubs','26':'Drôme','27':'Eure','28':'Eure-et-Loir',
+  '29':'Finistère','30':'Gard','31':'Haute-Garonne','32':'Gers','33':'Gironde','34':'Hérault',
+  '35':'Ille-et-Vilaine','36':'Indre','37':'Indre-et-Loire','38':'Isère','39':'Jura','40':'Landes',
+  '41':'Loir-et-Cher','42':'Loire','43':'Haute-Loire','44':'Loire-Atlantique','45':'Loiret',
+  '46':'Lot','47':'Lot-et-Garonne','48':'Lozère','49':'Maine-et-Loire','50':'Manche','51':'Marne',
+  '52':'Haute-Marne','53':'Mayenne','54':'Meurthe-et-Moselle','55':'Meuse','56':'Morbihan',
+  '57':'Moselle','58':'Nièvre','59':'Nord','60':'Oise','61':'Orne','62':'Pas-de-Calais',
+  '63':'Puy-de-Dôme','64':'Pyrénées-Atlantiques','65':'Hautes-Pyrénées','66':'Pyrénées-Orientales',
+  '67':'Bas-Rhin','68':'Haut-Rhin','69':'Rhône','70':'Haute-Saône','71':'Saône-et-Loire',
+  '72':'Sarthe','73':'Savoie','74':'Haute-Savoie','75':'Paris','76':'Seine-Maritime',
+  '77':'Seine-et-Marne','78':'Yvelines','79':'Deux-Sèvres','80':'Somme','81':'Tarn',
+  '82':'Tarn-et-Garonne','83':'Var','84':'Vaucluse','85':'Vendée','86':'Vienne','87':'Haute-Vienne',
+  '88':'Vosges','89':'Yonne','90':'Territoire de Belfort','91':'Essonne','92':'Hauts-de-Seine',
+  '93':'Seine-Saint-Denis','94':'Val-de-Marne','95':"Val-d'Oise",
 }
-function deptName(d) { return DEPT_NAMES[d] || 'Province' }
+function deptName(d) { return DEPT_NAMES[d] || 'Autre' }
 
 const departments = computed(() => {
   const set = new Set(points.value.map(p => (p.postal_code || '').slice(0, 2)).filter(Boolean))
@@ -289,6 +343,30 @@ async function toggleActive(pt) {
   const updated = { ...pt, is_active: !pt.is_active }
   await fetch(`${BASE}/collection-points/${pt.id}`, { method: 'PUT', headers: authHeaders(true), body: JSON.stringify(updated) })
   pt.is_active = !pt.is_active
+}
+
+// ── Out of service ──
+const oosTarget = ref(null)
+const oosUntil = ref('')
+const todayStr = new Date().toISOString().slice(0, 10)
+function openOOS(pt) { oosTarget.value = pt; oosUntil.value = ''; }
+async function doOOS() {
+  submitting.value = true
+  try {
+    const body = { out_of_service: true, until: oosUntil.value || null }
+    const res = await fetch(`${BASE}/collection-points/${oosTarget.value.id}/out-of-service`, { method: 'PUT', headers: authHeaders(true), body: JSON.stringify(body) })
+    if (res.ok) { const upd = await res.json(); Object.assign(oosTarget.value, upd) }
+    oosTarget.value = null
+  } finally { submitting.value = false }
+}
+async function restore(pt) {
+  const res = await fetch(`${BASE}/collection-points/${pt.id}/out-of-service`, { method: 'PUT', headers: authHeaders(true), body: JSON.stringify({ out_of_service: false }) })
+  if (res.ok) { const upd = await res.json(); Object.assign(pt, upd) }
+}
+
+function formatDate(iso) {
+  if (!iso) return ''
+  return new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })
 }
 
 function emptyForm() {
