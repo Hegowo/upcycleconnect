@@ -345,16 +345,25 @@ func (h *UserProviderHandler) SubmitPrestation(c *gin.Context) {
 	}
 
 	old := map[string]string{"status": p.Status}
-	h.DB.Model(&p).Update("status", "published")
+	// Annonces require validation by the administrative service (per spec p.5):
+	// submission moves the prestation to "pending", an admin then publishes it.
+	h.DB.Model(&p).Update("status", "pending")
 	h.DB.Preload("Category").First(&p, p.ID)
 
-	h.Audit.Log(c, "provider.prestation_submitted", "Prestation", &p.ID, old, map[string]string{"status": "published"})
+	h.Audit.Log(c, "provider.prestation_submitted", "Prestation", &p.ID, old, map[string]string{"status": "pending"})
 
 	if h.Notifications != nil {
-		h.Notifications.MustNotify(user.ID, "prestation.published",
-			"Prestation publiée",
-			"Votre prestation « "+p.Title+" » est maintenant en ligne et visible par les clients.",
-			"/profil/parametres")
+		// Notify admins that an annonce awaits validation.
+		h.Notifications.NotifyAdmins("prestation.pending_validation",
+			"Annonce à valider",
+			fmt.Sprintf("%s a soumis l'annonce « %s » pour validation.",
+				user.FirstName+" "+user.LastName, p.Title),
+			"/admin/prestations")
+		// Confirm reception to the provider.
+		h.Notifications.MustNotify(user.ID, "prestation.submitted",
+			"Annonce soumise",
+			"Votre prestation « "+p.Title+" » a été soumise et sera examinée par un administrateur.",
+			"/profil/pro")
 	}
 
 	c.JSON(http.StatusOK, models.ToPrestationResponse(&p))

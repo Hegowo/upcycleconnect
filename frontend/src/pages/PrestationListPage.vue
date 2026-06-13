@@ -161,6 +161,22 @@
               
               <div class="flex items-center gap-2 pt-3 border-t border-[#f8fafc]">
                 <button
+                  v-if="p.status === 'pending'"
+                  @click="changeStatus(p, 'published')"
+                  class="flex-1 py-1.5 rounded-lg text-xs font-semibold text-center transition"
+                  style="background:#dcfce7; color:#166534;"
+                >
+                  Valider
+                </button>
+                <button
+                  v-if="p.status === 'pending'"
+                  @click="changeStatus(p, 'draft')"
+                  class="flex-1 py-1.5 rounded-lg text-xs font-semibold text-center transition"
+                  style="background:#fef2f2; color:#b91c1c;"
+                >
+                  Rejeter
+                </button>
+                <button
                   v-if="p.status === 'draft'"
                   @click="changeStatus(p, 'published')"
                   class="flex-1 py-1.5 rounded-lg text-xs font-semibold text-center transition"
@@ -250,6 +266,7 @@ const priceTypes = [
 
 const statusOptions = [
   { value: '',          label: 'Tous' },
+  { value: 'pending',   label: 'À valider' },
   { value: 'published', label: 'Publié' },
   { value: 'draft',     label: 'Brouillon' },
   { value: 'suspended', label: 'Suspendu' },
@@ -320,12 +337,13 @@ const priceTypeLabel = (type) => ({
 
 function prestationStatusBadge(status) {
   if (status === 'published') return 'bg-[#dcfce7] text-[#166534]'
+  if (status === 'pending')   return 'bg-[#fef9c3] text-[#854d0e]'
   if (status === 'suspended') return 'bg-[#fee2e2] text-[#991b1b]'
   if (status === 'archived')  return 'bg-[#fee2e2] text-[#991b1b]'
   return 'bg-[#f1f5f9] text-[#475569]'
 }
 function prestationStatusText(status) {
-  const map = { published: 'Publié', draft: 'Brouillon', suspended: 'Suspendu', archived: 'Archivé' }
+  const map = { published: 'Publié', pending: 'À valider', draft: 'Brouillon', suspended: 'Suspendu', archived: 'Archivé' }
   return map[status] || status
 }
 

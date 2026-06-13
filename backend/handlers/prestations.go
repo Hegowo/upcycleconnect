@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"math"
 	"net/http"
 	"strconv"
@@ -13,8 +14,9 @@ import (
 )
 
 type PrestationHandler struct {
-	DB    *gorm.DB
-	Audit *services.AuditService
+	DB            *gorm.DB
+	Audit         *services.AuditService
+	Notifications *services.NotificationService
 }
 
 func (h *PrestationHandler) Index(c *gin.Context) {
@@ -234,7 +236,7 @@ func (h *PrestationHandler) UpdateStatus(c *gin.Context) {
 	}
 
 	var req struct {
-		Status string `json:"status" binding:"required,oneof=draft published suspended archived"`
+		Status string `json:"status" binding:"required,oneof=draft pending published suspended archived"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"message": "Données invalides."})
@@ -242,9 +244,25 @@ func (h *PrestationHandler) UpdateStatus(c *gin.Context) {
 	}
 
 	old := map[string]string{"status": prestation.Status}
+	wasPending := prestation.Status == "pending"
 	h.DB.Model(&prestation).Update("status", req.Status)
 
 	h.Audit.Log(c, "prestation.status_changed", "Prestation", &prestation.ID, old, map[string]string{"status": req.Status})
+
+	// Notify the provider of the admin's validation decision.
+	if h.Notifications != nil && wasPending && prestation.ProviderID != nil {
+		if req.Status == "published" {
+			h.Notifications.MustNotify(*prestation.ProviderID, "prestation.approved",
+				"Annonce validée",
+				fmt.Sprintf("Votre annonce « %s » a été validée et est en ligne.", prestation.Title),
+				"/profil/pro")
+		} else if req.Status == "draft" {
+			h.Notifications.MustNotify(*prestation.ProviderID, "prestation.rejected",
+				"Annonce à revoir",
+				fmt.Sprintf("Votre annonce « %s » a été renvoyée en brouillon pour modifications.", prestation.Title),
+				"/profil/pro")
+		}
+	}
 
 	h.DB.Preload("Category").Preload("Provider.Roles").First(&prestation, prestation.ID)
 

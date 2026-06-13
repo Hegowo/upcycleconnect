@@ -31,7 +31,7 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 	userHandler := &handlers.UserHandler{DB: db, Audit: audit, Mailer: mailer, Cfg: cfg, Notifications: notifications}
 	providerHandler := &handlers.ProviderHandler{DB: db, Audit: audit, Notifications: notifications}
 	categoryHandler := &handlers.CategoryHandler{DB: db, Audit: audit}
-	prestationHandler := &handlers.PrestationHandler{DB: db, Audit: audit}
+	prestationHandler := &handlers.PrestationHandler{DB: db, Audit: audit, Notifications: notifications}
 	eventHandler := &handlers.EventHandler{DB: db, Audit: audit, Notifications: notifications}
 	adminHandler := &handlers.AdminHandler{DB: db, Audit: audit}
 	logsHandler := &handlers.LogsHandler{DB: db}
