@@ -122,6 +122,7 @@ import {
   ChatBubbleLeftEllipsisIcon,
   BanknotesIcon,
   LanguageIcon,
+  BellAlertIcon,
 } from '@heroicons/vue/24/outline'
 
 const { t } = useI18n()
@@ -143,6 +144,7 @@ const navItems = computed(() => [
   { to: '/admin/forum',             icon: ChatBubbleLeftEllipsisIcon, label: t('nav.forum') },
   { to: '/admin/monetization',      icon: BanknotesIcon,              label: 'Monétisation' },
   { to: '/admin/locales',           icon: LanguageIcon,               label: 'Langues' },
+  { to: '/admin/notifications',     icon: BellAlertIcon,              label: 'Notifications' },
   { to: '/admin/logs',              icon: ClockIcon,                  label: t('nav.logs') },
   { to: '/admin/box-requests',      icon: InboxIcon,                  label: t('nav.boxRequests') },
   { to: '/admin/collection-points', icon: MapPinIcon,                 label: t('nav.collectionPoints') },

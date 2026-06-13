@@ -77,6 +77,7 @@ const router = createRouter({
         { path: 'monetization',  component: () => import('@/pages/MonetizationPage.vue'), meta: { title: 'Monétisation' } },
         { path: 'campaigns',     redirect: '/admin/monetization' },
         { path: 'locales',       component: () => import('@/pages/LocalesPage.vue'),       meta: { title: 'Langues' } },
+        { path: 'notifications', component: () => import('@/pages/AdminNotificationsPage.vue'), meta: { title: 'Notifications' } },
         { path: 'events',        component: () => import('@/pages/EventListPage.vue'),  meta: { title: 'Événements' } },
         { path: 'events/create', component: () => import('@/pages/EventFormPage.vue'),  meta: { title: 'Nouvel événement' } },
         { path: 'events/:id/edit', component: () => import('@/pages/EventFormPage.vue'), meta: { title: 'Modifier l\'événement' } },

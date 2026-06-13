@@ -30,6 +30,7 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 	localeHandler := &handlers.LocaleHandler{DB: db, Audit: audit}
 	swaggerHandler := &handlers.SwaggerHandler{}
 	notificationHandler := &handlers.NotificationHandler{DB: db}
+	adminNotifHandler := &handlers.AdminNotificationHandler{DB: db, Notifications: notifications, Audit: audit}
 	userHandler := &handlers.UserHandler{DB: db, Audit: audit, Mailer: mailer, Cfg: cfg, Notifications: notifications}
 	providerHandler := &handlers.ProviderHandler{DB: db, Audit: audit, Notifications: notifications}
 	categoryHandler := &handlers.CategoryHandler{DB: db, Audit: audit}
@@ -264,6 +265,8 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 			protected.GET("/notifications/unread-count", notificationHandler.UnreadCount)
 			protected.POST("/notifications/:id/read", notificationHandler.MarkRead)
 			protected.POST("/notifications/read-all", notificationHandler.MarkAllRead)
+			protected.GET("/notifications/sent", adminNotifHandler.SentList)
+			protected.POST("/notifications/broadcast", adminNotifHandler.Broadcast)
 
 			protected.GET("/docs/spec", swaggerHandler.Spec)
 
