@@ -78,6 +78,7 @@ const router = createRouter({
         { path: 'campaigns',     redirect: '/admin/monetization' },
         { path: 'locales',       component: () => import('@/pages/LocalesPage.vue'),       meta: { title: 'Langues' } },
         { path: 'notifications', component: () => import('@/pages/AdminNotificationsPage.vue'), meta: { title: 'Notifications' } },
+        { path: 'export',        component: () => import('@/pages/ExportPage.vue'),             meta: { title: 'Export & Audit' } },
         { path: 'events',        component: () => import('@/pages/EventListPage.vue'),  meta: { title: 'Événements' } },
         { path: 'events/create', component: () => import('@/pages/EventFormPage.vue'),  meta: { title: 'Nouvel événement' } },
         { path: 'events/:id/edit', component: () => import('@/pages/EventFormPage.vue'), meta: { title: 'Modifier l\'événement' } },
