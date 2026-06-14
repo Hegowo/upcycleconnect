@@ -125,7 +125,17 @@ func (s *NotificationService) NotifyAdmins(typ, title, body, link string) {
 		Joins("JOIN roles ON roles.id = user_roles.role_id").
 		Where("roles.name IN ?", []string{"admin", "super_admin"}).
 		Pluck("user_roles.user_id", &ids)
-	s.NotifyMany(ids, typ, title, body, link)
+	// A user with both 'admin' and 'super_admin' roles would appear twice and
+	// receive duplicate notifications — dedupe before notifying.
+	seen := make(map[uint]bool, len(ids))
+	uniq := ids[:0]
+	for _, id := range ids {
+		if !seen[id] {
+			seen[id] = true
+			uniq = append(uniq, id)
+		}
+	}
+	s.NotifyMany(uniq, typ, title, body, link)
 }
 
 // MustNotify is a tiny helper that swallows errors — convenient when wiring from handlers
