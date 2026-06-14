@@ -21,6 +21,7 @@ type Prestation struct {
 
 	Category *PrestationCategory `gorm:"foreignKey:CategoryID" json:"-"`
 	Provider *User               `gorm:"foreignKey:ProviderID" json:"-"`
+	Images   []PrestationImage   `gorm:"foreignKey:PrestationID" json:"-"`
 }
 
 func (Prestation) TableName() string {
@@ -36,6 +37,7 @@ type PrestationResponse struct {
 	Status      string             `json:"status"`
 	Category    *CategoryResponse  `json:"category"`
 	Provider    *UserResponse      `json:"provider"`
+	Images      []PrestationImageResponse `json:"images"`
 	CreatedAt   string             `json:"created_at"`
 	UpdatedAt   string             `json:"updated_at"`
 }
@@ -51,6 +53,10 @@ func ToPrestationResponse(p *Prestation) PrestationResponse {
 		u := ToUserResponse(p.Provider)
 		prov = &u
 	}
+	images := make([]PrestationImageResponse, 0, len(p.Images))
+	for _, img := range p.Images {
+		images = append(images, PrestationImageResponse{ID: img.ID, URL: img.URL, Order: img.Position})
+	}
 	return PrestationResponse{
 		ID:          p.ID,
 		Title:       p.Title,
@@ -60,6 +66,7 @@ func ToPrestationResponse(p *Prestation) PrestationResponse {
 		Status:      p.Status,
 		Category:    cat,
 		Provider:    prov,
+		Images:      images,
 		CreatedAt:   p.CreatedAt.UTC().Format("2006-01-02T15:04:05.000000Z"),
 		UpdatedAt:   p.UpdatedAt.UTC().Format("2006-01-02T15:04:05.000000Z"),
 	}

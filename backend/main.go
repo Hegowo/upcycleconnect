@@ -34,6 +34,7 @@ func main() {
 		&models.EventRegistration{},
 		&models.EventMessage{},
 		&models.ReservationMessage{},
+		&models.PrestationImage{},
 		&models.ForumCategory{},
 		&models.ForumThread{},
 		&models.ForumReply{},

@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strconv"
+	"strings"
 	"time"
 
 	"upcycleconnect/backend/middleware"
@@ -212,7 +213,7 @@ func (h *UserProviderHandler) ListPrestations(c *gin.Context) {
 	}
 
 	var items []models.Prestation
-	fetch := h.DB.Preload("Category").
+	fetch := h.DB.Preload("Category").Preload("Images").
 		Where("provider_id = ? AND deleted_at IS NULL", user.ID)
 	if status := c.Query("status"); status != "" {
 		fetch = fetch.Where("status = ?", status)
@@ -539,4 +540,133 @@ func (h *UserProviderHandler) CompleteOnboarding(c *gin.Context) {
 	profile.OnboardingCompletedAt = &now
 	h.Audit.Log(c, "provider.onboarded", "ProviderProfile", &profile.ID, nil, nil)
 	c.JSON(http.StatusOK, models.ToProviderProfileResponse(&profile))
+}
+
+// ownedPrestation loads a prestation and verifies the caller owns it.
+func (h *UserProviderHandler) ownedPrestation(c *gin.Context) (*models.Prestation, bool) {
+	user := middleware.GetAuthUser(c)
+	if user == nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Non authentifié"})
+		return nil, false
+	}
+	var p models.Prestation
+	if err := h.DB.Where("id = ? AND deleted_at IS NULL", c.Param("id")).First(&p).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": "Prestation introuvable"})
+		return nil, false
+	}
+	if p.ProviderID == nil || *p.ProviderID != user.ID {
+		c.JSON(http.StatusForbidden, gin.H{"message": "Accès refusé"})
+		return nil, false
+	}
+	return &p, true
+}
+
+// ShowPrestation returns a single prestation owned by the provider, with images.
+func (h *UserProviderHandler) ShowPrestation(c *gin.Context) {
+	p, ok := h.ownedPrestation(c)
+	if !ok {
+		return
+	}
+	h.DB.Preload("Category").Preload("Images").First(p, p.ID)
+	c.JSON(http.StatusOK, models.ToPrestationResponse(p))
+}
+
+// ListParticipants returns the clients who reserved a given prestation.
+func (h *UserProviderHandler) ListParticipants(c *gin.Context) {
+	p, ok := h.ownedPrestation(c)
+	if !ok {
+		return
+	}
+	type row struct {
+		ID           uint
+		FirstName    string
+		LastName     string
+		Email        string
+		AvatarURL    *string
+		RegisteredAt time.Time
+	}
+	var rows []row
+	h.DB.Table("reservations r").
+		Select("u.id, u.first_name, u.last_name, u.email, u.avatar_url, MIN(r.created_at) AS registered_at").
+		Joins("JOIN users u ON u.id = r.user_id").
+		Where("r.prestation_id = ? AND r.deleted_at IS NULL", p.ID).
+		Group("u.id").
+		Order("registered_at DESC").
+		Scan(&rows)
+
+	out := make([]gin.H, 0, len(rows))
+	for _, r := range rows {
+		out = append(out, gin.H{
+			"id":            r.ID,
+			"first_name":    r.FirstName,
+			"last_name":     r.LastName,
+			"email":         r.Email,
+			"avatar_url":    r.AvatarURL,
+			"registered_at": r.RegisteredAt,
+		})
+	}
+	c.JSON(http.StatusOK, gin.H{"data": out})
+}
+
+// UploadPrestationImage adds one gallery image to a prestation.
+func (h *UserProviderHandler) UploadPrestationImage(c *gin.Context) {
+	p, ok := h.ownedPrestation(c)
+	if !ok {
+		return
+	}
+	file, header, err := c.Request.FormFile("image")
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"message": "Image requise (champ 'image')"})
+		return
+	}
+	defer file.Close()
+	ext := strings.ToLower(filepath.Ext(header.Filename))
+	allowed := map[string]bool{".jpg": true, ".jpeg": true, ".png": true, ".webp": true}
+	if !allowed[ext] {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"message": "Format invalide (JPG, PNG, WEBP)"})
+		return
+	}
+	if header.Size > 5*1024*1024 {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"message": "Image trop volumineuse (max 5 Mo)"})
+		return
+	}
+	dir := "/uploads/prestations"
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Erreur de stockage"})
+		return
+	}
+	filename := fmt.Sprintf("prestation-%d-%d%s", p.ID, time.Now().UnixNano(), ext)
+	dst, err := os.Create(filepath.Join(dir, filename))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Erreur de stockage"})
+		return
+	}
+	defer dst.Close()
+	if _, err := io.Copy(dst, file); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Erreur lors de l'enregistrement"})
+		return
+	}
+
+	var count int64
+	h.DB.Model(&models.PrestationImage{}).Where("prestation_id = ?", p.ID).Count(&count)
+	img := models.PrestationImage{PrestationID: p.ID, URL: "/uploads/prestations/" + filename, Position: int(count)}
+	if err := h.DB.Create(&img).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Erreur lors de l'enregistrement"})
+		return
+	}
+	c.JSON(http.StatusCreated, gin.H{"id": img.ID, "url": img.URL, "order": img.Position})
+}
+
+// DeletePrestationImage removes one image from a prestation.
+func (h *UserProviderHandler) DeletePrestationImage(c *gin.Context) {
+	p, ok := h.ownedPrestation(c)
+	if !ok {
+		return
+	}
+	res := h.DB.Where("id = ? AND prestation_id = ?", c.Param("imageId"), p.ID).Delete(&models.PrestationImage{})
+	if res.RowsAffected == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"message": "Image introuvable"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Image supprimée."})
 }
