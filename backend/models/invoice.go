@@ -17,6 +17,8 @@ type Invoice struct {
 	TVAPercent      float64        `gorm:"type:decimal(5,2);default:20.00" json:"tva_percent"`
 	Currency        string         `gorm:"size:3;default:eur" json:"currency"`
 	PDFPath         *string        `gorm:"size:500" json:"pdf_path"`
+	// LineItems holds the multi-line quote breakdown as JSON: [{"label":..,"amount_cents":..}].
+	LineItems       *string        `gorm:"type:text" json:"line_items"`
 	Status          string         `gorm:"size:20;default:issued" json:"status"`
 	IssuedAt        time.Time      `gorm:"not null" json:"issued_at"`
 	CreatedAt       time.Time      `json:"created_at"`

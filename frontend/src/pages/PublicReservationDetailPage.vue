@@ -18,9 +18,12 @@
         <p class="text-[#40617f]">{{ error }}</p>
       </div>
 
-      <div v-else-if="reservation" class="grid grid-cols-12 gap-6">
+      <div v-else-if="reservation" class="grid grid-cols-12 gap-6 items-start">
 
-        <div class="col-span-12 bg-white rounded-[24px] p-6 sm:p-8 relative overflow-hidden">
+        <!-- LEFT: reservation details, quote, contract -->
+        <div class="col-span-12 lg:col-span-7 space-y-6">
+
+        <div class="bg-white rounded-[24px] p-6 sm:p-8 relative overflow-hidden">
           <div class="absolute -right-10 -top-10 w-40 h-40 rounded-full bg-[rgba(0,109,53,0.05)]" />
 
           <div class="flex flex-wrap items-start gap-4 mb-4">
@@ -55,7 +58,7 @@
           </p>
         </div>
 
-        <div class="col-span-12 lg:col-span-7 bg-white rounded-[24px] p-6 sm:p-8">
+        <div class="bg-white rounded-[24px] p-6 sm:p-8">
           <h2 class="font-jakarta font-bold text-[#001d32] text-lg mb-5">{{ t('public.reservation.detailsTitle') }}</h2>
 
           <dl class="divide-y divide-[#edf4ff]">
@@ -103,7 +106,7 @@
           </dl>
         </div>
 
-        <div class="col-span-12 lg:col-span-5 flex flex-col gap-6">
+        <div class="space-y-6">
 
           <div v-if="!isProviderView" class="bg-[#edf4ff] rounded-[24px] p-6">
             <h3 class="font-jakarta font-bold text-[#001d32] text-base mb-4">{{ t('public.reservation.paymentStatusTitle') }}</h3>
@@ -120,15 +123,30 @@
             </div>
           </div>
 
-          <!-- Provider: establish / revise the quote -->
+          <!-- Provider: establish / revise the quote (multi-line) -->
           <div v-if="isProviderView && canEditQuote" class="bg-white rounded-[24px] p-6 border border-[#edf4ff]">
             <h3 class="font-jakarta font-bold text-[#001d32] text-base mb-1">Établir le devis</h3>
-            <p class="text-[#40617f] text-xs mb-4">Indiquez le montant TTC proposé. Le client pourra le consulter et le signer pour l'accepter.</p>
-            <label class="block text-xs font-semibold text-[#40617f] uppercase mb-1">Montant TTC (€)</label>
-            <input v-model.number="quoteAmount" type="number" min="0" step="0.01" placeholder="0,00"
-              class="w-full px-3 py-2.5 bg-[#f8fafc] border border-[#e5e7eb] rounded-xl text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-[#006d35]/30" />
-            <label class="block text-xs font-semibold text-[#40617f] uppercase mb-1">Note (optionnel)</label>
-            <textarea v-model="quoteMessage" rows="2" placeholder="Détail de la prestation, conditions…"
+            <p class="text-[#40617f] text-xs mb-4">Ajoutez une ligne par élément demandé. Le total TTC est calculé automatiquement.</p>
+
+            <div class="space-y-2 mb-2">
+              <div v-for="(line, i) in quoteLines" :key="i" class="flex items-center gap-2">
+                <input v-model="line.label" type="text" placeholder="Désignation"
+                  class="flex-1 min-w-0 px-3 py-2 bg-[#f8fafc] border border-[#e5e7eb] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#006d35]/30" />
+                <input v-model.number="line.amount" type="number" min="0" step="0.01" placeholder="€"
+                  class="w-24 px-3 py-2 bg-[#f8fafc] border border-[#e5e7eb] rounded-lg text-sm text-right focus:outline-none focus:ring-2 focus:ring-[#006d35]/30" />
+                <button @click="removeLine(i)" class="text-[#94a3b8] hover:text-red-500 shrink-0 p-1" title="Supprimer">
+                  <XMarkIcon class="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+            <button @click="addLine" class="text-sm font-semibold text-[#006d35] hover:underline mb-3">+ Ajouter une ligne</button>
+
+            <div class="flex items-center justify-between border-t border-[#edf4ff] pt-3 mb-3">
+              <span class="text-sm font-semibold text-[#001d32]">Total TTC</span>
+              <span class="text-lg font-bold text-[#006d35]">{{ formatAmount(Math.round(quoteTotal * 100), 'eur') }}</span>
+            </div>
+
+            <textarea v-model="quoteMessage" rows="2" placeholder="Note pour le client (optionnel)…"
               class="w-full px-3 py-2.5 bg-[#f8fafc] border border-[#e5e7eb] rounded-xl text-sm mb-3 resize-none focus:outline-none focus:ring-2 focus:ring-[#006d35]/30" />
             <button @click="sendQuote" :disabled="quoteSending"
               class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-white font-bold text-sm transition hover:opacity-90 disabled:opacity-60"
@@ -142,6 +160,21 @@
           <div v-else-if="isProviderView && contract" class="bg-[#f0fdf4] rounded-[24px] p-6 border border-[#bbf7d0]">
             <p class="font-semibold text-[#166534] text-sm">Devis signé par le client ✓</p>
             <p class="text-[#40617f] text-xs mt-1">Montant accepté : {{ formatAmount(reservation.amount_cents, reservation.currency) }}</p>
+          </div>
+
+          <!-- Quote breakdown (read-only): for the client, or the provider once signed -->
+          <div v-if="quote && quote.lines && quote.lines.length && !canEditQuote" class="bg-white rounded-[24px] p-6 border border-[#edf4ff]">
+            <h3 class="font-jakarta font-bold text-[#001d32] text-base mb-3">Détail du devis</h3>
+            <div class="divide-y divide-[#edf4ff]">
+              <div v-for="(l, i) in quote.lines" :key="i" class="flex items-center justify-between py-2 gap-3">
+                <span class="text-sm text-[#001d32]">{{ l.label }}</span>
+                <span class="text-sm font-medium text-[#001d32] shrink-0">{{ formatAmount(l.amount_cents, 'eur') }}</span>
+              </div>
+            </div>
+            <div class="flex items-center justify-between border-t-2 border-[#edf4ff] pt-3 mt-2">
+              <span class="font-bold text-[#001d32]">Total TTC</span>
+              <span class="font-bold text-[#006d35] text-lg">{{ formatAmount(quote.amount_cents, 'eur') }}</span>
+            </div>
           </div>
 
           <div v-if="invoice" class="bg-white rounded-[24px] p-6 border border-[#edf4ff]">
@@ -218,15 +251,17 @@
             <ChevronRightIcon class="w-5 h-5 text-[#40617f]" />
           </router-link>
         </div>
+        </div>
 
-        <!-- Chat client ↔ prestataire -->
-        <div class="col-span-12 bg-white rounded-[24px] p-6 sm:p-8">
-          <h2 class="font-jakarta font-bold text-[#001d32] text-lg mb-1 flex items-center gap-2">
+        <!-- RIGHT: chat client ↔ prestataire (sticky) -->
+        <div class="col-span-12 lg:col-span-5">
+        <div class="lg:sticky lg:top-6 bg-white rounded-[24px] p-6 flex flex-col" style="height: calc(100vh - 6rem); max-height: 720px;">
+          <h2 class="font-jakarta font-bold text-[#001d32] text-lg mb-1 flex items-center gap-2 shrink-0">
             <ChatBubbleLeftRightIcon class="w-5 h-5 text-[#006d35]" />
             Messagerie
           </h2>
-          <p class="text-[#40617f] text-xs mb-4">Échangez directement avec {{ isProviderView ? 'le client' : 'le prestataire' }}.</p>
-          <div ref="chatBox" class="space-y-3 max-h-80 overflow-y-auto px-1 py-2">
+          <p class="text-[#40617f] text-xs mb-4 shrink-0">Échangez directement avec {{ isProviderView ? 'le client' : 'le prestataire' }}.</p>
+          <div ref="chatBox" class="flex-1 space-y-3 overflow-y-auto px-1 py-2">
             <p v-if="!messages.length" class="text-center text-[#94a3b8] text-sm py-8">Aucun message pour l'instant. Démarrez la conversation.</p>
             <div v-for="m in messages" :key="m.id" class="flex" :class="m.sender_id === userAuth.user?.id ? 'justify-end' : 'justify-start'">
               <div class="max-w-[75%] rounded-2xl px-4 py-2"
@@ -247,6 +282,7 @@
               Envoyer
             </button>
           </form>
+        </div>
         </div>
 
       </div>
@@ -274,6 +310,7 @@ import {
   PencilSquareIcon,
   UserIcon,
   WrenchScrewdriverIcon,
+  XMarkIcon,
 } from '@heroicons/vue/24/outline'
 
 const { t, locale } = useI18n()
@@ -291,28 +328,43 @@ const downloadingContract = ref(false)
 const showQuoteSign = ref(false)
 const isProviderView = ref(false)
 
-// ---- Quote editing (provider) ----
-const quoteAmount = ref(null)
+// ---- Quote editing (provider), multi-line ----
+const quote = ref(null)
+const quoteLines = ref([{ label: '', amount: null }])
 const quoteMessage = ref('')
 const quoteSending = ref(false)
 const quoteFeedback = ref('')
+const quoteTotal = computed(() =>
+  quoteLines.value.reduce((s, l) => s + (Number(l.amount) || 0), 0)
+)
 const canEditQuote = computed(() =>
   isProviderView.value && !contract.value &&
   ['quote_requested', 'quote_issued'].includes(reservation.value?.status)
 )
+function addLine() { quoteLines.value.push({ label: '', amount: null }) }
+function removeLine(i) { quoteLines.value.splice(i, 1); if (!quoteLines.value.length) addLine() }
+function prefillQuoteLines() {
+  if (quote.value?.lines?.length) {
+    quoteLines.value = quote.value.lines.map(l => ({ label: l.label, amount: (l.amount_cents || 0) / 100 }))
+  }
+}
 async function sendQuote() {
-  if (!quoteAmount.value || quoteAmount.value <= 0) { quoteFeedback.value = 'Montant invalide.'; return }
+  const lines = quoteLines.value
+    .map(l => ({ label: (l.label || '').trim(), amount: Number(l.amount) || 0 }))
+    .filter(l => l.label && l.amount > 0)
+  if (!lines.length) { quoteFeedback.value = 'Ajoute au moins une ligne avec un montant.'; return }
   quoteSending.value = true; quoteFeedback.value = ''
   try {
     const res = await fetch(`/api/v1/reservations/${route.params.id}/quote`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${userAuth.token}` },
-      body: JSON.stringify({ amount: Number(quoteAmount.value), message: quoteMessage.value || null }),
+      body: JSON.stringify({ lines, message: quoteMessage.value || null }),
     })
     const j = await res.json()
     if (!res.ok) throw new Error(j.message || 'Erreur')
     quoteFeedback.value = 'Devis envoyé au client ✓'
     if (reservation.value) { reservation.value.status = 'quote_issued'; reservation.value.amount_cents = j.amount_cents }
+    quote.value = { ...(quote.value || {}), amount_cents: j.amount_cents, lines: lines.map(l => ({ label: l.label, amount_cents: Math.round(l.amount * 100) })) }
   } catch (e) { quoteFeedback.value = e.message } finally { quoteSending.value = false }
 }
 
@@ -381,7 +433,9 @@ onMounted(async () => {
       const data = await res.json()
       reservation.value    = data.reservation
       invoice.value        = data.invoice
+      quote.value          = data.quote || null
       isProviderView.value = !!data.is_provider_view
+      prefillQuoteLines()
       // Best-effort contract fetch (404 = no contract, e.g. quote)
       try {
         const cRes = await fetch(`/api/v1/reservations/${route.params.id}/contract`, {

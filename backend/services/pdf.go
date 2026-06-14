@@ -35,6 +35,13 @@ type InvoiceData struct {
 	TVAPercent      float64
 	Currency        string
 	Notes           string
+	Lines           []InvoiceLine
+}
+
+// InvoiceLine is one billable line of a multi-line quote/invoice.
+type InvoiceLine struct {
+	Label       string
+	AmountCents int64
 }
 
 func formatEUR(cents int64) string {
@@ -91,10 +98,20 @@ func (s *PDFService) Generate(data InvoiceData) (string, error) {
 	pdf.Ln(-1)
 
 	pdf.SetFont("Arial", "", 10)
-	pdf.CellFormat(110, 8, tr(data.PrestationTitle), "1", 0, "L", false, 0, "")
-	pdf.CellFormat(30, 8, tr("1"), "1", 0, "C", false, 0, "")
-	pdf.CellFormat(30, 8, tr(formatEUR(data.AmountCents)), "1", 0, "R", false, 0, "")
-	pdf.Ln(12)
+	if len(data.Lines) > 0 {
+		for _, ln := range data.Lines {
+			pdf.CellFormat(110, 8, tr(ln.Label), "1", 0, "L", false, 0, "")
+			pdf.CellFormat(30, 8, tr("1"), "1", 0, "C", false, 0, "")
+			pdf.CellFormat(30, 8, tr(formatEUR(ln.AmountCents)), "1", 0, "R", false, 0, "")
+			pdf.Ln(-1)
+		}
+		pdf.Ln(4)
+	} else {
+		pdf.CellFormat(110, 8, tr(data.PrestationTitle), "1", 0, "L", false, 0, "")
+		pdf.CellFormat(30, 8, tr("1"), "1", 0, "C", false, 0, "")
+		pdf.CellFormat(30, 8, tr(formatEUR(data.AmountCents)), "1", 0, "R", false, 0, "")
+		pdf.Ln(12)
+	}
 
 	tva := data.TVAPercent
 	if tva <= 0 {
