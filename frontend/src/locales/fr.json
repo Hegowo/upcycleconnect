@@ -122,7 +122,14 @@
     "widgetEvents": "Événements",
     "widgetTrends": "Tendances mensuelles",
     "widgetActivity": "Activité récente",
-    "widgetPending": "Validation prestataires"
+    "widgetPending": "Validation prestataires",
+    "editHint": "Glisse les widgets pour les déplacer, change leur taille avec ×, ou masque-les. Tes choix sont sauvegardés automatiquement.",
+    "doneEditing": "Terminer",
+    "addWidget": "Ajouter",
+    "allWidgetsShown": "Tous les widgets sont affichés.",
+    "dragHint": "Déplacer",
+    "size": "Taille",
+    "hideWidget": "Masquer"
   },
   "users": {
     "title": "Gestion Utilisateurs",

@@ -1,10 +1,11 @@
 <template>
-  <div class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm overflow-hidden h-full">
-    <div class="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-[#f1f5f9]">
+  <div class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm overflow-hidden h-full flex flex-col">
+    <div class="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-[#f1f5f9] shrink-0">
       <h3 class="font-semibold text-[#001d32] text-sm sm:text-base">{{ t('dashboard.recentActivity') }}</h3>
       <RouterLink to="/admin/logs" class="text-xs font-medium hover:underline" style="color:#006d35;">{{ t('common.seeAll') }}</RouterLink>
     </div>
 
+    <div class="flex-1 overflow-y-auto">
     <div v-if="loading" class="p-4 space-y-3">
       <div v-for="n in 5" :key="n" class="h-10 bg-gray-50 rounded-lg animate-pulse"></div>
     </div>
@@ -57,6 +58,7 @@
           <p class="hidden sm:block text-xs text-gray-400 mt-0.5">{{ formatDate(log.created_at) }}</p>
         </div>
       </div>
+    </div>
     </div>
   </div>
 

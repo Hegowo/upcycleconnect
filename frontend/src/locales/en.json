@@ -122,7 +122,14 @@
     "widgetEvents": "Events",
     "widgetTrends": "Monthly trends",
     "widgetActivity": "Recent activity",
-    "widgetPending": "Provider validation"
+    "widgetPending": "Provider validation",
+    "editHint": "Drag widgets to move them, change their size with ×, or hide them. Your choices are saved automatically.",
+    "doneEditing": "Done",
+    "addWidget": "Add",
+    "allWidgetsShown": "All widgets are shown.",
+    "dragHint": "Move",
+    "size": "Size",
+    "hideWidget": "Hide"
   },
   "users": {
     "title": "User Management",
