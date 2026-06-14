@@ -50,6 +50,7 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 	calendarHandler := &handlers.CalendarHandler{DB: db}
 	providerEventHandler := &handlers.ProviderEventHandler{DB: db, Audit: audit, Notifications: notifications}
 	eventMessageHandler := &handlers.EventMessageHandler{DB: db, Audit: audit}
+	reservationMessageHandler := &handlers.ReservationMessageHandler{DB: db, Notifications: notifications}
 	forumHandler := &handlers.ForumHandler{DB: db, Audit: audit}
 	searchHandler := &handlers.SearchHandler{DB: db}
 	oauthHandler := &handlers.OAuthHandler{DB: db, Cfg: cfg}
@@ -167,6 +168,9 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 			userProtected.GET("/reservations/:id/contract", contractHandler.ByReservation)
 			userProtected.GET("/reservations/:id/quote-contract-preview", contractHandler.QuotePreview)
 			userProtected.POST("/reservations/:id/accept-quote", paymentHandler.AcceptQuote)
+			userProtected.PUT("/reservations/:id/quote", paymentHandler.UpdateQuote)
+			userProtected.GET("/reservations/:id/messages", reservationMessageHandler.Index)
+			userProtected.POST("/reservations/:id/messages", reservationMessageHandler.Store)
 
 			userProtected.GET("/invoices", invoiceHandler.Index)
 			userProtected.GET("/invoices/:id", invoiceHandler.Show)

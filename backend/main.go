@@ -33,6 +33,7 @@ func main() {
 		&models.DepositRequest{},
 		&models.EventRegistration{},
 		&models.EventMessage{},
+		&models.ReservationMessage{},
 		&models.ForumCategory{},
 		&models.ForumThread{},
 		&models.ForumReply{},

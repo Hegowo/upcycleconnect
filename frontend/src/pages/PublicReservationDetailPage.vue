@@ -105,7 +105,7 @@
 
         <div class="col-span-12 lg:col-span-5 flex flex-col gap-6">
 
-          <div class="bg-[#edf4ff] rounded-[24px] p-6">
+          <div v-if="!isProviderView" class="bg-[#edf4ff] rounded-[24px] p-6">
             <h3 class="font-jakarta font-bold text-[#001d32] text-base mb-4">{{ t('public.reservation.paymentStatusTitle') }}</h3>
             <div class="flex items-start gap-3">
               <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
@@ -118,6 +118,30 @@
                 <p class="text-[#40617f] text-xs mt-1 leading-relaxed">{{ statusDescription(reservation.status) }}</p>
               </div>
             </div>
+          </div>
+
+          <!-- Provider: establish / revise the quote -->
+          <div v-if="isProviderView && canEditQuote" class="bg-white rounded-[24px] p-6 border border-[#edf4ff]">
+            <h3 class="font-jakarta font-bold text-[#001d32] text-base mb-1">Établir le devis</h3>
+            <p class="text-[#40617f] text-xs mb-4">Indiquez le montant TTC proposé. Le client pourra le consulter et le signer pour l'accepter.</p>
+            <label class="block text-xs font-semibold text-[#40617f] uppercase mb-1">Montant TTC (€)</label>
+            <input v-model.number="quoteAmount" type="number" min="0" step="0.01" placeholder="0,00"
+              class="w-full px-3 py-2.5 bg-[#f8fafc] border border-[#e5e7eb] rounded-xl text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-[#006d35]/30" />
+            <label class="block text-xs font-semibold text-[#40617f] uppercase mb-1">Note (optionnel)</label>
+            <textarea v-model="quoteMessage" rows="2" placeholder="Détail de la prestation, conditions…"
+              class="w-full px-3 py-2.5 bg-[#f8fafc] border border-[#e5e7eb] rounded-xl text-sm mb-3 resize-none focus:outline-none focus:ring-2 focus:ring-[#006d35]/30" />
+            <button @click="sendQuote" :disabled="quoteSending"
+              class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-white font-bold text-sm transition hover:opacity-90 disabled:opacity-60"
+              style="background: linear-gradient(134deg, #006d35 0%, #1b8848 100%);">
+              {{ quoteSending ? 'Envoi…' : 'Envoyer le devis au client' }}
+            </button>
+            <p v-if="quoteFeedback" class="text-sm mt-2" :class="quoteFeedback.includes('✓') ? 'text-[#006d35]' : 'text-red-600'">{{ quoteFeedback }}</p>
+          </div>
+
+          <!-- Provider: quote already signed -->
+          <div v-else-if="isProviderView && contract" class="bg-[#f0fdf4] rounded-[24px] p-6 border border-[#bbf7d0]">
+            <p class="font-semibold text-[#166534] text-sm">Devis signé par le client ✓</p>
+            <p class="text-[#40617f] text-xs mt-1">Montant accepté : {{ formatAmount(reservation.amount_cents, reservation.currency) }}</p>
           </div>
 
           <div v-if="invoice" class="bg-white rounded-[24px] p-6 border border-[#edf4ff]">
@@ -195,13 +219,43 @@
           </router-link>
         </div>
 
+        <!-- Chat client ↔ prestataire -->
+        <div class="col-span-12 bg-white rounded-[24px] p-6 sm:p-8">
+          <h2 class="font-jakarta font-bold text-[#001d32] text-lg mb-1 flex items-center gap-2">
+            <ChatBubbleLeftRightIcon class="w-5 h-5 text-[#006d35]" />
+            Messagerie
+          </h2>
+          <p class="text-[#40617f] text-xs mb-4">Échangez directement avec {{ isProviderView ? 'le client' : 'le prestataire' }}.</p>
+          <div ref="chatBox" class="space-y-3 max-h-80 overflow-y-auto px-1 py-2">
+            <p v-if="!messages.length" class="text-center text-[#94a3b8] text-sm py-8">Aucun message pour l'instant. Démarrez la conversation.</p>
+            <div v-for="m in messages" :key="m.id" class="flex" :class="m.sender_id === userAuth.user?.id ? 'justify-end' : 'justify-start'">
+              <div class="max-w-[75%] rounded-2xl px-4 py-2"
+                :class="m.sender_id === userAuth.user?.id ? 'bg-[#006d35] text-white' : 'bg-[#f1f5f9] text-[#001d32]'">
+                <p v-if="m.sender_id !== userAuth.user?.id" class="text-[10px] font-semibold opacity-70 mb-0.5">{{ m.sender_name }}</p>
+                <p class="text-sm whitespace-pre-wrap break-words">{{ m.content }}</p>
+                <p class="text-[10px] mt-0.5" :class="m.sender_id === userAuth.user?.id ? 'text-white/70' : 'text-[#94a3b8]'">{{ formatChatTime(m.created_at) }}</p>
+              </div>
+            </div>
+          </div>
+          <form @submit.prevent="sendMessage" class="flex items-end gap-2 mt-4">
+            <textarea v-model="newMessage" rows="1" placeholder="Votre message…"
+              @keydown.enter.exact.prevent="sendMessage"
+              class="flex-1 px-3 py-2.5 bg-[#f8fafc] border border-[#e5e7eb] rounded-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#006d35]/30" />
+            <button type="submit" :disabled="chatSending || !newMessage.trim()"
+              class="px-4 py-2.5 rounded-xl text-white font-bold text-sm transition hover:opacity-90 disabled:opacity-40 shrink-0"
+              style="background: linear-gradient(134deg, #006d35 0%, #1b8848 100%);">
+              Envoyer
+            </button>
+          </form>
+        </div>
+
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useUserAuthStore } from '@/stores/userAuth'
@@ -211,6 +265,7 @@ import {
   ArrowDownTrayIcon,
   BanknotesIcon,
   CalendarDaysIcon,
+  ChatBubbleLeftRightIcon,
   CheckCircleIcon,
   ChevronRightIcon,
   ClockIcon,
@@ -234,6 +289,61 @@ const contract    = ref(null)
 const downloading = ref(false)
 const downloadingContract = ref(false)
 const showQuoteSign = ref(false)
+const isProviderView = ref(false)
+
+// ---- Quote editing (provider) ----
+const quoteAmount = ref(null)
+const quoteMessage = ref('')
+const quoteSending = ref(false)
+const quoteFeedback = ref('')
+const canEditQuote = computed(() =>
+  isProviderView.value && !contract.value &&
+  ['quote_requested', 'quote_issued'].includes(reservation.value?.status)
+)
+async function sendQuote() {
+  if (!quoteAmount.value || quoteAmount.value <= 0) { quoteFeedback.value = 'Montant invalide.'; return }
+  quoteSending.value = true; quoteFeedback.value = ''
+  try {
+    const res = await fetch(`/api/v1/reservations/${route.params.id}/quote`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${userAuth.token}` },
+      body: JSON.stringify({ amount: Number(quoteAmount.value), message: quoteMessage.value || null }),
+    })
+    const j = await res.json()
+    if (!res.ok) throw new Error(j.message || 'Erreur')
+    quoteFeedback.value = 'Devis envoyé au client ✓'
+    if (reservation.value) { reservation.value.status = 'quote_issued'; reservation.value.amount_cents = j.amount_cents }
+  } catch (e) { quoteFeedback.value = e.message } finally { quoteSending.value = false }
+}
+
+// ---- Chat (client ↔ provider) ----
+const messages = ref([])
+const newMessage = ref('')
+const chatSending = ref(false)
+const chatBox = ref(null)
+function scrollChat() { if (chatBox.value) chatBox.value.scrollTop = chatBox.value.scrollHeight }
+async function fetchMessages() {
+  try {
+    const res = await fetch(`/api/v1/reservations/${route.params.id}/messages`, {
+      headers: { Authorization: `Bearer ${userAuth.token}` },
+    })
+    if (res.ok) { const j = await res.json(); messages.value = j.data || []; await nextTick(); scrollChat() }
+  } catch {}
+}
+async function sendMessage() {
+  const content = newMessage.value.trim()
+  if (!content) return
+  chatSending.value = true
+  try {
+    const res = await fetch(`/api/v1/reservations/${route.params.id}/messages`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${userAuth.token}` },
+      body: JSON.stringify({ content }),
+    })
+    const j = await res.json()
+    if (res.ok && j.data) { messages.value.push(j.data); newMessage.value = ''; await nextTick(); scrollChat() }
+  } catch {} finally { chatSending.value = false }
+}
 
 const canAcceptQuote = computed(() => {
   if (!reservation.value || !invoice.value) return false
@@ -269,8 +379,9 @@ onMounted(async () => {
       error.value = t('public.reservation.loadError')
     } else {
       const data = await res.json()
-      reservation.value = data.reservation
-      invoice.value     = data.invoice
+      reservation.value    = data.reservation
+      invoice.value        = data.invoice
+      isProviderView.value = !!data.is_provider_view
       // Best-effort contract fetch (404 = no contract, e.g. quote)
       try {
         const cRes = await fetch(`/api/v1/reservations/${route.params.id}/contract`, {
@@ -278,6 +389,7 @@ onMounted(async () => {
         })
         if (cRes.ok) contract.value = await cRes.json()
       } catch {}
+      await fetchMessages()
     }
   } catch (e) {
     error.value = t('public.reservation.networkError')
@@ -333,6 +445,11 @@ async function downloadInvoice() {
   } finally {
     downloading.value = false
   }
+}
+
+function formatChatTime(iso) {
+  if (!iso) return ''
+  return new Date(iso).toLocaleString(localeCode.value, { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
 }
 
 function formatDateTime(iso) {

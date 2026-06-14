@@ -162,6 +162,120 @@ func (h *PaymentHandler) Reserve(c *gin.Context) {
 
 // AcceptQuote turns a quote_requested reservation into a signed contract + Stripe checkout.
 // The client signs the same legal text as a direct purchase; the amount is locked to the issued quote.
+// UpdateQuote lets the PROVIDER set/revise the quote amount (and an optional note)
+// before the client signs. It updates the quote invoice, regenerates the PDF and
+// moves the reservation to "quote_issued", then notifies the client.
+func (h *PaymentHandler) UpdateQuote(c *gin.Context) {
+	user := middleware.GetAuthUser(c)
+	if user == nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Non authentifié"})
+		return
+	}
+	resID, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": "Réservation introuvable"})
+		return
+	}
+
+	var reservation models.Reservation
+	if err := h.DB.Preload("User").First(&reservation, resID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": "Réservation introuvable"})
+		return
+	}
+	var prestation models.Prestation
+	if err := h.DB.First(&prestation, reservation.PrestationID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": "Prestation introuvable"})
+		return
+	}
+	if prestation.ProviderID == nil || *prestation.ProviderID != user.ID {
+		c.JSON(http.StatusForbidden, gin.H{"message": "Seul le prestataire peut éditer ce devis."})
+		return
+	}
+	if reservation.Status != "quote_requested" && reservation.Status != "quote_issued" {
+		c.JSON(http.StatusConflict, gin.H{"message": "Ce devis ne peut plus être modifié."})
+		return
+	}
+	var existing models.Contract
+	if err := h.DB.Where("reservation_id = ?", reservation.ID).First(&existing).Error; err == nil {
+		c.JSON(http.StatusConflict, gin.H{"message": "Le devis a déjà été signé."})
+		return
+	}
+
+	var req struct {
+		Amount  float64 `json:"amount"`
+		Message *string `json:"message"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"message": "Données invalides."})
+		return
+	}
+	amountCents := int64(math.Round(req.Amount * 100))
+	if amountCents <= 0 {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"message": "Le montant du devis doit être supérieur à 0."})
+		return
+	}
+
+	var quote models.Invoice
+	if err := h.DB.Where("reservation_id = ? AND type = ?", reservation.ID, "quote").
+		Order("created_at DESC").First(&quote).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": "Aucun devis à modifier."})
+		return
+	}
+
+	customerName := "Client"
+	customerEmail := ""
+	if reservation.User != nil {
+		customerName = strings.TrimSpace(reservation.User.FirstName + " " + reservation.User.LastName)
+		customerEmail = reservation.User.Email
+	}
+	notes := "Devis établi par le prestataire."
+	if req.Message != nil && strings.TrimSpace(*req.Message) != "" {
+		notes = strings.TrimSpace(*req.Message)
+	}
+
+	pdfPath, gerr := h.PDF.Generate(services.InvoiceData{
+		Number:          quote.Number,
+		Type:            "quote",
+		IssuedAt:        time.Now(),
+		CustomerName:    customerName,
+		CustomerEmail:   customerEmail,
+		PrestationTitle: prestation.Title,
+		AmountCents:     amountCents,
+		TVAPercent:      20.0,
+		Currency:        "eur",
+		Notes:           notes,
+	})
+	if gerr != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Erreur lors de la génération du devis."})
+		return
+	}
+
+	h.DB.Model(&quote).Updates(map[string]interface{}{
+		"amount_cents": amountCents,
+		"pdf_path":     pdfPath,
+		"issued_at":    time.Now(),
+	})
+	h.DB.Model(&reservation).Updates(map[string]interface{}{"status": "quote_issued", "amount_cents": amountCents})
+
+	if h.Notifications != nil {
+		h.Notifications.MustNotify(reservation.UserID, "quote.issued",
+			"Votre devis est prêt",
+			fmt.Sprintf("Le prestataire a établi un devis pour « %s ». Consultez-le et signez-le si vous l'acceptez.", prestation.Title),
+			fmt.Sprintf("/profil/reservations/%d", reservation.ID))
+	}
+	if reservation.User != nil {
+		go func(email, first, title, number, path string) {
+			_ = h.Mailer.SendQuote(email, first, title, number, path)
+		}(customerEmail, reservation.User.FirstName, prestation.Title, quote.Number, pdfPath)
+	}
+
+	h.Audit.Log(c, "quote.updated", "Invoice", &quote.ID, nil, map[string]interface{}{
+		"reservation_id": reservation.ID, "amount_cents": amountCents,
+	})
+
+	c.JSON(http.StatusOK, gin.H{"message": "Devis envoyé au client.", "amount_cents": amountCents})
+}
+
 func (h *PaymentHandler) AcceptQuote(c *gin.Context) {
 	user := middleware.GetAuthUser(c)
 	if user == nil {
