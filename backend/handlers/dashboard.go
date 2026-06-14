@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"net/http"
+	"strconv"
+	"time"
 
 	"upcycleconnect/backend/models"
 
@@ -11,6 +13,41 @@ import (
 
 type DashboardHandler struct {
 	DB *gorm.DB
+}
+
+// Trends returns the number of end-user sign-ups per month for a given year
+// (defaults to the current year) as a 12-length array (Jan..Dec). Used by the
+// "Monthly trends" dashboard widget. Staff accounts (those with a role) are
+// excluded, to match the "Members" metric.
+func (h *DashboardHandler) Trends(c *gin.Context) {
+	year := time.Now().Year()
+	if y := c.Query("year"); y != "" {
+		if n, err := strconv.Atoi(y); err == nil && n > 2000 && n < 3000 {
+			year = n
+		}
+	}
+
+	type row struct {
+		M int
+		C int64
+	}
+	var rows []row
+	h.DB.Model(&models.User{}).
+		Select("MONTH(created_at) as m, COUNT(*) as c").
+		Where("deleted_at IS NULL").
+		Where("id NOT IN (SELECT user_id FROM user_roles)").
+		Where("YEAR(created_at) = ?", year).
+		Group("MONTH(created_at)").
+		Scan(&rows)
+
+	months := make([]int64, 12)
+	for _, r := range rows {
+		if r.M >= 1 && r.M <= 12 {
+			months[r.M-1] = r.C
+		}
+	}
+
+	c.JSON(http.StatusOK, gin.H{"year": year, "monthly_signups": months})
 }
 
 func (h *DashboardHandler) Stats(c *gin.Context) {

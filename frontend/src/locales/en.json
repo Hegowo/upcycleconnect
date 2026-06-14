@@ -129,7 +129,8 @@
     "allWidgetsShown": "All widgets are shown.",
     "dragHint": "Move",
     "size": "Size",
-    "hideWidget": "Hide"
+    "hideWidget": "Hide",
+    "trendsEmpty": "No sign-ups recorded this year yet."
   },
   "users": {
     "title": "User Management",

@@ -129,7 +129,8 @@
     "allWidgetsShown": "Tous les widgets sont affichés.",
     "dragHint": "Déplacer",
     "size": "Taille",
-    "hideWidget": "Masquer"
+    "hideWidget": "Masquer",
+    "trendsEmpty": "Aucune inscription enregistrée cette année pour le moment."
   },
   "users": {
     "title": "Gestion Utilisateurs",

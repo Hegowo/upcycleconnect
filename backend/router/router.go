@@ -272,6 +272,7 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 			protected.GET("/docs/spec", swaggerHandler.Spec)
 
 			protected.GET("/dashboard/stats", dashHandler.Stats)
+			protected.GET("/dashboard/trends", dashHandler.Trends)
 			protected.GET("/finance/overview", financeHandler.Overview)
 			protected.GET("/finance/transactions", financeHandler.Transactions)
 
