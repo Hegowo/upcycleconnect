@@ -108,7 +108,21 @@
     "seeProviders": "View providers",
     "manageCategories": "Manage Categories",
     "manageCategoriesDesc": "Organize and manage item and service categories.",
-    "manageCategoriasLink": "Manage categories"
+    "manageCategoriasLink": "Manage categories",
+    "customize": "Customize",
+    "customizeTitle": "Customize dashboard",
+    "customizeHint": "Toggle widgets on/off and drag to reorder.",
+    "layoutReset": "Reset",
+    "emptyLayout": "No widgets displayed.",
+    "widgetUsers": "Users",
+    "widgetProviders": "Active providers",
+    "widgetEnv": "Environmental score",
+    "widgetDeposits": "Items collected",
+    "widgetPrestations": "Listings",
+    "widgetEvents": "Events",
+    "widgetTrends": "Monthly trends",
+    "widgetActivity": "Recent activity",
+    "widgetPending": "Provider validation"
   },
   "users": {
     "title": "User Management",

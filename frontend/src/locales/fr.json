@@ -108,7 +108,21 @@
     "seeProviders": "Voir les prestataires",
     "manageCategories": "Gestion Catégories",
     "manageCategoriesDesc": "Organisez et gérez les catégories d'objets et de prestations.",
-    "manageCategoriasLink": "Gérer les catégories"
+    "manageCategoriasLink": "Gérer les catégories",
+    "customize": "Personnaliser",
+    "customizeTitle": "Personnaliser le tableau de bord",
+    "customizeHint": "Active ou masque les widgets, glisse-les pour les réordonner.",
+    "layoutReset": "Réinitialiser",
+    "emptyLayout": "Aucun widget affiché.",
+    "widgetUsers": "Utilisateurs",
+    "widgetProviders": "Prestataires actifs",
+    "widgetEnv": "Score environnemental",
+    "widgetDeposits": "Objets collectés",
+    "widgetPrestations": "Prestations",
+    "widgetEvents": "Événements",
+    "widgetTrends": "Tendances mensuelles",
+    "widgetActivity": "Activité récente",
+    "widgetPending": "Validation prestataires"
   },
   "users": {
     "title": "Gestion Utilisateurs",
