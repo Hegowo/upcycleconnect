@@ -127,4 +127,61 @@ onUnmounted(() => {
 .swagger-wrapper .swagger-ui .btn.execute:hover { background-color: #005a2b; }
 .swagger-wrapper .swagger-ui .auth-wrapper .authorize { background-color: #006d35; border-color: #006d35; color: #fff; }
 .swagger-wrapper .swagger-ui section.models { display: none; }
+
+/* ── Dark theme for Swagger UI (admin dark mode) ─────────────────────────── */
+.admin-dark .swagger-wrapper { background: #0f172a; }
+.admin-dark .swagger-ui,
+.admin-dark .swagger-ui .info .title,
+.admin-dark .swagger-ui .info p,
+.admin-dark .swagger-ui .info li,
+.admin-dark .swagger-ui label,
+.admin-dark .swagger-ui .opblock-tag,
+.admin-dark .swagger-ui .opblock-tag small,
+.admin-dark .swagger-ui .opblock .opblock-summary-path,
+.admin-dark .swagger-ui .opblock .opblock-summary-description,
+.admin-dark .swagger-ui .opblock-description-wrapper p,
+.admin-dark .swagger-ui .parameter__name,
+.admin-dark .swagger-ui .parameter__type,
+.admin-dark .swagger-ui table thead tr td,
+.admin-dark .swagger-ui table thead tr th,
+.admin-dark .swagger-ui .response-col_status,
+.admin-dark .swagger-ui .response-col_description,
+.admin-dark .swagger-ui .responses-inner h4,
+.admin-dark .swagger-ui .responses-inner h5,
+.admin-dark .swagger-ui .tab li,
+.admin-dark .swagger-ui .model-title,
+.admin-dark .swagger-ui .model { color: #e2e8f0; }
+
+.admin-dark .swagger-ui .info .title small pre { background: #334155; }
+.admin-dark .swagger-ui .opblock-tag { border-bottom-color: #334155; }
+.admin-dark .swagger-ui .scheme-container { background: #1e293b; box-shadow: none; }
+
+.admin-dark .swagger-ui .opblock { background: #1e293b; border-color: #334155; box-shadow: none; }
+.admin-dark .swagger-ui .opblock .opblock-summary { border-color: #334155; }
+.admin-dark .swagger-ui .opblock.opblock-get    { background: rgba(0,109,53,0.12); border-color: #15803d; }
+.admin-dark .swagger-ui .opblock.opblock-post   { background: rgba(37,99,235,0.12); border-color: #2563eb; }
+.admin-dark .swagger-ui .opblock.opblock-put    { background: rgba(202,138,4,0.12); border-color: #ca8a04; }
+.admin-dark .swagger-ui .opblock.opblock-delete { background: rgba(220,38,38,0.12); border-color: #dc2626; }
+
+.admin-dark .swagger-ui .opblock-body,
+.admin-dark .swagger-ui .opblock-section-header { background: #0f172a; box-shadow: none; }
+.admin-dark .swagger-ui .opblock-section-header h4,
+.admin-dark .swagger-ui .opblock-section-header label,
+.admin-dark .swagger-ui .opblock-section-header > label > span { color: #e2e8f0; }
+
+.admin-dark .swagger-ui table tbody tr td { border-color: #334155; color: #cbd5e1; }
+.admin-dark .swagger-ui .parameters-col_description input,
+.admin-dark .swagger-ui .filter .operation-filter-input,
+.admin-dark .swagger-ui select { background: #0f172a; color: #f1f5f9; border-color: #334155; }
+
+.admin-dark .swagger-ui section.models { border-color: #334155; background: #1e293b; }
+.admin-dark .swagger-ui section.models .model-container { background: #0f172a; }
+
+.admin-dark .swagger-ui .highlight-code,
+.admin-dark .swagger-ui .microlight { background: #0b1220 !important; }
+.admin-dark .swagger-ui .markdown p,
+.admin-dark .swagger-ui .markdown code,
+.admin-dark .swagger-ui .renderedMarkdown p { color: #cbd5e1; }
+.admin-dark .swagger-ui .response-col_links { color: #94a3b8; }
+.admin-dark .swagger-ui svg:not(:root) { fill: #cbd5e1; }
 </style>

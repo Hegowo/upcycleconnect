@@ -24,29 +24,7 @@
         </button>
       </div>
 
-      
-      <div class="py-3 border-b border-[#f8fafc]">
-        <p class="text-sm font-medium text-[#001d32] mb-1">{{ t('settings.langManagement') }}</p>
-        <p class="text-xs text-gray-400 mb-3">{{ t('settings.langManagementDesc') }}</p>
-        <div class="flex items-center gap-2 flex-wrap">
-          <span class="px-3 py-1.5 rounded-lg text-xs font-semibold border-2 flex items-center gap-1.5" style="border-color:#006d35; color:#006d35; background:#f0fdf4;">
-            🇫🇷 FR
-            <span class="text-[10px] text-green-600">{{ t('settings.active') }}</span>
-          </span>
-          <span class="px-3 py-1.5 rounded-lg text-xs font-semibold border-2 flex items-center gap-1.5" style="border-color:#006d35; color:#006d35; background:#f0fdf4;">
-            🇬🇧 EN
-            <span class="text-[10px] text-green-600">{{ t('settings.active') }}</span>
-          </span>
-          <span class="px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-200 text-gray-400 flex items-center gap-1.5">
-            🇩🇪 DE
-          </span>
-          <button class="px-3 py-1.5 rounded-lg text-xs font-medium border border-dashed border-[#006d35] text-[#006d35] hover:bg-[#f0fdf4] transition">
-            {{ t('settings.addLang') }}
-          </button>
-        </div>
-      </div>
 
-      
       <div class="flex items-center justify-between py-3 border-b border-[#f8fafc]">
         <div>
           <p class="text-sm font-medium text-[#001d32]">{{ t('settings.emailNotif') }}</p>

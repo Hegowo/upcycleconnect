@@ -307,6 +307,7 @@ html.dark .fixed.inset-0.z-50 .btn-secondary  {
 /* Missed utility classes */
 .admin-dark .text-\[\#64748b\] { color: #94a3b8 !important; }           /* muted slate text */
 .admin-dark .bg-\[\#fee2e2\]   { background-color: rgba(220,38,38,0.22) !important; } /* "Banni" badge bg */
+.admin-dark .bg-gray-300       { background-color: #475569 !important; }              /* OFF toggle track */
 
 /* Inline :style TEXT colours (serialised to rgb). Match only when the value is
    the `color` property — at the start of the style string, or preceded by "; " —
@@ -344,3 +345,26 @@ html.dark .fixed.inset-0.z-50 .btn-secondary  {
 .admin-dark [style^="color: rgb(29, 78, 216)"], .admin-dark [style*="; color: rgb(29, 78, 216)"]   { color: #93c5fd !important; } /* #1d4ed8 */
 .admin-dark [style^="color: rgb(17, 24, 39)"],  .admin-dark [style*="; color: rgb(17, 24, 39)"]    { color: #f1f5f9 !important; } /* #111827 */
 .admin-dark [style^="color: rgb(107, 114, 128)"],.admin-dark [style*="; color: rgb(107, 114, 128)"]{ color: #94a3b8 !important; } /* #6b7280 */
+
+/* ── Light SURFACES that stayed light in dark mode ──────────────────────────
+   Icon containers (dashboard stat widgets, category cards) and secondary action
+   buttons ("Modifier"/"Suspendre"/"Annuler") use inline :style backgrounds,
+   serialised to rgb(...). Darken them, and lighten the matching inline text. */
+
+/* Inline light backgrounds → dark tints */
+.admin-dark [style*="rgb(237, 233, 254)"] { background-color: rgba(124,58,237,0.25) !important; } /* #ede9fe purple */
+.admin-dark [style*="rgb(224, 242, 254)"] { background-color: rgba(14,165,233,0.25) !important; } /* #e0f2fe sky */
+.admin-dark [style*="rgb(252, 231, 243)"] { background-color: rgba(219,39,119,0.25) !important; } /* #fce7f3 pink */
+.admin-dark [style*="rgb(224, 231, 255)"] { background-color: rgba(79,70,229,0.25)  !important; } /* #e0e7ff indigo */
+.admin-dark [style*="rgb(255, 247, 237)"] { background-color: rgba(234,88,12,0.20)  !important; } /* #fff7ed orange */
+.admin-dark [style*="rgb(254, 242, 242)"] { background-color: rgba(220,38,38,0.20)  !important; } /* #fef2f2 red */
+.admin-dark [style*="rgb(241, 245, 249)"] { background-color: #263244 !important; }               /* #f1f5f9 secondary btn */
+
+/* Inline icon / button text colours (serialised to rgb) */
+.admin-dark [style^="color: rgb(124, 58, 237)"], .admin-dark [style*="; color: rgb(124, 58, 237)"] { color: #c4b5fd !important; } /* #7c3aed purple */
+.admin-dark [style^="color: rgb(8, 145, 178)"],  .admin-dark [style*="; color: rgb(8, 145, 178)"]  { color: #67e8f9 !important; } /* #0891b2 cyan */
+.admin-dark [style^="color: rgb(157, 23, 77)"],  .admin-dark [style*="; color: rgb(157, 23, 77)"]  { color: #f9a8d4 !important; } /* #9d174d pink */
+.admin-dark [style^="color: rgb(67, 56, 202)"],  .admin-dark [style*="; color: rgb(67, 56, 202)"]  { color: #a5b4fc !important; } /* #4338ca indigo */
+.admin-dark [style^="color: rgb(194, 65, 12)"],  .admin-dark [style*="; color: rgb(194, 65, 12)"]  { color: #fdba74 !important; } /* #c2410c orange */
+.admin-dark [style^="color: rgb(185, 28, 28)"],  .admin-dark [style*="; color: rgb(185, 28, 28)"]  { color: #fca5a5 !important; } /* #b91c1c red */
+.admin-dark [style^="color: rgb(71, 85, 105)"],  .admin-dark [style*="; color: rgb(71, 85, 105)"]  { color: #94a3b8 !important; } /* #475569 slate */
