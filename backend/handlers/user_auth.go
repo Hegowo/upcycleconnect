@@ -5,7 +5,9 @@ import (
 	"encoding/hex"
 	"fmt"
 	"log"
+	"mime/multipart"
 	"net/http"
+	"strings"
 	"time"
 
 	"upcycleconnect/backend/config"
@@ -38,9 +40,46 @@ func (h *UserAuthHandler) Register(c *gin.Context) {
 		Activity    *string `json:"activity"`
 		Address     *string `json:"address"`
 	}
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{"message": "Données invalides. Vérifiez les champs obligatoires."})
-		return
+	// Provider registrations send multipart/form-data so the Kbis document can be
+	// uploaded in the same request: a freshly-created account is "pending" and cannot
+	// authenticate, so a later authenticated upload would be impossible. Individuals
+	// keep sending JSON.
+	var kbisHeader *multipart.FileHeader
+	var kbisFile multipart.File
+	if strings.HasPrefix(c.ContentType(), "multipart/form-data") {
+		req.FirstName = c.PostForm("first_name")
+		req.LastName = c.PostForm("last_name")
+		req.Email = c.PostForm("email")
+		req.Password = c.PostForm("password")
+		req.AccountType = c.PostForm("account_type")
+		if v := c.PostForm("phone"); v != "" {
+			req.Phone = &v
+		}
+		if v := c.PostForm("company_name"); v != "" {
+			req.CompanyName = &v
+		}
+		if v := c.PostForm("siret"); v != "" {
+			req.Siret = &v
+		}
+		if v := c.PostForm("activity"); v != "" {
+			req.Activity = &v
+		}
+		if v := c.PostForm("address"); v != "" {
+			req.Address = &v
+		}
+		if req.FirstName == "" || req.LastName == "" || req.Email == "" || len(req.Password) < 8 {
+			c.JSON(http.StatusUnprocessableEntity, gin.H{"message": "Données invalides. Vérifiez les champs obligatoires."})
+			return
+		}
+		if f, header, err := c.Request.FormFile("kbis"); err == nil {
+			kbisFile, kbisHeader = f, header
+			defer kbisFile.Close()
+		}
+	} else {
+		if err := c.ShouldBindJSON(&req); err != nil {
+			c.JSON(http.StatusUnprocessableEntity, gin.H{"message": "Données invalides. Vérifiez les champs obligatoires."})
+			return
+		}
 	}
 
 	var count int64
@@ -80,6 +119,13 @@ func (h *UserAuthHandler) Register(c *gin.Context) {
 			Status:      "pending",
 		}
 		h.DB.Create(&profile)
+		if kbisHeader != nil {
+			if path, err := saveKbisFile(kbisHeader, kbisFile, user.ID); err == nil {
+				h.DB.Model(&profile).Update("kbis_path", path)
+			} else {
+				log.Printf("[register] kbis save failed for user %d: %v", user.ID, err)
+			}
+		}
 	}
 
 	token := newToken()

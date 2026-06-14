@@ -765,36 +765,36 @@ async function handleRegister() {
     ].map(s => s.trim()).filter(Boolean)
     const fullAddress = addressParts.length ? addressParts.join(' ') : null
 
-    await userAuth.register({
-      first_name:   form.value.firstName,
-      last_name:    form.value.lastName,
-      email:        form.value.email,
-      password:     form.value.password,
-      phone:        form.value.phone || null,
-      account_type: accountType.value,
-      company_name: form.value.companyName || null,
-      siret:        form.value.siret || null,
-      activity:     form.value.activity || null,
-      address:      fullAddress,
-    })
-
-    // For pro accounts: log in then upload the Kbis immediately after registration.
-    // The account is pending admin validation — the Kbis helps admins decide.
-    if (accountType.value === 'provider' && kbisFile.value) {
-      try {
-        await userAuth.login(form.value.email, form.value.password)
-      } catch {}
-      if (userAuth.token) {
-        const fd = new FormData()
-        fd.append('kbis', kbisFile.value)
-        await fetch('/api/v1/provider/kbis', {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${userAuth.token}` },
-          body: fd,
-        })
-        // Log out again — the account needs email verification first.
-        await userAuth.logout()
-      }
+    if (accountType.value === 'provider') {
+      // Send everything — including the Kbis file — in one multipart request. A new
+      // account is "pending" and cannot authenticate, so uploading the Kbis afterwards
+      // would be impossible; the backend stores it while creating the provider profile.
+      const fd = new FormData()
+      fd.append('first_name',   form.value.firstName)
+      fd.append('last_name',    form.value.lastName)
+      fd.append('email',        form.value.email)
+      fd.append('password',     form.value.password)
+      fd.append('account_type', 'provider')
+      if (form.value.phone)       fd.append('phone',        form.value.phone)
+      if (form.value.companyName) fd.append('company_name', form.value.companyName)
+      if (form.value.siret)       fd.append('siret',        form.value.siret)
+      if (form.value.activity)    fd.append('activity',     form.value.activity)
+      if (fullAddress)            fd.append('address',      fullAddress)
+      if (kbisFile.value)         fd.append('kbis',         kbisFile.value)
+      await userAuth.register(fd)
+    } else {
+      await userAuth.register({
+        first_name:   form.value.firstName,
+        last_name:    form.value.lastName,
+        email:        form.value.email,
+        password:     form.value.password,
+        phone:        form.value.phone || null,
+        account_type: accountType.value,
+        company_name: form.value.companyName || null,
+        siret:        form.value.siret || null,
+        activity:     form.value.activity || null,
+        address:      fullAddress,
+      })
     }
 
     step.value = 'done'

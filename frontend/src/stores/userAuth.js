@@ -33,6 +33,18 @@ export const useUserAuthStore = defineStore('userAuth', () => {
   )
 
   async function register(payload) {
+    // Provider sign-ups pass a FormData (so the Kbis file rides along in the same
+    // request); individuals pass a plain object sent as JSON.
+    if (payload instanceof FormData) {
+      const res = await fetch(`${BASE}/auth/register`, {
+        method: 'POST',
+        headers: { Accept: 'application/json' },
+        body: payload,
+      })
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok) throw Object.assign(new Error(json.message || 'Erreur réseau'), { status: res.status, data: json })
+      return json
+    }
     await apiFetch('/auth/register', { method: 'POST', body: JSON.stringify(payload) })
   }
 

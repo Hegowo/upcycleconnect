@@ -2,7 +2,9 @@ package handlers
 
 import (
 	"fmt"
+	"io"
 	"math"
+	"mime/multipart"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -17,6 +19,35 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
+
+// saveKbisFile validates and writes a Kbis upload to /uploads/kbis, returning the
+// stored path. Shared by the authenticated UploadKbis endpoint and by registration
+// (where the provider isn't active yet and can't authenticate). Accepts PDF/JPG/PNG
+// up to 10 MB and names the file after the user id so a re-upload replaces it.
+func saveKbisFile(header *multipart.FileHeader, src multipart.File, userID uint) (string, error) {
+	ext := filepath.Ext(header.Filename)
+	allowed := map[string]bool{".pdf": true, ".jpg": true, ".jpeg": true, ".png": true}
+	if !allowed[ext] {
+		return "", fmt.Errorf("format invalide")
+	}
+	if header.Size > 10*1024*1024 {
+		return "", fmt.Errorf("fichier trop volumineux")
+	}
+	dir := "/uploads/kbis"
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return "", err
+	}
+	destPath := filepath.Join(dir, fmt.Sprintf("kbis-%d%s", userID, ext))
+	dst, err := os.Create(destPath)
+	if err != nil {
+		return "", err
+	}
+	defer dst.Close()
+	if _, err := io.Copy(dst, src); err != nil {
+		return "", err
+	}
+	return destPath, nil
+}
 
 type UserProviderHandler struct {
 	DB            *gorm.DB
@@ -417,36 +448,9 @@ func (h *UserProviderHandler) UploadKbis(c *gin.Context) {
 	}
 	defer file.Close()
 
-	// Validate extension: accept PDF and common image formats.
-	ext := filepath.Ext(header.Filename)
-	allowed := map[string]bool{".pdf": true, ".jpg": true, ".jpeg": true, ".png": true}
-	if !allowed[ext] {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{"message": "Format invalide. Acceptés : PDF, JPG, PNG"})
-		return
-	}
-
-	// Limit to 10 MB.
-	if header.Size > 10*1024*1024 {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{"message": "Fichier trop volumineux (max 10 Mo)"})
-		return
-	}
-
-	dir := "/uploads/kbis"
-	if err := os.MkdirAll(dir, 0755); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Impossible de créer le dossier de stockage"})
-		return
-	}
-
-	filename := fmt.Sprintf("kbis-%d%s", user.ID, ext)
-	destPath := filepath.Join(dir, filename)
-
-	buf := make([]byte, header.Size)
-	if _, err := file.Read(buf); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Erreur lors de la lecture du fichier"})
-		return
-	}
-	if err := os.WriteFile(destPath, buf, 0644); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Erreur lors de l'enregistrement du fichier"})
+	destPath, err := saveKbisFile(header, file, user.ID)
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"message": "Format invalide (PDF/JPG/PNG, max 10 Mo)"})
 		return
 	}
 
@@ -457,7 +461,7 @@ func (h *UserProviderHandler) UploadKbis(c *gin.Context) {
 	profile.KbisPath = &destPath
 
 	h.Audit.Log(c, "provider.kbis_uploaded", "ProviderProfile", &profile.ID, nil, map[string]interface{}{
-		"filename": filename,
+		"filename": filepath.Base(destPath),
 	})
 
 	c.JSON(http.StatusOK, gin.H{
