@@ -181,32 +181,62 @@
             <div v-if="collectPointsLoading" class="text-[#40617f] text-sm">{{ t('common.loading') }}</div>
             <div v-else-if="collectPoints.length === 0" class="text-[#40617f] text-sm italic">Aucun point de collecte disponible pour le moment.</div>
             <div v-else class="flex flex-col gap-2">
-              <!-- Badge adresse utilisateur -->
-              <div v-if="userAddress" class="text-xs text-[#40617f] bg-[#edf4ff] rounded-lg px-3 py-2 flex items-center gap-1.5">
-                <MapPinIcon class="w-3.5 h-3.5 text-[#006d35] shrink-0" />
-                Points triés par distance depuis votre adresse
+              <!-- Localisation en cours (adresse en base) -->
+              <div v-if="locating" class="text-[#40617f] text-sm flex items-center gap-2">
+                <MapPinIcon class="w-4 h-4 text-[#006d35]" /> Recherche des éco-box les plus proches…
               </div>
-              <div
-                v-for="pt in sortedCollectPoints"
-                :key="pt.id"
-                @click="form.collectionPointId = pt.id"
-                class="flex items-start gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all"
-                :class="form.collectionPointId === pt.id ? 'border-[#006d35] bg-[#f0fdf4]' : 'border-[#e5e7eb] hover:border-[#006d35]/30 bg-white'"
-              >
-                <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5" :class="form.collectionPointId === pt.id ? 'bg-[#006d35]' : 'bg-[#edf4ff]'">
-                  <MapPinIcon class="w-4 h-4" :class="form.collectionPointId === pt.id ? 'text-white' : 'text-[#40617f]'" />
+
+              <!-- Pas de localisation : demander le code postal -->
+              <div v-else-if="!userCoords">
+                <p class="text-xs text-[#40617f] mb-2">Indiquez votre code postal pour voir les 3 éco-box les plus proches.</p>
+                <div class="flex gap-2">
+                  <input
+                    v-model="postalCode" type="text" inputmode="numeric" maxlength="5" placeholder="Code postal"
+                    @keydown.enter.prevent="searchByPostal"
+                    class="flex-1 px-3 py-2.5 bg-[#f8fafc] border border-[#e5e7eb] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#006d35]/30"
+                  />
+                  <button
+                    type="button" @click="searchByPostal" :disabled="geocoding || postalCode.trim().length < 4"
+                    class="px-4 py-2.5 rounded-xl text-white font-semibold text-sm transition hover:opacity-90 disabled:opacity-50 shrink-0"
+                    style="background: linear-gradient(135deg, #006d35, #1b8848);"
+                  >
+                    {{ geocoding ? '…' : 'Rechercher' }}
+                  </button>
                 </div>
-                <div class="flex-1 min-w-0">
-                  <p class="font-semibold text-[#001d32] text-sm">{{ pt.name }}</p>
-                  <p class="text-xs text-[#40617f] mt-0.5">{{ pt.address }}, {{ pt.postal_code }} {{ pt.city }}</p>
-                  <p v-if="pt.opening_hours" class="text-xs text-[#40617f] mt-0.5 flex items-center gap-1">
-                    <ClockIcon class="w-3 h-3 shrink-0" />{{ pt.opening_hours }}
-                  </p>
-                </div>
-                <div v-if="pt._distance != null" class="text-xs font-semibold text-[#006d35] shrink-0">
-                  {{ pt._distance < 1 ? (pt._distance * 1000).toFixed(0) + 'm' : pt._distance.toFixed(1) + 'km' }}
-                </div>
+                <p v-if="geoError" class="text-xs text-red-500 mt-1">{{ geoError }}</p>
               </div>
+
+              <!-- Les 3 éco-box les plus proches -->
+              <template v-else>
+                <div class="text-xs text-[#40617f] bg-[#edf4ff] rounded-lg px-3 py-2 flex items-center justify-between gap-2">
+                  <span class="flex items-center gap-1.5">
+                    <MapPinIcon class="w-3.5 h-3.5 text-[#006d35] shrink-0" />
+                    Les 3 éco-box les plus proches{{ userAddress ? ' de votre adresse' : '' }}
+                  </span>
+                  <button v-if="!userAddress" type="button" @click="resetLocation" class="font-semibold text-[#006d35] shrink-0 hover:underline">Changer</button>
+                </div>
+                <div
+                  v-for="pt in nearestCollectPoints"
+                  :key="pt.id"
+                  @click="form.collectionPointId = pt.id"
+                  class="flex items-start gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all"
+                  :class="form.collectionPointId === pt.id ? 'border-[#006d35] bg-[#f0fdf4]' : 'border-[#e5e7eb] hover:border-[#006d35]/30 bg-white'"
+                >
+                  <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5" :class="form.collectionPointId === pt.id ? 'bg-[#006d35]' : 'bg-[#edf4ff]'">
+                    <MapPinIcon class="w-4 h-4" :class="form.collectionPointId === pt.id ? 'text-white' : 'text-[#40617f]'" />
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <p class="font-semibold text-[#001d32] text-sm">{{ pt.name }}</p>
+                    <p class="text-xs text-[#40617f] mt-0.5">{{ pt.address }}, {{ pt.postal_code }} {{ pt.city }}</p>
+                    <p v-if="pt.opening_hours" class="text-xs text-[#40617f] mt-0.5 flex items-center gap-1">
+                      <ClockIcon class="w-3 h-3 shrink-0" />{{ pt.opening_hours }}
+                    </p>
+                  </div>
+                  <div v-if="pt._distance != null" class="text-xs font-semibold text-[#006d35] shrink-0">
+                    {{ pt._distance < 1 ? (pt._distance * 1000).toFixed(0) + 'm' : pt._distance.toFixed(1) + 'km' }}
+                  </div>
+                </div>
+              </template>
             </div>
           </div>
 
@@ -411,6 +441,10 @@ const categoriesLoading = ref(true)
 const collectPoints = ref([])
 const collectPointsLoading = ref(true)
 const userCoords = ref(null)
+const postalCode = ref('')
+const geocoding = ref(false)
+const geoError = ref('')
+const locating = ref(false)
 
 const conditions = computed(() => [
   { key: 'good', label: t('public.depot.condGood') },
@@ -449,6 +483,34 @@ const sortedCollectPoints = computed(() => {
     .map(p => ({ ...p, _distance: haversineKm(userCoords.value.lat, userCoords.value.lon, p.latitude, p.longitude) }))
     .sort((a, b) => a._distance - b._distance)
 })
+
+// Only ever show the 3 closest eco-box.
+const nearestCollectPoints = computed(() => sortedCollectPoints.value.slice(0, 3))
+
+async function searchByPostal() {
+  const cp = postalCode.value.trim()
+  if (cp.length < 4) { geoError.value = 'Code postal invalide.'; return }
+  geocoding.value = true; geoError.value = ''
+  try {
+    const res = await fetch(`https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(cp)}&type=municipality&limit=1`)
+    const data = await res.json()
+    const f = data.features?.[0]
+    if (f) {
+      userCoords.value = { lat: f.geometry.coordinates[1], lon: f.geometry.coordinates[0] }
+      if (sortedCollectPoints.value.length > 0) form.value.collectionPointId = sortedCollectPoints.value[0].id
+    } else {
+      geoError.value = 'Code postal introuvable.'
+    }
+  } catch {
+    geoError.value = 'Erreur de recherche, réessayez.'
+  } finally {
+    geocoding.value = false
+  }
+}
+function resetLocation() {
+  userCoords.value = null
+  form.value.collectionPointId = null
+}
 
 async function geocodeUserAddress(address) {
   try {
@@ -561,7 +623,9 @@ async function loadCollectPoints() {
 onMounted(async () => {
   await Promise.all([loadCategories(), loadCollectPoints()])
   if (userAddress.value) {
+    locating.value = true
     await geocodeUserAddress(userAddress.value)
+    locating.value = false
   }
   window.addEventListener('resize', onResize)
 })
