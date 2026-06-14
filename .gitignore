@@ -48,3 +48,8 @@ Thumbs.db
 
 # Docker
 docker-compose.override.yml
+
+# Exports/dumps de prod (contiennent secrets + données) — JAMAIS sur GitHub
+export/
+deploy-lab.sh
+apache/certs/
