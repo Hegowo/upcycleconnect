@@ -161,7 +161,7 @@ const WIDGET_META = [
   { id: 'events',      defaultVisible: false, w: 1, h: 1, sizes: [[1, 1], [2, 1]] },
   { id: 'trends',      defaultVisible: true,  w: 2, h: 2, sizes: [[2, 2], [4, 2], [2, 3], [3, 2]] },
   { id: 'activity',    defaultVisible: true,  w: 2, h: 3, sizes: [[2, 3], [2, 4], [4, 3], [2, 2]] },
-  { id: 'pending',     defaultVisible: true,  w: 2, h: 2, sizes: [[2, 2], [2, 1], [1, 2], [4, 1]] },
+  { id: 'pending',     defaultVisible: true,  w: 2, h: 1, sizes: [[2, 1], [2, 2], [1, 1], [4, 1]] },
 ]
 const metaMap = Object.fromEntries(WIDGET_META.map(w => [w.id, w]))
 function sizesOf(id) { return metaMap[id]?.sizes || [[1, 1]] }
@@ -174,7 +174,7 @@ const WIDGET_LABELS = {
 function widgetLabel(id) { return t(WIDGET_LABELS[id] || id) }
 
 // ---- Persisted layout (per admin, localStorage) ----
-const storageKey = computed(() => `admin_dashboard_layout_v3_${auth.user?.id || 'default'}`)
+const storageKey = computed(() => `admin_dashboard_layout_v4_${auth.user?.id || 'default'}`)
 const layout = ref([]) // [{ id, visible, w, h }]
 
 function defaultLayout() {
