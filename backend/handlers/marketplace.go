@@ -68,6 +68,9 @@ func (h *MarketplaceHandler) List(c *gin.Context) {
 	if v := c.Query("sale_type"); v == "don" || v == "vente" {
 		base = base.Where("sale_type = ?", v)
 	}
+	if v := c.Query("condition"); v == "good" || v == "fair" || v == "poor" {
+		base = base.Where("`condition` = ?", v)
+	}
 
 	var total int64
 	base.Count(&total)

@@ -19,6 +19,23 @@ type UserDepositHandler struct {
 	Audit *services.AuditService
 }
 
+// depositPhotosDir is where deposit photos decoded from base64 data-URIs are written.
+const depositPhotosDir = "/uploads/deposits"
+
+// saveDepositPhoto converts a base64 data-URI photo to a file under /uploads/deposits
+// and returns its URL. Non-data-URI values (already a URL, or nil) pass through.
+func saveDepositPhoto(p *string) *string {
+	if p == nil || *p == "" {
+		return p
+	}
+	url, _, err := services.SaveDataURIImage(*p, depositPhotosDir, "/uploads/deposits")
+	if err != nil {
+		// Keep the original value rather than dropping the photo on a decode error.
+		return p
+	}
+	return &url
+}
+
 func (h *UserDepositHandler) Index(c *gin.Context) {
 	user := middleware.GetAuthUser(c)
 
@@ -137,6 +154,14 @@ func (h *UserDepositHandler) Store(c *gin.Context) {
 		v := *req.EstimatedWeight * 2.5
 		carbon = &v
 	}
+
+	// Photos arrive as base64 data-URIs from the web form. Persist them as real
+	// files served from /uploads/deposits so any client (incl. the mobile app,
+	// whose image loader can't read data: URIs) can load them by URL, and to keep
+	// API payloads small.
+	req.Photo1 = saveDepositPhoto(req.Photo1)
+	req.Photo2 = saveDepositPhoto(req.Photo2)
+	req.Photo3 = saveDepositPhoto(req.Photo3)
 
 	deposit := models.DepositRequest{
 		UserID:            user.ID,

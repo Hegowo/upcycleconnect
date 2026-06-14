@@ -60,6 +60,10 @@ func main() {
 	// Idempotent seed: roles, built-in locales, optional default super-admin.
 	database.Seed(db)
 
+	// One-time (idempotent) migration: convert deposit photos stored as base64
+	// data-URIs into files under /uploads/deposits so all clients can load them.
+	database.MigrateDepositPhotos(db)
+
 	r := router.Setup(db, cfg)
 
 	port := os.Getenv("PORT")
