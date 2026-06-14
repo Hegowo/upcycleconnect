@@ -61,50 +61,50 @@
 
     <div v-else class="dash-grid" :class="{ 'is-editing': editMode }">
       <div
-        v-for="t in visibleTiles"
-        :key="t.id"
+        v-for="tile in visibleTiles"
+        :key="tile.id"
         class="dash-tile"
-        :class="{ dragging: dragId === t.id, 'drag-over': dragOverId === t.id && dragId && dragId !== t.id }"
-        :style="{ '--w': t.w, '--h': t.h }"
+        :class="{ dragging: dragId === tile.id, 'drag-over': dragOverId === tile.id && dragId && dragId !== tile.id }"
+        :style="{ '--w': tile.w, '--h': tile.h }"
         :draggable="editMode"
-        @dragstart="onDragStart(t)"
-        @dragover.prevent="dragOverId = t.id"
-        @drop="onDrop(t)"
+        @dragstart="onDragStart(tile)"
+        @dragover.prevent="dragOverId = tile.id"
+        @drop="onDrop(tile)"
         @dragend="onDragEnd"
       >
         <div class="tile-content" :class="{ 'pointer-events-none select-none': editMode }">
-          <StatWidget v-if="t.id === 'users'" :icon="UsersIcon" iconBg="#dcfce7" iconColor="#006d35"
+          <StatWidget v-if="tile.id === 'users'" :icon="UsersIcon" iconBg="#dcfce7" iconColor="#006d35"
             :value="stats?.users_count ?? 0" :label="t('dashboard.statsUsers')" :cornerLabel="t('dashboard.members')" to="/admin/users" />
-          <StatWidget v-else-if="t.id === 'providers'" :icon="BriefcaseIcon" iconBg="#dbeafe" iconColor="#2563eb"
+          <StatWidget v-else-if="tile.id === 'providers'" :icon="BriefcaseIcon" iconBg="#dbeafe" iconColor="#2563eb"
             :value="stats?.providers_count ?? 0" :label="t('dashboard.statsProviders')" :cornerLabel="t('dashboard.statsActive')" to="/admin/providers?status=approved" />
-          <StatWidget v-else-if="t.id === 'env'" :icon="GlobeAltIcon" iconBg="#f0fdf4" iconColor="#006d35"
+          <StatWidget v-else-if="tile.id === 'env'" :icon="GlobeAltIcon" iconBg="#f0fdf4" iconColor="#006d35"
             :value="envScore" suffix="/100" :label="t('dashboard.envScore')" :cornerLabel="t('dashboard.envScoreImpact')" :tooltip="t('dashboard.envScoreFormula')" />
-          <StatWidget v-else-if="t.id === 'deposits'" :icon="CubeIcon" iconBg="#fef9c3" iconColor="#ca8a04"
+          <StatWidget v-else-if="tile.id === 'deposits'" :icon="CubeIcon" iconBg="#fef9c3" iconColor="#ca8a04"
             :value="stats?.deposits_accepted ?? 0" :label="t('dashboard.objectsCollected')" :cornerLabel="t('dashboard.totalLabel')" />
-          <StatWidget v-else-if="t.id === 'prestations'" :icon="TagIcon" iconBg="#ede9fe" iconColor="#7c3aed"
+          <StatWidget v-else-if="tile.id === 'prestations'" :icon="TagIcon" iconBg="#ede9fe" iconColor="#7c3aed"
             :value="stats?.prestations_count ?? 0" :label="t('dashboard.statsPrestations')" to="/admin/prestations" />
-          <StatWidget v-else-if="t.id === 'events'" :icon="CalendarDaysIcon" iconBg="#e0f2fe" iconColor="#0891b2"
+          <StatWidget v-else-if="tile.id === 'events'" :icon="CalendarDaysIcon" iconBg="#e0f2fe" iconColor="#0891b2"
             :value="stats?.events_count ?? 0" :label="t('dashboard.statsEvents')" />
-          <TrendsWidget v-else-if="t.id === 'trends'" />
-          <ActivityWidget v-else-if="t.id === 'activity'" :logs="logs" :loading="logsLoading" />
-          <PendingProvidersWidget v-else-if="t.id === 'pending'" :pending="stats?.providers_pending ?? 0" />
+          <TrendsWidget v-else-if="tile.id === 'trends'" />
+          <ActivityWidget v-else-if="tile.id === 'activity'" :logs="logs" :loading="logsLoading" />
+          <PendingProvidersWidget v-else-if="tile.id === 'pending'" :pending="stats?.providers_pending ?? 0" />
         </div>
 
         <div v-if="editMode" class="tile-tools">
           <span class="tile-btn cursor-grab active:cursor-grabbing" :title="t('dashboard.dragHint')"><Bars3Icon class="w-4 h-4" /></span>
           <div class="relative">
-            <button class="tile-btn font-semibold tabular-nums" @click.stop="sizeMenu = sizeMenu === t.id ? null : t.id" :title="t('dashboard.size')">
-              {{ t.w }}×{{ t.h }}
+            <button class="tile-btn font-semibold tabular-nums" @click.stop="sizeMenu = sizeMenu === tile.id ? null : tile.id" :title="t('dashboard.size')">
+              {{ tile.w }}×{{ tile.h }}
             </button>
-            <div v-if="sizeMenu === t.id" class="absolute right-0 mt-1 bg-white rounded-xl border border-[#e5e7eb] shadow-lg z-30 p-1.5 grid grid-cols-2 gap-1 w-28">
-              <button v-for="s in sizesOf(t.id)" :key="s.join('x')" @click.stop="setSize(t, s)"
+            <div v-if="sizeMenu === tile.id" class="absolute right-0 mt-1 bg-white rounded-xl border border-[#e5e7eb] shadow-lg z-30 p-1.5 grid grid-cols-2 gap-1 w-28">
+              <button v-for="s in sizesOf(tile.id)" :key="s.join('x')" @click.stop="setSize(tile, s)"
                 class="px-2 py-1.5 rounded-lg text-xs font-medium tabular-nums transition"
-                :class="s[0] === t.w && s[1] === t.h ? 'bg-[#006d35] text-white' : 'text-[#001d32] hover:bg-[#f0fdf4]'">
+                :class="s[0] === tile.w && s[1] === tile.h ? 'bg-[#006d35] text-white' : 'text-[#001d32] hover:bg-[#f0fdf4]'">
                 {{ s[0] }}×{{ s[1] }}
               </button>
             </div>
           </div>
-          <button class="tile-btn" @click.stop="hideWidget(t.id)" :title="t('dashboard.hideWidget')"><EyeSlashIcon class="w-4 h-4" /></button>
+          <button class="tile-btn" @click.stop="hideWidget(tile.id)" :title="t('dashboard.hideWidget')"><EyeSlashIcon class="w-4 h-4" /></button>
         </div>
       </div>
     </div>
