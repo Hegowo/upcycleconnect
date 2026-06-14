@@ -78,6 +78,7 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 	tipHandler          := &handlers.TipHandler{DB: db, Audit: audit}
 	subscriptionHandler := &handlers.SubscriptionHandler{DB: db, Stripe: stripeService, Audit: audit}
 	campaignHandler     := &handlers.CampaignHandler{DB: db, Stripe: stripeService, Audit: audit}
+	marketplaceHandler  := &handlers.MarketplaceHandler{DB: db, Stripe: stripeService, Audit: audit, Notifications: notifications}
 	projectHandler      := &handlers.UpcyclingProjectHandler{DB: db, Audit: audit}
 	providerDashHandler := &handlers.ProviderDashboardHandler{DB: db}
 
@@ -180,6 +181,14 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 
 			// Abonnements
 			userProtected.GET("/provider/dashboard", providerDashHandler.Dashboard)
+			// Marketplace (browse / buy / favorite deposits) + purchases
+			userProtected.GET("/provider/marketplace", marketplaceHandler.List)
+			userProtected.POST("/provider/marketplace/:id/purchase", marketplaceHandler.Purchase)
+			userProtected.POST("/provider/marketplace/:id/favorite", marketplaceHandler.FavoriteAdd)
+			userProtected.DELETE("/provider/marketplace/:id/favorite", marketplaceHandler.FavoriteRemove)
+			userProtected.GET("/provider/favorites", marketplaceHandler.Favorites)
+			userProtected.GET("/provider/purchases", marketplaceHandler.Purchases)
+			userProtected.GET("/provider/purchases/:id", marketplaceHandler.PurchaseShow)
 			userProtected.GET("/subscription", subscriptionHandler.MySubscription)
 			userProtected.POST("/subscription/checkout", subscriptionHandler.Checkout)
 			userProtected.POST("/subscription/cancel", subscriptionHandler.Cancel)

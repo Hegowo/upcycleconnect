@@ -94,6 +94,8 @@ func (h *UserDepositHandler) Store(c *gin.Context) {
 		Condition         string   `json:"condition"`
 		History           *string  `json:"history"`
 		EstimatedWeight   *float64 `json:"estimated_weight"`
+		SaleType          string   `json:"sale_type"`   // "don" (défaut) ou "vente"
+		PriceCents        int64    `json:"price_cents"` // requis si vente
 		Photo1            *string  `json:"photo1"`
 		Photo2            *string  `json:"photo2"`
 		Photo3            *string  `json:"photo3"`
@@ -105,6 +107,13 @@ func (h *UserDepositHandler) Store(c *gin.Context) {
 
 	if req.Condition == "" {
 		req.Condition = "good"
+	}
+	if req.SaleType != "vente" {
+		req.SaleType = "don"
+		req.PriceCents = 0
+	} else if req.PriceCents <= 0 {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"message": "Un prix (price_cents > 0) est requis pour une vente."})
+		return
 	}
 	allowed := map[string]bool{"good": true, "fair": true, "poor": true}
 	if !allowed[req.Condition] {
@@ -140,6 +149,8 @@ func (h *UserDepositHandler) Store(c *gin.Context) {
 		EstimatedWeight:   req.EstimatedWeight,
 		CarbonSavings:     carbon,
 		Status:            "pending",
+		SaleType:          req.SaleType,
+		PriceCents:        req.PriceCents,
 		Photo1:            req.Photo1,
 		Photo2:            req.Photo2,
 		Photo3:            req.Photo3,

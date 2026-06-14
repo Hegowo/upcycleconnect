@@ -35,6 +35,8 @@ func main() {
 		&models.EventMessage{},
 		&models.ReservationMessage{},
 		&models.PrestationImage{},
+		&models.DepositPurchase{},
+		&models.DepositFavorite{},
 		&models.ForumCategory{},
 		&models.ForumThread{},
 		&models.ForumReply{},

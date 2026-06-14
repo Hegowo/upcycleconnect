@@ -542,6 +542,10 @@ func (h *PaymentHandler) Webhook(c *gin.Context) {
 			if err := h.fulfillCampaign(&session); err != nil {
 				log.Printf("[webhook] campaign fulfill failed for session=%s: %v", session.ID, err)
 			}
+		case "deposit_purchase":
+			if err := h.fulfillDepositPurchase(&session); err != nil {
+				log.Printf("[webhook] deposit purchase fulfill failed for session=%s: %v", session.ID, err)
+			}
 		default:
 			if err := h.fulfillReservation(&session); err != nil {
 				log.Printf("[webhook] fulfill failed for session=%s: %v", session.ID, err)
@@ -567,6 +571,32 @@ func (h *PaymentHandler) Webhook(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"received": true})
+}
+
+// fulfillDepositPurchase marks a "vente" marketplace purchase paid and reserves
+// the deposit for the buyer. Idempotent.
+func (h *PaymentHandler) fulfillDepositPurchase(session *stripe.CheckoutSession) error {
+	var purchase models.DepositPurchase
+	if err := h.DB.Where("stripe_session_id = ?", session.ID).First(&purchase).Error; err != nil {
+		return err
+	}
+	if purchase.Status == "paid" {
+		return nil
+	}
+	now := time.Now()
+	h.DB.Model(&purchase).Updates(map[string]interface{}{"status": "paid", "paid_at": now})
+
+	var dep models.DepositRequest
+	if err := h.DB.First(&dep, purchase.DepositID).Error; err == nil && dep.PurchasedBy == nil {
+		h.DB.Model(&dep).Updates(map[string]interface{}{"purchased_by": purchase.ProviderID, "purchased_at": now})
+		if h.Notifications != nil {
+			h.Notifications.MustNotify(dep.UserID, "deposit.purchased",
+				"Votre objet a été acheté",
+				fmt.Sprintf("Votre annonce « %s » a été achetée par un professionnel.", dep.Title),
+				"/profil")
+		}
+	}
+	return nil
 }
 
 // fulfillSubscription activates a provider's subscription after a successful Stripe Checkout

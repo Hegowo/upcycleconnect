@@ -154,6 +154,39 @@ func (s *StripeService) CreateCampaignCheckout(userID, campaignID uint, userEmai
 	return session.New(params)
 }
 
+// CreateDepositCheckout starts a Stripe payment for buying a "vente" deposit on
+// the marketplace. Metadata type=deposit_purchase is dispatched by the webhook.
+func (s *StripeService) CreateDepositCheckout(providerID, depositID uint, userEmail, title string, amountCents int64) (*stripe.CheckoutSession, error) {
+	if s.cfg.StripeSecret == "" || s.cfg.StripeSecret == "sk_test_local_dummy" {
+		return nil, fmt.Errorf("Stripe non configuré — ajoute ta clé dans le .env")
+	}
+	stripe.Key = s.cfg.StripeSecret
+	successURL := fmt.Sprintf("%s/profil/pro/achats?success=1&session_id={CHECKOUT_SESSION_ID}", s.cfg.AppURL)
+	cancelURL := fmt.Sprintf("%s/profil/pro/achats?cancelled=1", s.cfg.AppURL)
+	params := &stripe.CheckoutSessionParams{
+		Mode:          stripe.String(string(stripe.CheckoutSessionModePayment)),
+		SuccessURL:    stripe.String(successURL),
+		CancelURL:     stripe.String(cancelURL),
+		CustomerEmail: stripe.String(userEmail),
+		LineItems: []*stripe.CheckoutSessionLineItemParams{
+			{
+				PriceData: &stripe.CheckoutSessionLineItemPriceDataParams{
+					Currency: stripe.String("eur"),
+					ProductData: &stripe.CheckoutSessionLineItemPriceDataProductDataParams{
+						Name: stripe.String("Achat objet : " + title),
+					},
+					UnitAmount: stripe.Int64(amountCents),
+				},
+				Quantity: stripe.Int64(1),
+			},
+		},
+	}
+	params.AddMetadata("provider_id", fmt.Sprintf("%d", providerID))
+	params.AddMetadata("deposit_id", fmt.Sprintf("%d", depositID))
+	params.AddMetadata("type", "deposit_purchase")
+	return session.New(params)
+}
+
 func (s *StripeService) VerifyWebhook(payload []byte, signature string) (stripe.Event, error) {
 	if s.cfg.StripeWebhookSecret == "" {
 		return stripe.Event{}, fmt.Errorf("stripe webhook secret is not configured")

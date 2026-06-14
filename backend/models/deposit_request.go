@@ -18,6 +18,12 @@ type DepositRequest struct {
 	ValidatedBy       *uint      `gorm:"index" json:"validated_by"`
 	ValidatedAt       *time.Time `json:"validated_at"`
 	QRCode            *string    `gorm:"size:100" json:"qr_code"`
+	// SaleType: "don" (gratuit) or "vente" (payant, prix dans PriceCents).
+	SaleType          string     `gorm:"size:10;default:don" json:"sale_type"`
+	PriceCents        int64      `gorm:"not null;default:0" json:"price_cents"`
+	// Set when a professional buys/claims the deposit on the marketplace.
+	PurchasedBy       *uint      `gorm:"index" json:"purchased_by"`
+	PurchasedAt       *time.Time `json:"purchased_at"`
 	CollectedAt       *time.Time `json:"collected_at"`
 	CollectedBy       *uint      `gorm:"index" json:"collected_by"`
 	Photo1            *string    `gorm:"type:mediumtext" json:"photo1"`
@@ -44,6 +50,10 @@ type DepositRequestResponse struct {
 	EstimatedWeight   *float64                 `json:"estimated_weight"`
 	CarbonSavings     *float64                 `json:"carbon_savings"`
 	Status            string                   `json:"status"`
+	SaleType          string                   `json:"sale_type"`
+	PriceCents        int64                    `json:"price_cents"`
+	PurchasedBy       *uint                    `json:"purchased_by"`
+	IsFavorited       bool                     `json:"is_favorited"`
 	ValidationNote    *string                  `json:"validation_note"`
 	QRCode            *string                  `json:"qr_code"`
 	CollectedAt       *string                  `json:"collected_at"`
@@ -88,6 +98,9 @@ func ToDepositResponse(d *DepositRequest) DepositRequestResponse {
 		EstimatedWeight: d.EstimatedWeight,
 		CarbonSavings:   d.CarbonSavings,
 		Status:          d.Status,
+		SaleType:        d.SaleType,
+		PriceCents:      d.PriceCents,
+		PurchasedBy:     d.PurchasedBy,
 		ValidationNote:  d.ValidationNote,
 		QRCode:          d.QRCode,
 		CollectedAt:     fmtTime(d.CollectedAt),
