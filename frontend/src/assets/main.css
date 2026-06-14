@@ -53,9 +53,12 @@
    This avoids touching the public site even when html.dark is set.
    ─────────────────────────────────────────────────────────────────────────── */
 
-/* Page bg */
+/* Page bg + default text colour. Setting a base text colour here catches every
+   element that inherits the light-mode default (#111827) without declaring its
+   own colour, so unstyled text/labels stay legible in dark mode. */
 .admin-dark {
   background-color: #0f172a !important;
+  color: #e2e8f0;
 }
 
 /* Cards & white surfaces */
@@ -293,3 +296,51 @@ html.dark .fixed.inset-0.z-50 .btn-secondary  {
 /* ring / focus */
 .admin-dark .focus\:ring-\[\#006d35\]\/20:focus,
 .admin-dark .focus\:ring-\[\#006d35\]\/30:focus { --tw-ring-color: rgba(74,222,128,0.25) !important; }
+
+/* ───────────────────────────────────────────────────────────────────────────
+   Dark-mode accessibility fixes (WCAG contrast).
+   Vue serialises :style bindings to rgb(...), so the #hex attribute selectors
+   above never match those — target the rgb() forms here. Plus a couple of
+   utility classes that were missed. (Audited page-by-page in dark mode.)
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* Missed utility classes */
+.admin-dark .text-\[\#64748b\] { color: #94a3b8 !important; }           /* muted slate text */
+.admin-dark .bg-\[\#fee2e2\]   { background-color: rgba(220,38,38,0.22) !important; } /* "Banni" badge bg */
+
+/* Inline :style TEXT colours (serialised to rgb). Match only when the value is
+   the `color` property — at the start of the style string, or preceded by "; " —
+   so we never hit `background-color: rgb(...)` (which contains "color:"). */
+.admin-dark [style^="color: rgb(0, 109, 53)"],   .admin-dark [style*="; color: rgb(0, 109, 53)"]   { color: #4ade80 !important; } /* #006d35 green */
+.admin-dark [style^="color: rgb(27, 136, 72)"],  .admin-dark [style*="; color: rgb(27, 136, 72)"]  { color: #4ade80 !important; } /* #1B8848 green */
+.admin-dark [style^="color: rgb(0, 29, 50)"],    .admin-dark [style*="; color: rgb(0, 29, 50)"]    { color: #f1f5f9 !important; } /* #001d32 heading */
+.admin-dark [style^="color: rgb(64, 97, 127)"],  .admin-dark [style*="; color: rgb(64, 97, 127)"]  { color: #94a3b8 !important; } /* #40617f muted */
+.admin-dark [style^="color: rgb(100, 116, 139)"],.admin-dark [style*="; color: rgb(100, 116, 139)"]{ color: #94a3b8 !important; } /* #64748b muted */
+.admin-dark [style^="color: rgb(22, 101, 52)"],  .admin-dark [style*="; color: rgb(22, 101, 52)"]  { color: #86efac !important; } /* #166534 success */
+.admin-dark [style^="color: rgb(153, 27, 27)"],  .admin-dark [style*="; color: rgb(153, 27, 27)"]  { color: #fca5a5 !important; } /* #991b1b danger */
+.admin-dark [style^="color: rgb(220, 38, 38)"],  .admin-dark [style*="; color: rgb(220, 38, 38)"]  { color: #fca5a5 !important; } /* #dc2626 danger */
+.admin-dark [style^="color: rgb(202, 138, 4)"],  .admin-dark [style*="; color: rgb(202, 138, 4)"]  { color: #fde047 !important; } /* #ca8a04 amber */
+.admin-dark [style^="color: rgb(133, 77, 14)"],  .admin-dark [style*="; color: rgb(133, 77, 14)"]  { color: #fde047 !important; } /* #854d0e amber */
+
+/* Inline :style light BACKGROUNDS (serialised to rgb) — these light tints are
+   only ever used as backgrounds, so a bare substring match is safe. */
+.admin-dark [style*="rgb(240, 253, 244)"] { background-color: rgba(0,109,53,0.20)  !important; } /* #f0fdf4 */
+.admin-dark [style*="rgb(220, 252, 231)"] { background-color: rgba(0,109,53,0.24)  !important; } /* #dcfce7 */
+.admin-dark [style*="rgb(254, 226, 226)"] { background-color: rgba(220,38,38,0.22) !important; } /* #fee2e2 */
+.admin-dark [style*="rgb(219, 234, 254)"] { background-color: rgba(37,99,235,0.22) !important; } /* #dbeafe */
+.admin-dark [style*="rgb(254, 249, 195)"] { background-color: rgba(202,138,4,0.22) !important; } /* #fef9c3 */
+.admin-dark [style*="rgb(237, 244, 255)"] { background-color: rgba(30,58,138,0.22) !important; } /* #edf4ff */
+.admin-dark [style*="rgb(248, 250, 252)"] { background-color: #0f172a !important; }              /* #f8fafc */
+
+/* More missed text utilities (badges/labels found while auditing) */
+.admin-dark .text-blue-700      { color: #93c5fd !important; }   /* blue badges ("Intégrée", "Administrateur") */
+.admin-dark .text-\[\#1d4ed8\]  { color: #93c5fd !important; }   /* blue accent */
+.admin-dark .text-\[\#6b7280\]  { color: #94a3b8 !important; }   /* gray-500 label */
+.admin-dark .text-\[\#111827\]  { color: #f1f5f9 !important; }   /* gray-900 dark text */
+.admin-dark .text-\[\#1f2937\]  { color: #e2e8f0 !important; }   /* gray-800 dark text */
+.admin-dark .text-\[\#4b5563\]  { color: #cbd5e1 !important; }   /* gray-600 dark text */
+
+/* Inline :style text colours for the above (serialised to rgb) */
+.admin-dark [style^="color: rgb(29, 78, 216)"], .admin-dark [style*="; color: rgb(29, 78, 216)"]   { color: #93c5fd !important; } /* #1d4ed8 */
+.admin-dark [style^="color: rgb(17, 24, 39)"],  .admin-dark [style*="; color: rgb(17, 24, 39)"]    { color: #f1f5f9 !important; } /* #111827 */
+.admin-dark [style^="color: rgb(107, 114, 128)"],.admin-dark [style*="; color: rgb(107, 114, 128)"]{ color: #94a3b8 !important; } /* #6b7280 */
