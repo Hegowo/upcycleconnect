@@ -2,7 +2,6 @@
   <div class="bg-[#f7f9ff] min-h-screen pb-16">
     <div class="max-w-[1100px] mx-auto px-4 sm:px-6 py-10">
 
-      <!-- Header -->
       <div class="mb-8">
         <h1 class="font-jakarta font-extrabold text-[#001d32] text-3xl tracking-tight">
           {{ t('public.community.title') }}
@@ -10,14 +9,12 @@
         <p class="text-[#40617f] text-sm mt-1">{{ t('public.community.subtitle') }}</p>
       </div>
 
-      <!-- Loading -->
       <div v-if="loading" class="flex items-center justify-center py-24">
         <div class="w-8 h-8 border-4 border-[#006d35] border-t-transparent rounded-full animate-spin" />
       </div>
 
       <template v-else>
 
-        <!-- Conseils shortcut -->
         <RouterLink
           to="/communaute/conseils"
           class="group flex items-center justify-between gap-4 bg-gradient-to-br from-[#006d35] to-[#1b8848] rounded-2xl p-5 mb-6 hover:shadow-lg transition"
@@ -34,7 +31,6 @@
           <ArrowRightIcon class="w-5 h-5 text-white opacity-70 group-hover:translate-x-1 transition" />
         </RouterLink>
 
-        <!-- Hero banner -->
         <section class="relative rounded-2xl overflow-hidden mb-10 bg-gradient-to-br from-[#001d32] to-[#003060] p-8 sm:p-12">
           <div class="relative z-10">
             <p class="text-[#7dd3b0] text-xs font-bold uppercase tracking-widest mb-2">{{ t('public.community.heroTag') }}</p>
@@ -56,7 +52,6 @@
           <div class="absolute right-8 top-8 w-40 h-40 rounded-full bg-[#006d35]/20 blur-2xl pointer-events-none" />
         </section>
 
-        <!-- Categories -->
         <section class="mb-10">
           <div class="flex items-center justify-between mb-5">
             <h2 class="font-jakarta font-bold text-[#001d32] text-xl">{{ t('public.community.categoriesTitle') }}</h2>
@@ -96,7 +91,6 @@
           </div>
         </section>
 
-        <!-- Recent threads -->
         <section>
           <div class="flex items-center justify-between mb-5">
             <h2 class="font-jakarta font-bold text-[#001d32] text-xl">{{ t('public.community.recentTitle') }}</h2>
@@ -113,7 +107,6 @@
               :to="`/communaute/forum/${thread.category?.slug}/${thread.id}`"
               class="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition flex items-center gap-4 group">
 
-              <!-- Author avatar -->
               <div class="w-9 h-9 rounded-full bg-[#edf4ff] flex items-center justify-center shrink-0 text-sm font-bold text-[#40617f]">
                 {{ authorInitial(thread.author) }}
               </div>
@@ -150,7 +143,6 @@
       </template>
     </div>
 
-    <!-- New Thread Modal -->
     <div v-if="showModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" @click.self="showModal = false">
       <div class="bg-white rounded-2xl p-6 w-full max-w-lg shadow-xl">
         <div class="flex items-center justify-between mb-5">
@@ -307,7 +299,6 @@ async function loadData() {
     categories.value = data.data || []
   }
 
-  // Load recent threads from all categories
   const threads = []
   for (const cat of categories.value) {
     const r = await fetch(`/api/public/v1/forum/categories/${cat.slug}?page=1`).catch(() => null)

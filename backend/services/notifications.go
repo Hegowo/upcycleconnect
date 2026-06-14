@@ -31,8 +31,6 @@ type NotifyInput struct {
 	Link   string
 }
 
-// Notify persists an in-app notification and best-effort fires a OneSignal push.
-// Never blocks the caller's flow on remote/DB failure — logs and continues.
 func (s *NotificationService) Notify(in NotifyInput) {
 	if in.UserID == 0 || in.Title == "" {
 		return
@@ -56,13 +54,12 @@ func (s *NotificationService) Notify(in NotifyInput) {
 		return
 	}
 
-	// Async OneSignal push — never blocks the caller.
 	go s.sendPush(in)
 }
 
 func (s *NotificationService) sendPush(in NotifyInput) {
 	if s.cfg.OneSignalAppID == "" || s.cfg.OneSignalAPIKey == "" {
-		return // not configured — in-app only
+		return
 	}
 
 	var user models.User
@@ -70,7 +67,7 @@ func (s *NotificationService) sendPush(in NotifyInput) {
 		return
 	}
 	if user.OneSignalPlayerID == nil || *user.OneSignalPlayerID == "" {
-		return // user has not subscribed to push yet
+		return
 	}
 
 	payload := map[string]interface{}{
@@ -80,8 +77,6 @@ func (s *NotificationService) sendPush(in NotifyInput) {
 		"contents":           map[string]string{"en": in.Body, "fr": in.Body},
 	}
 	if in.Link != "" {
-		// OneSignal requires an absolute URL. A relative path like "/admin/monetization"
-		// is not resolved and the click falls back to the site root (home page).
 		url := in.Link
 		if strings.HasPrefix(url, "/") {
 			url = strings.TrimRight(s.cfg.AppURL, "/") + url
@@ -110,14 +105,12 @@ func (s *NotificationService) sendPush(in NotifyInput) {
 	}
 }
 
-// NotifyMany dispatches the same notification to multiple users.
 func (s *NotificationService) NotifyMany(userIDs []uint, typ, title, body, link string) {
 	for _, id := range userIDs {
 		s.Notify(NotifyInput{UserID: id, Type: typ, Title: title, Body: body, Link: link})
 	}
 }
 
-// NotifyAdmins notifies every user with admin / super_admin role.
 func (s *NotificationService) NotifyAdmins(typ, title, body, link string) {
 	var ids []uint
 	s.db.
@@ -125,8 +118,7 @@ func (s *NotificationService) NotifyAdmins(typ, title, body, link string) {
 		Joins("JOIN roles ON roles.id = user_roles.role_id").
 		Where("roles.name IN ?", []string{"admin", "super_admin"}).
 		Pluck("user_roles.user_id", &ids)
-	// A user with both 'admin' and 'super_admin' roles would appear twice and
-	// receive duplicate notifications — dedupe before notifying.
+
 	seen := make(map[uint]bool, len(ids))
 	uniq := ids[:0]
 	for _, id := range ids {
@@ -138,9 +130,6 @@ func (s *NotificationService) NotifyAdmins(typ, title, body, link string) {
 	s.NotifyMany(uniq, typ, title, body, link)
 }
 
-// MustNotify is a tiny helper that swallows errors — convenient when wiring from handlers
-// where we just want fire-and-forget behavior.
 func (s *NotificationService) MustNotify(userID uint, typ, title, body, link string) {
 	s.Notify(NotifyInput{UserID: userID, Type: typ, Title: title, Body: body, Link: link})
 }
-

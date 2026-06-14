@@ -1,10 +1,8 @@
 <template>
   <div class="tiptap-editor-wrap border border-[#e5e7eb] rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-[#006d35]/30 focus-within:border-[#006d35]/50 transition">
 
-    <!-- Toolbar -->
     <div class="tiptap-toolbar flex flex-wrap items-center gap-0.5 p-2 bg-[#f8fafc] border-b border-[#e5e7eb]">
 
-      <!-- Text style -->
       <select @change="setHeading($event.target.value)" class="h-7 px-2 text-xs border border-[#e5e7eb] rounded-lg bg-white text-[#374151] focus:outline-none cursor-pointer mr-1">
         <option value="p">Paragraphe</option>
         <option value="1">Titre 1</option>
@@ -14,7 +12,6 @@
 
       <div class="h-5 w-px bg-[#e5e7eb] mx-1" />
 
-      <!-- Bold / Italic / Underline / Strike -->
       <ToolBtn @click="editor.chain().focus().toggleBold().run()" :active="editor?.isActive('bold')" title="Gras">
         <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path d="M5 4a1 1 0 0 1 1-1h4.5a4 4 0 0 1 2.828 6.828A4 4 0 0 1 10.5 17H6a1 1 0 0 1-1-1V4zm2 1v4h3.5a2 2 0 0 0 0-4H7zm0 6v4h3.5a2 2 0 0 0 0-4H7z"/></svg>
       </ToolBtn>
@@ -30,7 +27,6 @@
 
       <div class="h-5 w-px bg-[#e5e7eb] mx-1" />
 
-      <!-- Lists -->
       <ToolBtn @click="editor.chain().focus().toggleBulletList().run()" :active="editor?.isActive('bulletList')" title="Liste à puces">
         <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path d="M4 5a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM6 5a1 1 0 0 1 1-1h9a1 1 0 1 1 0 2H7a1 1 0 0 1-1-1zM4 10a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM6 10a1 1 0 0 1 1-1h9a1 1 0 1 1 0 2H7a1 1 0 0 1-1-1zM4 15a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM6 15a1 1 0 0 1 1-1h9a1 1 0 1 1 0 2H7a1 1 0 0 1-1-1z"/></svg>
       </ToolBtn>
@@ -43,13 +39,11 @@
 
       <div class="h-5 w-px bg-[#e5e7eb] mx-1" />
 
-      <!-- Text color -->
       <div class="relative flex items-center" title="Couleur du texte">
         <input type="color" :value="currentColor" @input="e => editor.chain().focus().setColor(e.target.value).run()"
           class="w-7 h-7 rounded-lg cursor-pointer border border-[#e5e7eb] p-0.5 bg-white" />
       </div>
 
-      <!-- Highlight -->
       <div class="relative flex items-center" title="Surlignage">
         <input type="color" value="#fef08a" @input="e => editor.chain().focus().toggleHighlight({ color: e.target.value }).run()"
           class="w-7 h-7 rounded-lg cursor-pointer border border-[#e5e7eb] p-0.5 bg-[#fef08a]" />
@@ -57,12 +51,10 @@
 
       <div class="h-5 w-px bg-[#e5e7eb] mx-1" />
 
-      <!-- Link -->
       <ToolBtn @click="addLink" :active="editor?.isActive('link')" title="Lien">
         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 0 0-5.656 0l-4 4a4 4 0 1 0 5.656 5.656l1.102-1.101m-.758-4.899a4 4 0 0 0 5.656 0l4-4a4 4 0 0 0-5.656-5.656l-1.1 1.1"/></svg>
       </ToolBtn>
 
-      <!-- Image -->
       <ToolBtn @click="triggerImageInput" title="Image">
         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M3 21h18a.75.75 0 0 0 .75-.75V5.25A.75.75 0 0 0 21 3H3a.75.75 0 0 0-.75.75v15c0 .414.336.75.75.75ZM9.75 9.75a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z"/></svg>
       </ToolBtn>
@@ -70,7 +62,6 @@
 
       <div class="h-5 w-px bg-[#e5e7eb] mx-1" />
 
-      <!-- Undo / Redo -->
       <ToolBtn @click="editor.chain().focus().undo().run()" :disabled="!editor?.can().undo()" title="Annuler">
         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3"/></svg>
       </ToolBtn>
@@ -78,14 +69,12 @@
         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m15 15 6-6m0 0-6-6m6 6H9a6 6 0 0 0 0 12h3"/></svg>
       </ToolBtn>
 
-      <!-- Upload progress indicator -->
       <span v-if="uploading" class="ml-2 text-xs text-[#94a3b8] flex items-center gap-1">
         <div class="w-3 h-3 border-2 border-[#006d35] border-t-transparent rounded-full animate-spin" />
         Upload...
       </span>
     </div>
 
-    <!-- Editor -->
     <EditorContent :editor="editor" class="tiptap-content" />
   </div>
 </template>
@@ -278,7 +267,6 @@ onBeforeUnmount(() => editor.value?.destroy())
   padding: 0 2px;
 }
 
-/* Placeholder */
 .tiptap-content .tiptap-inner p.is-editor-empty:first-child::before {
   content: attr(data-placeholder);
   float: left;

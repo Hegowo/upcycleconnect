@@ -17,7 +17,7 @@
       </div>
 
       <template v-else>
-        <!-- Hero -->
+
         <div class="bg-white rounded-[24px] overflow-hidden border border-[#edf4ff] mb-8">
           <div class="aspect-[21/9] bg-gradient-to-br from-[#006d35] to-[#1b8848] relative overflow-hidden">
             <img v-if="campaign.image_url" :src="campaign.image_url" :alt="campaign.title" class="w-full h-full object-cover" />
@@ -35,7 +35,6 @@
           </div>
         </div>
 
-        <!-- Promoted prestations -->
         <div v-if="prestations.length" class="mb-8">
           <h2 class="font-jakarta font-bold text-[#001d32] text-xl mb-4">Prestations mises en avant</h2>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -53,7 +52,6 @@
           </div>
         </div>
 
-        <!-- Promoted events -->
         <div v-if="events.length" class="mb-8">
           <h2 class="font-jakarta font-bold text-[#001d32] text-xl mb-4">Événements mis en avant</h2>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">

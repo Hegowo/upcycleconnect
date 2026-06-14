@@ -11,17 +11,16 @@
       </RouterLink>
     </div>
 
-    
     <div class="lg:hidden">
-      
+
       <div v-if="loading" class="space-y-3">
         <div v-for="n in 4" :key="n" class="bg-white rounded-2xl border border-[#f1f5f9] h-20 animate-pulse"></div>
       </div>
-      
+
       <div v-else-if="!admins.length" class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm py-12 text-center">
         <p class="text-gray-500 font-medium text-sm">{{ t('common.noResults') }}</p>
       </div>
-      
+
       <div v-else class="space-y-3">
         <div v-for="admin in admins" :key="admin.id" class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm p-4">
           <div class="flex items-center gap-3 mb-3">

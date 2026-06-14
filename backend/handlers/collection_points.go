@@ -25,8 +25,7 @@ func (h *CollectionPointHandler) Index(c *gin.Context) {
 
 func (h *CollectionPointHandler) PublicIndex(c *gin.Context) {
 	var items []models.CollectionPoint
-	// Exclude inactive boxes AND those currently out of service (an expired
-	// out-of-service window means the box is available again).
+
 	h.DB.Where("is_active = true").
 		Where("out_of_service = false OR (out_of_service_until IS NOT NULL AND out_of_service_until <= ?)", time.Now()).
 		Order("name ASC").Find(&items)
@@ -124,9 +123,6 @@ func (h *CollectionPointHandler) Update(c *gin.Context) {
 	c.JSON(http.StatusOK, models.ToCollectionPointResponse(&cp))
 }
 
-// SetOutOfService declares a box out of service (optionally until a given date) or
-// restores it. During the out-of-service window, the box is excluded from the public
-// list so no user can choose it for a deposit.
 func (h *CollectionPointHandler) SetOutOfService(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
@@ -141,7 +137,7 @@ func (h *CollectionPointHandler) SetOutOfService(c *gin.Context) {
 
 	var req struct {
 		OutOfService bool    `json:"out_of_service"`
-		Until        *string `json:"until"` // optional "2006-01-02" or RFC3339; nil = indefinite
+		Until        *string `json:"until"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"message": "Données invalides."})
@@ -155,7 +151,7 @@ func (h *CollectionPointHandler) SetOutOfService(c *gin.Context) {
 		t, perr := time.Parse(time.RFC3339, *req.Until)
 		if perr != nil {
 			if t, perr = time.Parse("2006-01-02", *req.Until); perr == nil {
-				t = t.Add(24*time.Hour - time.Second) // end of the selected day
+				t = t.Add(24*time.Hour - time.Second)
 			}
 		}
 		if perr != nil {
@@ -164,7 +160,7 @@ func (h *CollectionPointHandler) SetOutOfService(c *gin.Context) {
 		}
 		updates["out_of_service_until"] = t
 	} else {
-		updates["out_of_service_until"] = nil // indefinite
+		updates["out_of_service_until"] = nil
 	}
 
 	h.DB.Model(&cp).Updates(updates)

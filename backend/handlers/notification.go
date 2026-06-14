@@ -106,7 +106,7 @@ func (h *NotificationHandler) RegisterPushToken(c *gin.Context) {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"message": "player_id requis"})
 		return
 	}
-	// player IDs are UUIDs (36 chars) but allow up to 100 just in case
+
 	if len(body.PlayerID) > 100 {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"message": "player_id invalide"})
 		return

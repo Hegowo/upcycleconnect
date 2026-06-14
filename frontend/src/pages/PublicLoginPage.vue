@@ -163,8 +163,6 @@ async function handleLogin() {
   }
 }
 
-// ─── Passkey login ─────────────────────────────────────────────────────────
-
 const passkeyLoading = ref(false)
 const passkeyError   = ref('')
 

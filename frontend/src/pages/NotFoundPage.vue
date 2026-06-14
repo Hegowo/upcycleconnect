@@ -1,25 +1,24 @@
 <template>
   <div class="nf-root">
-    <!-- Falling leaves (CSS animation) -->
+
     <div class="leaves" aria-hidden="true">
       <div v-for="n in 14" :key="n" class="leaf" :class="`leaf--${(n % 4) + 1}`" :style="leafStyle(n)">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75C7 8 17 8 17 8z"/></svg>
       </div>
     </div>
 
-    <!-- Content -->
     <div class="nf-content">
-      <!-- Tree -->
+
       <div class="tree-wrap">
         <svg class="tree" viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg">
-          <!-- trunk -->
+
           <rect x="90" y="140" width="20" height="70" rx="6" fill="#7c5a3a"/>
-          <!-- foliage -->
+
           <circle cx="100" cy="90" r="58" fill="#1b8848"/>
           <circle cx="62"  cy="110" r="40" fill="#006d35"/>
           <circle cx="138" cy="110" r="40" fill="#22a45a"/>
           <circle cx="100" cy="120" r="46" fill="#1b8848"/>
-          <!-- ground -->
+
           <ellipse cx="100" cy="212" rx="70" ry="8" fill="#000" opacity="0.08"/>
         </svg>
       </div>
@@ -53,12 +52,11 @@ function goBack() {
   else router.push('/')
 }
 
-// Randomise each leaf's horizontal start, duration and delay for a natural fall.
 function leafStyle(n) {
-  const left  = (n * 7 + (n * 13) % 30) % 100         // spread across width
-  const dur   = 6 + (n % 5)                            // 6s–10s
-  const delay = (n * 0.7) % 6                          // staggered
-  const scale = 0.6 + ((n % 4) * 0.18)                // varied sizes
+  const left  = (n * 7 + (n * 13) % 30) % 100
+  const dur   = 6 + (n % 5)
+  const delay = (n * 0.7) % 6
+  const scale = 0.6 + ((n % 4) * 0.18)
   return {
     left: `${left}%`,
     animationDuration: `${dur}s`,
@@ -81,7 +79,6 @@ function leafStyle(n) {
   font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
 }
 
-/* ─── Falling leaves animation ─────────────────────────────────────────── */
 .leaves {
   position: absolute;
   inset: 0;
@@ -100,7 +97,7 @@ function leafStyle(n) {
 }
 .leaf svg { width: 100%; height: 100%; display: block; }
 .leaf--1 { color: #1b8848; }
-.leaf--2 { color: #d97706; }   /* autumn touch */
+.leaf--2 { color: #d97706; }
 .leaf--3 { color: #22a45a; }
 .leaf--4 { color: #ca8a04; }
 
@@ -122,7 +119,6 @@ function leafStyle(n) {
   }
 }
 
-/* ─── Content ──────────────────────────────────────────────────────────── */
 .nf-content {
   position: relative;
   z-index: 2;

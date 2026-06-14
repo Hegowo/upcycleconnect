@@ -21,8 +21,6 @@ type TipHandler struct {
 	Audit *services.AuditService
 }
 
-// ─── Public (listed adherents) ──────────────────────────────────────────────
-
 func (h *TipHandler) PublicIndex(c *gin.Context) {
 	q := h.DB.Preload("Author").
 		Where("status = ?", "published").
@@ -45,7 +43,6 @@ func (h *TipHandler) PublicIndex(c *gin.Context) {
 		resp = append(resp, models.ToTipResponse(&tips[i], false))
 	}
 
-	// Distinct categories for the filter chip row, computed off the published rows so empty cats don't show.
 	categorySet := map[string]struct{}{}
 	for _, t := range tips {
 		if t.Category != "" {
@@ -77,13 +74,11 @@ func (h *TipHandler) PublicShow(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"message": "Conseil introuvable"})
 		return
 	}
-	// Best-effort view count; ignore concurrent races.
+
 	h.DB.Model(&tip).UpdateColumn("view_count", gorm.Expr("view_count + 1"))
 	tip.ViewCount++
 	c.JSON(http.StatusOK, models.ToTipResponse(&tip, true))
 }
-
-// ─── Admin CRUD ─────────────────────────────────────────────────────────────
 
 type tipPayload struct {
 	Title       string  `json:"title" binding:"required,min=3,max=200"`
@@ -92,7 +87,7 @@ type tipPayload struct {
 	Content     string  `json:"content" binding:"required,min=10"`
 	CoverImage  *string `json:"cover_image"`
 	Category    string  `json:"category"`
-	Status      string  `json:"status"` // draft | published
+	Status      string  `json:"status"`
 	PublishedAt *string `json:"published_at"`
 }
 
@@ -193,8 +188,6 @@ func (h *TipHandler) AdminDestroy(c *gin.Context) {
 	h.Audit.Log(c, "tip.deleted", "Tip", &tip.ID, map[string]string{"title": tip.Title}, nil)
 	c.JSON(http.StatusOK, gin.H{"message": "Conseil supprimé"})
 }
-
-// ─── Helpers ────────────────────────────────────────────────────────────────
 
 var slugRe = regexp.MustCompile(`[^a-z0-9]+`)
 

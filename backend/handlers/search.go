@@ -43,7 +43,6 @@ func (h *SearchHandler) Search(c *gin.Context) {
 	like := "%" + q + "%"
 	limit := 5
 
-	// Events
 	var events []models.Event
 	h.DB.Where(
 		"(title LIKE ? OR description LIKE ? OR location LIKE ?) AND status = 'published'",
@@ -70,7 +69,6 @@ func (h *SearchHandler) Search(c *gin.Context) {
 		}
 	}
 
-	// Prestations
 	var prestations []models.Prestation
 	h.DB.Where(
 		"(title LIKE ? OR description LIKE ?) AND status = 'published'",
@@ -92,7 +90,6 @@ func (h *SearchHandler) Search(c *gin.Context) {
 		}
 	}
 
-	// Forum threads
 	var threads []models.ForumThread
 	h.DB.Where("(title LIKE ? OR content LIKE ?) AND deleted_at IS NULL", like, like).
 		Preload("Category").Limit(limit).Find(&threads)
@@ -126,7 +123,6 @@ func (h *SearchHandler) Search(c *gin.Context) {
 		}
 	}
 
-	// Providers
 	type provRow struct {
 		ID          uint
 		CompanyName string

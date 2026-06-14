@@ -53,10 +53,8 @@ func buildUserPDF(user models.User, deposits []models.DepositRequest, logs []mod
 	pdf.SetAutoPageBreak(true, 20)
 	pdf.AddPage()
 
-	// UTF-8 → Latin-1 (required by built-in Helvetica font)
 	tr := pdf.UnicodeTranslatorFromDescriptor("")
 
-	// ─── Logo + header ───────────────────────────────────────────────────────
 	if len(logoBytes) > 0 {
 		pdf.RegisterImageOptionsReader("logo", fpdf.ImageOptions{ImageType: "PNG"}, bytes.NewReader(logoBytes))
 		pdf.ImageOptions("logo", 20, 12, 28, 0, false, fpdf.ImageOptions{}, 0, "")
@@ -78,7 +76,6 @@ func buildUserPDF(user models.User, deposits []models.DepositRequest, logs []mod
 
 	y := 48.0
 
-	// ─── Informations personnelles ───────────────────────────────────────────
 	y = pdfSectionTitle(pdf, y, tr("Informations personnelles"))
 
 	phone := "-"
@@ -108,7 +105,6 @@ func buildUserPDF(user models.User, deposits []models.DepositRequest, logs []mod
 		y = pdfRow(pdf, y, row[0], row[1])
 	}
 
-	// ─── Dépôts d'objets ─────────────────────────────────────────────────────
 	y += 8
 	y = pdfSectionTitle(pdf, y, tr(fmt.Sprintf("Dépôts d'objets (%d)", len(deposits))))
 
@@ -154,7 +150,6 @@ func buildUserPDF(user models.User, deposits []models.DepositRequest, logs []mod
 		}
 	}
 
-	// ─── Journaux d'activité ─────────────────────────────────────────────────
 	y += 8
 	if y > 240 {
 		pdf.AddPage()
@@ -200,7 +195,6 @@ func buildUserPDF(user models.User, deposits []models.DepositRequest, logs []mod
 		}
 	}
 
-	// ─── Footer ───────────────────────────────────────────────────────────────
 	pdf.SetFont("Helvetica", "I", 7)
 	pdf.SetTextColor(160, 174, 192)
 	pdf.SetXY(20, 285)
@@ -208,8 +202,6 @@ func buildUserPDF(user models.User, deposits []models.DepositRequest, logs []mod
 
 	return pdf
 }
-
-// ─── Helpers (reçoivent des chaînes déjà converties en Latin-1) ──────────────
 
 func pdfSectionTitle(pdf *fpdf.Fpdf, y float64, title string) float64 {
 	pdf.SetFillColor(0, 109, 53)

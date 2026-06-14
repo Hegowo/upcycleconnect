@@ -1,13 +1,12 @@
 <template>
   <div class="space-y-6">
-    
+
     <div class="flex items-center justify-between">
       <div>
         <h2 class="text-2xl font-bold text-[#001d32]">{{ t('logs.title') }}</h2>
       </div>
     </div>
 
-    
     <div>
       <div>
         <div class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm overflow-hidden">
@@ -21,7 +20,6 @@
             </div>
           </div>
 
-          
           <div class="flex gap-1 p-3 bg-[#f8fafc] border-b border-[#f1f5f9]">
             <button @click="tab='admin'" :class="tab==='admin' ? 'bg-white shadow text-[#001d32] font-semibold' : 'text-gray-500 hover:text-gray-700'" class="px-4 py-2 rounded-lg text-sm transition">
               {{ t('logs.tabAdmin') }}
@@ -31,7 +29,6 @@
             </button>
           </div>
 
-          
           <div v-if="tab === 'admin'" class="overflow-x-auto">
             <div v-if="adminLoading" class="p-4 space-y-3">
               <div v-for="n in 6" :key="n" class="h-12 bg-gray-50 rounded-lg animate-pulse"></div>
@@ -86,7 +83,6 @@
               </tbody>
             </table>
 
-            
             <div v-if="!adminLoading && adminLogs.length" class="lg:hidden divide-y divide-[#f8fafc]">
               <div
                 v-for="log in adminLogs"
@@ -117,7 +113,6 @@
             </div>
           </div>
 
-          
           <div v-if="tab === 'platform'">
             <div v-if="platformLoading" class="p-4 space-y-3">
               <div v-for="n in 5" :key="n" class="h-12 bg-gray-50 rounded-lg animate-pulse"></div>
@@ -151,8 +146,6 @@
         </div>
       </div>
     </div>
-
-
 
     <Teleport to="body">
       <Transition name="modal">

@@ -108,7 +108,7 @@
           <div class="col-span-12 lg:col-span-4 flex flex-col gap-4 sm:gap-6">
             <div class="bg-white rounded-[24px] p-6 shadow-[0_12px_40px_0_rgba(0,29,50,0.06)] flex flex-col gap-4">
               <h3 class="font-jakarta font-bold text-[#001d32] text-lg">{{ t('public.depotConfirmation.objectTitle') }}</h3>
-              <!-- Photo(s) or placeholder -->
+
               <div v-if="deposit.photo1 || deposit.photo2 || deposit.photo3" class="flex gap-2 overflow-x-auto">
                 <img
                   v-for="src in [deposit.photo1, deposit.photo2, deposit.photo3].filter(Boolean)"
@@ -190,7 +190,6 @@
     </div>
   </div>
 
-  <!-- Photo lightbox -->
   <Teleport to="body">
     <div v-if="lightboxSrc" class="fixed inset-0 z-50 bg-black/80 flex items-center justify-center" @click="lightboxSrc = null">
       <img :src="lightboxSrc" class="max-w-[90vw] max-h-[90vh] rounded-2xl object-contain shadow-2xl" @click.stop />
@@ -368,14 +367,20 @@ async function printVoucher() {
   </div>
 </div>
 ${cp ? `<div class="section"><div class="section-title">Point de collecte</div><div class="cp-box"><div class="cp-name">${cp.name}</div><div class="cp-addr">${cp.address}<br/>${cp.postal_code} ${cp.city}${cp.opening_hours ? '<br/>' + cp.opening_hours : ''}</div></div></div>` : ''}
+
 <div class="section"><div class="section-title">Objet</div>
+
 <div class="info-grid">
   <div class="info-cell"><div class="info-label">Nom</div><div class="info-value">${d.title}</div></div>
+
   <div class="info-cell"><div class="info-label">Catégorie</div><div class="info-value">${d.category?.name || '—'}</div></div>
+
   ${d.estimated_weight ? `<div class="info-cell"><div class="info-label">Poids estimé</div><div class="info-value">${d.estimated_weight} kg</div></div>` : ''}
   ${d.carbon_savings ? `<div class="info-cell"><div class="info-label">CO₂ économisé</div><div class="info-value" style="color:#006d35;">${d.carbon_savings} kg</div></div>` : ''}
 </div>
+
 </div>
+
 ${photos.length ? `<div class="section"><div class="section-title">Photos de l'objet</div><div class="photos">${photoHtml}</div></div>` : ''}
 <div class="instructions"><p><strong>Comment procéder ?</strong>1. Présentez ce bon (imprimé ou sur écran) au point de collecte.<br/>2. Le code affiché en haut vous permet d'ouvrir le conteneur. Le code-barres ci-contre sera scanné par le professionnel qui récupèrera votre objet.<br/>3. Vous recevrez une confirmation par e-mail.</p></div>
 <div class="footer">UpcycleConnect — Ensemble pour une économie circulaire · Bon valable 1 mois à compter de la validation</div>
@@ -388,6 +393,7 @@ ${photos.length ? `<div class="section"><div class="section-title">Photos de l'o
 onMounted(async () => {
   if (!userAuth.isLoggedIn) {
     router.push('/connexion?redirect=/profil')
+
     return
   }
   const id = route.query.id

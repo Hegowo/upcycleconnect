@@ -2,15 +2,13 @@ package models
 
 import "time"
 
-// Subscription tracks a provider's Stripe subscription (15€ basic / 30€ premium/month).
-// Created when the provider completes a Stripe Checkout in subscription mode.
 type Subscription struct {
 	ID                   uint       `gorm:"primaryKey" json:"id"`
 	UserID               uint       `gorm:"uniqueIndex;not null" json:"user_id"`
 	StripeCustomerID     string     `gorm:"size:100" json:"stripe_customer_id"`
 	StripeSubscriptionID string     `gorm:"size:100;uniqueIndex" json:"stripe_subscription_id"`
-	Plan                 string     `gorm:"size:20;default:basic" json:"plan"` // basic | premium
-	Status               string     `gorm:"size:30;default:inactive" json:"status"` // active | inactive | cancelled | past_due
+	Plan                 string     `gorm:"size:20;default:basic" json:"plan"`
+	Status               string     `gorm:"size:30;default:inactive" json:"status"`
 	CurrentPeriodEnd     *time.Time `json:"current_period_end"`
 	CreatedAt            time.Time  `json:"created_at"`
 	UpdatedAt            time.Time  `json:"updated_at"`
@@ -20,13 +18,10 @@ type Subscription struct {
 
 func (Subscription) TableName() string { return "subscriptions" }
 
-// SubscriptionPlans aligns with the project spec (Annexe 1): a freemium model where
-// base pro features are free and "outils avancés" are paid. The 4 advanced tools
-// listed in the spec are split across the two paid tiers.
 var SubscriptionPlans = map[string]struct {
-	Label      string
+	Label       string
 	AmountCents int64
-	Features   []string
+	Features    []string
 }{
 	"basic": {
 		Label:       "Basic",

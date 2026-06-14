@@ -56,7 +56,6 @@
       </table>
     </div>
 
-    <!-- Add language modal -->
     <Teleport to="body">
       <div v-if="showAdd" class="fixed inset-0 z-50 flex items-center justify-center p-4">
         <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="showAdd = false" />
@@ -83,12 +82,10 @@
         </div>
       </div>
 
-      <!-- Translation editor -->
       <div v-if="showEdit" class="fixed inset-0 z-50 flex items-center justify-center p-4">
         <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="showEdit = false" />
         <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-6xl h-[92vh] flex flex-col overflow-hidden">
 
-          <!-- Header with global progress -->
           <div class="px-6 py-4 border-b flex items-center justify-between shrink-0 gap-4" style="background:linear-gradient(135deg,#006d35,#1b8848);">
             <div class="min-w-0">
               <h3 class="text-white font-bold text-lg leading-tight">Traduction — {{ editLocale?.name }}</h3>
@@ -108,7 +105,6 @@
             </div>
           </div>
 
-          <!-- Toolbar -->
           <div class="px-6 py-3 border-b border-gray-100 shrink-0 flex flex-wrap items-center gap-3">
             <div class="relative flex-1 min-w-[200px]">
               <MagnifyingGlassIcon class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#94a3b8]" />
@@ -123,9 +119,8 @@
             </div>
           </div>
 
-          <!-- Workspace: sections sidebar + entries -->
           <div class="flex-1 flex min-h-0">
-            <!-- Sections sidebar -->
+
             <div class="w-56 border-r border-gray-100 overflow-y-auto bg-[#fafbfc] shrink-0">
               <button v-for="s in sections" :key="s.name" @click="activeSection = s.name"
                 :class="['w-full text-left px-4 py-2.5 border-b border-gray-50 transition',
@@ -140,7 +135,6 @@
               </button>
             </div>
 
-            <!-- Entries -->
             <div class="flex-1 overflow-y-auto p-5 space-y-3">
               <div v-if="!visibleKeys.length" class="text-center py-16 text-[#94a3b8] text-sm">
                 Aucun texte ne correspond à ce filtre.
@@ -168,7 +162,6 @@
             </div>
           </div>
 
-          <!-- Footer -->
           <div class="px-6 py-3.5 border-t bg-[#f8fafc] flex items-center justify-between gap-3 shrink-0">
             <p class="text-xs text-[#64748b]">
               <span v-if="dirtyCount > 0" class="text-[#006d35] font-semibold">{{ dirtyCount }} modification(s) non enregistrée(s)</span>
@@ -203,7 +196,6 @@ function authHeaders() {
 const locales = ref([])
 const loading = ref(true)
 
-// Flatten/unflatten helpers — keys like "public.home.title"
 function flatten(obj, prefix = '', out = {}) {
   for (const [k, v] of Object.entries(obj || {})) {
     const key = prefix ? `${prefix}.${k}` : k
@@ -236,7 +228,6 @@ async function fetchLocales() {
   } finally { loading.value = false }
 }
 
-// ── Add ──
 const showAdd = ref(false)
 const adding = ref(false)
 const addError = ref('')
@@ -247,7 +238,6 @@ async function createLocale() {
   adding.value = true
   addError.value = ''
   try {
-    // Seed the new language with the FR message tree so the admin only has to translate.
     const res = await fetch(`${BASE}/locales`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...authHeaders() },
@@ -259,14 +249,13 @@ async function createLocale() {
   } catch (e) { addError.value = e.message } finally { adding.value = false }
 }
 
-// ── Edit translations workspace ──
 const showEdit = ref(false)
 const savingEdit = ref(false)
 const editLocale = ref(null)
 const editFlat = ref({})
-const savedSnapshot = ref({})       // last-saved state, to detect unsaved changes
+const savedSnapshot = ref({})
 const search = ref('')
-const filterMode = ref('all')        // all | todo | done
+const filterMode = ref('all')
 const activeSection = ref('')
 
 const filters = [
@@ -275,7 +264,6 @@ const filters = [
   { value: 'done', label: 'Traduits' },
 ]
 
-// Friendly labels for the top-level sections.
 const SECTION_LABELS = {
   common: 'Commun', nav: 'Navigation', login: 'Connexion', dashboard: 'Tableau de bord',
   users: 'Utilisateurs', providers: 'Prestataires', categories: 'Catégories',
@@ -284,7 +272,6 @@ const SECTION_LABELS = {
 }
 function sectionLabel(name) { return SECTION_LABELS[name] || name }
 
-// A key is "translated" when its value is non-empty and differs from the French reference.
 function isTranslated(k) {
   const v = (editFlat.value[k] || '').trim()
   return v !== '' && v !== String(frFlat[k]).trim()
@@ -296,7 +283,6 @@ const translatedCount = computed(() => allKeys.filter(isTranslated).length)
 const globalProgress = computed(() => totalKeys.value ? Math.round(translatedCount.value / totalKeys.value * 100) : 0)
 const dirtyCount = computed(() => allKeys.filter(k => (editFlat.value[k] || '') !== (savedSnapshot.value[k] || '')).length)
 
-// Sections with per-section progress, derived from the top-level key segment.
 const sections = computed(() => {
   const map = {}
   for (const k of allKeys) {
@@ -308,7 +294,6 @@ const sections = computed(() => {
   return Object.values(map).sort((a, b) => a.name.localeCompare(b.name))
 })
 
-// Keys visible in the right pane = active section ∩ search ∩ filter.
 const visibleKeys = computed(() => {
   const q = search.value.trim().toLowerCase()
   return allKeys.filter(k => {

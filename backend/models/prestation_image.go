@@ -2,7 +2,6 @@ package models
 
 import "time"
 
-// PrestationImage is a gallery image attached to a prestation.
 type PrestationImage struct {
 	ID           uint      `gorm:"primaryKey" json:"id"`
 	PrestationID uint      `gorm:"index;not null" json:"prestation_id"`

@@ -20,7 +20,6 @@
 
       <div v-else-if="reservation" class="grid grid-cols-12 gap-6 items-start">
 
-        <!-- LEFT: reservation details, quote, contract -->
         <div class="col-span-12 lg:col-span-7 space-y-6">
 
         <div class="bg-white rounded-[24px] p-6 sm:p-8 relative overflow-hidden">
@@ -123,7 +122,6 @@
             </div>
           </div>
 
-          <!-- Provider: establish / revise the quote (multi-line) -->
           <div v-if="isProviderView && canEditQuote" class="bg-white rounded-[24px] p-6 border border-[#edf4ff]">
             <h3 class="font-jakarta font-bold text-[#001d32] text-base mb-1">Établir le devis</h3>
             <p class="text-[#40617f] text-xs mb-4">Ajoutez une ligne par élément demandé. Le total TTC est calculé automatiquement.</p>
@@ -156,13 +154,11 @@
             <p v-if="quoteFeedback" class="text-sm mt-2" :class="quoteFeedback.includes('✓') ? 'text-[#006d35]' : 'text-red-600'">{{ quoteFeedback }}</p>
           </div>
 
-          <!-- Provider: quote already signed -->
           <div v-else-if="isProviderView && contract" class="bg-[#f0fdf4] rounded-[24px] p-6 border border-[#bbf7d0]">
             <p class="font-semibold text-[#166534] text-sm">Devis signé par le client ✓</p>
             <p class="text-[#40617f] text-xs mt-1">Montant accepté : {{ formatAmount(reservation.amount_cents, reservation.currency) }}</p>
           </div>
 
-          <!-- Quote breakdown (read-only): for the client, or the provider once signed -->
           <div v-if="quote && quote.lines && quote.lines.length && !canEditQuote" class="bg-white rounded-[24px] p-6 border border-[#edf4ff]">
             <h3 class="font-jakarta font-bold text-[#001d32] text-base mb-3">Détail du devis</h3>
             <div class="divide-y divide-[#edf4ff]">
@@ -253,7 +249,6 @@
         </div>
         </div>
 
-        <!-- RIGHT: chat client ↔ prestataire (sticky) -->
         <div class="col-span-12 lg:col-span-5">
         <div class="lg:sticky lg:top-6 bg-white rounded-[24px] p-6 flex flex-col" style="height: calc(100vh - 6rem); max-height: 720px;">
           <h2 class="font-jakarta font-bold text-[#001d32] text-lg mb-1 flex items-center gap-2 shrink-0">
@@ -328,7 +323,6 @@ const downloadingContract = ref(false)
 const showQuoteSign = ref(false)
 const isProviderView = ref(false)
 
-// ---- Quote editing (provider), multi-line ----
 const quote = ref(null)
 const quoteLines = ref([{ label: '', amount: null }])
 const quoteMessage = ref('')
@@ -368,7 +362,6 @@ async function sendQuote() {
   } catch (e) { quoteFeedback.value = e.message } finally { quoteSending.value = false }
 }
 
-// ---- Chat (client ↔ provider) ----
 const messages = ref([])
 const newMessage = ref('')
 const chatSending = ref(false)
@@ -436,7 +429,7 @@ onMounted(async () => {
       quote.value          = data.quote || null
       isProviderView.value = !!data.is_provider_view
       prefillQuoteLines()
-      // Best-effort contract fetch (404 = no contract, e.g. quote)
+
       try {
         const cRes = await fetch(`/api/v1/reservations/${route.params.id}/contract`, {
           headers: { Authorization: `Bearer ${userAuth.token}` },
@@ -467,7 +460,6 @@ async function downloadContract() {
     a.click()
     URL.revokeObjectURL(url)
   } catch {
-    // silent
   } finally {
     downloadingContract.value = false
   }

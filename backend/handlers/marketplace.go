@@ -22,7 +22,6 @@ type MarketplaceHandler struct {
 	Notifications *services.NotificationService
 }
 
-// approvedProvider ensures the caller is an approved professional.
 func (h *MarketplaceHandler) approvedProvider(c *gin.Context) (*models.User, bool) {
 	user := middleware.GetAuthUser(c)
 	if user == nil {
@@ -37,8 +36,6 @@ func (h *MarketplaceHandler) approvedProvider(c *gin.Context) (*models.User, boo
 	return user, true
 }
 
-// List returns validated, still-available deposits (don or vente) for pros,
-// with filters and an is_favorited flag.
 func (h *MarketplaceHandler) List(c *gin.Context) {
 	user, ok := h.approvedProvider(c)
 	if !ok {
@@ -102,8 +99,6 @@ func (h *MarketplaceHandler) List(c *gin.Context) {
 	})
 }
 
-// Purchase claims a "don" deposit (immediate, free) or starts a Stripe checkout
-// for a "vente" deposit.
 func (h *MarketplaceHandler) Purchase(c *gin.Context) {
 	user, ok := h.approvedProvider(c)
 	if !ok {
@@ -123,7 +118,6 @@ func (h *MarketplaceHandler) Purchase(c *gin.Context) {
 		return
 	}
 
-	// Paid deposit → Stripe checkout.
 	if dep.SaleType == "vente" && dep.PriceCents > 0 {
 		sess, err := h.Stripe.CreateDepositCheckout(user.ID, dep.ID, user.Email, dep.Title, dep.PriceCents)
 		if err != nil {
@@ -139,7 +133,6 @@ func (h *MarketplaceHandler) Purchase(c *gin.Context) {
 		return
 	}
 
-	// Free deposit (don) → immediate claim.
 	now := time.Now()
 	purchase := models.DepositPurchase{DepositID: dep.ID, ProviderID: user.ID, AmountCents: 0, Status: "paid", PaidAt: &now}
 	h.DB.Create(&purchase)
@@ -155,7 +148,6 @@ func (h *MarketplaceHandler) Purchase(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"type": "don", "data": purchase, "qr_code": dep.QRCode})
 }
 
-// Purchases lists the professional's purchases.
 func (h *MarketplaceHandler) Purchases(c *gin.Context) {
 	user, ok := h.approvedProvider(c)
 	if !ok {
@@ -167,7 +159,6 @@ func (h *MarketplaceHandler) Purchases(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": items})
 }
 
-// PurchaseShow returns one purchase of the professional.
 func (h *MarketplaceHandler) PurchaseShow(c *gin.Context) {
 	user, ok := h.approvedProvider(c)
 	if !ok {

@@ -21,8 +21,6 @@ type AdminNotificationHandler struct {
 	Audit         *services.AuditService
 }
 
-// SentList returns every notification dispatched to users, newest first,
-// with the recipient's identity (admin oversight of "notifications envoyées").
 func (h *AdminNotificationHandler) SentList(c *gin.Context) {
 	q := h.DB.Model(&models.Notification{})
 	if t := c.Query("type"); t != "" {
@@ -83,8 +81,6 @@ func (h *AdminNotificationHandler) SentList(c *gin.Context) {
 	})
 }
 
-// Broadcast sends a notification to a target audience (all, particuliers, pros)
-// or to a single user (audience="user" + user_id).
 func (h *AdminNotificationHandler) Broadcast(c *gin.Context) {
 	var req struct {
 		Title    string `json:"title" binding:"required,min=2"`
@@ -98,7 +94,6 @@ func (h *AdminNotificationHandler) Broadcast(c *gin.Context) {
 		return
 	}
 
-	// Resolve recipient ids based on audience.
 	var ids []uint
 	switch req.Audience {
 	case "user":
@@ -115,11 +110,11 @@ func (h *AdminNotificationHandler) Broadcast(c *gin.Context) {
 	case "pros":
 		h.DB.Model(&models.ProviderProfile{}).Where("status = ?", "approved").Pluck("user_id", &ids)
 	case "particuliers":
-		// Users without an approved provider profile.
+
 		h.DB.Model(&models.User{}).
 			Where("status = ? AND id NOT IN (SELECT user_id FROM provider_profiles WHERE status = 'approved')", "active").
 			Pluck("id", &ids)
-	default: // all
+	default:
 		h.DB.Model(&models.User{}).Where("status = ?", "active").Pluck("id", &ids)
 	}
 
@@ -136,8 +131,6 @@ func (h *AdminNotificationHandler) Broadcast(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Notification envoyée.", "sent": len(ids)})
 }
 
-// RecipientSearch returns up to 10 active users matching a query on email,
-// first/last name, full name or company — used by the "single user" picker.
 func (h *AdminNotificationHandler) RecipientSearch(c *gin.Context) {
 	q := strings.TrimSpace(c.Query("q"))
 	if len(q) < 2 {
@@ -175,8 +168,6 @@ func (h *AdminNotificationHandler) RecipientSearch(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": out})
 }
 
-// LinkTargets returns clickable destinations (a specific prestation or event)
-// so admins pick the right deep-link instead of typing a path by hand.
 func (h *AdminNotificationHandler) LinkTargets(c *gin.Context) {
 	typ := c.Query("type")
 	q := strings.TrimSpace(c.Query("q"))

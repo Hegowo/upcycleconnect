@@ -5,7 +5,6 @@
 
       <div class="relative bg-white rounded-[28px] shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[92vh]">
 
-        <!-- Header -->
         <div class="px-6 pt-6 pb-4 shrink-0" style="background:linear-gradient(135deg,#006d35,#1b8848);">
           <div class="flex items-center justify-between mb-3">
             <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/20 text-white text-[10px] font-bold uppercase tracking-wider">
@@ -18,7 +17,6 @@
           <p v-if="current.subtitle" class="text-white/80 text-sm mt-1">{{ current.subtitle }}</p>
         </div>
 
-        <!-- Progress -->
         <div class="flex items-center gap-1.5 px-6 pt-4 shrink-0">
           <div
             v-for="(_, i) in steps"
@@ -28,10 +26,8 @@
           />
         </div>
 
-        <!-- Body -->
         <div class="flex-1 overflow-y-auto px-6 py-6">
 
-          <!-- Step 0: Welcome -->
           <div v-if="current.key === 'welcome'" class="text-center py-4">
             <div class="w-20 h-20 rounded-2xl mx-auto mb-4 flex items-center justify-center" style="background:linear-gradient(135deg,#006d35,#1b8848);">
               <BuildingStorefrontIcon class="w-10 h-10 text-white" />
@@ -52,7 +48,6 @@
             </div>
           </div>
 
-          <!-- Step 1: Description -->
           <div v-else-if="current.key === 'description'" class="space-y-4">
             <p class="text-[#40617f] text-sm">
               Décrivez votre activité, vos spécialités et ce qui rend votre savoir-faire unique. Cette description sera visible publiquement sur votre fiche.
@@ -66,7 +61,6 @@
             <p class="text-xs text-[#94a3b8]">{{ form.description.length }} caractères — minimum 50 recommandé.</p>
           </div>
 
-          <!-- Step 2: Website -->
           <div v-else-if="current.key === 'website'" class="space-y-4">
             <p class="text-[#40617f] text-sm">
               Si vous avez un site web, un portfolio ou une page Instagram, partagez-le pour que la communauté puisse découvrir votre univers en détail.
@@ -83,7 +77,6 @@
             <p class="text-xs text-[#94a3b8]">Optionnel — vous pouvez passer cette étape.</p>
           </div>
 
-          <!-- Step 3: First prestation -->
           <div v-else-if="current.key === 'prestation'" class="space-y-4">
             <p class="text-[#40617f] text-sm">
               Créez votre première prestation pour montrer ce que vous proposez. Vous pourrez en ajouter d'autres plus tard.
@@ -146,7 +139,6 @@
             <p class="text-xs text-[#94a3b8]">Optionnel — vous pouvez passer cette étape pour le faire plus tard.</p>
           </div>
 
-          <!-- Step 4: Done -->
           <div v-else-if="current.key === 'done'" class="text-center py-4">
             <div class="w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center" style="background:linear-gradient(135deg,#006d35,#1b8848);">
               <CheckCircleIcon class="w-12 h-12 text-white" />
@@ -169,7 +161,6 @@
           <p v-if="error" class="text-red-600 text-sm mt-4 text-center">{{ error }}</p>
         </div>
 
-        <!-- Footer -->
         <div class="px-6 py-4 bg-[#f8fafc] border-t border-gray-100 flex items-center justify-between gap-3 shrink-0">
           <button
             @click="prev"
@@ -269,7 +260,6 @@ function prev() {
   error.value = ''
 }
 
-// Skips the current step without saving anything
 function next() {
   if (step.value < steps.length - 1) {
     step.value++
@@ -277,12 +267,10 @@ function next() {
   }
 }
 
-// Saves the data of the current step, then moves forward.
 async function saveAndNext() {
   if (saving.value) return
   error.value = ''
 
-  // welcome step → just advance
   if (current.value.key === 'welcome') {
     next()
     return
@@ -290,7 +278,6 @@ async function saveAndNext() {
 
   saving.value = true
   try {
-    // Save description + website on their respective steps
     if (current.value.key === 'description' && form.value.description.trim()) {
       await userApi('/provider/profile', {
         method: 'PUT',
@@ -303,7 +290,7 @@ async function saveAndNext() {
         body: JSON.stringify({ website: form.value.website.trim() }),
       })
     }
-    // Create the first prestation if title is filled
+
     if (current.value.key === 'prestation' && form.value.prestationTitle.trim()) {
       await userApi('/provider/prestations', {
         method: 'POST',
@@ -316,7 +303,7 @@ async function saveAndNext() {
         }),
       })
     }
-    // Final step → mark onboarding done and close
+
     if (isLast.value) {
       await userApi('/provider/onboarding/complete', { method: 'POST' })
       await userAuth.fetchMe()

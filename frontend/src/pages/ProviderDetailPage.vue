@@ -51,7 +51,6 @@
             <dd class="text-gray-700 leading-relaxed">{{ provider.profile?.description || t('providers.noDescription') }}</dd>
           </div>
 
-          <!-- Kbis document -->
           <div class="col-span-2">
             <dt class="text-xs text-gray-400 uppercase font-medium mb-2">Document officiel (Kbis)</dt>
             <dd>

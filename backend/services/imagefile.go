@@ -10,7 +10,6 @@ import (
 	"strings"
 )
 
-// dataURIExt maps a data-URI mime type to a file extension.
 var dataURIExt = map[string]string{
 	"image/jpeg": ".jpg",
 	"image/jpg":  ".jpg",
@@ -19,23 +18,16 @@ var dataURIExt = map[string]string{
 	"image/gif":  ".gif",
 }
 
-// SaveDataURIImage decodes a base64 data-URI ("data:image/jpeg;base64,...") and
-// writes it as a file under dir, returning its public URL ("<urlPrefix>/<file>").
-//
-// If s is empty or is NOT a data URI (e.g. already a "/uploads/..." URL or an
-// http URL), it is returned unchanged with converted=false. This makes the call
-// idempotent and safe to run over already-migrated values.
 func SaveDataURIImage(s, dir, urlPrefix string) (out string, converted bool, err error) {
 	if s == "" || !strings.HasPrefix(s, "data:") {
 		return s, false, nil
 	}
 
-	// Split "data:<mime>;base64,<payload>".
 	comma := strings.IndexByte(s, ',')
 	if comma < 0 {
 		return s, false, fmt.Errorf("data URI sans virgule")
 	}
-	header := s[5:comma] // strip leading "data:"
+	header := s[5:comma]
 	payload := s[comma+1:]
 
 	mime := header

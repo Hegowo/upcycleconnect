@@ -2,7 +2,6 @@
   <div class="bg-[#f7f9ff] min-h-screen pb-16">
     <div class="max-w-[900px] mx-auto px-4 sm:px-6 py-10">
 
-      <!-- Header -->
       <div class="mb-8">
         <button @click="router.push('/communaute')"
           class="text-sm text-[#40617f] hover:text-[#006d35] flex items-center gap-1.5 mb-4 transition">
@@ -27,7 +26,7 @@
       </div>
 
       <template v-if="!loading">
-        <!-- Action bar -->
+
         <div class="flex items-center justify-between mb-5">
           <p class="text-[#64748b] text-sm">{{ total }} {{ t('public.community.threads') }}</p>
           <button v-if="userAuth.isLoggedIn" @click="openNewThread"
@@ -41,7 +40,6 @@
           </RouterLink>
         </div>
 
-        <!-- Threads list -->
         <div v-if="threads.length === 0" class="text-center py-16 text-[#40617f]">
           <ChatBubbleLeftEllipsisIcon class="w-12 h-12 mx-auto mb-3 text-[#d1d5db]" />
           <p class="text-sm">{{ t('public.community.noThreadsInCategory') }}</p>
@@ -54,7 +52,6 @@
             :to="`/communaute/forum/${slug}/${thread.id}`"
             class="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition flex items-center gap-4 group">
 
-            <!-- Pinned / Locked indicators -->
             <div class="shrink-0 w-9 h-9 rounded-full bg-[#f1f5f9] flex items-center justify-center text-sm font-bold text-[#40617f]">
               {{ authorInitial(thread.author) }}
             </div>
@@ -82,7 +79,6 @@
           </RouterLink>
         </div>
 
-        <!-- Pagination -->
         <div v-if="totalPages > 1" class="flex justify-center gap-2">
           <button v-for="p in totalPages" :key="p" @click="goPage(p)"
             :class="[
@@ -97,7 +93,6 @@
       </template>
     </div>
 
-    <!-- New Thread Modal -->
     <div v-if="showModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" @click.self="showModal = false">
       <div class="bg-white rounded-2xl p-6 w-full max-w-lg shadow-xl">
         <div class="flex items-center justify-between mb-5">

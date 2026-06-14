@@ -11,9 +11,6 @@ import (
 	"gorm.io/gorm"
 )
 
-// Seed inserts baseline rows required for a fresh deployment to function:
-// roles, the two built-in locales, and a default super-admin if none exists.
-// It is idempotent — safe to run on every boot.
 func Seed(db *gorm.DB) {
 	seedRoles(db)
 	seedLocales(db)
@@ -30,8 +27,6 @@ func seedRoles(db *gorm.DB) {
 	}
 }
 
-// seedLocales registers FR/EN as built-in languages so they appear in the
-// admin Langues page. Their actual message trees are bundled in the frontend.
 func seedLocales(db *gorm.DB) {
 	builtins := []models.Locale{
 		{Code: "fr", Name: "Français", Enabled: true, Builtin: true, Messages: "{}"},
@@ -46,16 +41,13 @@ func seedLocales(db *gorm.DB) {
 	}
 }
 
-// seedDefaultAdmin creates a super-admin from env vars (SEED_ADMIN_EMAIL / SEED_ADMIN_PASSWORD)
-// only if no super-admin exists yet. Lets a fresh deployment be administered out of the box.
 func seedDefaultAdmin(db *gorm.DB) {
 	email := os.Getenv("SEED_ADMIN_EMAIL")
 	password := os.Getenv("SEED_ADMIN_PASSWORD")
 	if email == "" || password == "" {
-		return // opt-in only
+		return
 	}
 
-	// Skip if any super-admin already exists.
 	var superCount int64
 	db.Table("user_roles").
 		Joins("JOIN roles ON roles.id = user_roles.role_id").

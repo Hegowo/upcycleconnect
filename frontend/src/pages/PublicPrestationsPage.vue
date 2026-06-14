@@ -84,7 +84,6 @@
       </div>
     </section>
 
-    <!-- Campagnes sponsorisées — affichées seulement sans filtre prestataire -->
     <SponsoredCampaigns v-if="!providerFilter" wrapper-class="pb-8" />
 
     <section class="px-4 sm:px-6 pb-12 sm:pb-16 max-w-[1280px] mx-auto">

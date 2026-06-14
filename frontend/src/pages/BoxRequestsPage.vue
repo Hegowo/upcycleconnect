@@ -1,6 +1,6 @@
 <template>
   <div class="space-y-6">
-    
+
     <div class="flex items-start justify-between gap-3">
       <div>
         <h2 class="text-xl sm:text-2xl font-bold text-[#001d32]">Demandes de Dépôt</h2>
@@ -11,7 +11,6 @@
       </span>
     </div>
 
-    
     <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
       <div class="relative flex-1">
         <MagnifyingGlassIcon class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -36,10 +35,8 @@
       </div>
     </div>
 
-    
     <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
 
-      
       <div class="lg:col-span-2" :class="selectedRequest ? 'hidden lg:block' : ''">
         <div class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm overflow-hidden">
           <div class="px-5 py-4 border-b border-[#f1f5f9]">
@@ -47,18 +44,15 @@
             <p class="text-xs text-gray-400 mt-0.5">{{ meta.total }} demandes au total</p>
           </div>
 
-          
           <div v-if="loading" class="flex items-center justify-center py-12">
             <div class="w-6 h-6 border-2 border-[#006d35] border-t-transparent rounded-full animate-spin"></div>
           </div>
 
-          
           <div v-else-if="requests.length === 0" class="flex flex-col items-center justify-center py-12 text-gray-400">
             <InboxIcon class="w-10 h-10 mb-2 text-gray-300" />
             <p class="text-sm">Aucune demande</p>
           </div>
 
-          
           <div v-else class="divide-y divide-[#f8fafc] max-h-[600px] overflow-y-auto">
             <div
               v-for="req in requests"
@@ -86,7 +80,6 @@
             </div>
           </div>
 
-          
           <div v-if="meta.last_page > 1" class="flex items-center justify-between px-5 py-3 border-t border-[#f1f5f9]">
             <button @click="changePage(meta.current_page - 1)" :disabled="meta.current_page <= 1" class="text-xs text-[#40617f] disabled:opacity-40 hover:text-[#006d35] transition">← Précédent</button>
             <span class="text-xs text-gray-400">{{ meta.current_page }} / {{ meta.last_page }}</span>
@@ -95,7 +88,6 @@
         </div>
       </div>
 
-      
       <div class="lg:col-span-3" ref="detailPanel">
         <div v-if="!selectedRequest" class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm flex items-center justify-center h-96">
           <div class="text-center text-gray-400">
@@ -106,14 +98,14 @@
         </div>
 
         <div v-else class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm overflow-hidden">
-          
+
           <div class="lg:hidden px-4 py-2 border-b border-[#f1f5f9]">
             <button @click="selectedRequest = null" class="flex items-center gap-1.5 text-sm text-[#40617f] font-medium">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
               Retour à la liste
             </button>
           </div>
-          
+
           <div class="px-6 py-4 border-b border-[#f1f5f9] flex items-center justify-between">
             <div>
               <h3 class="font-semibold text-[#001d32]">{{ selectedRequest.title }}</h3>
@@ -125,7 +117,7 @@
           </div>
 
           <div class="p-6 space-y-5">
-            
+
             <div>
               <p class="text-xs font-semibold text-[#6b7280] uppercase tracking-wider mb-3">Informations</p>
               <div class="grid grid-cols-2 sm:grid-cols-2 gap-3">
@@ -149,7 +141,6 @@
               </div>
             </div>
 
-            <!-- Photos -->
             <div v-if="selectedRequest.photo1 || selectedRequest.photo2 || selectedRequest.photo3">
               <p class="text-xs font-semibold text-[#6b7280] uppercase tracking-wider mb-2">Photos</p>
               <div class="flex gap-2">
@@ -168,13 +159,11 @@
               <p class="text-sm text-gray-600 bg-[#f8fafc] rounded-xl p-3 leading-relaxed">{{ selectedRequest.description }}</p>
             </div>
 
-            
             <div v-if="selectedRequest.history">
               <p class="text-xs font-semibold text-[#6b7280] uppercase tracking-wider mb-2">Historique de l'objet</p>
               <p class="text-sm text-gray-600 bg-[#f8fafc] rounded-xl p-3 leading-relaxed">{{ selectedRequest.history }}</p>
             </div>
 
-            
             <div v-if="selectedRequest.carbon_savings">
               <p class="text-xs font-semibold text-[#6b7280] uppercase tracking-wider mb-3">Impact Environnemental</p>
               <div class="rounded-xl p-3 text-center" style="background:#f0fdf4;">
@@ -191,13 +180,11 @@
               </div>
             </div>
 
-            
             <div v-if="selectedRequest.validation_note && selectedRequest.status !== 'pending'">
               <p class="text-xs font-semibold text-[#6b7280] uppercase tracking-wider mb-2">Note de validation</p>
               <p class="text-sm text-gray-600 bg-[#f8fafc] rounded-xl p-3">{{ selectedRequest.validation_note }}</p>
             </div>
 
-            
             <template v-if="selectedRequest.status === 'pending'">
               <div>
                 <p class="text-xs font-semibold text-[#6b7280] uppercase tracking-wider mb-2">Note de validation</p>
@@ -209,7 +196,6 @@
                 ></textarea>
               </div>
 
-              
               <p v-if="actionError" class="text-xs text-red-500">{{ actionError }}</p>
 
               <div class="flex items-center gap-3 pt-2">
@@ -239,7 +225,6 @@
     </div>
   </div>
 
-  <!-- Photo lightbox -->
   <Teleport to="body">
     <div v-if="lightboxSrc" class="fixed inset-0 z-50 bg-black/80 flex items-center justify-center" @click="lightboxSrc = null">
       <img :src="lightboxSrc" class="max-w-[90vw] max-h-[90vh] rounded-2xl object-contain shadow-2xl" @click.stop />

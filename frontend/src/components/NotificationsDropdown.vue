@@ -101,7 +101,7 @@ import {
 import { adminNotifications, userNotifications } from '@/services/notifications'
 
 const props = defineProps({
-  variant: { type: String, default: 'admin' }, // 'admin' | 'user'
+  variant: { type: String, default: 'admin' },
   isDark:  { type: Boolean, default: false },
 })
 
@@ -154,9 +154,7 @@ async function onItemClick(n) {
   if (n.link) {
     open.value = false
     const link = String(n.link).trim()
-    // External / absolute links (http(s)://, //, mailto:, tel:) must open as-is,
-    // not be pushed through vue-router (which would treat them as a relative path
-    // and append them to the current URL, e.g. /admin/https://…).
+
     if (/^(https?:)?\/\//i.test(link) || link.startsWith('mailto:') || link.startsWith('tel:')) {
       window.open(link, '_blank', 'noopener')
     } else {
@@ -179,7 +177,6 @@ onUnmounted(() => {
   document.removeEventListener('mousedown', onDocClick)
 })
 
-// ── Helpers ────────────────────────────────────────────────────────────────
 function iconFor(type) {
   if (type.startsWith('payment'))    return BanknotesIcon
   if (type.startsWith('quote'))      return DocumentTextIcon
@@ -214,7 +211,6 @@ function formatTime(iso) {
   return d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })
 }
 
-// Close on route change
 watch(() => router.currentRoute.value.fullPath, () => { open.value = false })
 </script>
 

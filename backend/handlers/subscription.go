@@ -17,7 +17,6 @@ type SubscriptionHandler struct {
 	Audit  *services.AuditService
 }
 
-// Plans returns the available subscription plans (public, no auth needed).
 func (h *SubscriptionHandler) Plans(c *gin.Context) {
 	plans := []gin.H{}
 	for key, plan := range models.SubscriptionPlans {
@@ -31,7 +30,6 @@ func (h *SubscriptionHandler) Plans(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": plans})
 }
 
-// MySubscription returns the connected provider's current subscription.
 func (h *SubscriptionHandler) MySubscription(c *gin.Context) {
 	user := middleware.GetAuthUser(c)
 	if user == nil {
@@ -40,14 +38,12 @@ func (h *SubscriptionHandler) MySubscription(c *gin.Context) {
 	}
 	var sub models.Subscription
 	if err := h.DB.Where("user_id = ?", user.ID).First(&sub).Error; err != nil {
-		// No subscription yet — return empty active state
 		c.JSON(http.StatusOK, gin.H{"subscription": nil})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"subscription": models.ToSubscriptionResponse(&sub)})
 }
 
-// Checkout creates a Stripe Checkout session for the requested plan.
 func (h *SubscriptionHandler) Checkout(c *gin.Context) {
 	user := middleware.GetAuthUser(c)
 	if user == nil {
@@ -63,7 +59,6 @@ func (h *SubscriptionHandler) Checkout(c *gin.Context) {
 		return
 	}
 
-	// Already subscribed and active?
 	var existing models.Subscription
 	if h.DB.Where("user_id = ? AND status = ?", user.ID, "active").First(&existing).Error == nil {
 		c.JSON(http.StatusConflict, gin.H{"message": "Tu as déjà un abonnement actif."})
@@ -91,7 +86,6 @@ func (h *SubscriptionHandler) Checkout(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"checkout_url": sess.URL, "session_id": sess.ID})
 }
 
-// Cancel cancels the active subscription.
 func (h *SubscriptionHandler) Cancel(c *gin.Context) {
 	user := middleware.GetAuthUser(c)
 	if user == nil {
@@ -111,8 +105,6 @@ func (h *SubscriptionHandler) Cancel(c *gin.Context) {
 	h.Audit.Log(c, "subscription.cancelled", "Subscription", &sub.ID, nil, nil)
 	c.JSON(http.StatusOK, gin.H{"message": "Abonnement annulé."})
 }
-
-// ─── Admin ──────────────────────────────────────────────────────────────────
 
 func (h *SubscriptionHandler) AdminIndex(c *gin.Context) {
 	var subs []models.Subscription

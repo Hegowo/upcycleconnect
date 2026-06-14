@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/stripe/stripe-go/v76"
-	stripeSub "github.com/stripe/stripe-go/v76/subscription"
 	"github.com/stripe/stripe-go/v76/checkout/session"
+	stripeSub "github.com/stripe/stripe-go/v76/subscription"
 	"github.com/stripe/stripe-go/v76/webhook"
 
 	"upcycleconnect/backend/config"
@@ -67,21 +67,20 @@ func (s *StripeService) CreateCheckoutSession(p CheckoutParams) (*stripe.Checkou
 }
 
 type SubscriptionCheckoutParams struct {
-	UserID    uint
-	UserEmail string
-	Plan      string // basic | premium
-	Label     string
+	UserID      uint
+	UserEmail   string
+	Plan        string
+	Label       string
 	AmountCents int64
 }
 
-// CreateSubscriptionCheckout creates a Stripe Checkout in subscription mode for a provider plan.
 func (s *StripeService) CreateSubscriptionCheckout(p SubscriptionCheckoutParams) (*stripe.CheckoutSession, error) {
 	if s.cfg.StripeSecret == "" || s.cfg.StripeSecret == "sk_test_local_dummy" {
 		return nil, fmt.Errorf("Stripe non configuré — ajoute ta clé dans le .env pour activer les abonnements")
 	}
 	stripe.Key = s.cfg.StripeSecret
 	successURL := fmt.Sprintf("%s/profil/pro/abonnement?success=1&session_id={CHECKOUT_SESSION_ID}", s.cfg.AppURL)
-	cancelURL  := fmt.Sprintf("%s/profil/pro/abonnement?cancelled=1", s.cfg.AppURL)
+	cancelURL := fmt.Sprintf("%s/profil/pro/abonnement?cancelled=1", s.cfg.AppURL)
 	params := &stripe.CheckoutSessionParams{
 		Mode:          stripe.String(string(stripe.CheckoutSessionModeSubscription)),
 		SuccessURL:    stripe.String(successURL),
@@ -110,7 +109,6 @@ func (s *StripeService) CreateSubscriptionCheckout(p SubscriptionCheckoutParams)
 	return session.New(params)
 }
 
-// CancelSubscription cancels a Stripe subscription immediately.
 func (s *StripeService) CancelSubscription(stripeSubID string) error {
 	if s.cfg.StripeSecret == "" || s.cfg.StripeSecret == "sk_test_local_dummy" {
 		return fmt.Errorf("Stripe non configuré")
@@ -122,14 +120,13 @@ func (s *StripeService) CancelSubscription(stripeSubID string) error {
 	return err
 }
 
-// CreateCampaignCheckout creates a one-time Stripe Checkout for a publicity campaign.
 func (s *StripeService) CreateCampaignCheckout(userID, campaignID uint, userEmail, title string, amountCents int64) (*stripe.CheckoutSession, error) {
 	if s.cfg.StripeSecret == "" || s.cfg.StripeSecret == "sk_test_local_dummy" {
 		return nil, fmt.Errorf("Stripe non configuré — ajoute ta clé dans le .env")
 	}
 	stripe.Key = s.cfg.StripeSecret
 	successURL := fmt.Sprintf("%s/profil/pro/campagnes?success=1&session_id={CHECKOUT_SESSION_ID}", s.cfg.AppURL)
-	cancelURL  := fmt.Sprintf("%s/profil/pro/campagnes?cancelled=1", s.cfg.AppURL)
+	cancelURL := fmt.Sprintf("%s/profil/pro/campagnes?cancelled=1", s.cfg.AppURL)
 	params := &stripe.CheckoutSessionParams{
 		Mode:          stripe.String(string(stripe.CheckoutSessionModePayment)),
 		SuccessURL:    stripe.String(successURL),
@@ -154,8 +151,6 @@ func (s *StripeService) CreateCampaignCheckout(userID, campaignID uint, userEmai
 	return session.New(params)
 }
 
-// CreateDepositCheckout starts a Stripe payment for buying a "vente" deposit on
-// the marketplace. Metadata type=deposit_purchase is dispatched by the webhook.
 func (s *StripeService) CreateDepositCheckout(providerID, depositID uint, userEmail, title string, amountCents int64) (*stripe.CheckoutSession, error) {
 	if s.cfg.StripeSecret == "" || s.cfg.StripeSecret == "sk_test_local_dummy" {
 		return nil, fmt.Errorf("Stripe non configuré — ajoute ta clé dans le .env")

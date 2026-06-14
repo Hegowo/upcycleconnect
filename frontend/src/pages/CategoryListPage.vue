@@ -1,6 +1,6 @@
 <template>
   <div class="space-y-6">
-    
+
     <div class="flex items-center justify-between gap-3">
       <div class="min-w-0">
         <h2 class="text-xl sm:text-2xl font-bold text-[#001d32] truncate">{{ t('categories.objectTitle') }}</h2>
@@ -16,12 +16,10 @@
       </RouterLink>
     </div>
 
-    
     <div v-if="loading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <div v-for="n in 8" :key="n" class="bg-white rounded-2xl border border-[#f1f5f9] h-48 animate-pulse"></div>
     </div>
 
-    
     <div v-else-if="!categories.length" class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm py-16 text-center">
       <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-3">
         <TagIcon class="w-6 h-6 text-gray-400" />
@@ -30,7 +28,6 @@
       <p class="text-gray-400 text-sm mt-1">{{ t('categories.createFirst') }}</p>
     </div>
 
-    
     <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <div
         v-for="cat in categories"
@@ -39,7 +36,7 @@
         :class="cat.is_active ? 'border-[#f1f5f9]' : 'border-gray-200 opacity-75'"
       >
         <div class="p-5">
-          
+
           <div class="flex items-start justify-between mb-4">
             <div class="w-12 h-12 rounded-xl flex items-center justify-center" :style="{ backgroundColor: catIconBg(cat) }">
               <component :is="catIcon(cat)" class="w-6 h-6" :style="{ color: catIconColor(cat) }" />
@@ -53,11 +50,9 @@
             </button>
           </div>
 
-          
           <h4 class="text-sm font-bold text-[#001d32] mb-1">{{ cat.name }}</h4>
           <p class="text-xs text-gray-400 mb-3 line-clamp-2">{{ cat.description || t('categories.noDescription') }}</p>
 
-          
           <div class="flex items-center justify-between mb-4">
             <span class="text-xs font-semibold px-2 py-0.5 rounded-full" :class="cat.is_active ? 'bg-[#dcfce7] text-[#166534]' : 'bg-gray-100 text-gray-500'">
               {{ cat.is_active ? t('categories.active') : t('categories.inactive') }}
@@ -67,7 +62,6 @@
             </span>
           </div>
 
-          
           <div class="flex items-center gap-2 pt-3 border-t border-[#f8fafc]">
             <RouterLink
               :to="`/admin/categories/${cat.id}/edit`"
@@ -88,7 +82,6 @@
       </div>
     </div>
 
-    
     <div v-if="categories.length" class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm p-4">
       <div class="grid grid-cols-3 gap-3 sm:gap-6">
         <div class="text-center">

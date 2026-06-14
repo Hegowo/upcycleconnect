@@ -3,23 +3,21 @@ package models
 import "time"
 
 type ProviderProfile struct {
-	ID          uint       `gorm:"primaryKey" json:"id"`
-	UserID      uint       `gorm:"index" json:"user_id"`
-	CompanyName string     `gorm:"size:255" json:"company_name"`
-	Siret       *string    `gorm:"size:20" json:"siret"`
-	Description *string    `gorm:"type:text" json:"description"`
-	Website     *string    `gorm:"size:255" json:"website"`
-	Status      string     `gorm:"size:20;default:pending" json:"status"`
-	// KbisPath is the server-side path to the uploaded Kbis document (PDF or image).
-	// Kept permanently even after approval so admins can always consult it.
-	KbisPath    *string    `gorm:"size:500" json:"kbis_path"`
-	// OnboardingCompletedAt tracks whether the pro has been through the interactive
-	// setup wizard on /profil/pro. NULL = first time, wizard is shown.
+	ID          uint    `gorm:"primaryKey" json:"id"`
+	UserID      uint    `gorm:"index" json:"user_id"`
+	CompanyName string  `gorm:"size:255" json:"company_name"`
+	Siret       *string `gorm:"size:20" json:"siret"`
+	Description *string `gorm:"type:text" json:"description"`
+	Website     *string `gorm:"size:255" json:"website"`
+	Status      string  `gorm:"size:20;default:pending" json:"status"`
+
+	KbisPath *string `gorm:"size:500" json:"kbis_path"`
+
 	OnboardingCompletedAt *time.Time `json:"onboarding_completed_at"`
-	ApprovedAt  *time.Time `json:"approved_at"`
-	ApprovedBy  *uint      `json:"approved_by"`
-	CreatedAt   time.Time  `json:"created_at"`
-	UpdatedAt   time.Time  `json:"updated_at"`
+	ApprovedAt            *time.Time `json:"approved_at"`
+	ApprovedBy            *uint      `json:"approved_by"`
+	CreatedAt             time.Time  `json:"created_at"`
+	UpdatedAt             time.Time  `json:"updated_at"`
 }
 
 func (ProviderProfile) TableName() string {

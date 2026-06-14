@@ -6,16 +6,14 @@ import (
 	"gorm.io/gorm"
 )
 
-// Campaign is a paid publicity/promotion slot purchased by a provider.
-// Pricing: 100-500 €/mois/campagne. Admin validation required before activation.
 type Campaign struct {
 	ID              uint           `gorm:"primaryKey" json:"id"`
 	ProviderID      uint           `gorm:"index;not null" json:"provider_id"`
 	Title           string         `gorm:"size:200;not null" json:"title"`
 	Description     string         `gorm:"type:text" json:"description"`
 	ImageURL        *string        `gorm:"size:500" json:"image_url"`
-	BudgetCents     int64          `gorm:"not null" json:"budget_cents"` // 10000–50000
-	Status          string         `gorm:"size:20;default:draft;index" json:"status"` // draft | pending | active | rejected | ended
+	BudgetCents     int64          `gorm:"not null" json:"budget_cents"`
+	Status          string         `gorm:"size:20;default:draft;index" json:"status"`
 	RejectionReason *string        `gorm:"type:text" json:"rejection_reason"`
 	StartDate       *time.Time     `json:"start_date"`
 	EndDate         *time.Time     `json:"end_date"`
@@ -31,18 +29,17 @@ type Campaign struct {
 
 func (Campaign) TableName() string { return "campaigns" }
 
-// CampaignItem links a campaign to a prestation or an event it promotes.
 type CampaignItem struct {
 	ID         uint   `gorm:"primaryKey" json:"id"`
 	CampaignID uint   `gorm:"index;not null" json:"campaign_id"`
-	ItemType   string `gorm:"size:20;not null" json:"item_type"` // prestation | event
+	ItemType   string `gorm:"size:20;not null" json:"item_type"`
 	ItemID     uint   `gorm:"not null" json:"item_id"`
 }
 
 func (CampaignItem) TableName() string { return "campaign_items" }
 
 type CampaignItemRef struct {
-	Type string `json:"type"` // prestation | event
+	Type string `json:"type"`
 	ID   uint   `json:"id"`
 }
 
@@ -64,7 +61,9 @@ type CampaignResponse struct {
 
 func ToCampaignResponse(c *Campaign) CampaignResponse {
 	fmtDate := func(t *time.Time) *string {
-		if t == nil { return nil }
+		if t == nil {
+			return nil
+		}
 		s := t.UTC().Format(time.RFC3339)
 		return &s
 	}

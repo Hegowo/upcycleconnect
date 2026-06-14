@@ -25,7 +25,7 @@ type campaignPayload struct {
 	Title       string  `json:"title" binding:"required,min=3,max=200"`
 	Description string  `json:"description"`
 	ImageURL    *string `json:"image_url"`
-	// budget in euros, between 100 and 500
+
 	BudgetEuros   float64 `json:"budget_euros" binding:"required,min=100,max=500"`
 	StartDate     *string `json:"start_date"`
 	EndDate       *string `json:"end_date"`
@@ -33,8 +33,6 @@ type campaignPayload struct {
 	EventIDs      []uint  `json:"event_ids"`
 }
 
-// syncCampaignItems replaces a campaign's linked prestations/events.
-// Only items genuinely owned by the provider are linked (security).
 func (h *CampaignHandler) syncCampaignItems(campaignID, providerID uint, prestationIDs, eventIDs []uint) {
 	h.DB.Where("campaign_id = ?", campaignID).Delete(&models.CampaignItem{})
 
@@ -69,8 +67,6 @@ func parseCampaignDate(raw *string) *time.Time {
 	return &t
 }
 
-// ─── Provider CRUD ──────────────────────────────────────────────────────────
-
 func (h *CampaignHandler) MyCampaigns(c *gin.Context) {
 	user := middleware.GetAuthUser(c)
 	if user == nil {
@@ -93,11 +89,11 @@ func (h *CampaignHandler) CreateCampaign(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"message": "Non authentifié"})
 		return
 	}
-	// Premium feature: campaigns (project highlighting) require an active Premium subscription.
+
 	if !h.hasPremiumSubscription(user.ID) {
 		c.JSON(http.StatusPaymentRequired, gin.H{
-			"message":  "La gestion de campagnes publicitaires nécessite un abonnement Premium.",
-			"upgrade":  "/profil/pro/abonnement",
+			"message": "La gestion de campagnes publicitaires nécessite un abonnement Premium.",
+			"upgrade": "/profil/pro/abonnement",
 		})
 		return
 	}
@@ -180,7 +176,6 @@ func (h *CampaignHandler) DeleteCampaign(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Campagne supprimée"})
 }
 
-// Submit sends the campaign to admin validation and triggers Stripe checkout.
 func (h *CampaignHandler) SubmitCampaign(c *gin.Context) {
 	user := middleware.GetAuthUser(c)
 	if user == nil {
@@ -199,10 +194,9 @@ func (h *CampaignHandler) SubmitCampaign(c *gin.Context) {
 	}
 	sess, err := h.Stripe.CreateCampaignCheckout(user.ID, camp.ID, user.Email, camp.Title, camp.BudgetCents)
 	if err != nil {
-		// If Stripe is not configured (local dev), mark pending directly
 		h.DB.Model(&camp).Updates(map[string]interface{}{"status": "pending"})
 		c.JSON(http.StatusOK, gin.H{
-			"message":     fmt.Sprintf("Campagne soumise (mode hors-ligne : %s)", err.Error()),
+			"message":      fmt.Sprintf("Campagne soumise (mode hors-ligne : %s)", err.Error()),
 			"checkout_url": nil,
 		})
 		return
@@ -215,9 +209,6 @@ func (h *CampaignHandler) SubmitCampaign(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"checkout_url": sess.URL, "session_id": sess.ID})
 }
 
-// ─── Public ─────────────────────────────────────────────────────────────────
-
-// ActiveCampaigns returns currently running, admin-approved campaigns for display in listings.
 func (h *CampaignHandler) ActiveCampaigns(c *gin.Context) {
 	var campaigns []models.Campaign
 	now := time.Now()
@@ -234,8 +225,6 @@ func (h *CampaignHandler) ActiveCampaigns(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": resp})
 }
 
-// PublicShow returns one active campaign with its promoted prestations and events resolved,
-// so the public detail page can render them. Only active campaigns are visible.
 func (h *CampaignHandler) PublicShow(c *gin.Context) {
 	id, _ := strconv.ParseUint(c.Param("id"), 10, 64)
 	var camp models.Campaign
@@ -270,8 +259,6 @@ func (h *CampaignHandler) PublicShow(c *gin.Context) {
 		"events":      models.ToEventResponses(events),
 	})
 }
-
-// ─── Admin ──────────────────────────────────────────────────────────────────
 
 func (h *CampaignHandler) AdminIndex(c *gin.Context) {
 	var campaigns []models.Campaign
@@ -316,7 +303,6 @@ func (h *CampaignHandler) AdminUpdateStatus(c *gin.Context) {
 	c.JSON(http.StatusOK, models.ToCampaignResponse(&camp))
 }
 
-// hasPremiumSubscription returns true if the user has an active Premium subscription.
 func (h *CampaignHandler) hasPremiumSubscription(userID uint) bool {
 	var sub models.Subscription
 	if err := h.DB.Where("user_id = ? AND status = ? AND plan = ?", userID, "active", "premium").

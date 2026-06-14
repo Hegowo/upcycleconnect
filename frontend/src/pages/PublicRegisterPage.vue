@@ -401,7 +401,6 @@
                       </div>
                     </Transition>
 
-                    <!-- Kbis upload -->
                     <div>
                       <label class="block text-xs font-medium text-[#001d32] mb-1">
                         Document officiel (Kbis, extrait RCS...) <span class="text-red-400">*</span>
@@ -749,7 +748,6 @@ const strengthLabel = computed(() => [
 ][passwordStrength.value])
 
 async function handleRegister() {
-  // Validate Kbis for pro accounts
   if (accountType.value === 'provider' && !kbisFile.value) {
     kbisError.value = 'Le document officiel (Kbis) est obligatoire pour une inscription prestataire.'
     return
@@ -766,9 +764,6 @@ async function handleRegister() {
     const fullAddress = addressParts.length ? addressParts.join(' ') : null
 
     if (accountType.value === 'provider') {
-      // Send everything — including the Kbis file — in one multipart request. A new
-      // account is "pending" and cannot authenticate, so uploading the Kbis afterwards
-      // would be impossible; the backend stores it while creating the provider profile.
       const fd = new FormData()
       fd.append('first_name',   form.value.firstName)
       fd.append('last_name',    form.value.lastName)

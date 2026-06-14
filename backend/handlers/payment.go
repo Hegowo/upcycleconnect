@@ -30,10 +30,9 @@ type PaymentHandler struct {
 	Notifications *services.NotificationService
 }
 
-
 type reserveRequest struct {
 	Notes     *string `json:"notes"`
-	Signature string  `json:"signature"` // base64 PNG, required for paid prestations
+	Signature string  `json:"signature"`
 }
 
 func (h *PaymentHandler) Reserve(c *gin.Context) {
@@ -57,7 +56,6 @@ func (h *PaymentHandler) Reserve(c *gin.Context) {
 		return
 	}
 
-	// A provider cannot reserve or request a quote on their own prestation.
 	if prestation.ProviderID != nil && *prestation.ProviderID == user.ID {
 		c.JSON(http.StatusForbidden, gin.H{"message": "Vous ne pouvez pas réserver votre propre prestation."})
 		return
@@ -83,7 +81,6 @@ func (h *PaymentHandler) Reserve(c *gin.Context) {
 	}
 	amountCents := int64(math.Round(amountFloat * 100))
 
-	// Signature obligatoire pour toute prestation payante
 	sigBytes, sigErr := decodeSignaturePNG(req.Signature)
 	if sigErr != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"message": "Signature requise : " + sigErr.Error()})
@@ -103,8 +100,6 @@ func (h *PaymentHandler) Reserve(c *gin.Context) {
 		return
 	}
 
-	// Persist signed contract before redirecting to Stripe — proves engagement
-	// even if the user abandons mid-payment.
 	contract, cerr := createSignedContract(h.DB, h.PDF, user, &prestation,
 		reservation.ID, amountCents, "eur", sigBytes, c.ClientIP())
 	if cerr != nil {
@@ -142,7 +137,6 @@ func (h *PaymentHandler) Reserve(c *gin.Context) {
 		"contract_id":   contract.ID,
 	})
 
-	// Notify the provider that a new reservation is incoming (pending payment).
 	if prestation.ProviderID != nil {
 		link := fmt.Sprintf("/profil/reservations/%d", reservation.ID)
 		h.Notifications.MustNotify(*prestation.ProviderID, "reservation.received",
@@ -152,19 +146,14 @@ func (h *PaymentHandler) Reserve(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"reservation_id": reservation.ID,
-		"contract_id":    contract.ID,
+		"reservation_id":  reservation.ID,
+		"contract_id":     contract.ID,
 		"contract_number": contract.Number,
-		"checkout_url":   sess.URL,
-		"session_id":     sess.ID,
+		"checkout_url":    sess.URL,
+		"session_id":      sess.ID,
 	})
 }
 
-// AcceptQuote turns a quote_requested reservation into a signed contract + Stripe checkout.
-// The client signs the same legal text as a direct purchase; the amount is locked to the issued quote.
-// UpdateQuote lets the PROVIDER set/revise the quote amount (and an optional note)
-// before the client signs. It updates the quote invoice, regenerates the PDF and
-// moves the reservation to "quote_issued", then notifies the client.
 func (h *PaymentHandler) UpdateQuote(c *gin.Context) {
 	user := middleware.GetAuthUser(c)
 	if user == nil {
@@ -214,7 +203,6 @@ func (h *PaymentHandler) UpdateQuote(c *gin.Context) {
 		return
 	}
 
-	// Build the line items and compute the total. Falls back to a single amount.
 	var pdfLines []services.InvoiceLine
 	var lineItemsForDB []map[string]interface{}
 	var amountCents int64
@@ -336,7 +324,6 @@ func (h *PaymentHandler) AcceptQuote(c *gin.Context) {
 		return
 	}
 
-	// Double-signature guard: refuse if a contract already exists for this reservation.
 	var existing models.Contract
 	if err := h.DB.Where("reservation_id = ?", reservation.ID).First(&existing).Error; err == nil {
 		c.JSON(http.StatusConflict, gin.H{"message": "Un contrat existe déjà pour ce devis", "contract_id": existing.ID})
@@ -532,7 +519,7 @@ func (h *PaymentHandler) Webhook(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{"message": "Payload session invalide"})
 			return
 		}
-		// Route based on the metadata.type set when the checkout was created.
+
 		switch session.Metadata["type"] {
 		case "subscription":
 			if err := h.fulfillSubscription(&session); err != nil {
@@ -554,7 +541,7 @@ func (h *PaymentHandler) Webhook(c *gin.Context) {
 			}
 		}
 	case "customer.subscription.deleted":
-		// Subscription cancelled on Stripe's side — mark inactive locally.
+
 		var sub stripe.Subscription
 		if err := json.Unmarshal(event.Data.Raw, &sub); err == nil {
 			h.DB.Model(&models.Subscription{}).
@@ -573,8 +560,6 @@ func (h *PaymentHandler) Webhook(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"received": true})
 }
 
-// fulfillDepositPurchase marks a "vente" marketplace purchase paid and reserves
-// the deposit for the buyer. Idempotent.
 func (h *PaymentHandler) fulfillDepositPurchase(session *stripe.CheckoutSession) error {
 	var purchase models.DepositPurchase
 	if err := h.DB.Where("stripe_session_id = ?", session.ID).First(&purchase).Error; err != nil {
@@ -599,8 +584,6 @@ func (h *PaymentHandler) fulfillDepositPurchase(session *stripe.CheckoutSession)
 	return nil
 }
 
-// fulfillSubscription activates a provider's subscription after a successful Stripe Checkout
-// and generates the first monthly invoice PDF.
 func (h *PaymentHandler) fulfillSubscription(session *stripe.CheckoutSession) error {
 	if session.PaymentStatus != "" &&
 		session.PaymentStatus != stripe.CheckoutSessionPaymentStatusPaid &&
@@ -632,14 +615,13 @@ func (h *PaymentHandler) fulfillSubscription(session *stripe.CheckoutSession) er
 		custID = session.Customer.ID
 	}
 
-	// Idempotency: if a subscription already exists for this stripe sub, do nothing.
 	var existing models.Subscription
 	if subID != "" && h.DB.Where("stripe_subscription_id = ?", subID).First(&existing).Error == nil {
 		return nil
 	}
 
 	periodEnd := time.Now().AddDate(0, 1, 0)
-	// Upsert: one subscription row per user.
+
 	var sub models.Subscription
 	if h.DB.Where("user_id = ?", userID).First(&sub).Error == nil {
 		h.DB.Model(&sub).Updates(map[string]interface{}{
@@ -661,7 +643,6 @@ func (h *PaymentHandler) fulfillSubscription(session *stripe.CheckoutSession) er
 		h.DB.Create(&sub)
 	}
 
-	// Generate the subscription invoice PDF.
 	number := fmt.Sprintf("ABO-%d-%06d", time.Now().Year(), sub.ID)
 	pdfPath, perr := h.PDF.Generate(services.InvoiceData{
 		Number:          number,
@@ -702,8 +683,6 @@ func (h *PaymentHandler) fulfillSubscription(session *stripe.CheckoutSession) er
 	return nil
 }
 
-// fulfillCampaign records the campaign payment. The campaign stays "pending"
-// until an admin validates it (it then becomes "active").
 func (h *PaymentHandler) fulfillCampaign(session *stripe.CheckoutSession) error {
 	if session.PaymentStatus != "" &&
 		session.PaymentStatus != stripe.CheckoutSessionPaymentStatusPaid &&
@@ -719,15 +698,14 @@ func (h *PaymentHandler) fulfillCampaign(session *stripe.CheckoutSession) error 
 		return fmt.Errorf("campagne introuvable: %w", err)
 	}
 	if camp.PaidAt != nil {
-		return nil // already processed
+		return nil
 	}
 	now := time.Now()
 	h.DB.Model(&camp).Updates(map[string]interface{}{
 		"paid_at": &now,
-		"status":  "pending", // awaiting admin validation
+		"status":  "pending",
 	})
 
-	// Generate an invoice for the campaign payment.
 	var user models.User
 	h.DB.First(&user, camp.ProviderID)
 	number := fmt.Sprintf("PUB-%d-%06d", time.Now().Year(), camp.ID)
@@ -769,9 +747,6 @@ func (h *PaymentHandler) fulfillCampaign(session *stripe.CheckoutSession) error 
 }
 
 func (h *PaymentHandler) fulfillReservation(session *stripe.CheckoutSession) error {
-	// For async payment methods (SEPA Debit, Bancontact, bank redirects),
-	// checkout.session.completed fires before funds clear. Wait for the
-	// async_payment_succeeded event (which comes with payment_status=paid).
 	if session.PaymentStatus != "" &&
 		session.PaymentStatus != stripe.CheckoutSessionPaymentStatusPaid &&
 		session.PaymentStatus != stripe.CheckoutSessionPaymentStatusNoPaymentRequired {
@@ -782,17 +757,12 @@ func (h *PaymentHandler) fulfillReservation(session *stripe.CheckoutSession) err
 	reservation, err := h.lookupReservation(session)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			// Permanent miss: webhook misconfigured or Save side-effect was lost.
-			// Returning nil => 200 to Stripe, which stops retries.
 			log.Printf("[webhook] no reservation for session=%s cref=%q — acking to stop retries", session.ID, session.ClientReferenceID)
 			return nil
 		}
 		return fmt.Errorf("lookup réservation: %w", err)
 	}
 
-	// Idempotency: use invoice-row existence as the source of truth.
-	// A retry that runs after the invoice is already stored returns cleanly;
-	// a retry after a crash *before* the invoice was stored re-runs the full path.
 	var existing models.Invoice
 	switch err := h.DB.Where("reservation_id = ? AND type = ?", reservation.ID, "invoice").
 		First(&existing).Error; {
@@ -840,15 +810,12 @@ func (h *PaymentHandler) fulfillReservation(session *stripe.CheckoutSession) err
 		return fmt.Errorf("enregistrement facture: %w", err)
 	}
 
-	// Activate the matching contract (best-effort — contract exists since Reserve created it).
 	h.DB.Model(&models.Contract{}).
 		Where("reservation_id = ?", reservation.ID).
 		Update("status", "active")
 
-	// Flip the reservation to paid only after the invoice is safely persisted.
-	// If this Save fails, the next Stripe retry finds the invoice row and early-returns above.
 	reservation.Status = "paid"
-	// Freeze the platform commission (5-10%) and the provider's net share at payment time.
+
 	commission, net := models.ComputeCommission(reservation.AmountCents)
 	reservation.CommissionCents = commission
 	reservation.NetCents = net
@@ -872,7 +839,6 @@ func (h *PaymentHandler) fulfillReservation(session *stripe.CheckoutSession) err
 		)
 	}()
 
-	// In-app notifications: client + provider
 	if h.Notifications != nil {
 		reservationLink := fmt.Sprintf("/profil/reservations/%d", reservation.ID)
 		h.Notifications.MustNotify(reservation.UserID, "payment.confirmed",
@@ -898,10 +864,6 @@ func formatEUR(cents int64) string {
 	return fmt.Sprintf("%.2f €", float64(cents)/100)
 }
 
-// lookupReservation finds the reservation for a Stripe checkout session. It
-// first tries stripe_session_id, then falls back to ClientReferenceID — which
-// protects against a silent failure of the Save that persists the session ID
-// in Reserve().
 func (h *PaymentHandler) lookupReservation(session *stripe.CheckoutSession) (*models.Reservation, error) {
 	var reservation models.Reservation
 	err := h.DB.Preload("User").Preload("Prestation").
@@ -948,8 +910,7 @@ func (h *PaymentHandler) ShowReservation(c *gin.Context) {
 	}
 
 	var reservation models.Reservation
-	// Accessible to the customer who made it OR the provider who owns the prestation
-	// (so the provider can open a reservation / quote-request notification).
+
 	if err := h.DB.
 		Preload("Prestation").
 		Preload("Prestation.Category").
@@ -964,7 +925,6 @@ func (h *PaymentHandler) ShowReservation(c *gin.Context) {
 
 	resp := models.ToReservationResponse(&reservation)
 
-	// Latest quote with its line breakdown — visible to both the client and the provider.
 	var quoteData gin.H
 	var quoteInv models.Invoice
 	if err := h.DB.Where("reservation_id = ? AND type = ?", reservation.ID, "quote").

@@ -10,20 +10,20 @@ import (
 )
 
 type ContractData struct {
-	Number             string
-	SignedAt           time.Time
-	CustomerName       string
-	CustomerEmail      string
-	CustomerAddress    string
-	CustomerPhone      string
-	PrestationTitle    string
-	PrestationDesc     string
-	ProviderName       string
-	ProviderEmail      string
-	AmountCents        int64
-	Currency           string
-	SignedIP           string
-	SignaturePNG       []byte // raw PNG bytes
+	Number          string
+	SignedAt        time.Time
+	CustomerName    string
+	CustomerEmail   string
+	CustomerAddress string
+	CustomerPhone   string
+	PrestationTitle string
+	PrestationDesc  string
+	ProviderName    string
+	ProviderEmail   string
+	AmountCents     int64
+	Currency        string
+	SignedIP        string
+	SignaturePNG    []byte
 }
 
 func (s *PDFService) GenerateContract(data ContractData) (string, error) {
@@ -33,7 +33,6 @@ func (s *PDFService) GenerateContract(data ContractData) (string, error) {
 	pdf.AddPage()
 	tr := pdf.UnicodeTranslatorFromDescriptor("")
 
-	// ─── Header ───────────────────────────────────────────────────────────────
 	pdf.SetFont("Arial", "B", 22)
 	pdf.SetTextColor(0, 29, 50)
 	pdf.Cell(0, 10, tr("CONTRAT DE PRESTATION"))
@@ -49,7 +48,6 @@ func (s *PDFService) GenerateContract(data ContractData) (string, error) {
 	pdf.Line(20, pdf.GetY(), 190, pdf.GetY())
 	pdf.Ln(6)
 
-	// ─── Métadonnées ──────────────────────────────────────────────────────────
 	pdf.SetFont("Arial", "", 10)
 	pdf.SetTextColor(30, 41, 59)
 	pdf.CellFormat(45, 6, tr("Numéro de contrat :"), "", 0, "L", false, 0, "")
@@ -62,7 +60,6 @@ func (s *PDFService) GenerateContract(data ContractData) (string, error) {
 	pdf.CellFormat(0, 6, tr(data.SignedAt.Format("02/01/2006 à 15:04")), "", 1, "L", false, 0, "")
 	pdf.Ln(6)
 
-	// ─── Article 1 - Parties ──────────────────────────────────────────────────
 	sectionTitle(pdf, tr, "Article 1 — Entre les soussignés")
 
 	pdf.SetFont("Arial", "B", 10)
@@ -92,7 +89,6 @@ func (s *PDFService) GenerateContract(data ContractData) (string, error) {
 	pdf.MultiCell(0, 4.5, tr(clientLines), "", "L", false)
 	pdf.Ln(4)
 
-	// ─── Article 2 - Objet du contrat ─────────────────────────────────────────
 	sectionTitle(pdf, tr, "Article 2 — Objet du contrat")
 
 	pdf.SetFont("Arial", "", 9)
@@ -101,7 +97,6 @@ func (s *PDFService) GenerateContract(data ContractData) (string, error) {
 			"commandée par le Client auprès du Prestataire via la plateforme UpcycleConnect :"), "", "J", false)
 	pdf.Ln(3)
 
-	// Left vertical accent bar
 	desc := data.PrestationDesc
 	if desc == "" {
 		desc = "(Voir descriptif détaillé sur la fiche prestation en ligne.)"
@@ -125,7 +120,6 @@ func (s *PDFService) GenerateContract(data ContractData) (string, error) {
 	}
 	pdf.Ln(2)
 
-	// ─── Article 3 - Prix et modalités de paiement ────────────────────────────
 	sectionTitle(pdf, tr, "Article 3 — Prix et modalités de paiement")
 
 	pdf.SetFont("Arial", "", 9)
@@ -146,7 +140,6 @@ func (s *PDFService) GenerateContract(data ContractData) (string, error) {
 			"transmise au Client par email ainsi que dans son espace personnel."), "", "J", false)
 	pdf.Ln(3)
 
-	// ─── Article 4 - Exécution de la prestation ──────────────────────────────
 	sectionTitle(pdf, tr, "Article 4 — Exécution de la prestation")
 	pdf.SetFont("Arial", "", 9)
 	pdf.MultiCell(0, 4.5, tr(
@@ -156,7 +149,6 @@ func (s *PDFService) GenerateContract(data ContractData) (string, error) {
 			"au Prestataire toutes les informations nécessaires à la bonne exécution de la prestation."), "", "J", false)
 	pdf.Ln(3)
 
-	// ─── Article 5 - Droit de rétractation ────────────────────────────────────
 	sectionTitle(pdf, tr, "Article 5 — Droit de rétractation")
 	pdf.SetFont("Arial", "", 9)
 	pdf.MultiCell(0, 4.5, tr(
@@ -167,7 +159,6 @@ func (s *PDFService) GenerateContract(data ContractData) (string, error) {
 			"expressément à son droit de rétractation pour la part de prestation déjà exécutée."), "", "J", false)
 	pdf.Ln(3)
 
-	// ─── Article 6 - Données personnelles ─────────────────────────────────────
 	sectionTitle(pdf, tr, "Article 6 — Protection des données personnelles")
 	pdf.SetFont("Arial", "", 9)
 	pdf.MultiCell(0, 4.5, tr(
@@ -178,7 +169,6 @@ func (s *PDFService) GenerateContract(data ContractData) (string, error) {
 			"exerçable par email à dpo@upcycleconnect.xyz."), "", "J", false)
 	pdf.Ln(3)
 
-	// ─── Article 7 - Litiges ──────────────────────────────────────────────────
 	sectionTitle(pdf, tr, "Article 7 — Loi applicable et règlement des litiges")
 	pdf.SetFont("Arial", "", 9)
 	pdf.MultiCell(0, 4.5, tr(
@@ -188,7 +178,6 @@ func (s *PDFService) GenerateContract(data ContractData) (string, error) {
 			"médiation MEDICYS (www.medicys.fr)."), "", "J", false)
 	pdf.Ln(6)
 
-	// ─── Signature du Client ──────────────────────────────────────────────────
 	if pdf.GetY() > 220 {
 		pdf.AddPage()
 	}
@@ -202,10 +191,8 @@ func (s *PDFService) GenerateContract(data ContractData) (string, error) {
 			"un pour chaque partie, et fait foi entre elles."), "", "J", false)
 	pdf.Ln(5)
 
-	// Two side-by-side signature blocks
 	sigY := pdf.GetY()
 
-	// Left: Le Prestataire
 	pdf.SetFont("Arial", "B", 10)
 	pdf.SetXY(20, sigY)
 	pdf.Cell(80, 6, tr("Pour le Prestataire :"))
@@ -217,7 +204,7 @@ func (s *PDFService) GenerateContract(data ContractData) (string, error) {
 	pdf.SetTextColor(100, 116, 139)
 	pdf.Cell(80, 5, tr("(Signature électronique de la plateforme)"))
 	pdf.SetTextColor(30, 41, 59)
-	// Stamp box
+
 	pdf.SetDrawColor(0, 109, 53)
 	pdf.SetLineWidth(0.4)
 	pdf.Rect(20, sigY+18, 80, 24, "D")
@@ -227,7 +214,6 @@ func (s *PDFService) GenerateContract(data ContractData) (string, error) {
 	pdf.CellFormat(80, 8, tr("✓ UpcycleConnect"), "", 0, "C", false, 0, "")
 	pdf.SetTextColor(30, 41, 59)
 
-	// Right: Le Client
 	pdf.SetFont("Arial", "B", 10)
 	pdf.SetXY(110, sigY)
 	pdf.Cell(80, 6, tr("Pour le Client :"))
@@ -261,7 +247,6 @@ func (s *PDFService) GenerateContract(data ContractData) (string, error) {
 		"Conformément au règlement eIDAS (UE) n° 910/2014 et aux articles 1366 et 1367 du Code civil, "+
 			"la signature électronique apposée ci-dessus a la même valeur juridique qu'une signature manuscrite."), "", "L", false)
 
-	// ─── Footer ───────────────────────────────────────────────────────────────
 	pdf.SetY(-15)
 	pdf.SetFont("Arial", "I", 7)
 	pdf.SetTextColor(160, 174, 192)

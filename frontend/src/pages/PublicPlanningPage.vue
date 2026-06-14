@@ -2,7 +2,6 @@
   <div class="bg-[#f7f9ff] min-h-screen pb-16">
     <div class="max-w-[900px] mx-auto px-4 sm:px-6 py-10">
 
-      <!-- Header -->
       <div class="mb-8">
         <button @click="router.push('/profil')"
           class="text-sm text-[#40617f] hover:text-[#006d35] flex items-center gap-1.5 mb-4 transition">
@@ -15,13 +14,12 @@
         <p class="text-[#40617f] text-sm mt-1">{{ t('public.planning.subtitle') }}</p>
       </div>
 
-      <!-- Loading -->
       <div v-if="loading" class="flex items-center justify-center py-24">
         <div class="w-8 h-8 border-4 border-[#006d35] border-t-transparent rounded-full animate-spin" />
       </div>
 
       <template v-else>
-        <!-- Filter tabs -->
+
         <div class="flex gap-2 mb-6">
           <button v-for="f in filters" :key="f.value"
             @click="activeFilter = f.value"
@@ -35,19 +33,16 @@
           </button>
         </div>
 
-        <!-- Events list -->
         <div v-if="filteredItems.length" class="space-y-4 mb-10">
           <div v-for="item in filteredItems" :key="`${item.type}-${item.id}`"
             class="bg-white rounded-2xl p-5 flex gap-4 items-start shadow-sm hover:shadow-md transition">
 
-            <!-- Date badge -->
             <div class="shrink-0 w-14 h-14 rounded-xl flex flex-col items-center justify-center text-white font-jakarta font-bold"
               :class="item.past ? 'bg-[#9ca3af]' : 'bg-gradient-to-br from-[#006d35] to-[#1b8848]'">
               <span class="text-xs uppercase leading-none">{{ monthShort(item.startDate) }}</span>
               <span class="text-xl leading-tight">{{ dayNum(item.startDate) }}</span>
             </div>
 
-            <!-- Content -->
             <div class="flex-1 min-w-0">
               <div class="flex items-center gap-2 flex-wrap mb-1">
                 <span :class="[
@@ -85,7 +80,6 @@
               </p>
             </div>
 
-            <!-- Action -->
             <div class="shrink-0">
               <button v-if="item.type === 'event'"
                 @click="router.push(`/evenements/${item.eventId}`)"
@@ -101,13 +95,11 @@
           </div>
         </div>
 
-        <!-- Empty state -->
         <div v-else class="text-center py-16 text-[#40617f]">
           <CalendarDaysIcon class="w-12 h-12 mx-auto mb-3 text-[#d1d5db]" />
           <p class="text-sm">{{ emptyMessage }}</p>
         </div>
 
-        <!-- iCal subscription card -->
         <div class="bg-white rounded-2xl p-6 shadow-sm mt-4">
           <div class="flex items-center gap-3 mb-3">
             <div class="w-10 h-10 rounded-xl bg-[#edf4ff] flex items-center justify-center">
@@ -119,14 +111,13 @@
             </div>
           </div>
 
-          <!-- Token loading -->
           <div v-if="tokenLoading" class="flex items-center gap-2 text-sm text-[#40617f] py-2">
             <div class="w-4 h-4 border-2 border-[#006d35] border-t-transparent rounded-full animate-spin" />
             {{ t('common.loading') }}
           </div>
 
           <template v-else-if="calendarToken">
-            <!-- URL field -->
+
             <div class="mt-4">
               <label class="text-xs font-semibold text-[#40617f] uppercase tracking-wide mb-1 block">
                 {{ t('public.planning.calendarUrlLabel') }}
@@ -144,7 +135,6 @@
               </div>
             </div>
 
-            <!-- Apple Calendar button -->
             <a :href="webcalUrl"
               class="mt-3 inline-flex items-center gap-2 px-4 py-2 bg-[#001d32] text-white text-sm font-semibold rounded-xl hover:bg-[#003060] transition">
               <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
@@ -153,7 +143,6 @@
               {{ t('public.planning.calendarOpenApple') }}
             </a>
 
-            <!-- Instructions -->
             <details class="mt-4">
               <summary class="text-sm font-semibold text-[#40617f] cursor-pointer hover:text-[#006d35] transition">
                 {{ t('public.planning.calendarHowTitle') }}
@@ -165,7 +154,6 @@
               </ul>
             </details>
 
-            <!-- Regenerate -->
             <button @click="regenToken"
               class="mt-4 text-xs text-[#ef4444] hover:underline">
               {{ t('public.planning.calendarRegen') }}

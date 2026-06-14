@@ -3,17 +3,14 @@
     <Transition name="search-fade">
       <div v-if="isOpen" class="fixed inset-0 z-[200] flex items-start justify-center pt-[8vh] px-4">
 
-        <!-- Backdrop -->
         <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="close" />
 
-        <!-- Panel -->
         <div
           ref="panelRef"
           class="search-panel relative w-full max-w-[660px] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col"
           style="max-height: 80vh;"
         >
 
-          <!-- Input -->
           <div class="flex items-center gap-3 px-5 py-4 border-b border-[#e5e7eb] shrink-0">
             <MagnifyingGlassIcon class="w-5 h-5 text-[#94a3b8] shrink-0" />
             <input
@@ -32,13 +29,10 @@
             </div>
           </div>
 
-          <!-- Scroll area -->
           <div ref="scrollRef" class="overflow-y-auto flex-1">
 
-            <!-- Empty state: quick actions + recent -->
             <div v-if="!query.trim()" class="p-3">
 
-              <!-- Recent searches -->
               <div v-if="recent.length > 0" class="mb-5">
                 <div class="flex items-center justify-between px-3 mb-2">
                   <p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-widest">{{ t('public.search.recentTitle') }}</p>
@@ -58,7 +52,6 @@
                 </div>
               </div>
 
-              <!-- Quick navigation -->
               <p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-widest px-3 mb-2">{{ t('public.search.quickNav') }}</p>
               <div class="grid grid-cols-2 gap-1.5">
                 <button
@@ -77,14 +70,12 @@
                 </button>
               </div>
 
-              <!-- Keyboard hint -->
               <p class="text-center text-[11px] text-[#c4c4c4] mt-5 mb-1">
                 <kbd class="bg-[#f1f5f9] px-1.5 py-0.5 rounded text-[#64748b] font-mono">⌘K</kbd>
                 {{ t('public.search.shortcutHint') }}
               </p>
             </div>
 
-            <!-- Results -->
             <div v-else-if="hasResults" class="p-2">
               <template v-for="section in sections" :key="section.key">
                 <div v-if="results[section.key]?.length > 0" class="mb-3">
@@ -103,14 +94,13 @@
                           : 'hover:bg-[#f8fafc]'
                       ]"
                     >
-                      <!-- Type icon -->
+
                       <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition"
                         :class="hoveredKey === `${section.key}-${j}` || flatIndex(section.key, j) === focusedIndex ? 'bg-white/20' : section.iconBg">
                         <component :is="section.icon" class="w-4 h-4 transition"
                           :class="hoveredKey === `${section.key}-${j}` || flatIndex(section.key, j) === focusedIndex ? 'text-white' : section.iconColor" />
                       </div>
 
-                      <!-- Content -->
                       <div class="flex-1 min-w-0">
                         <p class="text-sm font-semibold truncate"
                           :class="hoveredKey === `${section.key}-${j}` || flatIndex(section.key, j) === focusedIndex ? 'text-white' : 'text-[#001d32]'"
@@ -121,7 +111,6 @@
                         </p>
                       </div>
 
-                      <!-- Meta badge -->
                       <span v-if="item.meta" class="text-xs shrink-0 font-medium px-2 py-0.5 rounded-full transition"
                         :class="hoveredKey === `${section.key}-${j}` || flatIndex(section.key, j) === focusedIndex ? 'bg-white/20 text-white' : 'bg-[#f1f5f9] text-[#64748b]'">
                         {{ item.meta }}
@@ -134,7 +123,6 @@
               </template>
             </div>
 
-            <!-- No results -->
             <div v-else-if="query.trim().length >= 2 && !loading" class="py-14 text-center">
               <div class="w-14 h-14 rounded-2xl bg-[#f1f5f9] flex items-center justify-center mx-auto mb-3">
                 <MagnifyingGlassIcon class="w-7 h-7 text-[#94a3b8]" />
@@ -143,13 +131,11 @@
               <p class="text-[#94a3b8] text-xs mt-1">{{ t('public.search.noResultsSub', { q: query }) }}</p>
             </div>
 
-            <!-- Typing... -->
             <div v-else-if="query.trim().length === 1" class="py-10 text-center text-[#94a3b8] text-sm">
               {{ t('public.search.typeMore') }}
             </div>
           </div>
 
-          <!-- Footer -->
           <div class="shrink-0 border-t border-[#e5e7eb] bg-[#f8fafc] px-5 py-2.5 flex items-center gap-5">
             <span class="text-[11px] text-[#94a3b8] flex items-center gap-1">
               <kbd class="bg-white border border-[#e5e7eb] px-1.5 py-0.5 rounded text-[10px] font-mono shadow-sm">↑↓</kbd>
@@ -220,7 +206,6 @@ const hasResults = computed(() =>
   sections.value.some(s => results.value[s.key]?.length > 0)
 )
 
-// Flat list of all results for keyboard nav
 const flatResults = computed(() => {
   const flat = []
   for (const section of sections.value) {
@@ -245,7 +230,6 @@ function setRef(el, sectionKey, j) {
   itemRefs[sectionKey][j] = el
 }
 
-// Debounced search
 let debounceTimer = null
 watch(query, (val) => {
   focusedIndex.value = -1
@@ -271,7 +255,6 @@ async function doSearch(q) {
   }
 }
 
-// Highlight matching text
 function highlight(text) {
   if (!query.value.trim()) return text
   const escaped = query.value.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
@@ -288,7 +271,6 @@ function go(url) {
   router.push(url)
 }
 
-// Recent searches
 function saveRecent(q) {
   if (!q) return
   const updated = [q, ...recent.value.filter(r => r !== q)].slice(0, 5)
@@ -304,7 +286,6 @@ function clearRecent() {
   localStorage.removeItem('uc_recent_searches')
 }
 
-// Keyboard navigation
 function handleKey(e) {
   const total = flatResults.value.length
   if (e.key === 'Escape') { close(); return }
@@ -339,7 +320,6 @@ function scrollToFocused() {
   })
 }
 
-// Open / Close
 function open() {
   isOpen.value = true
   nextTick(() => inputRef.value?.focus())
@@ -352,7 +332,6 @@ function close() {
   hoveredKey.value = ''
 }
 
-// Global keyboard shortcut Cmd+K / Ctrl+K
 function onKeydown(e) {
   if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
     e.preventDefault()

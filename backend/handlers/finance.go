@@ -14,11 +14,7 @@ type FinanceHandler struct {
 	DB *gorm.DB
 }
 
-// Overview returns the platform's revenue breakdown for the admin financial dashboard.
-// Sources (per Annexe 1): commissions on transactions, pro subscriptions, ad campaigns,
-// and formations/ateliers (sold as priced prestations, hence captured in commissions+GMV).
 func (h *FinanceHandler) Overview(c *gin.Context) {
-	// ── Transactions (paid prestation reservations) ──────────────────────
 	type txAgg struct {
 		Gross      int64
 		Commission int64
@@ -31,7 +27,6 @@ func (h *FinanceHandler) Overview(c *gin.Context) {
 		Select("COALESCE(SUM(amount_cents),0) AS gross, COALESCE(SUM(commission_cents),0) AS commission, COALESCE(SUM(net_cents),0) AS net, COUNT(*) AS count").
 		Scan(&tx)
 
-	// ── Subscriptions (active) ───────────────────────────────────────────
 	var subs []models.Subscription
 	h.DB.Where("status = ?", "active").Find(&subs)
 	var subMRR int64
@@ -42,7 +37,6 @@ func (h *FinanceHandler) Overview(c *gin.Context) {
 		}
 	}
 
-	// ── Campaigns (paid) ─────────────────────────────────────────────────
 	type campAgg struct {
 		Total int64
 		Count int64
@@ -53,10 +47,8 @@ func (h *FinanceHandler) Overview(c *gin.Context) {
 		Select("COALESCE(SUM(budget_cents),0) AS total, COUNT(*) AS count").
 		Scan(&camp)
 
-	// Platform revenue = commissions + subscription MRR + campaign payments.
 	platformRevenue := tx.Commission + subMRR + camp.Total
 
-	// ── Monthly commissions (last 6 months) ──────────────────────────────
 	type monthRow struct {
 		Month string
 		Cents int64
@@ -75,14 +67,14 @@ func (h *FinanceHandler) Overview(c *gin.Context) {
 		"commission_rate_percent": int(models.CommissionRate * 100),
 		"platform_revenue_cents":  platformRevenue,
 		"transactions": gin.H{
-			"gross_cents":      tx.Gross,      // total GMV processed
-			"commission_cents": tx.Commission, // platform's cut
-			"net_to_providers_cents": tx.Net,  // owed to providers
-			"count":            tx.Count,
+			"gross_cents":            tx.Gross,
+			"commission_cents":       tx.Commission,
+			"net_to_providers_cents": tx.Net,
+			"count":                  tx.Count,
 		},
 		"subscriptions": gin.H{
 			"active_count": subCount,
-			"mrr_cents":    subMRR, // monthly recurring revenue
+			"mrr_cents":    subMRR,
 		},
 		"campaigns": gin.H{
 			"paid_count":  camp.Count,
@@ -92,7 +84,6 @@ func (h *FinanceHandler) Overview(c *gin.Context) {
 	})
 }
 
-// Transactions lists recent paid transactions with their commission split (admin view).
 func (h *FinanceHandler) Transactions(c *gin.Context) {
 	var reservations []models.Reservation
 	h.DB.Preload("User").Preload("Prestation").

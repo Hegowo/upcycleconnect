@@ -2,8 +2,6 @@ package models
 
 import "time"
 
-// ReservationMessage is a chat message between the client (reservation owner) and
-// the provider (prestation owner) tied to a reservation / quote.
 type ReservationMessage struct {
 	ID            uint      `gorm:"primaryKey" json:"id"`
 	ReservationID uint      `gorm:"index;not null" json:"reservation_id"`

@@ -46,7 +46,6 @@
             {{ loading ? 'Vérification...' : 'Valider la collecte' }}
           </button>
 
-          <!-- Success -->
           <div v-if="result && !error" class="bg-[#f0fdf4] rounded-2xl border border-[#bbf7d0] p-5">
             <div class="flex items-center gap-3 mb-3">
               <CheckCircleIcon class="w-6 h-6 text-[#006d35] shrink-0" />
@@ -60,7 +59,6 @@
             </div>
           </div>
 
-          <!-- Error -->
           <div v-if="error" class="bg-red-50 rounded-2xl border border-red-200 p-5 flex items-start gap-3">
             <ExclamationCircleIcon class="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
             <p class="text-red-700 text-sm">{{ error }}</p>
@@ -69,7 +67,6 @@
         </div>
       </div>
 
-      <!-- Recent collections -->
       <div v-if="recent.length" class="mt-8">
         <h2 class="font-jakarta font-bold text-[#001d32] text-lg mb-4">Collectes récentes</h2>
         <div class="space-y-3">
@@ -110,7 +107,7 @@ async function collect() {
       body: JSON.stringify({ barcode: barcode.value.trim().toUpperCase() }),
     })
     result.value = res
-    // Add to recent list (deduplicate by id)
+
     if (!recent.value.find(r => r.id === res.deposit.id)) {
       recent.value.unshift(res.deposit)
     }
@@ -123,7 +120,6 @@ async function collect() {
 }
 
 onMounted(async () => {
-  // Load previously collected deposits by this provider (status collected)
   try {
     const data = await userApi('/deposits?status=collected')
     recent.value = (data.data || []).slice(0, 10)

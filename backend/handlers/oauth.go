@@ -37,12 +37,10 @@ func (h *OAuthHandler) buildUserWithProfile(user *models.User) map[string]interf
 		"avatar_url": resp.AvatarURL, "status": resp.Status,
 		"role": resp.Role, "email_verified_at": resp.EmailVerifiedAt,
 		"onboarding_completed_at": resp.OnboardingCompletedAt,
-		"created_at": resp.CreatedAt, "updated_at": resp.UpdatedAt,
+		"created_at":              resp.CreatedAt, "updated_at": resp.UpdatedAt,
 		"provider_profile": models.ToProviderProfileResponse(user.ProviderProfile),
 	}
 }
-
-// ─── Google ───────────────────────────────────────────────────────────────────
 
 type googleTokenInfo struct {
 	Sub              string `json:"sub"`
@@ -148,8 +146,6 @@ func (h *OAuthHandler) GoogleAuth(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"token": tokenStr, "user": h.buildUserWithProfile(&user)})
 }
 
-// ─── Apple ────────────────────────────────────────────────────────────────────
-
 type appleJWK struct {
 	Kty string `json:"kty"`
 	Kid string `json:"kid"`
@@ -187,7 +183,6 @@ func fetchAppleJWKS() (*appleJWKS, error) {
 }
 
 func verifyAppleIDToken(idToken, servicesID string) (jwt.MapClaims, error) {
-	// Parse header without verification to get kid
 	unverified, _, err := new(jwt.Parser).ParseUnverified(idToken, jwt.MapClaims{})
 	if err != nil {
 		return nil, err
@@ -207,7 +202,6 @@ func verifyAppleIDToken(idToken, servicesID string) (jwt.MapClaims, error) {
 		}
 	}
 	if matched == nil {
-		// Clé introuvable — vider le cache et réessayer
 		appleJWKSMu.Lock()
 		appleJWKSCache = nil
 		appleJWKSMu.Unlock()
@@ -253,14 +247,12 @@ func verifyAppleIDToken(idToken, servicesID string) (jwt.MapClaims, error) {
 		return nil, fmt.Errorf("signature invalide: %w", err)
 	}
 
-	// Validate iss and aud manually — avoids jwt library version discrepancies
 	iss, _ := claims.GetIssuer()
 	if iss != "https://appleid.apple.com" {
 		log.Printf("[apple] unexpected issuer: %q", iss)
 		return nil, fmt.Errorf("issuer invalide: %q", iss)
 	}
 
-	// aud can be a string or []string depending on Apple's encoding
 	audOK := false
 	switch v := claims["aud"].(type) {
 	case string:
@@ -308,15 +300,13 @@ func (h *OAuthHandler) AppleAuth(c *gin.Context) {
 	email = strings.ToLower(strings.TrimSpace(email))
 
 	var user models.User
-	// Chercher par Apple ID en premier
+
 	err = h.DB.Where("apple_id = ?", sub).First(&user).Error
 	if err == gorm.ErrRecordNotFound && email != "" {
-		// Chercher par email
 		err = h.DB.Where("email = ?", email).First(&user).Error
 	}
 
 	if err == gorm.ErrRecordNotFound {
-		// Créer un nouveau compte
 		now := time.Now()
 		firstName := strings.TrimSpace(req.FirstName)
 		lastName := strings.TrimSpace(req.LastName)
@@ -374,8 +364,6 @@ func (h *OAuthHandler) AppleAuth(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"token": tokenStr, "user": h.buildUserWithProfile(&user)})
 }
-
-// ─── Shared ───────────────────────────────────────────────────────────────────
 
 func (h *OAuthHandler) generateLinkToken(provider, sub, email string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{

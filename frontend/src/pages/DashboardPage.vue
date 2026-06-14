@@ -151,7 +151,6 @@ const envScore = computed(() => {
   return Math.min(100, Math.round(accepted * 5 + co2 * 1.5))
 })
 
-// ---- Widget registry: order = default order, w/h = default shape, sizes = allowed shapes ----
 const WIDGET_META = [
   { id: 'users',       defaultVisible: true,  w: 1, h: 1, sizes: [[1, 1], [2, 1]] },
   { id: 'providers',   defaultVisible: true,  w: 1, h: 1, sizes: [[1, 1], [2, 1]] },
@@ -173,9 +172,8 @@ const WIDGET_LABELS = {
 }
 function widgetLabel(id) { return t(WIDGET_LABELS[id] || id) }
 
-// ---- Persisted layout (per admin, localStorage) ----
 const storageKey = computed(() => `admin_dashboard_layout_v4_${auth.user?.id || 'default'}`)
-const layout = ref([]) // [{ id, visible, w, h }]
+const layout = ref([])
 
 function defaultLayout() {
   return WIDGET_META.map(w => ({ id: w.id, visible: w.defaultVisible, w: w.w, h: w.h }))
@@ -192,7 +190,7 @@ function loadLayout() {
       layout.value = merged
       return
     }
-  } catch { /* fall through */ }
+  } catch {  }
   layout.value = defaultLayout()
 }
 function clampW(v, id) { const def = metaMap[id]; return Math.min(4, Math.max(1, Number(v) || def.w)) }
@@ -220,7 +218,6 @@ function showWidget(id) {
 }
 function exitEdit() { editMode.value = false; addMenu.value = false; sizeMenu.value = null }
 
-// ---- Drag to reorder ----
 function onDragStart(tile) { dragId.value = tile.id; sizeMenu.value = null }
 function onDrop(target) {
   if (!dragId.value || dragId.value === target.id) return
@@ -233,10 +230,8 @@ function onDrop(target) {
 }
 function onDragEnd() { dragId.value = null; dragOverId.value = null }
 
-// Close popovers on outside click
 function onDocClick() { addMenu.value = false; sizeMenu.value = null }
 
-// ---- Data ----
 async function loadData() {
   loading.value = true
   logsLoading.value = true

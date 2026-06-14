@@ -9,9 +9,6 @@ import (
 	"gorm.io/gorm"
 )
 
-// MigrateDepositPhotos converts deposit photos still stored as base64 data-URIs
-// into files served from /uploads/deposits, rewriting the column to the file URL.
-// Idempotent: rows whose photos are already URLs are skipped by SaveDataURIImage.
 func MigrateDepositPhotos(db *gorm.DB) {
 	var deposits []models.DepositRequest
 	if err := db.Where(

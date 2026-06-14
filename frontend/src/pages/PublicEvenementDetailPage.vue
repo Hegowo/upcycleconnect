@@ -8,12 +8,10 @@
         <span class="text-[#001d32] font-medium truncate max-w-[300px]">{{ event?.title || '…' }}</span>
       </div>
 
-      <!-- Loading -->
       <div v-if="loading" class="flex items-center justify-center py-32">
         <div class="w-10 h-10 border-4 border-[#006d35] border-t-transparent rounded-full animate-spin" />
       </div>
 
-      <!-- Not found -->
       <div v-else-if="!event" class="flex flex-col items-center justify-center py-32 text-center">
         <CalendarDaysIcon class="w-16 h-16 text-[#40617f]/30 mb-4" />
         <p class="font-jakarta font-bold text-[#001d32] text-xl mb-2">{{ t('public.eventDetail.notFound') }}</p>
@@ -25,10 +23,8 @@
       <template v-else>
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
 
-          <!-- Main content -->
           <div class="lg:col-span-8 flex flex-col gap-8">
 
-            <!-- Hero -->
             <div class="relative h-[360px] sm:h-[440px] rounded-[32px] overflow-hidden flex items-center justify-center shadow-sm"
               :style="`background: ${cardGradient(event.id)};`">
               <CalendarDaysIcon class="w-40 h-40 text-white/20" />
@@ -52,7 +48,6 @@
               </div>
             </div>
 
-            <!-- Title + meta -->
             <div class="flex flex-col gap-3">
               <h1 class="font-jakarta font-extrabold text-[#001d32] text-4xl sm:text-5xl leading-tight tracking-tight">
                 {{ event.title }}
@@ -77,13 +72,11 @@
               </div>
             </div>
 
-            <!-- Description -->
             <div v-if="event.description" class="bg-white rounded-[32px] p-10 shadow-sm flex flex-col gap-4">
               <h2 class="font-jakarta font-bold text-[#001d32] text-2xl">{{ t('public.eventDetail.aboutTitle') }}</h2>
               <p class="text-[#40617f] text-lg leading-relaxed whitespace-pre-wrap">{{ event.description }}</p>
             </div>
 
-            <!-- Organizer -->
             <div v-if="event.creator" class="bg-[#edf4ff] rounded-[32px] p-8 flex gap-6 items-start">
               <div class="w-20 h-20 rounded-2xl overflow-hidden bg-gradient-to-br from-[#d1fae5] to-[#a7f3d0] flex items-center justify-center shrink-0 shadow-md">
                 <img v-if="event.creator.avatar_url" :src="event.creator.avatar_url" class="w-full h-full object-cover" alt="" />
@@ -99,10 +92,8 @@
 
           </div>
 
-          <!-- Sidebar -->
           <div class="lg:col-span-4 flex flex-col gap-6">
 
-            <!-- Registration card -->
             <div class="bg-white border border-[#d8eaff] rounded-[40px] p-8 shadow-[0_12px_40px_0_rgba(0,29,50,0.06)] relative overflow-hidden sticky top-6">
               <div class="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-[rgba(0,109,53,0.05)]" />
 
@@ -124,19 +115,16 @@
                 <p v-else class="text-sm text-[#40617f]">{{ t('public.eventDetail.spotsUnlimited') }}</p>
               </div>
 
-              <!-- Organizer badge -->
               <div v-if="isOrganizer" class="flex items-center gap-2 bg-[#d1fae5] text-[#065f46] px-4 py-2 rounded-xl mb-4 text-sm font-semibold">
                 <CheckBadgeIcon class="w-4 h-4 shrink-0" />
                 {{ t('public.planning.organizerBadge') }}
               </div>
 
-              <!-- Registered badge -->
               <div v-else-if="isRegistered && !isPast" class="flex items-center gap-2 bg-[#d1fae5] text-[#065f46] px-4 py-2 rounded-xl mb-4 text-sm font-semibold">
                 <CheckCircleIcon class="w-4 h-4 shrink-0" />
                 {{ t('public.eventDetail.badgeRegistered') }}
               </div>
 
-              <!-- CTA -->
               <button v-if="isOrganizer" disabled
                 class="w-full py-4 rounded-2xl text-[#065f46] font-bold text-base bg-[#d1fae5] cursor-default">
                 {{ t('public.planning.organizerBadge') }}
@@ -175,7 +163,6 @@
               </p>
             </div>
 
-            <!-- Location card -->
             <div v-if="event.location" class="bg-white border border-[#d8eaff] rounded-[32px] p-6 flex items-center justify-between gap-4">
               <div>
                 <p class="font-jakarta font-bold text-[#001d32] text-sm">{{ event.location }}</p>
@@ -188,10 +175,8 @@
           </div>
         </div>
 
-        <!-- ── Chat section ─────────────────────────────────── -->
         <div class="mt-10">
 
-          <!-- Not logged in -->
           <div v-if="!userAuth.isLoggedIn" class="bg-white rounded-[32px] p-8 shadow-sm flex items-center gap-4">
             <ChatBubbleLeftRightIcon class="w-8 h-8 text-[#40617f]/40 shrink-0" />
             <div>
@@ -200,7 +185,6 @@
             </div>
           </div>
 
-          <!-- Not registered (and not organizer) -->
           <div v-else-if="!canChat" class="bg-white rounded-[32px] p-8 shadow-sm flex items-center gap-4">
             <ChatBubbleLeftRightIcon class="w-8 h-8 text-[#40617f]/40 shrink-0" />
             <div>
@@ -209,9 +193,8 @@
             </div>
           </div>
 
-          <!-- Chat UI -->
           <div v-else class="bg-white rounded-[32px] shadow-sm overflow-hidden">
-            <!-- Header -->
+
             <div class="px-8 py-5 border-b border-gray-100 flex items-center gap-3">
               <ChatBubbleLeftRightIcon class="w-5 h-5 text-[#006d35]" />
               <h2 class="font-jakarta font-bold text-[#001d32] text-lg">{{ t('public.eventDetail.chatTitle') }}</h2>
@@ -222,7 +205,6 @@
               </span>
             </div>
 
-            <!-- Messages -->
             <div ref="messagesEl" class="h-[420px] overflow-y-auto px-6 py-4 flex flex-col gap-4 scroll-smooth">
               <div v-if="!messages.length" class="flex-1 flex items-center justify-center text-[#40617f] text-sm">
                 {{ t('public.eventDetail.chatEmpty') }}
@@ -231,14 +213,12 @@
               <div v-for="msg in messages" :key="msg.id"
                 :class="['flex gap-3', msg.is_me ? 'flex-row-reverse' : 'flex-row']">
 
-                <!-- Avatar -->
                 <div class="shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold text-white"
                   :style="msg.is_me ? 'background: linear-gradient(135deg,#006d35,#1b8848)' : 'background: #40617f'">
                   <img v-if="msg.avatar" :src="msg.avatar" class="w-full h-full object-cover rounded-full" alt="" />
                   <span v-else>{{ initials(msg.user_name) }}</span>
                 </div>
 
-                <!-- Bubble -->
                 <div :class="['max-w-[70%] flex flex-col gap-1', msg.is_me ? 'items-end' : 'items-start']">
                   <div class="flex items-center gap-2">
                     <span class="text-xs font-semibold text-[#40617f]">
@@ -252,7 +232,6 @@
                     <span class="text-[10px] text-gray-400">{{ formatMsgTime(msg.created_at) }}</span>
                   </div>
 
-                  <!-- Text -->
                   <div v-if="msg.content"
                     :class="[
                       'px-4 py-2.5 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap break-words',
@@ -263,7 +242,6 @@
                     {{ msg.content }}
                   </div>
 
-                  <!-- Image -->
                   <img v-if="msg.image_url" :src="msg.image_url"
                     :alt="t('public.eventDetail.chatImageAlt')"
                     class="max-w-[280px] rounded-2xl object-cover cursor-pointer hover:opacity-90 transition"
@@ -272,7 +250,6 @@
               </div>
             </div>
 
-            <!-- Input -->
             <div class="border-t border-gray-100 px-6 py-4 flex gap-3 items-end">
               <input type="file" ref="fileInput" accept="image/*" class="hidden" @change="onFileChange" />
 
@@ -300,7 +277,6 @@
               </button>
             </div>
 
-            <!-- Pending image preview -->
             <div v-if="pendingImagePreview" class="px-6 pb-4 flex items-center gap-3">
               <img :src="pendingImagePreview" class="h-16 w-16 object-cover rounded-xl border border-gray-200" alt="" />
               <button @click="clearPendingImage" class="text-xs text-red-500 hover:underline">Supprimer</button>
@@ -308,7 +284,6 @@
           </div>
         </div>
 
-        <!-- Lightbox -->
         <Teleport to="body">
           <div v-if="lightboxSrc" @click="lightboxSrc = null"
             class="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 cursor-zoom-out">
@@ -346,7 +321,6 @@ const route = useRoute()
 const router = useRouter()
 const userAuth = useUserAuthStore()
 
-// Event
 const loading = ref(true)
 const event = ref(null)
 const isRegistered = ref(false)
@@ -354,14 +328,13 @@ const actionLoading = ref(false)
 const feedback = ref('')
 const feedbackError = ref(false)
 
-// Chat
 const messages = ref([])
 const chatInput = ref('')
 const sendLoading = ref(false)
 const messagesEl = ref(null)
 const fileInput = ref(null)
-const pendingImage = ref(null)      // URL returned by upload
-const pendingImagePreview = ref(null) // local blob preview
+const pendingImage = ref(null)
+const pendingImagePreview = ref(null)
 const lightboxSrc = ref(null)
 let pollTimer = null
 
@@ -480,7 +453,6 @@ async function unregister() {
   actionLoading.value = false
 }
 
-// ─── Chat ────────────────────────────────────────────────
 async function fetchMessages(scrollToBottom = false) {
   if (!canChat.value || !userAuth.token) return
   try {
@@ -490,7 +462,7 @@ async function fetchMessages(scrollToBottom = false) {
     if (res.ok) {
       const data = await res.json()
       const newMsgs = data.data || []
-      // Only update + scroll if there are new messages
+
       if (newMsgs.length !== messages.value.length || scrollToBottom) {
         messages.value = newMsgs
         if (scrollToBottom || newMsgs.length > messages.value.length) {
@@ -542,10 +514,8 @@ async function onFileChange(e) {
   const file = e.target.files?.[0]
   if (!file) return
 
-  // Local preview
   pendingImagePreview.value = URL.createObjectURL(file)
 
-  // Upload
   const fd = new FormData()
   fd.append('image', file)
   try {
@@ -563,7 +533,7 @@ async function onFileChange(e) {
   } catch {
     clearPendingImage()
   }
-  // Reset input so same file can be re-selected
+
   if (fileInput.value) fileInput.value.value = ''
 }
 
@@ -591,7 +561,6 @@ onMounted(async () => {
 
   loading.value = false
 
-  // Start chat if user has access
   if (canChat.value) {
     await fetchMessages(true)
     startPolling()

@@ -249,7 +249,6 @@ func (h *PrestationHandler) UpdateStatus(c *gin.Context) {
 
 	h.Audit.Log(c, "prestation.status_changed", "Prestation", &prestation.ID, old, map[string]string{"status": req.Status})
 
-	// Notify the provider of the admin's validation decision.
 	if h.Notifications != nil && wasPending && prestation.ProviderID != nil {
 		if req.Status == "published" {
 			h.Notifications.MustNotify(*prestation.ProviderID, "prestation.approved",

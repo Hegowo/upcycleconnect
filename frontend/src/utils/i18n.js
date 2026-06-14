@@ -12,16 +12,13 @@ const i18n = createI18n({
   messages: { fr, en },
 })
 
-// Built-in languages always available (shipped with the app).
 export const builtinLocales = [
   { code: 'fr', name: 'Français', builtin: true },
   { code: 'en', name: 'English', builtin: true },
 ]
 
-// availableLocales is reactive: built-in + any language added via the back-office.
 export const availableLocales = ref([...builtinLocales])
 
-// fetchAndRegister pulls one dynamic locale's messages and registers them into vue-i18n.
 export async function fetchAndRegister(code) {
   if (code === 'fr' || code === 'en') return true
   try {
@@ -35,9 +32,6 @@ export async function fetchAndRegister(code) {
   }
 }
 
-// loadDynamicLocales fetches admin-managed languages from the API and registers the
-// active one's messages — so a language added in the back-office works WITHOUT any
-// code change or rebuild (spec requirement, page 7).
 export async function loadDynamicLocales() {
   try {
     const res = await fetch('/api/public/v1/locales', { headers: { Accept: 'application/json' } })
@@ -54,11 +48,9 @@ export async function loadDynamicLocales() {
     }
     availableLocales.value = merged
   } catch {
-    /* offline / not configured — keep built-in only */
   }
 }
 
-// setLocale switches the active language, loading its messages on demand if dynamic.
 export async function setLocale(code) {
   if (code !== 'fr' && code !== 'en') {
     await fetchAndRegister(code)

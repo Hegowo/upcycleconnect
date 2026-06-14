@@ -114,7 +114,6 @@ const feedback = ref('')
 const reserveError = ref('')
 const showContractModal = ref(false)
 
-// A provider can't reserve / request a quote on their own prestation.
 const isOwnPrestation = computed(() =>
   !!(prestation.value?.provider?.id && userAuth.user && prestation.value.provider.id === userAuth.user.id)
 )
@@ -155,7 +154,6 @@ async function reserve() {
   reserveError.value = ''
   feedback.value = ''
 
-  // Quote flow: no contract, send directly
   if (prestation.value?.price_type === 'quote') {
     reserving.value = true
     try {
@@ -173,7 +171,6 @@ async function reserve() {
     return
   }
 
-  // Paid flow: open contract modal — actual reserve call happens after signature
   showContractModal.value = true
 }
 

@@ -2,13 +2,12 @@
   <div class="bg-[#f7f9ff] min-h-screen pb-16">
     <div class="max-w-[860px] mx-auto px-4 sm:px-6 py-10">
 
-      <!-- Loading -->
       <div v-if="loading" class="flex items-center justify-center py-24">
         <div class="w-8 h-8 border-4 border-[#006d35] border-t-transparent rounded-full animate-spin" />
       </div>
 
       <template v-else-if="thread">
-        <!-- Breadcrumb -->
+
         <div class="flex items-center gap-2 text-sm text-[#40617f] mb-6 flex-wrap">
           <RouterLink to="/communaute" class="hover:text-[#006d35] transition">{{ t('public.community.title') }}</RouterLink>
           <ChevronRightIcon class="w-3.5 h-3.5 shrink-0" />
@@ -19,9 +18,8 @@
           <span class="text-[#001d32] font-medium truncate max-w-[180px]">{{ thread.title }}</span>
         </div>
 
-        <!-- Thread post -->
         <div class="bg-white rounded-2xl shadow-sm mb-6 overflow-hidden">
-          <!-- Thread meta header -->
+
           <div class="flex items-center gap-2 px-6 pt-5 pb-3 flex-wrap">
             <span v-if="thread.pinned" class="text-xs font-bold text-[#006d35] bg-[#d1fae5] px-2 py-0.5 rounded-full">
               📌 {{ t('public.community.pinned') }}
@@ -35,7 +33,7 @@
             <h1 class="font-jakarta font-extrabold text-[#001d32] text-xl sm:text-2xl mb-5">{{ thread.title }}</h1>
 
             <div class="flex items-start gap-4">
-              <!-- Author avatar -->
+
               <div class="w-11 h-11 rounded-full flex items-center justify-center shrink-0 text-base font-bold text-white"
                 :style="`background: ${avatarColor(thread.author)}`">
                 {{ authorInitial(thread.author) }}
@@ -50,10 +48,8 @@
                   <span v-if="thread.updated_at !== thread.created_at" class="text-[#94a3b8] text-xs">(modifié)</span>
                 </div>
 
-                <!-- Rich content display -->
                 <div v-if="!editingThread" class="forum-content" v-html="thread.content" />
 
-                <!-- Edit mode -->
                 <div v-else class="mb-3">
                   <TiptapEditor v-model="editThreadContent" :placeholder="t('public.community.modalContentPlaceholder')" minHeight="150px" />
                   <div class="flex gap-2 mt-2 justify-end">
@@ -69,9 +65,8 @@
               </div>
             </div>
 
-            <!-- Thread actions -->
             <div class="flex items-center gap-3 mt-5 pt-4 border-t border-[#f1f5f9] flex-wrap">
-              <!-- Owner actions -->
+
               <template v-if="isOwner && !editingThread">
                 <button @click="startEditThread"
                   class="flex items-center gap-1 text-xs text-[#40617f] hover:text-[#006d35] transition font-medium">
@@ -90,7 +85,6 @@
                 </button>
               </template>
 
-              <!-- Anyone logged in can report -->
               <button v-if="userAuth.isLoggedIn && !isOwner" @click="report('thread', thread.id)"
                 class="flex items-center gap-1 text-xs text-[#94a3b8] hover:text-[#ef4444] transition font-medium ml-auto">
                 <FlagIcon class="w-3.5 h-3.5" />
@@ -100,7 +94,6 @@
           </div>
         </div>
 
-        <!-- Bans panel (owner only) -->
         <div v-if="isOwner && bans.length > 0" class="bg-[#fef2f2] border border-[#fecaca] rounded-xl p-4 mb-6">
           <p class="text-sm font-semibold text-[#991b1b] mb-3 flex items-center gap-2">
             <ShieldExclamationIcon class="w-4 h-4" />
@@ -118,7 +111,6 @@
           </div>
         </div>
 
-        <!-- Replies -->
         <div class="mb-6">
           <p class="font-jakarta font-bold text-[#001d32] text-lg mb-4">
             {{ replies.length }} {{ t('public.community.repliesTitle') }}
@@ -132,7 +124,7 @@
             <div v-for="reply in replies" :key="reply.id"
               class="bg-white rounded-xl shadow-sm overflow-hidden">
               <div class="p-5 flex gap-4 items-start">
-                <!-- Avatar -->
+
                 <div class="w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-sm font-bold text-white"
                   :style="`background: ${avatarColor(reply.author)}`">
                   {{ authorInitial(reply.author) }}
@@ -144,10 +136,8 @@
                     <span class="text-[#94a3b8] text-xs">· {{ formatDate(reply.created_at) }}</span>
                   </div>
 
-                  <!-- Reply content -->
                   <div v-if="editingReply !== reply.id" class="forum-content" v-html="reply.content" />
 
-                  <!-- Edit reply -->
                   <div v-else>
                     <TiptapEditor v-model="editReplyContent" :placeholder="t('public.community.replyPlaceholder')" minHeight="100px" />
                     <div class="flex gap-2 mt-2 justify-end">
@@ -163,7 +153,6 @@
                 </div>
               </div>
 
-              <!-- Reply actions -->
               <div class="flex items-center gap-3 px-5 py-2 border-t border-[#f8fafc] bg-[#fafafa] flex-wrap">
                 <template v-if="canEditReply(reply) && editingReply !== reply.id">
                   <button @click="startEditReply(reply)"
@@ -180,7 +169,6 @@
                   </button>
                 </template>
 
-                <!-- Owner: ban user -->
                 <button v-if="isOwner && reply.user_id !== userAuth.user?.id && !isBanned(reply.user_id)"
                   @click="banUser(reply.user_id)"
                   class="flex items-center gap-1 text-xs text-[#40617f] hover:text-[#ef4444] transition font-medium">
@@ -192,7 +180,6 @@
                   {{ t('public.community.bannedLabel') }}
                 </span>
 
-                <!-- Report -->
                 <button v-if="userAuth.isLoggedIn && !canEditReply(reply)"
                   @click="report('reply', reply.id)"
                   class="flex items-center gap-1 text-xs text-[#94a3b8] hover:text-[#ef4444] transition font-medium ml-auto">
@@ -204,7 +191,6 @@
           </div>
         </div>
 
-        <!-- Reply form -->
         <div class="bg-white rounded-2xl shadow-sm p-6">
           <h3 class="font-jakarta font-bold text-[#001d32] mb-4">{{ t('public.community.replyTitle') }}</h3>
 
@@ -255,7 +241,6 @@
       </div>
     </div>
 
-    <!-- Report Modal -->
     <div v-if="reportModal.show" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" @click.self="reportModal.show = false">
       <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl">
         <h3 class="font-bold text-[#001d32] text-lg mb-4">{{ t('public.community.reportTitle') }}</h3>
@@ -315,7 +300,6 @@ const isOwner = computed(() => userAuth.isLoggedIn && thread.value?.author?.id =
 
 const reportModal = ref({ show: false, type: '', targetId: null, reason: '', sending: false, error: '' })
 
-// Avatar colors based on user id
 const COLORS = ['#006d35','#1a73e8','#7c3aed','#b45309','#ef4444','#0891b2','#059669']
 function avatarColor(author) {
   if (!author) return '#94a3b8'
@@ -369,7 +353,6 @@ async function loadThread() {
   }
 }
 
-// --- Thread edit ---
 function startEditThread() {
   editThreadContent.value = thread.value.content
   editingThread.value = true
@@ -389,7 +372,6 @@ async function saveThreadEdit() {
   } finally { saving.value = false }
 }
 
-// --- Reply edit ---
 function startEditReply(reply) {
   editReplyContent.value = reply.content
   editingReply.value = reply.id
@@ -409,7 +391,6 @@ async function saveReplyEdit(reply) {
   } finally { saving.value = false }
 }
 
-// --- Thread controls ---
 async function toggleClose() {
   const res = await fetch(`/api/v1/forum/threads/${threadId.value}/close`, {
     method: 'POST',
@@ -430,7 +411,6 @@ async function deleteThread() {
   if (res.ok) router.push(`/communaute/forum/${thread.value.category?.slug}`)
 }
 
-// --- Ban / Unban ---
 async function banUser(userId) {
   if (!confirm(t('public.community.confirmBan'))) return
   const res = await fetch(`/api/v1/forum/threads/${threadId.value}/ban/${userId}`, {
@@ -450,7 +430,6 @@ async function unbanUser(userId) {
   bans.value = bans.value.filter(b => b.user_id !== userId)
 }
 
-// --- Reply ---
 async function submitReply() {
   replyError.value = ''
   const stripped = replyContent.value.replace(/<[^>]*>/g, '').trim()
@@ -485,7 +464,6 @@ async function deleteReply(replyId) {
   if (res.ok) replies.value = replies.value.filter(r => r.id !== replyId)
 }
 
-// --- Reports ---
 function report(type, id) {
   reportModal.value = { show: true, type, targetId: id, reason: '', sending: false, error: '' }
 }
@@ -514,7 +492,7 @@ onMounted(async () => {
 </script>
 
 <style>
-/* Rich text display styles for forum content */
+
 .forum-content { line-height: 1.7; color: #1e293b; }
 .forum-content p { margin-bottom: 0.75em; }
 .forum-content p:last-child { margin-bottom: 0; }

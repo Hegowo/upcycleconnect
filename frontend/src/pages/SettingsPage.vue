@@ -1,16 +1,14 @@
 <template>
   <div class="space-y-6 max-w-3xl">
-    
+
     <div>
       <h2 class="text-2xl font-bold text-[#001d32]">{{ t('settings.title') }}</h2>
       <p class="text-sm text-[#40617f] mt-0.5">{{ t('settings.subtitle') }}</p>
     </div>
 
-    
     <div class="bg-white rounded-2xl border border-[#f1f5f9] shadow-sm p-6 space-y-6">
       <h3 class="font-semibold text-[#001d32] text-base">{{ t('settings.globalSettings') }}</h3>
 
-      
       <div class="flex items-center justify-between py-3 border-b border-[#f8fafc]">
         <div>
           <p class="text-sm font-medium text-[#001d32]">{{ t('settings.autoValidation') }}</p>
@@ -24,7 +22,6 @@
         </button>
       </div>
 
-
       <div class="flex items-center justify-between py-3 border-b border-[#f8fafc]">
         <div>
           <p class="text-sm font-medium text-[#001d32]">{{ t('settings.emailNotif') }}</p>
@@ -37,7 +34,6 @@
           <span :class="['inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow', emailNotifications ? 'translate-x-6' : 'translate-x-1']" />
         </button>
       </div>
-
 
       <div class="py-3">
         <p class="text-sm font-medium text-[#001d32] mb-3">{{ t('settings.profileInfo') }}</p>
@@ -61,7 +57,6 @@
         </div>
       </div>
 
-      
       <div class="flex items-center gap-3 pt-2">
         <button class="px-6 py-2.5 text-sm font-semibold rounded-lg border border-[#e5e7eb] text-[#374151] hover:bg-gray-50 transition">
           {{ t('settings.cancelBtn') }}

@@ -24,7 +24,7 @@ type projectPayload struct {
 	Category    string  `json:"category"`
 	CoverImage  *string `json:"cover_image"`
 	ImpactLabel *string `json:"impact_label"`
-	Status      string  `json:"status"` // in_progress | completed | showcased
+	Status      string  `json:"status"`
 }
 
 type stepPayload struct {
@@ -35,9 +35,6 @@ type stepPayload struct {
 	Completed   bool    `json:"completed"`
 }
 
-// ─── Public ─────────────────────────────────────────────────────────────────
-
-// PublicIndex returns all showcased/completed projects (visible on listings & provider pages).
 func (h *UpcyclingProjectHandler) PublicIndex(c *gin.Context) {
 	q := h.DB.Preload("Provider").Preload("Steps", func(db *gorm.DB) *gorm.DB {
 		return db.Order("step_order ASC")
@@ -73,8 +70,6 @@ func (h *UpcyclingProjectHandler) PublicShow(c *gin.Context) {
 	c.JSON(http.StatusOK, models.ToProjectResponse(&p, true))
 }
 
-// ─── Provider CRUD ──────────────────────────────────────────────────────────
-
 func (h *UpcyclingProjectHandler) MyProjects(c *gin.Context) {
 	user := middleware.GetAuthUser(c)
 	if user == nil {
@@ -104,7 +99,9 @@ func (h *UpcyclingProjectHandler) CreateProject(c *gin.Context) {
 		return
 	}
 	status := req.Status
-	if status == "" { status = "in_progress" }
+	if status == "" {
+		status = "in_progress"
+	}
 	p := models.UpcyclingProject{
 		ProviderID:  user.ID,
 		Title:       req.Title,
@@ -145,7 +142,9 @@ func (h *UpcyclingProjectHandler) UpdateProject(c *gin.Context) {
 	p.Category = req.Category
 	p.CoverImage = req.CoverImage
 	p.ImpactLabel = req.ImpactLabel
-	if req.Status != "" { p.Status = req.Status }
+	if req.Status != "" {
+		p.Status = req.Status
+	}
 	h.DB.Save(&p)
 	h.DB.Preload("Provider").Preload("Steps", func(db *gorm.DB) *gorm.DB {
 		return db.Order("step_order ASC")
@@ -168,8 +167,6 @@ func (h *UpcyclingProjectHandler) DeleteProject(c *gin.Context) {
 	h.DB.Delete(&p)
 	c.JSON(http.StatusOK, gin.H{"message": "Projet supprimé"})
 }
-
-// ─── Steps ──────────────────────────────────────────────────────────────────
 
 func (h *UpcyclingProjectHandler) AddStep(c *gin.Context) {
 	user := middleware.GetAuthUser(c)
@@ -214,7 +211,6 @@ func (h *UpcyclingProjectHandler) UpdateStep(c *gin.Context) {
 	projectID, _ := strconv.ParseUint(c.Param("id"), 10, 64)
 	stepID, _ := strconv.ParseUint(c.Param("step_id"), 10, 64)
 
-	// Verify project belongs to user
 	var p models.UpcyclingProject
 	if err := h.DB.Where("id = ? AND provider_id = ?", projectID, user.ID).First(&p).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"message": "Projet introuvable"})
@@ -260,8 +256,6 @@ func (h *UpcyclingProjectHandler) DeleteStep(c *gin.Context) {
 	h.DB.Where("id = ? AND project_id = ?", stepID, projectID).Delete(&models.ProjectStep{})
 	c.JSON(http.StatusOK, gin.H{"message": "Étape supprimée"})
 }
-
-// ─── Admin ──────────────────────────────────────────────────────────────────
 
 func (h *UpcyclingProjectHandler) AdminIndex(c *gin.Context) {
 	var projects []models.UpcyclingProject

@@ -52,7 +52,7 @@ onMounted(async () => {
     const { data } = await api.get('/dashboard/trends')
     if (Array.isArray(data.monthly_signups)) counts.value = data.monthly_signups
     if (data.year) year.value = data.year
-  } catch { /* keep zeros */ } finally {
+  } catch {  } finally {
     loading.value = false
   }
 })

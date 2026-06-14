@@ -5,7 +5,6 @@
       <p class="text-sm text-[#40617f] mt-0.5">Exportez n'importe quelle donnée de la plateforme en CSV ou PDF, sur la période de votre choix.</p>
     </div>
 
-    <!-- Date range + format -->
     <div class="card p-5 space-y-4">
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div>
@@ -26,7 +25,6 @@
       <p class="text-xs text-[#94a3b8]">Sans dates, l'export contient toutes les données. Le filtre s'applique à la date de création.</p>
     </div>
 
-    <!-- Datasets grid -->
     <div v-if="loading" class="py-16 text-center">
       <div class="w-8 h-8 border-4 border-[#006d35] border-t-transparent rounded-full animate-spin mx-auto" />
     </div>

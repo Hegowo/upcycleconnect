@@ -1,6 +1,5 @@
 FROM httpd:2.4-alpine
 
-# Enable required modules (proxy, rewrite, headers + ssl for HTTPS)
 RUN sed -i \
     -e 's|#LoadModule proxy_module|LoadModule proxy_module|' \
     -e 's|#LoadModule proxy_http_module|LoadModule proxy_http_module|' \

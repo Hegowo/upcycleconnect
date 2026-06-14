@@ -42,7 +42,6 @@ import { SparklesIcon, MegaphoneIcon, UserIcon } from '@heroicons/vue/24/outline
 import { publicGet } from '@/services/publicApi'
 
 defineProps({
-  // Extra classes for the wrapping <section> (spacing differs per host page).
   wrapperClass: { type: String, default: 'py-10' },
 })
 

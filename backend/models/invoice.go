@@ -7,23 +7,23 @@ import (
 )
 
 type Invoice struct {
-	ID              uint           `gorm:"primaryKey" json:"id"`
-	UserID          uint           `gorm:"index;not null" json:"user_id"`
-	ReservationID   *uint          `gorm:"index" json:"reservation_id"`
-	Type            string         `gorm:"size:20;default:invoice" json:"type"`
-	Number          string         `gorm:"size:50;uniqueIndex;not null" json:"number"`
-	PrestationTitle string         `gorm:"size:255;not null" json:"prestation_title"`
-	AmountCents     int64          `gorm:"not null;default:0" json:"amount_cents"`
-	TVAPercent      float64        `gorm:"type:decimal(5,2);default:20.00" json:"tva_percent"`
-	Currency        string         `gorm:"size:3;default:eur" json:"currency"`
-	PDFPath         *string        `gorm:"size:500" json:"pdf_path"`
-	// LineItems holds the multi-line quote breakdown as JSON: [{"label":..,"amount_cents":..}].
-	LineItems       *string        `gorm:"type:text" json:"line_items"`
-	Status          string         `gorm:"size:20;default:issued" json:"status"`
-	IssuedAt        time.Time      `gorm:"not null" json:"issued_at"`
-	CreatedAt       time.Time      `json:"created_at"`
-	UpdatedAt       time.Time      `json:"updated_at"`
-	DeletedAt       gorm.DeletedAt `gorm:"index" json:"-"`
+	ID              uint    `gorm:"primaryKey" json:"id"`
+	UserID          uint    `gorm:"index;not null" json:"user_id"`
+	ReservationID   *uint   `gorm:"index" json:"reservation_id"`
+	Type            string  `gorm:"size:20;default:invoice" json:"type"`
+	Number          string  `gorm:"size:50;uniqueIndex;not null" json:"number"`
+	PrestationTitle string  `gorm:"size:255;not null" json:"prestation_title"`
+	AmountCents     int64   `gorm:"not null;default:0" json:"amount_cents"`
+	TVAPercent      float64 `gorm:"type:decimal(5,2);default:20.00" json:"tva_percent"`
+	Currency        string  `gorm:"size:3;default:eur" json:"currency"`
+	PDFPath         *string `gorm:"size:500" json:"pdf_path"`
+
+	LineItems *string        `gorm:"type:text" json:"line_items"`
+	Status    string         `gorm:"size:20;default:issued" json:"status"`
+	IssuedAt  time.Time      `gorm:"not null" json:"issued_at"`
+	CreatedAt time.Time      `json:"created_at"`
+	UpdatedAt time.Time      `json:"updated_at"`
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 
 	User        *User        `gorm:"foreignKey:UserID" json:"-"`
 	Reservation *Reservation `gorm:"foreignKey:ReservationID" json:"-"`

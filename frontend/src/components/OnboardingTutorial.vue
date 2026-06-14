@@ -156,7 +156,6 @@ async function next() {
   }
 }
 
-// Block ESC/Tab navigation while modal is open so the user truly cannot dismiss it.
 function blockEscape(e) {
   if (!props.show) return
   if (e.key === 'Escape') {

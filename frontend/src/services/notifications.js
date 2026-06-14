@@ -1,7 +1,6 @@
 import api from './api'
 import { userApi } from './publicApi'
 
-// ── Admin panel (uses admin_token) ────────────────────────────────────────
 export const adminNotifications = {
   async list(limit = 30) {
     const { data } = await api.get('/notifications', { params: { limit } })
@@ -19,7 +18,6 @@ export const adminNotifications = {
   },
 }
 
-// ── Public site (uses user_token) ─────────────────────────────────────────
 export const userNotifications = {
   async list(limit = 30) {
     return userApi(`/notifications?limit=${limit}`)

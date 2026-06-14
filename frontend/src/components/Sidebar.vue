@@ -5,12 +5,11 @@
       ? 'bg-[#1e293b] border-[#334155]'
       : 'bg-white border-[#e5e7eb]'
   ]">
-    <!-- Logo -->
+
     <div :class="['flex items-center gap-3 px-4 py-4 border-b', theme.isDark ? 'border-[#334155]' : 'border-[#e5e7eb]']">
       <img src="/logoentier.png" alt="UpcycleConnect" class="h-9 w-auto object-contain" />
     </div>
 
-    <!-- Nav -->
     <nav class="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
       <RouterLink
         v-for="item in navItems"
@@ -83,7 +82,6 @@
       </template>
     </nav>
 
-    <!-- User card -->
     <div :class="['px-4 py-4 border-t', theme.isDark ? 'border-[#334155]' : 'border-[#e5e7eb]']">
       <div class="flex items-center gap-3">
         <div class="w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0" style="background-color:#001d32;">

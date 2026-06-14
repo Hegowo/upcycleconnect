@@ -7,13 +7,12 @@ import (
 )
 
 type Reservation struct {
-	ID                    uint           `gorm:"primaryKey" json:"id"`
-	UserID                uint           `gorm:"index;not null" json:"user_id"`
-	PrestationID          uint           `gorm:"index;not null" json:"prestation_id"`
-	Status                string         `gorm:"size:20;default:pending" json:"status"`
-	AmountCents           int64          `gorm:"not null;default:0" json:"amount_cents"`
-	// CommissionCents is UpcycleConnect's cut (5-10%) on the transaction; NetCents is the provider's share.
-	// Both are computed and frozen at payment fulfillment.
+	ID           uint   `gorm:"primaryKey" json:"id"`
+	UserID       uint   `gorm:"index;not null" json:"user_id"`
+	PrestationID uint   `gorm:"index;not null" json:"prestation_id"`
+	Status       string `gorm:"size:20;default:pending" json:"status"`
+	AmountCents  int64  `gorm:"not null;default:0" json:"amount_cents"`
+
 	CommissionCents       int64          `gorm:"not null;default:0" json:"commission_cents"`
 	NetCents              int64          `gorm:"not null;default:0" json:"net_cents"`
 	Currency              string         `gorm:"size:3;default:eur" json:"currency"`
@@ -33,14 +32,14 @@ func (Reservation) TableName() string {
 }
 
 type ReservationResponse struct {
-	ID           uint                `json:"id"`
-	Status       string              `json:"status"`
-	AmountCents  int64               `json:"amount_cents"`
-	Currency     string              `json:"currency"`
-	Notes        *string             `json:"notes"`
-	Prestation   *PrestationResponse `json:"prestation"`
-	CreatedAt    string              `json:"created_at"`
-	UpdatedAt    string              `json:"updated_at"`
+	ID          uint                `json:"id"`
+	Status      string              `json:"status"`
+	AmountCents int64               `json:"amount_cents"`
+	Currency    string              `json:"currency"`
+	Notes       *string             `json:"notes"`
+	Prestation  *PrestationResponse `json:"prestation"`
+	CreatedAt   string              `json:"created_at"`
+	UpdatedAt   string              `json:"updated_at"`
 }
 
 func ToReservationResponse(r *Reservation) ReservationResponse {

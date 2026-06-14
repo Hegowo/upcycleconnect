@@ -20,9 +20,6 @@ type LocaleHandler struct {
 
 var localeCodeRe = regexp.MustCompile(`^[a-z]{2}(-[A-Za-z]{2,4})?$`)
 
-// ─── Public ──────────────────────────────────────────────────────────────────
-
-// PublicList returns the enabled locales (code + name) for the language switcher.
 func (h *LocaleHandler) PublicList(c *gin.Context) {
 	var locales []models.Locale
 	h.DB.Where("enabled = ?", true).Order("builtin DESC, name ASC").Find(&locales)
@@ -33,7 +30,6 @@ func (h *LocaleHandler) PublicList(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": out})
 }
 
-// PublicMessages returns the raw message tree (JSON) for a given enabled locale.
 func (h *LocaleHandler) PublicMessages(c *gin.Context) {
 	code := c.Param("code")
 	var loc models.Locale
@@ -53,8 +49,6 @@ func (h *LocaleHandler) PublicMessages(c *gin.Context) {
 	c.JSON(http.StatusOK, tree)
 }
 
-// ─── Admin ───────────────────────────────────────────────────────────────────
-
 func (h *LocaleHandler) AdminList(c *gin.Context) {
 	var locales []models.Locale
 	h.DB.Order("builtin DESC, name ASC").Find(&locales)
@@ -65,7 +59,6 @@ func (h *LocaleHandler) AdminList(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": out})
 }
 
-// AdminGet returns a locale with its full message tree (for the translation editor).
 func (h *LocaleHandler) AdminGet(c *gin.Context) {
 	var loc models.Locale
 	if err := h.DB.Where("code = ?", c.Param("code")).First(&loc).Error; err != nil {
@@ -92,7 +85,6 @@ type localePayload struct {
 	Messages map[string]interface{} `json:"messages"`
 }
 
-// AdminCreate registers a new language with an initial message tree (seeded by the front from FR).
 func (h *LocaleHandler) AdminCreate(c *gin.Context) {
 	var req localePayload
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -132,7 +124,6 @@ func (h *LocaleHandler) AdminCreate(c *gin.Context) {
 	c.JSON(http.StatusCreated, models.ToLocaleMeta(&loc))
 }
 
-// AdminUpdate edits a locale's name, enabled flag and/or message tree.
 func (h *LocaleHandler) AdminUpdate(c *gin.Context) {
 	var loc models.Locale
 	if err := h.DB.Where("code = ?", c.Param("code")).First(&loc).Error; err != nil {
@@ -161,7 +152,6 @@ func (h *LocaleHandler) AdminUpdate(c *gin.Context) {
 	c.JSON(http.StatusOK, models.ToLocaleMeta(&loc))
 }
 
-// AdminDelete removes a non-builtin locale.
 func (h *LocaleHandler) AdminDelete(c *gin.Context) {
 	var loc models.Locale
 	if err := h.DB.Where("code = ?", c.Param("code")).First(&loc).Error; err != nil {

@@ -48,20 +48,11 @@
   }
 }
 
-/* ─── Admin Dark Mode ────────────────────────────────────────────────────────
-   Scoped to .admin-dark (applied on the AdminLayout root element).
-   This avoids touching the public site even when html.dark is set.
-   ─────────────────────────────────────────────────────────────────────────── */
-
-/* Page bg + default text colour. Setting a base text colour here catches every
-   element that inherits the light-mode default (#111827) without declaring its
-   own colour, so unstyled text/labels stay legible in dark mode. */
 .admin-dark {
   background-color: #0f172a !important;
   color: #e2e8f0;
 }
 
-/* Cards & white surfaces */
 .admin-dark .card,
 .admin-dark .bg-white {
   background-color: #1e293b !important;
@@ -73,7 +64,6 @@
   background-color: #1e293b !important;
 }
 
-/* Subtle / input backgrounds */
 .admin-dark .bg-\[\#f8fafc\],
 .admin-dark .bg-gray-50,
 .admin-dark .bg-\[\#f7f9ff\] {
@@ -84,7 +74,6 @@
   background-color: #1e293b !important;
 }
 
-/* Borders */
 .admin-dark .border-gray-200,
 .admin-dark .border-\[\#e5e7eb\],
 .admin-dark .border-\[\#f1f5f9\],
@@ -97,7 +86,6 @@
   border-color: #1e3352 !important;
 }
 
-/* Text — primary */
 .admin-dark .text-gray-900,
 .admin-dark .text-\[\#001d32\] {
   color: #f1f5f9 !important;
@@ -116,11 +104,11 @@
 .admin-dark .text-\[\#40617f\] {
   color: #94a3b8 !important;
 }
-/* Muted / secondary labels — previously #475569 which was too dark */
+
 .admin-dark .text-gray-400 {
   color: #94a3b8 !important;
 }
-/* Keep green accent as-is */
+
 .admin-dark .text-\[\#006d35\],
 .admin-dark .text-green-600,
 .admin-dark .text-green-700 {
@@ -128,13 +116,11 @@
 }
 .admin-dark .text-\[\#1B8848\] { color: #4ade80 !important; }
 
-/* Badge text colors not covered by generic overrides */
-.admin-dark .text-\[\#166534\] { color: #86efac !important; } /* success green */
-.admin-dark .text-\[\#991b1b\] { color: #fca5a5 !important; } /* danger red */
-.admin-dark .text-\[\#475569\] { color: #94a3b8 !important; } /* neutral gray */
-.admin-dark .text-\[\#1e40af\] { color: #93c5fd !important; } /* blue */
+.admin-dark .text-\[\#166534\] { color: #86efac !important; }
+.admin-dark .text-\[\#991b1b\] { color: #fca5a5 !important; }
+.admin-dark .text-\[\#475569\] { color: #94a3b8 !important; }
+.admin-dark .text-\[\#1e40af\] { color: #93c5fd !important; }
 
-/* Stat / badge backgrounds */
 .admin-dark .bg-green-50,  .admin-dark .bg-\[\#dcfce7\], .admin-dark .bg-\[\#f0fdf4\] { background-color: rgba(0,109,53,0.22) !important; }
 .admin-dark .bg-blue-50,   .admin-dark .bg-\[\#dbeafe\] { background-color: rgba(37,99,235,0.22) !important; }
 .admin-dark .bg-red-50     { background-color: rgba(220,38,38,0.22) !important; }
@@ -143,13 +129,11 @@
 .admin-dark .bg-\[\#edf4ff\] { background-color: rgba(30,58,138,0.22) !important; }
 .admin-dark .bg-\[\#fef9c3\] { background-color: rgba(202,138,4,0.22) !important; }
 
-/* Badge text */
 .admin-dark .text-green-700 { color: #86efac !important; }
 .admin-dark .text-blue-600  { color: #93c5fd !important; }
 .admin-dark .text-red-500, .admin-dark .text-red-600, .admin-dark .text-red-700 { color: #fca5a5 !important; }
 .admin-dark .text-yellow-700, .admin-dark .text-\[\#854d0e\] { color: #fde047 !important; }
 
-/* Hover states on rows / buttons */
 .admin-dark .hover\:bg-\[\#f8fafc\]:hover,
 .admin-dark .hover\:bg-gray-50:hover,
 .admin-dark .hover\:bg-\[\#f9fafb\]:hover {
@@ -158,7 +142,6 @@
 .admin-dark .hover\:bg-gray-100:hover { background-color: #334155 !important; }
 .admin-dark .hover\:bg-red-50:hover   { background-color: rgba(220,38,38,0.18) !important; }
 
-/* Inputs & selects */
 .admin-dark input:not([type="checkbox"]):not([type="radio"]),
 .admin-dark select,
 .admin-dark textarea {
@@ -177,7 +160,6 @@
 }
 .admin-dark .label { color: #cbd5e1 !important; }
 
-/* .btn-secondary in dark */
 .admin-dark .btn-secondary {
   background-color: #1e293b !important;
   border-color: #334155 !important;
@@ -185,39 +167,29 @@
 }
 .admin-dark .btn-secondary:hover { background-color: #263244 !important; }
 
-/* Table */
 .admin-dark table  { background-color: #1e293b !important; }
 .admin-dark thead  { background-color: #263244 !important; }
 .admin-dark th     { color: #94a3b8 !important; border-color: #334155 !important; }
 .admin-dark td     { color: #cbd5e1 !important; border-color: #334155 !important; }
 .admin-dark tbody tr:hover { background-color: #263244 !important; }
 
-/* Shadows softened */
 .admin-dark .shadow-sm  { box-shadow: 0 1px 2px 0 rgba(0,0,0,0.4) !important; }
 .admin-dark .shadow     { box-shadow: 0 1px 3px 0 rgba(0,0,0,0.5) !important; }
 .admin-dark .shadow-xl  { box-shadow: 0 20px 25px -5px rgba(0,0,0,0.6) !important; }
 
-/* Scrollbars */
 .admin-dark ::-webkit-scrollbar        { width: 6px; height: 6px; }
 .admin-dark ::-webkit-scrollbar-track  { background: #0f172a; }
 .admin-dark ::-webkit-scrollbar-thumb  { background: #334155; border-radius: 3px; }
 .admin-dark ::-webkit-scrollbar-thumb:hover { background: #475569; }
 
-/* ── Additional specific classes ─────────────────────────────────────────── */
-
-/* bg-[#edf4ff] — card-blue used in some panels */
 .admin-dark .bg-\[\#edf4ff\] { background-color: rgba(30,58,138,0.2) !important; }
 
-/* bg-[#374151] — rarely used as bg */
 .admin-dark .bg-\[\#374151\] { background-color: #334155 !important; }
 
-/* text-[#1B5B88] */
 .admin-dark .text-\[\#1B5B88\] { color: #93c5fd !important; }
 
-/* hover:bg-[#f0fdf4] */
 .admin-dark .hover\:bg-\[\#f0fdf4\]:hover { background-color: rgba(0,109,53,0.2) !important; }
 
-/* AppBadge — badge colors in dark */
 .admin-dark .bg-green-100  { background-color: rgba(0,109,53,0.25)    !important; }
 .admin-dark .text-green-800 { color: #86efac !important; }
 .admin-dark .bg-yellow-100 { background-color: rgba(202,138,4,0.25)   !important; }
@@ -229,7 +201,6 @@
 .admin-dark .bg-gray-100   { background-color: #334155 !important; }
 .admin-dark .text-gray-800 { color: #e2e8f0 !important; }
 
-/* Inline style= overrides — light icon-container backgrounds */
 .admin-dark [style*="background-color:#dcfce7"],
 .admin-dark [style*="background-color: #dcfce7"] { background-color: rgba(0,109,53,0.22)   !important; }
 .admin-dark [style*="background-color:#dbeafe"],
@@ -248,11 +219,10 @@
 .admin-dark [style*="background-color:#f8fafc"],
 .admin-dark [style*="background-color: #f8fafc"]  { background-color: #0f172a !important; }
 
-/* Inline style= icon color overrides */
 .admin-dark [style*="color:#006d35"]  { color: #4ade80 !important; }
 .admin-dark [style*="color:#1B8848"]  { color: #4ade80 !important; }
-.admin-dark [style*="color:#166534"]  { color: #86efac !important; } /* success green inline */
-.admin-dark [style*="color:#991b1b"]  { color: #fca5a5 !important; } /* danger red inline */
+.admin-dark [style*="color:#166534"]  { color: #86efac !important; }
+.admin-dark [style*="color:#991b1b"]  { color: #fca5a5 !important; }
 .admin-dark [style*="color:#001d32"]  { color: #f1f5f9 !important; }
 .admin-dark [style*="color:#40617f"]  { color: #94a3b8 !important; }
 .admin-dark [style*="color:#475569"]  { color: #94a3b8 !important; }
@@ -260,12 +230,10 @@
 .admin-dark [style*="color:#dc2626"]  { color: #fca5a5 !important; }
 .admin-dark [style*="color:#374151"]  { color: #cbd5e1 !important; }
 
-/* Inline border-color */
 .admin-dark [style*="border-color:#e5e7eb"],
 .admin-dark [style*="border-color:#e2e8f0"],
 .admin-dark [style*="border-color:#f1f5f9"]  { border-color: #334155 !important; }
 
-/* AppConfirmDialog (teleported outside .admin-dark) — extended coverage */
 html.dark .fixed.inset-0.z-50 .bg-white {
   background-color: #1e293b !important;
   border-color: #334155 !important;
@@ -278,7 +246,7 @@ html.dark .fixed.inset-0.z-50 .btn-secondary  {
   border-color: #334155 !important;
   color: #94a3b8 !important;
 }
-/* Teleported modals (broadcast notification, etc.) — form controls + brand text */
+
 html.dark .fixed.inset-0.z-50 input:not([type="checkbox"]):not([type="radio"]),
 html.dark .fixed.inset-0.z-50 select,
 html.dark .fixed.inset-0.z-50 textarea {
@@ -297,92 +265,66 @@ html.dark .fixed.inset-0.z-50 .text-\[\#374151\]    { color: #cbd5e1 !important;
 html.dark .fixed.inset-0.z-50 .border-\[\#e5e7eb\],
 html.dark .fixed.inset-0.z-50 .border-\[\#f1f5f9\]  { border-color: #334155 !important; }
 
-/* Select option legibility */
 .admin-dark select option { background-color: #1e293b; color: #f1f5f9; }
 
-/* Tab / pill active states with green bg */
 .admin-dark .bg-\[\#006d35\]  { background-color: #15803d !important; }
 .admin-dark .bg-\[\#1B8848\]  { background-color: #15803d !important; }
 .admin-dark .bg-\[\#10522b\]  { background-color: #166534 !important; }
 
-/* border-[#bbf7d0], border-[#fde047] — success/warning border in light alerts */
 .admin-dark .border-\[\#bbf7d0\] { border-color: rgba(0,109,53,0.4)  !important; }
 .admin-dark .border-\[\#fde047\] { border-color: rgba(202,138,4,0.4) !important; }
 .admin-dark .border-red-200      { border-color: rgba(220,38,38,0.4) !important; }
 .admin-dark .border-green-200    { border-color: rgba(0,109,53,0.4)  !important; }
 
-/* ring / focus */
 .admin-dark .focus\:ring-\[\#006d35\]\/20:focus,
 .admin-dark .focus\:ring-\[\#006d35\]\/30:focus { --tw-ring-color: rgba(74,222,128,0.25) !important; }
 
-/* ───────────────────────────────────────────────────────────────────────────
-   Dark-mode accessibility fixes (WCAG contrast).
-   Vue serialises :style bindings to rgb(...), so the #hex attribute selectors
-   above never match those — target the rgb() forms here. Plus a couple of
-   utility classes that were missed. (Audited page-by-page in dark mode.)
-   ─────────────────────────────────────────────────────────────────────────── */
+.admin-dark .text-\[\#64748b\] { color: #94a3b8 !important; }
+.admin-dark .bg-\[\#fee2e2\]   { background-color: rgba(220,38,38,0.22) !important; }
+.admin-dark .bg-gray-300       { background-color: #475569 !important; }
 
-/* Missed utility classes */
-.admin-dark .text-\[\#64748b\] { color: #94a3b8 !important; }           /* muted slate text */
-.admin-dark .bg-\[\#fee2e2\]   { background-color: rgba(220,38,38,0.22) !important; } /* "Banni" badge bg */
-.admin-dark .bg-gray-300       { background-color: #475569 !important; }              /* OFF toggle track */
+.admin-dark [style^="color: rgb(0, 109, 53)"],   .admin-dark [style*="; color: rgb(0, 109, 53)"]   { color: #4ade80 !important; }
+.admin-dark [style^="color: rgb(27, 136, 72)"],  .admin-dark [style*="; color: rgb(27, 136, 72)"]  { color: #4ade80 !important; }
+.admin-dark [style^="color: rgb(0, 29, 50)"],    .admin-dark [style*="; color: rgb(0, 29, 50)"]    { color: #f1f5f9 !important; }
+.admin-dark [style^="color: rgb(64, 97, 127)"],  .admin-dark [style*="; color: rgb(64, 97, 127)"]  { color: #94a3b8 !important; }
+.admin-dark [style^="color: rgb(100, 116, 139)"],.admin-dark [style*="; color: rgb(100, 116, 139)"]{ color: #94a3b8 !important; }
+.admin-dark [style^="color: rgb(22, 101, 52)"],  .admin-dark [style*="; color: rgb(22, 101, 52)"]  { color: #86efac !important; }
+.admin-dark [style^="color: rgb(153, 27, 27)"],  .admin-dark [style*="; color: rgb(153, 27, 27)"]  { color: #fca5a5 !important; }
+.admin-dark [style^="color: rgb(220, 38, 38)"],  .admin-dark [style*="; color: rgb(220, 38, 38)"]  { color: #fca5a5 !important; }
+.admin-dark [style^="color: rgb(202, 138, 4)"],  .admin-dark [style*="; color: rgb(202, 138, 4)"]  { color: #fde047 !important; }
+.admin-dark [style^="color: rgb(133, 77, 14)"],  .admin-dark [style*="; color: rgb(133, 77, 14)"]  { color: #fde047 !important; }
 
-/* Inline :style TEXT colours (serialised to rgb). Match only when the value is
-   the `color` property — at the start of the style string, or preceded by "; " —
-   so we never hit `background-color: rgb(...)` (which contains "color:"). */
-.admin-dark [style^="color: rgb(0, 109, 53)"],   .admin-dark [style*="; color: rgb(0, 109, 53)"]   { color: #4ade80 !important; } /* #006d35 green */
-.admin-dark [style^="color: rgb(27, 136, 72)"],  .admin-dark [style*="; color: rgb(27, 136, 72)"]  { color: #4ade80 !important; } /* #1B8848 green */
-.admin-dark [style^="color: rgb(0, 29, 50)"],    .admin-dark [style*="; color: rgb(0, 29, 50)"]    { color: #f1f5f9 !important; } /* #001d32 heading */
-.admin-dark [style^="color: rgb(64, 97, 127)"],  .admin-dark [style*="; color: rgb(64, 97, 127)"]  { color: #94a3b8 !important; } /* #40617f muted */
-.admin-dark [style^="color: rgb(100, 116, 139)"],.admin-dark [style*="; color: rgb(100, 116, 139)"]{ color: #94a3b8 !important; } /* #64748b muted */
-.admin-dark [style^="color: rgb(22, 101, 52)"],  .admin-dark [style*="; color: rgb(22, 101, 52)"]  { color: #86efac !important; } /* #166534 success */
-.admin-dark [style^="color: rgb(153, 27, 27)"],  .admin-dark [style*="; color: rgb(153, 27, 27)"]  { color: #fca5a5 !important; } /* #991b1b danger */
-.admin-dark [style^="color: rgb(220, 38, 38)"],  .admin-dark [style*="; color: rgb(220, 38, 38)"]  { color: #fca5a5 !important; } /* #dc2626 danger */
-.admin-dark [style^="color: rgb(202, 138, 4)"],  .admin-dark [style*="; color: rgb(202, 138, 4)"]  { color: #fde047 !important; } /* #ca8a04 amber */
-.admin-dark [style^="color: rgb(133, 77, 14)"],  .admin-dark [style*="; color: rgb(133, 77, 14)"]  { color: #fde047 !important; } /* #854d0e amber */
+.admin-dark [style*="rgb(240, 253, 244)"] { background-color: rgba(0,109,53,0.20)  !important; }
+.admin-dark [style*="rgb(220, 252, 231)"] { background-color: rgba(0,109,53,0.24)  !important; }
+.admin-dark [style*="rgb(254, 226, 226)"] { background-color: rgba(220,38,38,0.22) !important; }
+.admin-dark [style*="rgb(219, 234, 254)"] { background-color: rgba(37,99,235,0.22) !important; }
+.admin-dark [style*="rgb(254, 249, 195)"] { background-color: rgba(202,138,4,0.22) !important; }
+.admin-dark [style*="rgb(237, 244, 255)"] { background-color: rgba(30,58,138,0.22) !important; }
+.admin-dark [style*="rgb(248, 250, 252)"] { background-color: #0f172a !important; }
 
-/* Inline :style light BACKGROUNDS (serialised to rgb) — these light tints are
-   only ever used as backgrounds, so a bare substring match is safe. */
-.admin-dark [style*="rgb(240, 253, 244)"] { background-color: rgba(0,109,53,0.20)  !important; } /* #f0fdf4 */
-.admin-dark [style*="rgb(220, 252, 231)"] { background-color: rgba(0,109,53,0.24)  !important; } /* #dcfce7 */
-.admin-dark [style*="rgb(254, 226, 226)"] { background-color: rgba(220,38,38,0.22) !important; } /* #fee2e2 */
-.admin-dark [style*="rgb(219, 234, 254)"] { background-color: rgba(37,99,235,0.22) !important; } /* #dbeafe */
-.admin-dark [style*="rgb(254, 249, 195)"] { background-color: rgba(202,138,4,0.22) !important; } /* #fef9c3 */
-.admin-dark [style*="rgb(237, 244, 255)"] { background-color: rgba(30,58,138,0.22) !important; } /* #edf4ff */
-.admin-dark [style*="rgb(248, 250, 252)"] { background-color: #0f172a !important; }              /* #f8fafc */
+.admin-dark .text-blue-700      { color: #93c5fd !important; }
+.admin-dark .text-\[\#1d4ed8\]  { color: #93c5fd !important; }
+.admin-dark .text-\[\#6b7280\]  { color: #94a3b8 !important; }
+.admin-dark .text-\[\#111827\]  { color: #f1f5f9 !important; }
+.admin-dark .text-\[\#1f2937\]  { color: #e2e8f0 !important; }
+.admin-dark .text-\[\#4b5563\]  { color: #cbd5e1 !important; }
 
-/* More missed text utilities (badges/labels found while auditing) */
-.admin-dark .text-blue-700      { color: #93c5fd !important; }   /* blue badges ("Intégrée", "Administrateur") */
-.admin-dark .text-\[\#1d4ed8\]  { color: #93c5fd !important; }   /* blue accent */
-.admin-dark .text-\[\#6b7280\]  { color: #94a3b8 !important; }   /* gray-500 label */
-.admin-dark .text-\[\#111827\]  { color: #f1f5f9 !important; }   /* gray-900 dark text */
-.admin-dark .text-\[\#1f2937\]  { color: #e2e8f0 !important; }   /* gray-800 dark text */
-.admin-dark .text-\[\#4b5563\]  { color: #cbd5e1 !important; }   /* gray-600 dark text */
+.admin-dark [style^="color: rgb(29, 78, 216)"], .admin-dark [style*="; color: rgb(29, 78, 216)"]   { color: #93c5fd !important; }
+.admin-dark [style^="color: rgb(17, 24, 39)"],  .admin-dark [style*="; color: rgb(17, 24, 39)"]    { color: #f1f5f9 !important; }
+.admin-dark [style^="color: rgb(107, 114, 128)"],.admin-dark [style*="; color: rgb(107, 114, 128)"]{ color: #94a3b8 !important; }
 
-/* Inline :style text colours for the above (serialised to rgb) */
-.admin-dark [style^="color: rgb(29, 78, 216)"], .admin-dark [style*="; color: rgb(29, 78, 216)"]   { color: #93c5fd !important; } /* #1d4ed8 */
-.admin-dark [style^="color: rgb(17, 24, 39)"],  .admin-dark [style*="; color: rgb(17, 24, 39)"]    { color: #f1f5f9 !important; } /* #111827 */
-.admin-dark [style^="color: rgb(107, 114, 128)"],.admin-dark [style*="; color: rgb(107, 114, 128)"]{ color: #94a3b8 !important; } /* #6b7280 */
+.admin-dark [style*="rgb(237, 233, 254)"] { background-color: rgba(124,58,237,0.25) !important; }
+.admin-dark [style*="rgb(224, 242, 254)"] { background-color: rgba(14,165,233,0.25) !important; }
+.admin-dark [style*="rgb(252, 231, 243)"] { background-color: rgba(219,39,119,0.25) !important; }
+.admin-dark [style*="rgb(224, 231, 255)"] { background-color: rgba(79,70,229,0.25)  !important; }
+.admin-dark [style*="rgb(255, 247, 237)"] { background-color: rgba(234,88,12,0.20)  !important; }
+.admin-dark [style*="rgb(254, 242, 242)"] { background-color: rgba(220,38,38,0.20)  !important; }
+.admin-dark [style*="rgb(241, 245, 249)"] { background-color: #263244 !important; }
 
-/* ── Light SURFACES that stayed light in dark mode ──────────────────────────
-   Icon containers (dashboard stat widgets, category cards) and secondary action
-   buttons ("Modifier"/"Suspendre"/"Annuler") use inline :style backgrounds,
-   serialised to rgb(...). Darken them, and lighten the matching inline text. */
-
-/* Inline light backgrounds → dark tints */
-.admin-dark [style*="rgb(237, 233, 254)"] { background-color: rgba(124,58,237,0.25) !important; } /* #ede9fe purple */
-.admin-dark [style*="rgb(224, 242, 254)"] { background-color: rgba(14,165,233,0.25) !important; } /* #e0f2fe sky */
-.admin-dark [style*="rgb(252, 231, 243)"] { background-color: rgba(219,39,119,0.25) !important; } /* #fce7f3 pink */
-.admin-dark [style*="rgb(224, 231, 255)"] { background-color: rgba(79,70,229,0.25)  !important; } /* #e0e7ff indigo */
-.admin-dark [style*="rgb(255, 247, 237)"] { background-color: rgba(234,88,12,0.20)  !important; } /* #fff7ed orange */
-.admin-dark [style*="rgb(254, 242, 242)"] { background-color: rgba(220,38,38,0.20)  !important; } /* #fef2f2 red */
-.admin-dark [style*="rgb(241, 245, 249)"] { background-color: #263244 !important; }               /* #f1f5f9 secondary btn */
-
-/* Inline icon / button text colours (serialised to rgb) */
-.admin-dark [style^="color: rgb(124, 58, 237)"], .admin-dark [style*="; color: rgb(124, 58, 237)"] { color: #c4b5fd !important; } /* #7c3aed purple */
-.admin-dark [style^="color: rgb(8, 145, 178)"],  .admin-dark [style*="; color: rgb(8, 145, 178)"]  { color: #67e8f9 !important; } /* #0891b2 cyan */
-.admin-dark [style^="color: rgb(157, 23, 77)"],  .admin-dark [style*="; color: rgb(157, 23, 77)"]  { color: #f9a8d4 !important; } /* #9d174d pink */
-.admin-dark [style^="color: rgb(67, 56, 202)"],  .admin-dark [style*="; color: rgb(67, 56, 202)"]  { color: #a5b4fc !important; } /* #4338ca indigo */
-.admin-dark [style^="color: rgb(194, 65, 12)"],  .admin-dark [style*="; color: rgb(194, 65, 12)"]  { color: #fdba74 !important; } /* #c2410c orange */
-.admin-dark [style^="color: rgb(185, 28, 28)"],  .admin-dark [style*="; color: rgb(185, 28, 28)"]  { color: #fca5a5 !important; } /* #b91c1c red */
-.admin-dark [style^="color: rgb(71, 85, 105)"],  .admin-dark [style*="; color: rgb(71, 85, 105)"]  { color: #94a3b8 !important; } /* #475569 slate */
+.admin-dark [style^="color: rgb(124, 58, 237)"], .admin-dark [style*="; color: rgb(124, 58, 237)"] { color: #c4b5fd !important; }
+.admin-dark [style^="color: rgb(8, 145, 178)"],  .admin-dark [style*="; color: rgb(8, 145, 178)"]  { color: #67e8f9 !important; }
+.admin-dark [style^="color: rgb(157, 23, 77)"],  .admin-dark [style*="; color: rgb(157, 23, 77)"]  { color: #f9a8d4 !important; }
+.admin-dark [style^="color: rgb(67, 56, 202)"],  .admin-dark [style*="; color: rgb(67, 56, 202)"]  { color: #a5b4fc !important; }
+.admin-dark [style^="color: rgb(194, 65, 12)"],  .admin-dark [style*="; color: rgb(194, 65, 12)"]  { color: #fdba74 !important; }
+.admin-dark [style^="color: rgb(185, 28, 28)"],  .admin-dark [style*="; color: rgb(185, 28, 28)"]  { color: #fca5a5 !important; }
+.admin-dark [style^="color: rgb(71, 85, 105)"],  .admin-dark [style*="; color: rgb(71, 85, 105)"]  { color: #94a3b8 !important; }

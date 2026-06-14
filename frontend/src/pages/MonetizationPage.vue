@@ -5,7 +5,6 @@
       <p class="text-sm text-[#40617f] mt-0.5">Revenus de la plateforme, commissions, campagnes et abonnements pro.</p>
     </div>
 
-    <!-- Tabs -->
     <div class="flex gap-1 border-b border-[#e5e7eb]">
       <button v-for="tab in tabs" :key="tab.key" @click="activeTab = tab.key"
         :class="['px-4 py-2.5 text-sm font-semibold transition border-b-2 -mb-px flex items-center gap-2',
@@ -18,13 +17,12 @@
       </button>
     </div>
 
-    <!-- ===== FINANCE ===== -->
     <div v-if="activeTab === 'finance'">
       <div v-if="loadingFinance" class="py-16 text-center">
         <div class="w-8 h-8 border-4 border-[#006d35] border-t-transparent rounded-full animate-spin mx-auto" />
       </div>
       <template v-else-if="finance">
-        <!-- KPI cards -->
+
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <div class="card p-5">
             <BanknotesIcon class="w-6 h-6 text-[#006d35] mb-2" />
@@ -48,7 +46,6 @@
           </div>
         </div>
 
-        <!-- GMV breakdown -->
         <div class="card p-5 mb-6">
           <h3 class="font-bold text-[#001d32] mb-4">Volume de transactions (prestations)</h3>
           <div class="grid grid-cols-3 gap-4 text-center">
@@ -67,7 +64,6 @@
           </div>
         </div>
 
-        <!-- Recent transactions -->
         <div class="card overflow-hidden">
           <div class="px-5 py-3 border-b border-[#f1f5f9]">
             <h3 class="font-bold text-[#001d32] text-sm">Dernières transactions</h3>
@@ -97,7 +93,6 @@
       </template>
     </div>
 
-    <!-- ===== CAMPAIGNS ===== -->
     <div v-if="activeTab === 'campaigns'">
       <div class="flex items-center gap-2 mb-4">
         <button v-for="f in campaignFilters" :key="f.value"
@@ -154,7 +149,6 @@
       </div>
     </div>
 
-    <!-- ===== SUBSCRIPTIONS ===== -->
     <div v-else-if="activeTab === 'subscriptions'">
       <div v-if="loadingSubs" class="py-16 text-center">
         <div class="w-8 h-8 border-4 border-[#006d35] border-t-transparent rounded-full animate-spin mx-auto" />
@@ -191,7 +185,6 @@
       </div>
     </div>
 
-    <!-- Reject modal -->
     <Teleport to="body">
       <div v-if="rejectModal.show" class="fixed inset-0 z-50 flex items-center justify-center p-4">
         <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="rejectModal.show = false" />
@@ -270,7 +263,7 @@ async function fetchCampaigns() {
     const j = await res.json()
     campaigns.value = j.data || []
   } catch { campaigns.value = [] } finally { loadingCampaigns.value = false }
-  // update pending badge
+
   try {
     const res = await fetch(`${BASE}/campaigns?status=pending`, { headers: authHeaders() })
     const j = await res.json()

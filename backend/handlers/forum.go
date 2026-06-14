@@ -45,8 +45,6 @@ func (h *ForumHandler) currentUser(c *gin.Context) *models.User {
 	return user
 }
 
-// ---------- Categories (public) ----------
-
 func (h *ForumHandler) ListCategories(c *gin.Context) {
 	var cats []models.ForumCategory
 	if err := h.DB.Order("sort_order, id").Find(&cats).Error; err != nil {
@@ -100,8 +98,6 @@ func (h *ForumHandler) ShowCategory(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"category": cat, "threads": threads, "total": total, "page": page})
 }
 
-// ---------- Threads (public read) ----------
-
 func (h *ForumHandler) ShowThread(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -127,7 +123,6 @@ func (h *ForumHandler) ShowThread(c *gin.Context) {
 	}
 	thread.ReplyCount = len(replies)
 
-	// Load bans for this thread
 	var bans []models.ForumBan
 	h.DB.Preload("User").Where("thread_id = ?", thread.ID).Find(&bans)
 	for i := range bans {
@@ -138,8 +133,6 @@ func (h *ForumHandler) ShowThread(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"thread": thread, "replies": replies, "bans": bans})
 }
-
-// ---------- Threads (authenticated write) ----------
 
 func (h *ForumHandler) CreateThread(c *gin.Context) {
 	user := h.currentUser(c)
@@ -258,8 +251,6 @@ func (h *ForumHandler) DeleteThread(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"ok": true})
 }
 
-// ---------- Bans ----------
-
 func (h *ForumHandler) BanUser(c *gin.Context) {
 	user := h.currentUser(c)
 	if user == nil {
@@ -324,8 +315,6 @@ func (h *ForumHandler) UnbanUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"ok": true})
 }
 
-// ---------- Replies (authenticated write) ----------
-
 func (h *ForumHandler) CreateReply(c *gin.Context) {
 	user := h.currentUser(c)
 	if user == nil {
@@ -344,7 +333,6 @@ func (h *ForumHandler) CreateReply(c *gin.Context) {
 		return
 	}
 
-	// Check if user is banned from this thread
 	var ban models.ForumBan
 	if err := h.DB.Where("thread_id = ? AND user_id = ?", thread.ID, user.ID).First(&ban).Error; err == nil {
 		c.JSON(http.StatusForbidden, gin.H{"error": "banned"})
@@ -422,7 +410,6 @@ func (h *ForumHandler) DeleteReply(c *gin.Context) {
 		return
 	}
 
-	// Allow thread owner to delete replies too
 	var thread models.ForumThread
 	h.DB.First(&thread, reply.ThreadID)
 
@@ -435,8 +422,6 @@ func (h *ForumHandler) DeleteReply(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"ok": true})
 }
 
-// ---------- Reports ----------
-
 func (h *ForumHandler) CreateReport(c *gin.Context) {
 	user := h.currentUser(c)
 	if user == nil {
@@ -445,7 +430,7 @@ func (h *ForumHandler) CreateReport(c *gin.Context) {
 	}
 
 	var body struct {
-		Type     string `json:"type" binding:"required"`     // thread, reply
+		Type     string `json:"type" binding:"required"`
 		TargetID uint   `json:"target_id" binding:"required"`
 		Reason   string `json:"reason"`
 	}
@@ -458,7 +443,6 @@ func (h *ForumHandler) CreateReport(c *gin.Context) {
 		return
 	}
 
-	// Verify target exists
 	if body.Type == "thread" {
 		var thread models.ForumThread
 		if h.DB.First(&thread, body.TargetID).Error != nil {
@@ -483,8 +467,6 @@ func (h *ForumHandler) CreateReport(c *gin.Context) {
 	h.DB.Create(&report)
 	c.JSON(http.StatusCreated, gin.H{"ok": true})
 }
-
-// ---------- Media upload ----------
 
 func (h *ForumHandler) UploadMedia(c *gin.Context) {
 	user := h.currentUser(c)
@@ -525,8 +507,6 @@ func (h *ForumHandler) UploadMedia(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"url": fmt.Sprintf("/uploads/forum/%s", filename)})
 }
-
-// ---------- Admin ----------
 
 func (h *ForumHandler) AdminCreateCategory(c *gin.Context) {
 	var body struct {

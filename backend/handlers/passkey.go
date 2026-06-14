@@ -47,8 +47,6 @@ func NewPasskeyHandler(db *gorm.DB, cfg *config.Config) (*PasskeyHandler, error)
 	return &PasskeyHandler{DB: db, Cfg: cfg, WA: wa}, nil
 }
 
-// ─── Session store (in-memory, challenges expire after 5 min) ─────────────────
-
 type sessionEntry struct {
 	data      *webauthn.SessionData
 	expiresAt time.Time
@@ -62,7 +60,7 @@ var (
 func saveSession(key string, data *webauthn.SessionData) {
 	sessionsMu.Lock()
 	defer sessionsMu.Unlock()
-	// purge old entries
+
 	for k, v := range sessions {
 		if time.Now().After(v.expiresAt) {
 			delete(sessions, k)
@@ -83,16 +81,14 @@ func loadSession(key string) (*webauthn.SessionData, bool) {
 	return e.data, true
 }
 
-// ─── WebAuthn user adapter ────────────────────────────────────────────────────
-
 type waUser struct {
 	user        *models.User
 	credentials []webauthn.Credential
 }
 
-func (u *waUser) WebAuthnID() []byte          { return []byte(fmt.Sprintf("%d", u.user.ID)) }
-func (u *waUser) WebAuthnName() string         { return u.user.Email }
-func (u *waUser) WebAuthnDisplayName() string  { return u.user.FirstName + " " + u.user.LastName }
+func (u *waUser) WebAuthnID() []byte                         { return []byte(fmt.Sprintf("%d", u.user.ID)) }
+func (u *waUser) WebAuthnName() string                       { return u.user.Email }
+func (u *waUser) WebAuthnDisplayName() string                { return u.user.FirstName + " " + u.user.LastName }
 func (u *waUser) WebAuthnCredentials() []webauthn.Credential { return u.credentials }
 
 func (h *PasskeyHandler) loadWAUser(userID uint) (*waUser, error) {
@@ -112,8 +108,6 @@ func (h *PasskeyHandler) loadWAUser(userID uint) (*waUser, error) {
 	}
 	return &waUser{user: &user, credentials: creds}, nil
 }
-
-// ─── Registration ─────────────────────────────────────────────────────────────
 
 func (h *PasskeyHandler) RegisterBegin(c *gin.Context) {
 	user := middleware.GetAuthUser(c)
@@ -195,8 +189,6 @@ func (h *PasskeyHandler) RegisterComplete(c *gin.Context) {
 	c.JSON(http.StatusCreated, passkey)
 }
 
-// ─── List / Delete ────────────────────────────────────────────────────────────
-
 func (h *PasskeyHandler) List(c *gin.Context) {
 	user := middleware.GetAuthUser(c)
 	if user == nil {
@@ -254,8 +246,6 @@ func (h *PasskeyHandler) Rename(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Clé renommée."})
 }
 
-// ─── Authentication (discoverable login) ─────────────────────────────────────
-
 const authSessionKey = "auth:login"
 
 func (h *PasskeyHandler) AuthBegin(c *gin.Context) {
@@ -265,7 +255,6 @@ func (h *PasskeyHandler) AuthBegin(c *gin.Context) {
 		return
 	}
 
-	// Use challenge as the session key so multiple concurrent logins don't collide
 	challenge := base64.RawURLEncoding.EncodeToString([]byte(sessionData.Challenge))
 	saveSession("login:"+challenge, sessionData)
 	c.JSON(http.StatusOK, gin.H{"options": options, "session_key": challenge})
@@ -275,8 +264,7 @@ func (h *PasskeyHandler) AuthComplete(c *gin.Context) {
 	var body struct {
 		SessionKey string `json:"session_key" binding:"required"`
 	}
-	// We need to peek the session_key before gin reads the body for webauthn
-	// Solution: read session_key from query param
+
 	sessionKey := c.Query("session_key")
 	if sessionKey == "" {
 		if err := c.ShouldBindJSON(&body); err != nil || body.SessionKey == "" {
@@ -292,7 +280,6 @@ func (h *PasskeyHandler) AuthComplete(c *gin.Context) {
 		return
 	}
 
-	// handler to find user by credential rawID or userHandle
 	userHandler := func(rawID, userHandle []byte) (webauthn.User, error) {
 		rawIDStr := base64.RawURLEncoding.EncodeToString(rawID)
 		var passkey models.Passkey
@@ -312,7 +299,6 @@ func (h *PasskeyHandler) AuthComplete(c *gin.Context) {
 		return
 	}
 
-	// Find user by credential
 	rawIDStr := base64.RawURLEncoding.EncodeToString(credential.ID)
 	var passkey models.Passkey
 	if err := h.DB.Where("credential_id = ?", rawIDStr).First(&passkey).Error; err != nil {
@@ -320,7 +306,6 @@ func (h *PasskeyHandler) AuthComplete(c *gin.Context) {
 		return
 	}
 
-	// Update sign count and last used
 	now := time.Now()
 	credJSON, _ := json.Marshal(credential)
 	h.DB.Model(&passkey).Updates(map[string]interface{}{

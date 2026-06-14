@@ -61,7 +61,6 @@
 
     <section class="px-6 pb-16 max-w-[1280px] mx-auto">
 
-      <!-- Loading -->
       <div v-if="loading" class="flex items-center justify-center py-24">
         <div class="w-10 h-10 border-4 border-[#006d35] border-t-transparent rounded-full animate-spin" />
       </div>

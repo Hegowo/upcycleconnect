@@ -2,7 +2,6 @@
   <div class="bg-[#f7f9ff] min-h-screen pb-16">
     <div class="max-w-[960px] mx-auto px-4 sm:px-6 py-10">
 
-      <!-- Header -->
       <div class="mb-8">
         <button @click="router.push('/profil/pro')"
           class="text-sm text-[#40617f] hover:text-[#006d35] flex items-center gap-1.5 mb-4 transition">
@@ -24,14 +23,12 @@
         </div>
       </div>
 
-      <!-- Loading -->
       <div v-if="loading" class="flex items-center justify-center py-24">
         <div class="w-8 h-8 border-4 border-[#006d35] border-t-transparent rounded-full animate-spin" />
       </div>
 
       <template v-else>
 
-        <!-- Create / Edit form -->
         <div v-if="showForm" class="bg-white rounded-[32px] p-8 mb-8 shadow-sm">
           <h2 class="font-jakarta font-bold text-[#001d32] text-xl mb-6">
             {{ editingId ? t('public.providerEvents.formTitleEdit') : t('public.providerEvents.formTitleCreate') }}
@@ -105,26 +102,22 @@
           </div>
         </div>
 
-        <!-- Empty state -->
         <div v-if="!events.length && !showForm" class="flex flex-col items-center justify-center py-20 text-center">
           <CalendarDaysIcon class="w-14 h-14 text-[#40617f]/30 mb-4" />
           <p class="font-jakarta font-bold text-[#001d32] text-lg mb-1">{{ t('public.providerEvents.emptyTitle') }}</p>
           <p class="text-[#40617f] text-sm">{{ t('public.providerEvents.emptyHint') }}</p>
         </div>
 
-        <!-- Events list -->
         <div v-if="events.length" class="flex flex-col gap-4">
           <div v-for="ev in events" :key="ev.id"
             class="bg-white rounded-2xl p-6 shadow-sm flex flex-col sm:flex-row sm:items-center gap-4">
 
-            <!-- Date badge -->
             <div class="shrink-0 w-14 h-14 rounded-xl flex flex-col items-center justify-center text-white font-jakarta font-bold"
               :class="statusBgClass(ev.status)">
               <span class="text-xs uppercase leading-none">{{ monthShort(ev.start_date) }}</span>
               <span class="text-xl leading-tight">{{ dayNum(ev.start_date) }}</span>
             </div>
 
-            <!-- Info -->
             <div class="flex-1 min-w-0">
               <div class="flex items-center gap-2 flex-wrap mb-1">
                 <span :class="['text-xs font-bold px-2.5 py-1 rounded-full', statusClass(ev.status)]">
@@ -138,7 +131,6 @@
               <p class="text-[#40617f] text-xs mt-0.5">{{ formatDate(ev.start_date) }}</p>
             </div>
 
-            <!-- Actions -->
             <div class="flex items-center gap-2 shrink-0 flex-wrap">
               <button v-if="ev.status === 'draft' || ev.status === 'pending'"
                 @click="editEvent(ev)"

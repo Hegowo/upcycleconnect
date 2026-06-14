@@ -15,7 +15,6 @@ type ProviderDashboardHandler struct {
 	DB *gorm.DB
 }
 
-// activeSubscriptionPlan returns the active plan ("basic"/"premium") for a user, or "" if none.
 func (h *ProviderDashboardHandler) activeSubscriptionPlan(userID uint) string {
 	var sub models.Subscription
 	if err := h.DB.Where("user_id = ? AND status = ?", userID, "active").First(&sub).Error; err != nil {
@@ -24,10 +23,6 @@ func (h *ProviderDashboardHandler) activeSubscriptionPlan(userID uint) string {
 	return sub.Plan
 }
 
-// Dashboard returns the provider's stats. Structured as a freemium model (per the project spec):
-//   - basic: always available (free)
-//   - advanced: requires an active subscription (basic or premium tier)
-//   - premium: requires the premium tier
 func (h *ProviderDashboardHandler) Dashboard(c *gin.Context) {
 	user := middleware.GetAuthUser(c)
 	if user == nil {
@@ -39,7 +34,6 @@ func (h *ProviderDashboardHandler) Dashboard(c *gin.Context) {
 	hasAdvanced := plan == "basic" || plan == "premium"
 	hasPremium := plan == "premium"
 
-	// ─── Basic stats (free) ──────────────────────────────────────────────
 	var prestationsCount, activePrestations, projectsCount, campaignsCount int64
 	h.DB.Model(&models.Prestation{}).Where("provider_id = ? AND deleted_at IS NULL", user.ID).Count(&prestationsCount)
 	h.DB.Model(&models.Prestation{}).Where("provider_id = ? AND status = ? AND deleted_at IS NULL", user.ID, "published").Count(&activePrestations)
@@ -61,9 +55,7 @@ func (h *ProviderDashboardHandler) Dashboard(c *gin.Context) {
 		"premium":  nil,
 	}
 
-	// ─── Advanced dashboard + material stats (any paid plan) ─────────────
 	if hasAdvanced {
-		// Revenue: sum of paid reservations on this provider's prestations.
 		type revRow struct {
 			Total int64
 			Count int64
@@ -81,7 +73,6 @@ func (h *ProviderDashboardHandler) Dashboard(c *gin.Context) {
 			Where("prestations.provider_id = ?", user.ID).
 			Count(&reservationsTotal)
 
-		// Monthly revenue, last 6 months.
 		type monthRow struct {
 			Month string
 			Cents int64
@@ -99,7 +90,6 @@ func (h *ProviderDashboardHandler) Dashboard(c *gin.Context) {
 			monthly = append(monthly, gin.H{"month": m.Month, "cents": m.Cents})
 		}
 
-		// Material stats: available deposits (approved, not collected) grouped by category.
 		type matRow struct {
 			Category string
 			Count    int64
@@ -118,17 +108,15 @@ func (h *ProviderDashboardHandler) Dashboard(c *gin.Context) {
 		}
 
 		resp["advanced"] = gin.H{
-			"revenue_total_cents":   rev.Total,
-			"reservations_paid":     rev.Count,
-			"reservations_total":    reservationsTotal,
-			"monthly_revenue":       monthly,
-			"material_stats":        materials,
+			"revenue_total_cents": rev.Total,
+			"reservations_paid":   rev.Count,
+			"reservations_total":  reservationsTotal,
+			"monthly_revenue":     monthly,
+			"material_stats":      materials,
 		}
 	}
 
-	// ─── Premium: eco impact + prioritized collection alerts ─────────────
 	if hasPremium {
-		// Eco impact: CO2 + weight from deposits this provider has collected.
 		type ecoRow struct {
 			CO2    float64
 			Weight float64
@@ -140,7 +128,6 @@ func (h *ProviderDashboardHandler) Dashboard(c *gin.Context) {
 			Select("COALESCE(SUM(carbon_savings),0) AS co2, COALESCE(SUM(estimated_weight),0) AS weight, COUNT(*) AS items").
 			Scan(&eco)
 
-		// Collection alerts: approved deposits not yet collected, most recent first.
 		var alerts []models.DepositRequest
 		h.DB.Preload("Category").Preload("CollectionPoint").
 			Where("status = ? AND collected_at IS NULL", "approved").

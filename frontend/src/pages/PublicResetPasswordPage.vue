@@ -10,7 +10,6 @@
         <p class="text-[#40617f] text-sm mt-2">Choisissez un mot de passe sécurisé pour votre compte.</p>
       </div>
 
-      <!-- No token -->
       <div v-if="!token" class="bg-white rounded-[24px] shadow-[0px_12px_40px_0px_rgba(0,29,50,0.06)] border border-[#edf4ff] p-8 text-center space-y-4">
         <div class="w-16 h-16 rounded-full flex items-center justify-center mx-auto" style="background:#fee2e2;">
           <ExclamationTriangleIcon class="w-8 h-8 text-red-500" />
@@ -21,7 +20,6 @@
         </RouterLink>
       </div>
 
-      <!-- Success -->
       <div v-else-if="success" class="bg-white rounded-[24px] shadow-[0px_12px_40px_0px_rgba(0,29,50,0.06)] border border-[#edf4ff] p-8 text-center space-y-6">
         <div class="w-16 h-16 rounded-full flex items-center justify-center mx-auto" style="background:#dcfce7;">
           <CheckCircleIcon class="w-8 h-8 text-[#006d35]" />
@@ -40,7 +38,6 @@
         </RouterLink>
       </div>
 
-      <!-- Form -->
       <div v-else class="bg-white rounded-[24px] shadow-[0px_12px_40px_0px_rgba(0,29,50,0.06)] border border-[#edf4ff] p-8 space-y-5">
 
         <div>

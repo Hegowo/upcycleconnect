@@ -29,7 +29,6 @@
 
       <div class="grid grid-cols-12 gap-4 sm:gap-6">
 
-        <!-- Photos -->
         <div ref="photosCard" class="col-span-12 lg:col-span-8 bg-white rounded-[24px] p-6 sm:p-8 shadow-[0_12px_40px_0_rgba(0,29,50,0.06)] flex flex-col gap-6">
           <div class="flex items-center justify-between">
             <h2 class="font-jakarta font-bold text-[#001d32] text-xl">{{ t('public.depot.photosTitle') }}</h2>
@@ -38,7 +37,7 @@
 
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
             <div v-for="slot in photoSlots" :key="slot.id">
-              <!-- Slot vide -->
+
               <div
                 v-if="!slot.preview"
                 class="bg-[#edf4ff] border-2 border-dashed border-[#becabc] rounded-xl flex flex-col items-center justify-center cursor-pointer hover:bg-[#d8eaff] transition h-40 sm:h-52 group"
@@ -55,7 +54,6 @@
                 <p class="text-[#40617f] text-sm text-center font-medium px-2">{{ slotLabel(slot.id) }}</p>
               </div>
 
-              <!-- Slot avec photo -->
               <div v-else class="relative rounded-xl overflow-hidden h-40 sm:h-52 group">
                 <img :src="slot.preview" class="w-full h-full object-cover" />
                 <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2">
@@ -92,7 +90,6 @@
           <p class="text-[#40617f] text-sm">{{ t('public.depot.photoTip') }}</p>
         </div>
 
-        <!-- Description -->
         <div ref="descCard" class="col-span-12 lg:col-span-4 bg-white rounded-[24px] p-6 sm:p-8 shadow-[0_12px_40px_0_rgba(0,29,50,0.06)] flex flex-col gap-6">
           <h2 class="font-jakarta font-bold text-[#001d32] text-xl">{{ t('public.depot.descTitle') }}</h2>
           <div class="flex flex-col gap-5">
@@ -111,7 +108,6 @@
           </div>
         </div>
 
-        <!-- Catégorie -->
         <div ref="categoryCard" class="col-span-12 lg:col-span-5 bg-white rounded-[24px] p-6 sm:p-8 shadow-[0_12px_40px_0_rgba(0,29,50,0.06)] flex flex-col gap-6">
           <h2 class="font-jakarta font-bold text-[#001d32] text-xl">{{ t('public.depot.classificationTitle') }}</h2>
           <div class="flex flex-col gap-3">
@@ -132,7 +128,6 @@
           </div>
         </div>
 
-        <!-- État + impact + point de collecte + soumettre -->
         <div ref="conditionCard" class="col-span-12 lg:col-span-7 bg-white rounded-[24px] p-6 sm:p-8 shadow-[0_12px_40px_0_rgba(0,29,50,0.06)] flex flex-col gap-6">
           <h2 class="font-jakarta font-bold text-[#001d32] text-xl">{{ t('public.depot.conditionTitle') }}</h2>
 
@@ -148,7 +143,6 @@
             </button>
           </div>
 
-          <!-- Impact estimé dynamique -->
           <div class="bg-gradient-to-br from-[#f0fdf4] to-[#dcfce7] rounded-2xl p-5 border border-[#bbf7d0]">
             <div class="flex items-center gap-2 mb-3">
               <SparklesIcon class="w-4 h-4 text-[#006d35]" />
@@ -171,7 +165,6 @@
             <p class="text-xs text-[#40617f] mt-3 leading-relaxed">{{ impactData.tip }}</p>
           </div>
 
-          <!-- Point de collecte -->
           <div class="flex flex-col gap-3">
             <label class="text-[#001d32] font-semibold text-sm flex items-center gap-1.5">
               <MapPinIcon class="w-4 h-4 text-[#006d35]" />
@@ -181,12 +174,11 @@
             <div v-if="collectPointsLoading" class="text-[#40617f] text-sm">{{ t('common.loading') }}</div>
             <div v-else-if="collectPoints.length === 0" class="text-[#40617f] text-sm italic">Aucun point de collecte disponible pour le moment.</div>
             <div v-else class="flex flex-col gap-2">
-              <!-- Localisation en cours (adresse en base) -->
+
               <div v-if="locating" class="text-[#40617f] text-sm flex items-center gap-2">
                 <MapPinIcon class="w-4 h-4 text-[#006d35]" /> Recherche des éco-box les plus proches…
               </div>
 
-              <!-- Pas de localisation : demander le code postal -->
               <div v-else-if="!userCoords">
                 <p class="text-xs text-[#40617f] mb-2">Indiquez votre code postal pour voir les 3 éco-box les plus proches.</p>
                 <div class="flex gap-2">
@@ -206,7 +198,6 @@
                 <p v-if="geoError" class="text-xs text-red-500 mt-1">{{ geoError }}</p>
               </div>
 
-              <!-- Les 3 éco-box les plus proches -->
               <template v-else>
                 <div class="text-xs text-[#40617f] bg-[#edf4ff] rounded-lg px-3 py-2 flex items-center justify-between gap-2">
                   <span class="flex items-center gap-1.5">
@@ -240,7 +231,6 @@
             </div>
           </div>
 
-          <!-- Bouton soumettre -->
           <div class="flex items-center justify-end pt-2 border-t border-[#f1f5f9]">
             <button
               :disabled="submitting || !canSubmit"
@@ -256,7 +246,6 @@
           <p v-if="submitError" class="text-red-600 text-sm font-medium">{{ submitError }}</p>
         </div>
 
-        <!-- Bannière bas -->
         <div class="col-span-12 rounded-[24px] overflow-hidden relative min-h-[160px] sm:h-48">
           <div class="absolute inset-0 bg-gradient-to-br from-[#d1fae5] to-[#a7f3d0] opacity-50" />
           <div class="absolute inset-0 bg-gradient-to-r from-[#f7f9ff] to-transparent" />
@@ -269,14 +258,12 @@
       </div>
     </div>
 
-    <!-- Tutorial overlay -->
     <Teleport to="body">
       <Transition name="tut-fade">
         <div v-if="showTutorial" class="fixed inset-0 z-50" tabindex="-1" @keydown.esc="closeTutorial">
-          <!-- Dark backdrop -->
+
           <div class="absolute inset-0" @click="closeTutorial" />
 
-          <!-- Spotlight cutout — never covers the bottom panel -->
           <div
             v-if="spotlightRect"
             class="fixed rounded-[20px] pointer-events-none z-[51]"
@@ -290,14 +277,13 @@
             }"
           />
 
-          <!-- Fixed bottom drawer — always below the spotlight, never overlapping -->
           <Transition name="tut-drawer">
             <div
               :key="tutorialStep"
               class="fixed bottom-0 left-0 right-0 z-[52] bg-white rounded-t-[28px] shadow-[0_-12px_48px_0_rgba(0,29,50,0.18)] pointer-events-auto"
               @click.stop
             >
-              <!-- Progress bar -->
+
               <div class="flex gap-1.5 px-6 pt-5 pb-0">
                 <div
                   v-for="(_, i) in tutorialSteps" :key="i"
@@ -306,7 +292,6 @@
                 />
               </div>
 
-              <!-- Content row: icon + text -->
               <div class="px-6 pt-4 pb-3 flex items-start gap-4">
                 <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#006d35] to-[#1b8848] flex items-center justify-center shadow-md shadow-[#006d35]/20 shrink-0 mt-0.5">
                   <component :is="tutorialSteps[tutorialStep].icon" class="w-5 h-5 text-white" />
@@ -322,7 +307,6 @@
                 </div>
               </div>
 
-              <!-- Navigation -->
               <div class="flex items-center justify-between px-6 pb-8 pt-2 border-t border-[#f1f5f9]">
                 <button
                   @click="prevTutorialStep"
@@ -380,7 +364,6 @@ const form = ref({
   collectionPointId: null,
 })
 
-// ── Photos ──
 const photoSlots = ref([{ id: 1, file: null, preview: null, base64: null }, { id: 2, file: null, preview: null, base64: null }, { id: 3, file: null, preview: null, base64: null }])
 const inputRefs = ref({})
 
@@ -433,11 +416,9 @@ function slotLabel(id) {
   return { 1: t('public.depot.photoMain'), 2: t('public.depot.photoDetail'), 3: t('public.depot.photoAngle') }[id] || ''
 }
 
-// ── Catégories ──
 const categories = ref([])
 const categoriesLoading = ref(true)
 
-// ── Points de collecte ──
 const collectPoints = ref([])
 const collectPointsLoading = ref(true)
 const userCoords = ref(null)
@@ -452,7 +433,6 @@ const conditions = computed(() => [
   { key: 'poor', label: t('public.depot.condBroken') },
 ])
 
-// ── Impact estimé dynamique ──
 const conditionMultiplier = { good: 3.0, fair: 2.5, poor: 1.5 }
 const conditionLabel = { good: 'Excellent', fair: 'Moyen', poor: 'Faible' }
 
@@ -468,12 +448,12 @@ const impactData = computed(() => {
   return { co2, score, level, tip }
 })
 
-// ── Points de collecte triés par distance ──
 function haversineKm(lat1, lon1, lat2, lon2) {
   const R = 6371
   const dLat = (lat2 - lat1) * Math.PI / 180
   const dLon = (lon2 - lon1) * Math.PI / 180
   const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) ** 2
+
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
 }
 
@@ -484,7 +464,6 @@ const sortedCollectPoints = computed(() => {
     .sort((a, b) => a._distance - b._distance)
 })
 
-// Only ever show the 3 closest eco-box.
 const nearestCollectPoints = computed(() => sortedCollectPoints.value.slice(0, 3))
 
 async function searchByPostal() {
@@ -526,7 +505,6 @@ async function geocodeUserAddress(address) {
   } catch {}
 }
 
-// ── Submit ──
 const submitting = ref(false)
 const submitError = ref('')
 
@@ -540,7 +518,6 @@ async function submitForm() {
   submitError.value = ''
   submitting.value = true
   try {
-    // Compress photos to base64 JPEG (max 1024px, 75% quality)
     const photos = await Promise.all(
       photoSlots.value.map(s => s.file ? resizeImage(s.file) : null)
     )
@@ -564,7 +541,6 @@ async function submitForm() {
   }
 }
 
-// ── Tutorial ──
 const showTutorial = ref(false)
 const tutorialStep = ref(0)
 const spotlightRect = ref(null)
@@ -581,12 +557,12 @@ const tutorialSteps = computed(() => [
   { title: t('public.depot.tutorialStep4Title'), desc: t('public.depot.tutorialStep4Desc'), tip: t('public.depot.tutorialStep4Tip'), icon: SparklesIcon },
 ])
 
-const TUTORIAL_CARD_H = 270 // estimated height of the fixed bottom tutorial panel
+const TUTORIAL_CARD_H = 270
 
 function updateSpotlight() {
   const el = sectionRefs[tutorialStep.value]?.value
   if (!el) return
-  // Center the element in the viewport space above the tutorial panel
+
   const availH = window.innerHeight - TUTORIAL_CARD_H - 16
   const r = el.getBoundingClientRect()
   const delta = (r.top + r.height / 2) - (availH / 2)
@@ -607,7 +583,6 @@ function prevTutorialStep() { if (tutorialStep.value > 0) tutorialStep.value-- }
 watch(tutorialStep, () => nextTick(updateSpotlight))
 function onResize() { if (showTutorial.value) nextTick(updateSpotlight) }
 
-// ── Init ──
 async function loadCategories() {
   try { const res = await publicGet('/categories'); categories.value = res.data || [] }
   catch { categories.value = [] }

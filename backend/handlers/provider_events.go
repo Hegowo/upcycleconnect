@@ -276,7 +276,6 @@ func (h *ProviderEventHandler) Submit(c *gin.Context) {
 	h.Audit.Log(c, "provider.event_submitted", "Event", &event.ID,
 		map[string]string{"status": "draft"}, map[string]string{"status": "pending"})
 
-	// Notify the responsable (admins) that a formation/event awaits validation.
 	if h.Notifications != nil {
 		h.Notifications.NotifyAdmins("event.pending_validation",
 			"Formation à valider",

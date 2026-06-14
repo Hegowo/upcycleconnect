@@ -128,7 +128,6 @@ onUnmounted(() => {
 .swagger-wrapper .swagger-ui .auth-wrapper .authorize { background-color: #006d35; border-color: #006d35; color: #fff; }
 .swagger-wrapper .swagger-ui section.models { display: none; }
 
-/* ── Dark theme for Swagger UI (admin dark mode) ─────────────────────────── */
 .admin-dark .swagger-wrapper { background: #0f172a; }
 .admin-dark .swagger-ui,
 .admin-dark .swagger-ui .info .title,

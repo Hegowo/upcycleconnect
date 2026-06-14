@@ -40,10 +40,7 @@ func (h *UserAuthHandler) Register(c *gin.Context) {
 		Activity    *string `json:"activity"`
 		Address     *string `json:"address"`
 	}
-	// Provider registrations send multipart/form-data so the Kbis document can be
-	// uploaded in the same request: a freshly-created account is "pending" and cannot
-	// authenticate, so a later authenticated upload would be impossible. Individuals
-	// keep sending JSON.
+
 	var kbisHeader *multipart.FileHeader
 	var kbisFile multipart.File
 	if strings.HasPrefix(c.ContentType(), "multipart/form-data") {
@@ -312,9 +309,6 @@ func (h *UserAuthHandler) VerifyLogin(c *gin.Context) {
 	})
 }
 
-// userWithProfile builds the full user response including provider_profile.
-// Used by login, verify-login, OAuth and /me so the frontend always gets
-// provider_profile on the first response and can set isProvider correctly.
 func (h *UserAuthHandler) userWithProfile(user *models.User) map[string]interface{} {
 	h.DB.Preload("ProviderProfile").First(user, user.ID)
 	resp := models.ToUserResponse(user)
@@ -349,8 +343,6 @@ func (h *UserAuthHandler) Logout(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Déconnexion réussie."})
 }
 
-// CompleteOnboarding marks the user as having seen the first-login tutorial.
-// Called by the frontend when the user finishes the blocking overlay tour.
 func (h *UserAuthHandler) CompleteOnboarding(c *gin.Context) {
 	user := middleware.GetAuthUser(c)
 	if user == nil {

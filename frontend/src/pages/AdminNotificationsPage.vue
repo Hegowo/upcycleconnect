@@ -10,7 +10,6 @@
       </button>
     </div>
 
-    <!-- Filters -->
     <div class="card p-4 flex flex-wrap gap-3 items-center">
       <input v-model="search" @input="debouncedFetch" type="search" placeholder="Rechercher..." class="flex-1 min-w-[160px] text-sm border border-[#e5e7eb] rounded-lg px-3 py-2 bg-[#f8fafc] focus:outline-none focus:ring-2 focus:ring-[#006d35]/30" />
       <select v-model="typeFilter" @change="fetchSent(1)" class="text-sm border border-[#e5e7eb] rounded-lg px-3 py-2 bg-[#f8fafc] text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#006d35]/30">
@@ -59,7 +58,6 @@
       </div>
     </div>
 
-    <!-- Broadcast modal -->
     <Teleport to="body">
       <div v-if="showBroadcast" class="fixed inset-0 z-50 flex items-center justify-center p-4">
         <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="showBroadcast = false" />
@@ -183,7 +181,7 @@ async function fetchSent(page = 1) {
     const j = await res.json()
     items.value = j.data || []
     meta.value = j.meta || meta.value
-    // collect distinct types for the filter
+
     const set = new Set(knownTypes.value)
     items.value.forEach(n => set.add(n.type))
     knownTypes.value = [...set].sort()
@@ -200,7 +198,6 @@ const bcastMsg = ref('')
 const bcastError = ref(false)
 const bcast = ref({ audience: 'all', title: '', body: '' })
 
-// ---- Single-user recipient picker ----
 const selectedUser = ref(null)
 const userQuery = ref('')
 const userResults = ref([])
@@ -223,10 +220,9 @@ function pickUser(u) { selectedUser.value = u; userResults.value = []; userQuery
 function clearUser() { selectedUser.value = null }
 function onAudienceChange() { if (bcast.value.audience !== 'user') clearUser() }
 
-// ---- Destination (deep-link) picker ----
-const linkMode = ref('none')            // 'none' | path | 'prestation' | 'event' | 'custom'
+const linkMode = ref('none')
 const customLink = ref('')
-const selectedItem = ref(null)          // { label, path }
+const selectedItem = ref(null)
 const itemQuery = ref('')
 const itemResults = ref([])
 const itemSearching = ref(false)
@@ -249,7 +245,7 @@ function resolveLink() {
   if (linkMode.value === 'none') return ''
   if (linkMode.value === 'custom') return customLink.value.trim()
   if (linkMode.value === 'prestation' || linkMode.value === 'event') return selectedItem.value?.path || ''
-  return linkMode.value // a fixed path like '/prestations'
+  return linkMode.value
 }
 
 function resetBroadcast() {

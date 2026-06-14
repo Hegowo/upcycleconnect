@@ -29,17 +29,17 @@ func (Prestation) TableName() string {
 }
 
 type PrestationResponse struct {
-	ID          uint               `json:"id"`
-	Title       string             `json:"title"`
-	Description *string            `json:"description"`
-	Price       *string            `json:"price"`
-	PriceType   string             `json:"price_type"`
-	Status      string             `json:"status"`
-	Category    *CategoryResponse  `json:"category"`
-	Provider    *UserResponse      `json:"provider"`
+	ID          uint                      `json:"id"`
+	Title       string                    `json:"title"`
+	Description *string                   `json:"description"`
+	Price       *string                   `json:"price"`
+	PriceType   string                    `json:"price_type"`
+	Status      string                    `json:"status"`
+	Category    *CategoryResponse         `json:"category"`
+	Provider    *UserResponse             `json:"provider"`
 	Images      []PrestationImageResponse `json:"images"`
-	CreatedAt   string             `json:"created_at"`
-	UpdatedAt   string             `json:"updated_at"`
+	CreatedAt   string                    `json:"created_at"`
+	UpdatedAt   string                    `json:"updated_at"`
 }
 
 func ToPrestationResponse(p *Prestation) PrestationResponse {

@@ -8,7 +8,6 @@
       </div>
     </div>
 
-    <!-- Tabs -->
     <div class="flex gap-1 border-b border-[#e5e7eb]">
       <button v-for="tab in tabs" :key="tab.key" @click="activeTab = tab.key"
         :class="[
@@ -25,7 +24,6 @@
       </button>
     </div>
 
-    <!-- ===== CATEGORIES TAB ===== -->
     <div v-if="activeTab === 'categories'">
       <div class="flex items-center justify-between mb-4">
         <p class="text-sm text-[#64748b]">{{ categories.length }} catégorie(s)</p>
@@ -75,7 +73,6 @@
       </div>
     </div>
 
-    <!-- ===== THREADS TAB ===== -->
     <div v-if="activeTab === 'threads'">
       <div class="flex items-center justify-between mb-4">
         <p class="text-sm text-[#64748b]">{{ totalThreads }} discussion(s)</p>
@@ -144,7 +141,6 @@
       </div>
     </div>
 
-    <!-- ===== REPORTS TAB ===== -->
     <div v-if="activeTab === 'reports'">
       <div class="flex items-center gap-3 mb-4">
         <button v-for="s in ['pending', 'resolved']" :key="s" @click="reportStatus = s; loadReports()"
@@ -200,7 +196,6 @@
       </div>
     </div>
 
-    <!-- Category modal -->
     <div v-if="catModal.show" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" @click.self="catModal.show = false">
       <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl">
         <div class="flex items-center justify-between mb-5">
@@ -248,7 +243,6 @@
       </div>
     </div>
 
-    <!-- ===== CONSEILS TAB ===== -->
     <div v-if="activeTab === 'tips'">
       <TipsPage embedded />
     </div>
@@ -286,7 +280,6 @@ function formatDate(iso) {
   return new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
-// ===== Categories =====
 const catLoading = ref(true)
 const categories = ref([])
 const catModal = ref({ show: false, id: null, name: '', description: '', color: '#edf4ff', sort_order: 0, saving: false, error: '' })
@@ -328,7 +321,6 @@ async function deleteCategory(id) {
   await loadCategories()
 }
 
-// ===== Threads =====
 const threadLoading = ref(true)
 const threads = ref([])
 const totalThreads = ref(0)
@@ -363,7 +355,6 @@ async function deleteThread(id) {
   await loadThreads()
 }
 
-// ===== Reports =====
 const reportLoading = ref(true)
 const reports = ref([])
 const totalReports = ref(0)

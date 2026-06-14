@@ -39,12 +39,12 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 	eventHandler := &handlers.EventHandler{DB: db, Audit: audit, Notifications: notifications}
 	adminHandler := &handlers.AdminHandler{DB: db, Audit: audit}
 	logsHandler := &handlers.LogsHandler{DB: db}
-	siretHandler    := &handlers.SiretHandler{Cfg: cfg}
-	depositHandler         := &handlers.DepositHandler{DB: db, Audit: audit}
+	siretHandler := &handlers.SiretHandler{Cfg: cfg}
+	depositHandler := &handlers.DepositHandler{DB: db, Audit: audit}
 	collectionPointHandler := &handlers.CollectionPointHandler{DB: db, Audit: audit}
 	userAuthHandler := &handlers.UserAuthHandler{DB: db, Cfg: cfg, Mailer: mailer}
-	profileHandler  := &handlers.ProfileHandler{DB: db, Mailer: mailer}
-	publicHandler   := &handlers.PublicHandler{DB: db}
+	profileHandler := &handlers.ProfileHandler{DB: db, Mailer: mailer}
+	publicHandler := &handlers.PublicHandler{DB: db}
 	userDepositHandler := &handlers.UserDepositHandler{DB: db, Audit: audit}
 	userProviderHandler := &handlers.UserProviderHandler{DB: db, Audit: audit, Notifications: notifications}
 	calendarHandler := &handlers.CalendarHandler{DB: db}
@@ -75,11 +75,11 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 	}
 	invoiceHandler := &handlers.InvoiceHandler{DB: db}
 	contractHandler := &handlers.ContractHandler{DB: db, PDF: pdfService, Audit: audit}
-	tipHandler          := &handlers.TipHandler{DB: db, Audit: audit}
+	tipHandler := &handlers.TipHandler{DB: db, Audit: audit}
 	subscriptionHandler := &handlers.SubscriptionHandler{DB: db, Stripe: stripeService, Audit: audit}
-	campaignHandler     := &handlers.CampaignHandler{DB: db, Stripe: stripeService, Audit: audit}
-	marketplaceHandler  := &handlers.MarketplaceHandler{DB: db, Stripe: stripeService, Audit: audit, Notifications: notifications}
-	projectHandler      := &handlers.UpcyclingProjectHandler{DB: db, Audit: audit}
+	campaignHandler := &handlers.CampaignHandler{DB: db, Stripe: stripeService, Audit: audit}
+	marketplaceHandler := &handlers.MarketplaceHandler{DB: db, Stripe: stripeService, Audit: audit, Notifications: notifications}
+	projectHandler := &handlers.UpcyclingProjectHandler{DB: db, Audit: audit}
 	providerDashHandler := &handlers.ProviderDashboardHandler{DB: db}
 
 	r.Static("/uploads", "/uploads")
@@ -179,9 +179,8 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 			userProtected.GET("/contracts/:id/download", contractHandler.Download)
 			userProtected.GET("/provider/contracts", contractHandler.ProviderContracts)
 
-			// Abonnements
 			userProtected.GET("/provider/dashboard", providerDashHandler.Dashboard)
-			// Marketplace (browse / buy / favorite deposits) + purchases
+
 			userProtected.GET("/provider/marketplace", marketplaceHandler.List)
 			userProtected.POST("/provider/marketplace/:id/purchase", marketplaceHandler.Purchase)
 			userProtected.POST("/provider/marketplace/:id/favorite", marketplaceHandler.FavoriteAdd)
@@ -193,14 +192,12 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 			userProtected.POST("/subscription/checkout", subscriptionHandler.Checkout)
 			userProtected.POST("/subscription/cancel", subscriptionHandler.Cancel)
 
-			// Campagnes publicitaires
 			userProtected.GET("/campaigns", campaignHandler.MyCampaigns)
 			userProtected.POST("/campaigns", campaignHandler.CreateCampaign)
 			userProtected.PUT("/campaigns/:id", campaignHandler.UpdateCampaign)
 			userProtected.DELETE("/campaigns/:id", campaignHandler.DeleteCampaign)
 			userProtected.POST("/campaigns/:id/submit", campaignHandler.SubmitCampaign)
 
-			// Projets Upcycling
 			userProtected.GET("/projects", projectHandler.MyProjects)
 			userProtected.POST("/projects", projectHandler.CreateProject)
 			userProtected.PUT("/projects/:id", projectHandler.UpdateProject)
@@ -209,7 +206,6 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 			userProtected.PUT("/projects/:id/steps/:step_id", projectHandler.UpdateStep)
 			userProtected.DELETE("/projects/:id/steps/:step_id", projectHandler.DeleteStep)
 
-			// Collecte code-barres (pro/artisan)
 			userProtected.POST("/deposits/collect", userDepositHandler.CollectDeposit)
 
 			userProtected.GET("/notifications", notificationHandler.Index)

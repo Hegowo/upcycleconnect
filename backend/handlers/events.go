@@ -312,7 +312,6 @@ func (h *EventHandler) UpdateStatus(c *gin.Context) {
 
 	h.Audit.Log(c, "event.status_changed", "Event", &event.ID, old, map[string]string{"status": req.Status})
 
-	// Notify the creator (animateur/formateur) of the responsable's decision.
 	if h.Notifications != nil && event.CreatedBy != nil && wasPending {
 		if req.Status == "published" {
 			h.Notifications.MustNotify(*event.CreatedBy, "event.approved",

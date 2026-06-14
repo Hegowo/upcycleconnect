@@ -38,7 +38,6 @@ type InvoiceData struct {
 	Lines           []InvoiceLine
 }
 
-// InvoiceLine is one billable line of a multi-line quote/invoice.
 type InvoiceLine struct {
 	Label       string
 	AmountCents int64

@@ -24,8 +24,6 @@ type ContractHandler struct {
 	Audit *services.AuditService
 }
 
-// PreviewData returns the data needed to populate the contract modal client-side.
-// Lets the front render the contract text with real names/prices before signing.
 func (h *ContractHandler) Preview(c *gin.Context) {
 	user := middleware.GetAuthUser(c)
 	if user == nil {
@@ -68,8 +66,8 @@ func (h *ContractHandler) Preview(c *gin.Context) {
 			"description": prestation.Description,
 			"price_type":  prestation.PriceType,
 		},
-		"amount_cents":   amountCents,
-		"currency":       "eur",
+		"amount_cents": amountCents,
+		"currency":     "eur",
 		"customer": gin.H{
 			"name":    strings.TrimSpace(user.FirstName + " " + user.LastName),
 			"email":   user.Email,
@@ -84,9 +82,6 @@ func (h *ContractHandler) Preview(c *gin.Context) {
 	})
 }
 
-// QuotePreview returns the data needed to populate the contract modal for accepting an existing quote.
-// The amount comes from the issued Invoice (type=quote), not from the prestation, so a price change
-// after the quote was emitted does not silently shift what the client signs.
 func (h *ContractHandler) QuotePreview(c *gin.Context) {
 	user := middleware.GetAuthUser(c)
 	if user == nil {
@@ -162,7 +157,6 @@ func (h *ContractHandler) QuotePreview(c *gin.Context) {
 	})
 }
 
-// Download streams the signed contract PDF. Only the contract owner or an admin can fetch it.
 func (h *ContractHandler) Download(c *gin.Context) {
 	user := middleware.GetAuthUser(c)
 	if user == nil {
@@ -198,7 +192,6 @@ func (h *ContractHandler) Download(c *gin.Context) {
 	c.File(*contract.PDFPath)
 }
 
-// ByReservation returns the contract metadata attached to a reservation (used by the front to know if it exists).
 func (h *ContractHandler) ByReservation(c *gin.Context) {
 	user := middleware.GetAuthUser(c)
 	if user == nil {
@@ -223,8 +216,6 @@ func (h *ContractHandler) ByReservation(c *gin.Context) {
 	c.JSON(http.StatusOK, models.ToContractResponse(&contract))
 }
 
-// ProviderContracts lists every signed contract attached to a prestation owned by the connected provider.
-// Returns the same shape as the user-facing list so the front can reuse the components.
 func (h *ContractHandler) ProviderContracts(c *gin.Context) {
 	user := middleware.GetAuthUser(c)
 	if user == nil {
@@ -248,7 +239,6 @@ func (h *ContractHandler) ProviderContracts(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": resp})
 }
 
-// canAccessContract grants access to: the client who signed, the provider of the prestation, and any admin.
 func canAccessContract(db *gorm.DB, user *models.User, contract *models.Contract) bool {
 	if user == nil {
 		return false
@@ -259,7 +249,7 @@ func canAccessContract(db *gorm.DB, user *models.User, contract *models.Contract
 	if contract.UserID == user.ID {
 		return true
 	}
-	// provider check: walk reservation → prestation → provider_id
+
 	var providerID *uint
 	row := db.
 		Table("reservations").
@@ -273,9 +263,6 @@ func canAccessContract(db *gorm.DB, user *models.User, contract *models.Contract
 	return providerID != nil && *providerID == user.ID
 }
 
-// ─── Helpers shared with PaymentHandler.Reserve ──────────────────────────────
-
-// decodeSignaturePNG accepts either "data:image/png;base64,..." or a bare base64 string.
 func decodeSignaturePNG(raw string) ([]byte, error) {
 	raw = strings.TrimSpace(raw)
 	if raw == "" {
@@ -288,19 +275,17 @@ func decodeSignaturePNG(raw string) ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("signature invalide: %w", err)
 	}
-	// Sanity check — must start with PNG magic bytes
+
 	if len(data) < 8 || data[0] != 0x89 || data[1] != 0x50 || data[2] != 0x4E || data[3] != 0x47 {
 		return nil, fmt.Errorf("signature : format PNG attendu")
 	}
-	// Defensive size cap (~1MB raw → ~1.3MB base64). Reject anything past that.
+
 	if len(data) > 1024*1024 {
 		return nil, fmt.Errorf("signature trop volumineuse")
 	}
 	return data, nil
 }
 
-// createSignedContract persists a Contract row, generates its PDF, and returns the saved contract.
-// Called from PaymentHandler.Reserve right after the reservation is created.
 func createSignedContract(
 	db *gorm.DB,
 	pdfSvc *services.PDFService,
@@ -375,7 +360,7 @@ func createSignedContract(
 	})
 	if err != nil {
 		log.Printf("[contract] PDF generation failed for %s: %v", number, err)
-		// Keep contract row — PDF can be regenerated later.
+
 		return &contract, nil
 	}
 

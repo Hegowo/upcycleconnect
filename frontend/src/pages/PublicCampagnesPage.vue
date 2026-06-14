@@ -22,7 +22,6 @@
         <p class="text-green-800 text-sm font-medium">Campagne soumise et paiement confirmé ! Elle sera activée après validation par l'équipe.</p>
       </div>
 
-      <!-- Premium required banner -->
       <div v-if="!loading && !hasPremium" class="bg-white border-2 border-[#006d35] rounded-2xl p-5 mb-6 flex items-center justify-between gap-4 flex-wrap">
         <div class="flex items-center gap-3">
           <div class="w-11 h-11 rounded-xl flex items-center justify-center" style="background:linear-gradient(135deg,#006d35,#1b8848);">
@@ -81,7 +80,6 @@
         </div>
       </div>
 
-      <!-- Form modal -->
       <Teleport to="body">
         <div v-if="showForm" class="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="closeForm" />
@@ -114,7 +112,6 @@
                   class="w-full px-3 py-2.5 bg-[#f8fafc] border border-[#e5e7eb] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#006d35]/30" />
               </div>
 
-              <!-- Prestations à mettre en avant -->
               <div v-if="myPrestations.length">
                 <label class="block text-xs font-semibold text-[#40617f] uppercase mb-1.5">Prestations à mettre en avant</label>
                 <div class="space-y-1.5 max-h-36 overflow-y-auto bg-[#f8fafc] rounded-xl p-3 border border-[#e5e7eb]">
@@ -125,7 +122,6 @@
                 </div>
               </div>
 
-              <!-- Événements à mettre en avant -->
               <div v-if="myEvents.length">
                 <label class="block text-xs font-semibold text-[#40617f] uppercase mb-1.5">Événements à mettre en avant</label>
                 <div class="space-y-1.5 max-h-36 overflow-y-auto bg-[#f8fafc] rounded-xl p-3 border border-[#e5e7eb]">

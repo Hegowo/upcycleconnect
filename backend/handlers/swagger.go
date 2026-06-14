@@ -24,17 +24,17 @@ func buildOpenAPISpec() map[string]any {
 	userSchema := map[string]any{
 		"type": "object",
 		"properties": map[string]any{
-			"id":                  map[string]any{"type": "integer", "example": 1},
-			"email":               map[string]any{"type": "string", "format": "email", "example": "user@example.com"},
-			"first_name":          map[string]any{"type": "string", "example": "Jean"},
-			"last_name":           map[string]any{"type": "string", "example": "Dupont"},
-			"phone":               map[string]any{"type": "string", "example": "+33612345678", "nullable": true},
-			"avatar_url":          map[string]any{"type": "string", "nullable": true},
-			"status":              map[string]any{"type": "string", "enum": []string{"active", "pending", "banned"}, "example": "active"},
-			"role":                map[string]any{"type": "string", "example": "admin"},
-			"email_verified_at":   map[string]any{"type": "string", "format": "date-time", "nullable": true},
-			"created_at":          map[string]any{"type": "string", "format": "date-time"},
-			"updated_at":          map[string]any{"type": "string", "format": "date-time"},
+			"id":                map[string]any{"type": "integer", "example": 1},
+			"email":             map[string]any{"type": "string", "format": "email", "example": "user@example.com"},
+			"first_name":        map[string]any{"type": "string", "example": "Jean"},
+			"last_name":         map[string]any{"type": "string", "example": "Dupont"},
+			"phone":             map[string]any{"type": "string", "example": "+33612345678", "nullable": true},
+			"avatar_url":        map[string]any{"type": "string", "nullable": true},
+			"status":            map[string]any{"type": "string", "enum": []string{"active", "pending", "banned"}, "example": "active"},
+			"role":              map[string]any{"type": "string", "example": "admin"},
+			"email_verified_at": map[string]any{"type": "string", "format": "date-time", "nullable": true},
+			"created_at":        map[string]any{"type": "string", "format": "date-time"},
+			"updated_at":        map[string]any{"type": "string", "format": "date-time"},
 		},
 	}
 
@@ -85,19 +85,19 @@ func buildOpenAPISpec() map[string]any {
 	eventSchema := map[string]any{
 		"type": "object",
 		"properties": map[string]any{
-			"id":                   map[string]any{"type": "integer", "example": 1},
-			"title":                map[string]any{"type": "string", "example": "Repair Café Paris"},
-			"description":          map[string]any{"type": "string", "nullable": true},
-			"location":             map[string]any{"type": "string", "example": "15 rue de la Paix, Paris", "nullable": true},
-			"start_date":           map[string]any{"type": "string", "format": "date-time"},
-			"end_date":             map[string]any{"type": "string", "format": "date-time"},
-			"max_participants":     map[string]any{"type": "integer", "nullable": true, "example": 50},
-			"registrations_count":  map[string]any{"type": "integer", "example": 12},
-			"status":               map[string]any{"type": "string", "enum": []string{"draft", "published", "cancelled"}, "example": "published"},
-			"category":             map[string]any{"$ref": "#/components/schemas/Category"},
-			"creator":              map[string]any{"$ref": "#/components/schemas/User"},
-			"created_at":           map[string]any{"type": "string", "format": "date-time"},
-			"updated_at":           map[string]any{"type": "string", "format": "date-time"},
+			"id":                  map[string]any{"type": "integer", "example": 1},
+			"title":               map[string]any{"type": "string", "example": "Repair Café Paris"},
+			"description":         map[string]any{"type": "string", "nullable": true},
+			"location":            map[string]any{"type": "string", "example": "15 rue de la Paix, Paris", "nullable": true},
+			"start_date":          map[string]any{"type": "string", "format": "date-time"},
+			"end_date":            map[string]any{"type": "string", "format": "date-time"},
+			"max_participants":    map[string]any{"type": "integer", "nullable": true, "example": 50},
+			"registrations_count": map[string]any{"type": "integer", "example": 12},
+			"status":              map[string]any{"type": "string", "enum": []string{"draft", "published", "cancelled"}, "example": "published"},
+			"category":            map[string]any{"$ref": "#/components/schemas/Category"},
+			"creator":             map[string]any{"$ref": "#/components/schemas/User"},
+			"created_at":          map[string]any{"type": "string", "format": "date-time"},
+			"updated_at":          map[string]any{"type": "string", "format": "date-time"},
 		},
 	}
 
@@ -178,7 +178,6 @@ func buildOpenAPISpec() map[string]any {
 	}
 
 	paths := map[string]any{
-
 		"/up": map[string]any{
 			"get": map[string]any{
 				"tags":    []string{"Système"},
@@ -191,15 +190,15 @@ func buildOpenAPISpec() map[string]any {
 
 		"/api/public/v1/siret/{siret}": map[string]any{
 			"get": map[string]any{
-				"tags":    []string{"Public"},
-				"summary": "Recherche d'entreprise par SIRET",
+				"tags":        []string{"Public"},
+				"summary":     "Recherche d'entreprise par SIRET",
 				"description": "Consulte l'API Société.com pour obtenir les informations légales d'une entreprise à partir de son numéro SIRET (14 chiffres).",
 				"parameters": []map[string]any{
 					{
 						"name": "siret", "in": "path", "required": true,
-						"schema": map[string]any{"type": "string", "pattern": "^[0-9]{14}$"},
+						"schema":      map[string]any{"type": "string", "pattern": "^[0-9]{14}$"},
 						"description": "Numéro SIRET (14 chiffres)",
-						"example": "12345678901234",
+						"example":     "12345678901234",
 					},
 				},
 				"responses": map[string]any{
@@ -213,15 +212,15 @@ func buildOpenAPISpec() map[string]any {
 
 		"/api/v1/auth/register": map[string]any{
 			"post": map[string]any{
-				"tags":    []string{"Auth Utilisateur"},
-				"summary": "Inscription",
+				"tags":        []string{"Auth Utilisateur"},
+				"summary":     "Inscription",
 				"description": "Crée un nouveau compte utilisateur. Un email de vérification est envoyé.",
 				"requestBody": map[string]any{
 					"required": true,
 					"content": map[string]any{
 						"application/json": map[string]any{
 							"schema": map[string]any{
-								"type": "object",
+								"type":     "object",
 								"required": []string{"first_name", "last_name", "email", "password"},
 								"properties": map[string]any{
 									"first_name":   map[string]any{"type": "string", "example": "Marie"},
@@ -242,7 +241,7 @@ func buildOpenAPISpec() map[string]any {
 				"responses": map[string]any{
 					"201": map[string]any{
 						"description": "Compte créé — email de vérification envoyé",
-						"content": map[string]any{"application/json": map[string]any{"schema": map[string]any{"type": "object", "properties": map[string]any{"message": map[string]any{"type": "string", "example": "Account created. Verify your email."}}}}},
+						"content":     map[string]any{"application/json": map[string]any{"schema": map[string]any{"type": "object", "properties": map[string]any{"message": map[string]any{"type": "string", "example": "Account created. Verify your email."}}}}},
 					},
 					"422": map[string]any{"description": "Validation échouée ou email déjà utilisé"},
 				},
@@ -251,15 +250,15 @@ func buildOpenAPISpec() map[string]any {
 
 		"/api/v1/auth/login": map[string]any{
 			"post": map[string]any{
-				"tags":    []string{"Auth Utilisateur"},
-				"summary": "Connexion utilisateur",
+				"tags":        []string{"Auth Utilisateur"},
+				"summary":     "Connexion utilisateur",
 				"description": "Authentifie un utilisateur. Si l'IP est inconnue, un email de vérification est envoyé et la réponse est 202.",
 				"requestBody": map[string]any{
 					"required": true,
 					"content": map[string]any{
 						"application/json": map[string]any{
 							"schema": map[string]any{
-								"type": "object",
+								"type":     "object",
 								"required": []string{"email", "password"},
 								"properties": map[string]any{
 									"email":    map[string]any{"type": "string", "format": "email", "example": "user@example.com"},
@@ -272,7 +271,7 @@ func buildOpenAPISpec() map[string]any {
 				"responses": map[string]any{
 					"200": map[string]any{
 						"description": "Connexion réussie — token JWT retourné",
-						"content": map[string]any{"application/json": map[string]any{"schema": map[string]any{"type": "object", "properties": map[string]any{"token": map[string]any{"type": "string"}, "user": map[string]any{"$ref": "#/components/schemas/User"}}}}},
+						"content":     map[string]any{"application/json": map[string]any{"schema": map[string]any{"type": "object", "properties": map[string]any{"token": map[string]any{"type": "string"}, "user": map[string]any{"$ref": "#/components/schemas/User"}}}}},
 					},
 					"202": map[string]any{"description": "IP inconnue — email de vérification envoyé", "content": map[string]any{"application/json": map[string]any{"schema": map[string]any{"type": "object", "properties": map[string]any{"pending_verification": map[string]any{"type": "boolean", "example": true}, "message": map[string]any{"type": "string"}}}}}},
 					"401": map[string]any{"description": "Identifiants invalides"},
@@ -283,8 +282,8 @@ func buildOpenAPISpec() map[string]any {
 
 		"/api/v1/auth/verify-email": map[string]any{
 			"get": map[string]any{
-				"tags":    []string{"Auth Utilisateur"},
-				"summary": "Vérification de l'email d'inscription",
+				"tags":       []string{"Auth Utilisateur"},
+				"summary":    "Vérification de l'email d'inscription",
 				"parameters": []map[string]any{{"name": "token", "in": "query", "required": true, "schema": map[string]any{"type": "string"}, "description": "Token reçu par email"}},
 				"responses": map[string]any{
 					"200": map[string]any{"description": "Email vérifié"},
@@ -295,8 +294,8 @@ func buildOpenAPISpec() map[string]any {
 
 		"/api/v1/auth/verify-login": map[string]any{
 			"get": map[string]any{
-				"tags":    []string{"Auth Utilisateur"},
-				"summary": "Confirmation de connexion depuis une nouvelle IP",
+				"tags":       []string{"Auth Utilisateur"},
+				"summary":    "Confirmation de connexion depuis une nouvelle IP",
 				"parameters": []map[string]any{{"name": "token", "in": "query", "required": true, "schema": map[string]any{"type": "string"}, "description": "Token reçu par email"}},
 				"responses": map[string]any{
 					"200": map[string]any{"description": "IP validée — token JWT retourné", "content": map[string]any{"application/json": map[string]any{"schema": map[string]any{"type": "object", "properties": map[string]any{"token": map[string]any{"type": "string"}, "user": map[string]any{"$ref": "#/components/schemas/User"}}}}}},
@@ -341,12 +340,12 @@ func buildOpenAPISpec() map[string]any {
 						"content": map[string]any{"application/json": map[string]any{"schema": map[string]any{
 							"type": "object",
 							"properties": map[string]any{
-								"score":          map[string]any{"type": "integer", "example": 72},
-								"co2_saved":      map[string]any{"type": "number", "format": "float", "example": 12.5},
-								"objects_saved":  map[string]any{"type": "integer", "example": 4},
-								"deposits":       map[string]any{"type": "array", "items": map[string]any{"$ref": "#/components/schemas/Deposit"}},
-								"reservations":   map[string]any{"type": "array", "items": map[string]any{"type": "object", "properties": map[string]any{"id": map[string]any{"type": "integer"}, "event_id": map[string]any{"type": "integer"}, "title": map[string]any{"type": "string"}, "start_date": map[string]any{"type": "string", "format": "date-time"}, "location": map[string]any{"type": "string", "nullable": true}, "past": map[string]any{"type": "boolean"}}}},
-								"badges":         map[string]any{"type": "array", "items": map[string]any{"type": "object", "properties": map[string]any{"key": map[string]any{"type": "string"}, "label": map[string]any{"type": "string"}, "desc": map[string]any{"type": "string"}, "earned": map[string]any{"type": "boolean"}}}},
+								"score":         map[string]any{"type": "integer", "example": 72},
+								"co2_saved":     map[string]any{"type": "number", "format": "float", "example": 12.5},
+								"objects_saved": map[string]any{"type": "integer", "example": 4},
+								"deposits":      map[string]any{"type": "array", "items": map[string]any{"$ref": "#/components/schemas/Deposit"}},
+								"reservations":  map[string]any{"type": "array", "items": map[string]any{"type": "object", "properties": map[string]any{"id": map[string]any{"type": "integer"}, "event_id": map[string]any{"type": "integer"}, "title": map[string]any{"type": "string"}, "start_date": map[string]any{"type": "string", "format": "date-time"}, "location": map[string]any{"type": "string", "nullable": true}, "past": map[string]any{"type": "boolean"}}}},
+								"badges":        map[string]any{"type": "array", "items": map[string]any{"type": "object", "properties": map[string]any{"key": map[string]any{"type": "string"}, "label": map[string]any{"type": "string"}, "desc": map[string]any{"type": "string"}, "earned": map[string]any{"type": "boolean"}}}},
 							},
 						}}},
 					},
@@ -363,7 +362,7 @@ func buildOpenAPISpec() map[string]any {
 				"requestBody": map[string]any{
 					"required": true,
 					"content": map[string]any{"application/json": map[string]any{"schema": map[string]any{
-						"type": "object",
+						"type":     "object",
 						"required": []string{"first_name", "last_name"},
 						"properties": map[string]any{
 							"first_name": map[string]any{"type": "string", "example": "Marie"},
@@ -388,7 +387,7 @@ func buildOpenAPISpec() map[string]any {
 				"security":    bearerSecurityReq,
 				"requestBody": map[string]any{
 					"required": true,
-					"content": map[string]any{"multipart/form-data": map[string]any{"schema": map[string]any{"type": "object", "required": []string{"avatar"}, "properties": map[string]any{"avatar": map[string]any{"type": "string", "format": "binary"}}}}},
+					"content":  map[string]any{"multipart/form-data": map[string]any{"schema": map[string]any{"type": "object", "required": []string{"avatar"}, "properties": map[string]any{"avatar": map[string]any{"type": "string", "format": "binary"}}}}},
 				},
 				"responses": map[string]any{
 					"200": map[string]any{"description": "Avatar mis à jour", "content": map[string]any{"application/json": map[string]any{"schema": map[string]any{"type": "object", "properties": map[string]any{"avatar_url": map[string]any{"type": "string"}}}}}},
@@ -406,7 +405,7 @@ func buildOpenAPISpec() map[string]any {
 				"requestBody": map[string]any{
 					"required": true,
 					"content": map[string]any{"application/json": map[string]any{"schema": map[string]any{
-						"type": "object",
+						"type":     "object",
 						"required": []string{"current", "new"},
 						"properties": map[string]any{
 							"current": map[string]any{"type": "string", "example": "ancien_mdp"},
@@ -444,7 +443,7 @@ func buildOpenAPISpec() map[string]any {
 				"requestBody": map[string]any{
 					"required": true,
 					"content": map[string]any{"application/json": map[string]any{"schema": map[string]any{
-						"type": "object",
+						"type":     "object",
 						"required": []string{"code", "new_email"},
 						"properties": map[string]any{
 							"code":      map[string]any{"type": "string", "pattern": "^[0-9]{6}$", "example": "482910"},
@@ -469,7 +468,7 @@ func buildOpenAPISpec() map[string]any {
 				"requestBody": map[string]any{
 					"required": true,
 					"content": map[string]any{"application/json": map[string]any{"schema": map[string]any{
-						"type": "object",
+						"type":     "object",
 						"required": []string{"code"},
 						"properties": map[string]any{
 							"code": map[string]any{"type": "string", "pattern": "^[0-9]{6}$", "example": "193847"},
@@ -486,9 +485,9 @@ func buildOpenAPISpec() map[string]any {
 
 		"/api/v1/events/{id}/register": map[string]any{
 			"post": map[string]any{
-				"tags":     []string{"Profil Utilisateur"},
-				"summary":  "S'inscrire à un événement",
-				"security": bearerSecurityReq,
+				"tags":       []string{"Profil Utilisateur"},
+				"summary":    "S'inscrire à un événement",
+				"security":   bearerSecurityReq,
 				"parameters": []map[string]any{{"name": "id", "in": "path", "required": true, "schema": map[string]any{"type": "integer"}, "description": "ID de l'événement"}},
 				"responses": map[string]any{
 					"200": map[string]any{"description": "Inscription enregistrée"},
@@ -497,9 +496,9 @@ func buildOpenAPISpec() map[string]any {
 				},
 			},
 			"delete": map[string]any{
-				"tags":     []string{"Profil Utilisateur"},
-				"summary":  "Se désinscrire d'un événement",
-				"security": bearerSecurityReq,
+				"tags":       []string{"Profil Utilisateur"},
+				"summary":    "Se désinscrire d'un événement",
+				"security":   bearerSecurityReq,
 				"parameters": []map[string]any{{"name": "id", "in": "path", "required": true, "schema": map[string]any{"type": "integer"}, "description": "ID de l'événement"}},
 				"responses": map[string]any{
 					"200": map[string]any{"description": "Désinscription effectuée"},
@@ -510,8 +509,8 @@ func buildOpenAPISpec() map[string]any {
 
 		"/api/public/v1/categories": map[string]any{
 			"get": map[string]any{
-				"tags":    []string{"Public"},
-				"summary": "Liste des catégories actives",
+				"tags":        []string{"Public"},
+				"summary":     "Liste des catégories actives",
 				"description": "Retourne toutes les catégories visibles publiquement (actives) avec le nombre de prestations publiées associées.",
 				"responses": map[string]any{
 					"200": map[string]any{"description": "Liste paginée de catégories", "content": map[string]any{"application/json": map[string]any{"schema": map[string]any{"type": "object", "properties": map[string]any{"data": map[string]any{"type": "array", "items": map[string]any{"$ref": "#/components/schemas/Category"}}}}}}},
@@ -535,8 +534,8 @@ func buildOpenAPISpec() map[string]any {
 
 		"/api/public/v1/prestations/{id}": map[string]any{
 			"get": map[string]any{
-				"tags":    []string{"Public"},
-				"summary": "Détail d'une prestation publiée",
+				"tags":       []string{"Public"},
+				"summary":    "Détail d'une prestation publiée",
 				"parameters": []map[string]any{{"name": "id", "in": "path", "required": true, "schema": map[string]any{"type": "integer"}}},
 				"responses": map[string]any{
 					"200": map[string]any{"description": "Détail", "content": map[string]any{"application/json": map[string]any{"schema": map[string]any{"$ref": "#/components/schemas/Prestation"}}}},
@@ -562,8 +561,8 @@ func buildOpenAPISpec() map[string]any {
 
 		"/api/public/v1/events/{id}": map[string]any{
 			"get": map[string]any{
-				"tags":    []string{"Public"},
-				"summary": "Détail d'un événement publié",
+				"tags":       []string{"Public"},
+				"summary":    "Détail d'un événement publié",
 				"parameters": []map[string]any{{"name": "id", "in": "path", "required": true, "schema": map[string]any{"type": "integer"}}},
 				"responses": map[string]any{
 					"200": map[string]any{"description": "Détail", "content": map[string]any{"application/json": map[string]any{"schema": map[string]any{"$ref": "#/components/schemas/Event"}}}},
@@ -574,8 +573,8 @@ func buildOpenAPISpec() map[string]any {
 
 		"/api/public/v1/providers": map[string]any{
 			"get": map[string]any{
-				"tags":    []string{"Public"},
-				"summary": "Liste publique des prestataires validés",
+				"tags":       []string{"Public"},
+				"summary":    "Liste publique des prestataires validés",
 				"parameters": append([]map[string]any{searchParam}, paginationParams...),
 				"responses": map[string]any{
 					"200": map[string]any{"description": "Prestataires approuvés"},
@@ -585,8 +584,8 @@ func buildOpenAPISpec() map[string]any {
 
 		"/api/public/v1/providers/{id}": map[string]any{
 			"get": map[string]any{
-				"tags":    []string{"Public"},
-				"summary": "Fiche publique d'un prestataire (avec ses prestations publiées)",
+				"tags":       []string{"Public"},
+				"summary":    "Fiche publique d'un prestataire (avec ses prestations publiées)",
 				"parameters": []map[string]any{{"name": "id", "in": "path", "required": true, "schema": map[string]any{"type": "integer"}}},
 				"responses": map[string]any{
 					"200": map[string]any{"description": "Fiche prestataire"},
@@ -609,10 +608,10 @@ func buildOpenAPISpec() map[string]any {
 				},
 			},
 			"post": map[string]any{
-				"tags":     []string{"Dépôts Utilisateur"},
-				"summary":  "Créer une demande de dépôt",
+				"tags":        []string{"Dépôts Utilisateur"},
+				"summary":     "Créer une demande de dépôt",
 				"description": "Les particuliers soumettent une demande de dépôt d'objet. Elle est traitée par un admin.",
-				"security": bearerSecurityReq,
+				"security":    bearerSecurityReq,
 				"requestBody": map[string]any{
 					"required": true,
 					"content": map[string]any{"application/json": map[string]any{"schema": map[string]any{
@@ -638,9 +637,9 @@ func buildOpenAPISpec() map[string]any {
 
 		"/api/v1/deposits/{id}": map[string]any{
 			"get": map[string]any{
-				"tags":     []string{"Dépôts Utilisateur"},
-				"summary":  "Détail d'un de mes dépôts",
-				"security": bearerSecurityReq,
+				"tags":       []string{"Dépôts Utilisateur"},
+				"summary":    "Détail d'un de mes dépôts",
+				"security":   bearerSecurityReq,
 				"parameters": []map[string]any{{"name": "id", "in": "path", "required": true, "schema": map[string]any{"type": "integer"}}},
 				"responses": map[string]any{
 					"200": map[string]any{"description": "Détail", "content": map[string]any{"application/json": map[string]any{"schema": map[string]any{"$ref": "#/components/schemas/Deposit"}}}},
@@ -649,9 +648,9 @@ func buildOpenAPISpec() map[string]any {
 				},
 			},
 			"delete": map[string]any{
-				"tags":     []string{"Dépôts Utilisateur"},
-				"summary":  "Annuler un dépôt en attente",
-				"security": bearerSecurityReq,
+				"tags":       []string{"Dépôts Utilisateur"},
+				"summary":    "Annuler un dépôt en attente",
+				"security":   bearerSecurityReq,
 				"parameters": []map[string]any{{"name": "id", "in": "path", "required": true, "schema": map[string]any{"type": "integer"}}},
 				"responses": map[string]any{
 					"204": map[string]any{"description": "Annulé"},
@@ -664,23 +663,23 @@ func buildOpenAPISpec() map[string]any {
 
 		"/api/v1/upcycling-score": map[string]any{
 			"get": map[string]any{
-				"tags":     []string{"Profil Utilisateur"},
-				"summary":  "Score d'upcycling de l'utilisateur",
+				"tags":        []string{"Profil Utilisateur"},
+				"summary":     "Score d'upcycling de l'utilisateur",
 				"description": "Calcul : 5 pts/dépôt accepté + 1.5 pt/kg de CO₂ économisé + 3 pts/événement. Plafonné à 100.",
-				"security": bearerSecurityReq,
+				"security":    bearerSecurityReq,
 				"responses": map[string]any{
 					"200": map[string]any{"description": "Score et détails", "content": map[string]any{"application/json": map[string]any{"schema": map[string]any{
 						"type": "object",
 						"properties": map[string]any{
-							"score":              map[string]any{"type": "integer", "example": 72},
-							"level":              map[string]any{"type": "string", "example": "Confirmé"},
-							"deposits_total":     map[string]any{"type": "integer", "example": 8},
-							"deposits_accepted":  map[string]any{"type": "integer", "example": 6},
-							"deposits_pending":   map[string]any{"type": "integer", "example": 1},
-							"deposits_rejected":  map[string]any{"type": "integer", "example": 1},
-							"weight_saved_kg":    map[string]any{"type": "number", "format": "float"},
-							"co2_saved_kg":       map[string]any{"type": "number", "format": "float"},
-							"events_attended":    map[string]any{"type": "integer", "example": 2},
+							"score":             map[string]any{"type": "integer", "example": 72},
+							"level":             map[string]any{"type": "string", "example": "Confirmé"},
+							"deposits_total":    map[string]any{"type": "integer", "example": 8},
+							"deposits_accepted": map[string]any{"type": "integer", "example": 6},
+							"deposits_pending":  map[string]any{"type": "integer", "example": 1},
+							"deposits_rejected": map[string]any{"type": "integer", "example": 1},
+							"weight_saved_kg":   map[string]any{"type": "number", "format": "float"},
+							"co2_saved_kg":      map[string]any{"type": "number", "format": "float"},
+							"events_attended":   map[string]any{"type": "integer", "example": 2},
 						},
 					}}}},
 					"401": map[string]any{"description": "Non authentifié"},
@@ -690,10 +689,10 @@ func buildOpenAPISpec() map[string]any {
 
 		"/api/v1/provider/apply": map[string]any{
 			"post": map[string]any{
-				"tags":     []string{"Prestataire"},
-				"summary":  "Postuler pour devenir prestataire",
+				"tags":        []string{"Prestataire"},
+				"summary":     "Postuler pour devenir prestataire",
 				"description": "Soumet une candidature prestataire. Elle doit être approuvée par un admin pour que les endpoints prestataire soient accessibles.",
-				"security": bearerSecurityReq,
+				"security":    bearerSecurityReq,
 				"requestBody": map[string]any{
 					"required": true,
 					"content": map[string]any{"application/json": map[string]any{"schema": map[string]any{
@@ -792,9 +791,9 @@ func buildOpenAPISpec() map[string]any {
 
 		"/api/v1/provider/prestations/{id}": map[string]any{
 			"put": map[string]any{
-				"tags":     []string{"Prestataire"},
-				"summary":  "Mettre à jour ma prestation (repasse en draft)",
-				"security": bearerSecurityReq,
+				"tags":       []string{"Prestataire"},
+				"summary":    "Mettre à jour ma prestation (repasse en draft)",
+				"security":   bearerSecurityReq,
 				"parameters": []map[string]any{{"name": "id", "in": "path", "required": true, "schema": map[string]any{"type": "integer"}}},
 				"requestBody": map[string]any{
 					"required": true,
@@ -817,9 +816,9 @@ func buildOpenAPISpec() map[string]any {
 				},
 			},
 			"delete": map[string]any{
-				"tags":     []string{"Prestataire"},
-				"summary":  "Supprimer ma prestation",
-				"security": bearerSecurityReq,
+				"tags":       []string{"Prestataire"},
+				"summary":    "Supprimer ma prestation",
+				"security":   bearerSecurityReq,
 				"parameters": []map[string]any{{"name": "id", "in": "path", "required": true, "schema": map[string]any{"type": "integer"}}},
 				"responses": map[string]any{
 					"204": map[string]any{"description": "Supprimée"},
@@ -832,9 +831,9 @@ func buildOpenAPISpec() map[string]any {
 
 		"/api/v1/provider/prestations/{id}/submit": map[string]any{
 			"put": map[string]any{
-				"tags":     []string{"Prestataire"},
-				"summary":  "Publier une prestation brouillon",
-				"security": bearerSecurityReq,
+				"tags":       []string{"Prestataire"},
+				"summary":    "Publier une prestation brouillon",
+				"security":   bearerSecurityReq,
 				"parameters": []map[string]any{{"name": "id", "in": "path", "required": true, "schema": map[string]any{"type": "integer"}}},
 				"responses": map[string]any{
 					"200": map[string]any{"description": "Publiée"},
@@ -854,7 +853,7 @@ func buildOpenAPISpec() map[string]any {
 				"requestBody": map[string]any{
 					"required": true,
 					"content": map[string]any{"application/json": map[string]any{"schema": map[string]any{
-						"type": "object",
+						"type":     "object",
 						"required": []string{"email", "password"},
 						"properties": map[string]any{
 							"email":    map[string]any{"type": "string", "format": "email", "example": "admin@upcycleconnect.fr"},
@@ -865,7 +864,7 @@ func buildOpenAPISpec() map[string]any {
 				"responses": map[string]any{
 					"200": map[string]any{
 						"description": "Token JWT admin",
-						"content": map[string]any{"application/json": map[string]any{"schema": map[string]any{"type": "object", "properties": map[string]any{"token": map[string]any{"type": "string", "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."}, "user": map[string]any{"$ref": "#/components/schemas/User"}}}}},
+						"content":     map[string]any{"application/json": map[string]any{"schema": map[string]any{"type": "object", "properties": map[string]any{"token": map[string]any{"type": "string", "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."}, "user": map[string]any{"$ref": "#/components/schemas/User"}}}}},
 					},
 					"401": map[string]any{"description": "Identifiants invalides"},
 					"403": map[string]any{"description": "Compte non administrateur"},
@@ -901,14 +900,14 @@ func buildOpenAPISpec() map[string]any {
 						"description": "Statistiques",
 						"content": map[string]any{"application/json": map[string]any{"schema": map[string]any{"type": "object", "properties": map[string]any{
 							"users_count":           map[string]any{"type": "integer", "example": 342},
-							"providers_count":        map[string]any{"type": "integer", "example": 28},
-							"providers_pending":      map[string]any{"type": "integer", "example": 5},
-							"prestations_count":      map[string]any{"type": "integer", "example": 87},
-							"events_count":           map[string]any{"type": "integer", "example": 14},
-							"prestations_by_status":  map[string]any{"type": "object", "example": map[string]any{"draft": 12, "published": 70, "suspended": 5}},
-							"deposits_pending":       map[string]any{"type": "integer", "example": 9},
-							"deposits_accepted":      map[string]any{"type": "integer", "example": 63},
-							"co2_total":              map[string]any{"type": "number", "format": "float", "example": 1240.5},
+							"providers_count":       map[string]any{"type": "integer", "example": 28},
+							"providers_pending":     map[string]any{"type": "integer", "example": 5},
+							"prestations_count":     map[string]any{"type": "integer", "example": 87},
+							"events_count":          map[string]any{"type": "integer", "example": 14},
+							"prestations_by_status": map[string]any{"type": "object", "example": map[string]any{"draft": 12, "published": 70, "suspended": 5}},
+							"deposits_pending":      map[string]any{"type": "integer", "example": 9},
+							"deposits_accepted":     map[string]any{"type": "integer", "example": 63},
+							"co2_total":             map[string]any{"type": "number", "format": "float", "example": 1240.5},
 						}}}},
 					},
 					"401": map[string]any{"description": "Non authentifié"},
@@ -955,7 +954,7 @@ func buildOpenAPISpec() map[string]any {
 				"security":    bearerSecurityReq,
 				"parameters": append(paginationParams, searchParam, map[string]any{
 					"name": "status", "in": "query",
-					"schema": map[string]any{"type": "string", "enum": []string{"active", "pending", "banned"}},
+					"schema":      map[string]any{"type": "string", "enum": []string{"active", "pending", "banned"}},
 					"description": "Filtrer par statut",
 				}),
 				"responses": map[string]any{
@@ -976,14 +975,14 @@ func buildOpenAPISpec() map[string]any {
 			},
 			"put": map[string]any{
 				"tags": []string{"Utilisateurs"}, "summary": "Modifier un utilisateur", "security": bearerSecurityReq,
-				"parameters": []map[string]any{{"name": "id", "in": "path", "required": true, "schema": map[string]any{"type": "integer"}}},
+				"parameters":  []map[string]any{{"name": "id", "in": "path", "required": true, "schema": map[string]any{"type": "integer"}}},
 				"requestBody": map[string]any{"required": true, "content": map[string]any{"application/json": map[string]any{"schema": map[string]any{"type": "object", "properties": map[string]any{"first_name": map[string]any{"type": "string"}, "last_name": map[string]any{"type": "string"}, "phone": map[string]any{"type": "string"}}}}}},
-				"responses": map[string]any{"200": map[string]any{"description": "Utilisateur mis à jour"}, "404": map[string]any{"description": "Introuvable"}},
+				"responses":   map[string]any{"200": map[string]any{"description": "Utilisateur mis à jour"}, "404": map[string]any{"description": "Introuvable"}},
 			},
 			"delete": map[string]any{
 				"tags": []string{"Utilisateurs"}, "summary": "Supprimer un utilisateur (soft delete)", "security": bearerSecurityReq,
 				"parameters": []map[string]any{{"name": "id", "in": "path", "required": true, "schema": map[string]any{"type": "integer"}}},
-				"responses": map[string]any{"200": map[string]any{"description": "Supprimé"}, "404": map[string]any{"description": "Introuvable"}},
+				"responses":  map[string]any{"200": map[string]any{"description": "Supprimé"}, "404": map[string]any{"description": "Introuvable"}},
 			},
 		},
 
@@ -991,7 +990,7 @@ func buildOpenAPISpec() map[string]any {
 			"post": map[string]any{
 				"tags": []string{"Utilisateurs"}, "summary": "Bannir un utilisateur", "security": bearerSecurityReq,
 				"parameters": []map[string]any{{"name": "id", "in": "path", "required": true, "schema": map[string]any{"type": "integer"}}},
-				"responses": map[string]any{"200": map[string]any{"description": "Banni — action auditée"}, "404": map[string]any{"description": "Introuvable"}},
+				"responses":  map[string]any{"200": map[string]any{"description": "Banni — action auditée"}, "404": map[string]any{"description": "Introuvable"}},
 			},
 		},
 
@@ -999,7 +998,7 @@ func buildOpenAPISpec() map[string]any {
 			"post": map[string]any{
 				"tags": []string{"Utilisateurs"}, "summary": "Activer un utilisateur", "security": bearerSecurityReq,
 				"parameters": []map[string]any{{"name": "id", "in": "path", "required": true, "schema": map[string]any{"type": "integer"}}},
-				"responses": map[string]any{"200": map[string]any{"description": "Activé — action auditée"}, "404": map[string]any{"description": "Introuvable"}},
+				"responses":  map[string]any{"200": map[string]any{"description": "Activé — action auditée"}, "404": map[string]any{"description": "Introuvable"}},
 			},
 		},
 
@@ -1008,7 +1007,7 @@ func buildOpenAPISpec() map[string]any {
 				"tags": []string{"Prestataires"}, "summary": "Liste des prestataires", "security": bearerSecurityReq,
 				"parameters": append(paginationParams, searchParam, map[string]any{
 					"name": "status", "in": "query",
-					"schema": map[string]any{"type": "string", "enum": []string{"pending", "approved", "suspended"}},
+					"schema":      map[string]any{"type": "string", "enum": []string{"pending", "approved", "suspended"}},
 					"description": "Filtrer par statut de validation",
 				}),
 				"responses": map[string]any{
@@ -1021,16 +1020,16 @@ func buildOpenAPISpec() map[string]any {
 			"get": map[string]any{
 				"tags": []string{"Prestataires"}, "summary": "Détail d'un prestataire", "security": bearerSecurityReq,
 				"parameters": []map[string]any{{"name": "id", "in": "path", "required": true, "schema": map[string]any{"type": "integer"}}},
-				"responses": map[string]any{"200": map[string]any{"description": "Prestataire + profil", "content": map[string]any{"application/json": map[string]any{"schema": map[string]any{"$ref": "#/components/schemas/ProviderProfile"}}}}, "404": map[string]any{"description": "Introuvable"}},
+				"responses":  map[string]any{"200": map[string]any{"description": "Prestataire + profil", "content": map[string]any{"application/json": map[string]any{"schema": map[string]any{"$ref": "#/components/schemas/ProviderProfile"}}}}, "404": map[string]any{"description": "Introuvable"}},
 			},
 		},
 
 		"/api/admin/v1/providers/{id}/status": map[string]any{
 			"put": map[string]any{
 				"tags": []string{"Prestataires"}, "summary": "Modifier le statut d'un prestataire", "security": bearerSecurityReq,
-				"parameters": []map[string]any{{"name": "id", "in": "path", "required": true, "schema": map[string]any{"type": "integer"}}},
+				"parameters":  []map[string]any{{"name": "id", "in": "path", "required": true, "schema": map[string]any{"type": "integer"}}},
 				"requestBody": map[string]any{"required": true, "content": map[string]any{"application/json": map[string]any{"schema": map[string]any{"type": "object", "required": []string{"status"}, "properties": map[string]any{"status": map[string]any{"type": "string", "enum": []string{"pending", "approved", "suspended"}, "example": "approved"}}}}}},
-				"responses": map[string]any{"200": map[string]any{"description": "Statut mis à jour — action auditée"}, "404": map[string]any{"description": "Introuvable"}},
+				"responses":   map[string]any{"200": map[string]any{"description": "Statut mis à jour — action auditée"}, "404": map[string]any{"description": "Introuvable"}},
 			},
 		},
 
@@ -1058,18 +1057,18 @@ func buildOpenAPISpec() map[string]any {
 			"get": map[string]any{
 				"tags": []string{"Catégories"}, "summary": "Détail d'une catégorie", "security": bearerSecurityReq,
 				"parameters": []map[string]any{{"name": "id", "in": "path", "required": true, "schema": map[string]any{"type": "integer"}}},
-				"responses": map[string]any{"200": map[string]any{"description": "Catégorie", "content": map[string]any{"application/json": map[string]any{"schema": map[string]any{"$ref": "#/components/schemas/Category"}}}}, "404": map[string]any{"description": "Introuvable"}},
+				"responses":  map[string]any{"200": map[string]any{"description": "Catégorie", "content": map[string]any{"application/json": map[string]any{"schema": map[string]any{"$ref": "#/components/schemas/Category"}}}}, "404": map[string]any{"description": "Introuvable"}},
 			},
 			"put": map[string]any{
 				"tags": []string{"Catégories"}, "summary": "Modifier une catégorie", "security": bearerSecurityReq,
-				"parameters": []map[string]any{{"name": "id", "in": "path", "required": true, "schema": map[string]any{"type": "integer"}}},
+				"parameters":  []map[string]any{{"name": "id", "in": "path", "required": true, "schema": map[string]any{"type": "integer"}}},
 				"requestBody": map[string]any{"required": true, "content": map[string]any{"application/json": map[string]any{"schema": map[string]any{"type": "object", "properties": map[string]any{"name": map[string]any{"type": "string"}, "description": map[string]any{"type": "string"}, "sort_order": map[string]any{"type": "integer"}, "is_active": map[string]any{"type": "boolean"}}}}}},
-				"responses": map[string]any{"200": map[string]any{"description": "Catégorie mise à jour"}, "404": map[string]any{"description": "Introuvable"}},
+				"responses":   map[string]any{"200": map[string]any{"description": "Catégorie mise à jour"}, "404": map[string]any{"description": "Introuvable"}},
 			},
 			"delete": map[string]any{
 				"tags": []string{"Catégories"}, "summary": "Supprimer une catégorie (soft delete)", "security": bearerSecurityReq,
 				"parameters": []map[string]any{{"name": "id", "in": "path", "required": true, "schema": map[string]any{"type": "integer"}}},
-				"responses": map[string]any{"200": map[string]any{"description": "Supprimée"}, "404": map[string]any{"description": "Introuvable"}},
+				"responses":  map[string]any{"200": map[string]any{"description": "Supprimée"}, "404": map[string]any{"description": "Introuvable"}},
 			},
 		},
 
@@ -1077,7 +1076,7 @@ func buildOpenAPISpec() map[string]any {
 			"post": map[string]any{
 				"tags": []string{"Catégories"}, "summary": "Activer / désactiver une catégorie", "security": bearerSecurityReq,
 				"parameters": []map[string]any{{"name": "id", "in": "path", "required": true, "schema": map[string]any{"type": "integer"}}},
-				"responses": map[string]any{"200": map[string]any{"description": "Statut basculé"}, "404": map[string]any{"description": "Introuvable"}},
+				"responses":  map[string]any{"200": map[string]any{"description": "Statut basculé"}, "404": map[string]any{"description": "Introuvable"}},
 			},
 		},
 
@@ -1096,13 +1095,13 @@ func buildOpenAPISpec() map[string]any {
 				"requestBody": map[string]any{"required": true, "content": map[string]any{"application/json": map[string]any{"schema": map[string]any{
 					"type": "object", "required": []string{"title"},
 					"properties": map[string]any{
-						"category_id":  map[string]any{"type": "integer"},
-						"provider_id":  map[string]any{"type": "integer"},
-						"title":        map[string]any{"type": "string", "example": "Réparation smartphone"},
-						"description":  map[string]any{"type": "string"},
-						"price":        map[string]any{"type": "number", "format": "float", "example": 49.90},
-						"price_type":   map[string]any{"type": "string", "enum": []string{"fixed", "hourly", "quote"}, "default": "fixed"},
-						"status":       map[string]any{"type": "string", "enum": []string{"draft", "published", "suspended", "archived"}, "default": "draft"},
+						"category_id": map[string]any{"type": "integer"},
+						"provider_id": map[string]any{"type": "integer"},
+						"title":       map[string]any{"type": "string", "example": "Réparation smartphone"},
+						"description": map[string]any{"type": "string"},
+						"price":       map[string]any{"type": "number", "format": "float", "example": 49.90},
+						"price_type":  map[string]any{"type": "string", "enum": []string{"fixed", "hourly", "quote"}, "default": "fixed"},
+						"status":      map[string]any{"type": "string", "enum": []string{"draft", "published", "suspended", "archived"}, "default": "draft"},
 					},
 				}}}},
 				"responses": map[string]any{"201": map[string]any{"description": "Prestation créée", "content": map[string]any{"application/json": map[string]any{"schema": map[string]any{"$ref": "#/components/schemas/Prestation"}}}}, "422": map[string]any{"description": "Validation échouée"}},
@@ -1113,27 +1112,27 @@ func buildOpenAPISpec() map[string]any {
 			"get": map[string]any{
 				"tags": []string{"Prestations"}, "summary": "Détail d'une prestation", "security": bearerSecurityReq,
 				"parameters": []map[string]any{{"name": "id", "in": "path", "required": true, "schema": map[string]any{"type": "integer"}}},
-				"responses": map[string]any{"200": map[string]any{"description": "Prestation", "content": map[string]any{"application/json": map[string]any{"schema": map[string]any{"$ref": "#/components/schemas/Prestation"}}}}, "404": map[string]any{"description": "Introuvable"}},
+				"responses":  map[string]any{"200": map[string]any{"description": "Prestation", "content": map[string]any{"application/json": map[string]any{"schema": map[string]any{"$ref": "#/components/schemas/Prestation"}}}}, "404": map[string]any{"description": "Introuvable"}},
 			},
 			"put": map[string]any{
 				"tags": []string{"Prestations"}, "summary": "Modifier une prestation", "security": bearerSecurityReq,
-				"parameters": []map[string]any{{"name": "id", "in": "path", "required": true, "schema": map[string]any{"type": "integer"}}},
+				"parameters":  []map[string]any{{"name": "id", "in": "path", "required": true, "schema": map[string]any{"type": "integer"}}},
 				"requestBody": map[string]any{"required": true, "content": map[string]any{"application/json": map[string]any{"schema": map[string]any{"$ref": "#/components/schemas/Prestation"}}}},
-				"responses": map[string]any{"200": map[string]any{"description": "Prestation mise à jour"}, "404": map[string]any{"description": "Introuvable"}},
+				"responses":   map[string]any{"200": map[string]any{"description": "Prestation mise à jour"}, "404": map[string]any{"description": "Introuvable"}},
 			},
 			"delete": map[string]any{
 				"tags": []string{"Prestations"}, "summary": "Supprimer une prestation (soft delete)", "security": bearerSecurityReq,
 				"parameters": []map[string]any{{"name": "id", "in": "path", "required": true, "schema": map[string]any{"type": "integer"}}},
-				"responses": map[string]any{"200": map[string]any{"description": "Supprimée"}, "404": map[string]any{"description": "Introuvable"}},
+				"responses":  map[string]any{"200": map[string]any{"description": "Supprimée"}, "404": map[string]any{"description": "Introuvable"}},
 			},
 		},
 
 		"/api/admin/v1/prestations/{id}/status": map[string]any{
 			"put": map[string]any{
 				"tags": []string{"Prestations"}, "summary": "Changer le statut d'une prestation", "security": bearerSecurityReq,
-				"parameters": []map[string]any{{"name": "id", "in": "path", "required": true, "schema": map[string]any{"type": "integer"}}},
+				"parameters":  []map[string]any{{"name": "id", "in": "path", "required": true, "schema": map[string]any{"type": "integer"}}},
 				"requestBody": map[string]any{"required": true, "content": map[string]any{"application/json": map[string]any{"schema": map[string]any{"type": "object", "required": []string{"status"}, "properties": map[string]any{"status": map[string]any{"type": "string", "enum": []string{"draft", "published", "suspended", "archived"}}}}}}},
-				"responses": map[string]any{"200": map[string]any{"description": "Statut mis à jour — action auditée"}, "404": map[string]any{"description": "Introuvable"}},
+				"responses":   map[string]any{"200": map[string]any{"description": "Statut mis à jour — action auditée"}, "404": map[string]any{"description": "Introuvable"}},
 			},
 		},
 
@@ -1170,27 +1169,27 @@ func buildOpenAPISpec() map[string]any {
 			"get": map[string]any{
 				"tags": []string{"Événements"}, "summary": "Détail d'un événement", "security": bearerSecurityReq,
 				"parameters": []map[string]any{{"name": "id", "in": "path", "required": true, "schema": map[string]any{"type": "integer"}}},
-				"responses": map[string]any{"200": map[string]any{"description": "Événement", "content": map[string]any{"application/json": map[string]any{"schema": map[string]any{"$ref": "#/components/schemas/Event"}}}}, "404": map[string]any{"description": "Introuvable"}},
+				"responses":  map[string]any{"200": map[string]any{"description": "Événement", "content": map[string]any{"application/json": map[string]any{"schema": map[string]any{"$ref": "#/components/schemas/Event"}}}}, "404": map[string]any{"description": "Introuvable"}},
 			},
 			"put": map[string]any{
 				"tags": []string{"Événements"}, "summary": "Modifier un événement", "security": bearerSecurityReq,
-				"parameters": []map[string]any{{"name": "id", "in": "path", "required": true, "schema": map[string]any{"type": "integer"}}},
+				"parameters":  []map[string]any{{"name": "id", "in": "path", "required": true, "schema": map[string]any{"type": "integer"}}},
 				"requestBody": map[string]any{"required": true, "content": map[string]any{"application/json": map[string]any{"schema": map[string]any{"$ref": "#/components/schemas/Event"}}}},
-				"responses": map[string]any{"200": map[string]any{"description": "Événement mis à jour"}, "404": map[string]any{"description": "Introuvable"}},
+				"responses":   map[string]any{"200": map[string]any{"description": "Événement mis à jour"}, "404": map[string]any{"description": "Introuvable"}},
 			},
 			"delete": map[string]any{
 				"tags": []string{"Événements"}, "summary": "Supprimer un événement (soft delete)", "security": bearerSecurityReq,
 				"parameters": []map[string]any{{"name": "id", "in": "path", "required": true, "schema": map[string]any{"type": "integer"}}},
-				"responses": map[string]any{"200": map[string]any{"description": "Supprimé"}, "404": map[string]any{"description": "Introuvable"}},
+				"responses":  map[string]any{"200": map[string]any{"description": "Supprimé"}, "404": map[string]any{"description": "Introuvable"}},
 			},
 		},
 
 		"/api/admin/v1/events/{id}/status": map[string]any{
 			"put": map[string]any{
 				"tags": []string{"Événements"}, "summary": "Changer le statut d'un événement", "security": bearerSecurityReq,
-				"parameters": []map[string]any{{"name": "id", "in": "path", "required": true, "schema": map[string]any{"type": "integer"}}},
+				"parameters":  []map[string]any{{"name": "id", "in": "path", "required": true, "schema": map[string]any{"type": "integer"}}},
 				"requestBody": map[string]any{"required": true, "content": map[string]any{"application/json": map[string]any{"schema": map[string]any{"type": "object", "required": []string{"status"}, "properties": map[string]any{"status": map[string]any{"type": "string", "enum": []string{"draft", "published", "cancelled"}}}}}}},
-				"responses": map[string]any{"200": map[string]any{"description": "Statut mis à jour — action auditée"}, "404": map[string]any{"description": "Introuvable"}},
+				"responses":   map[string]any{"200": map[string]any{"description": "Statut mis à jour — action auditée"}, "404": map[string]any{"description": "Introuvable"}},
 			},
 		},
 
@@ -1209,7 +1208,7 @@ func buildOpenAPISpec() map[string]any {
 			"get": map[string]any{
 				"tags": []string{"Dépôts"}, "summary": "Détail d'un dépôt", "security": bearerSecurityReq,
 				"parameters": []map[string]any{{"name": "id", "in": "path", "required": true, "schema": map[string]any{"type": "integer"}}},
-				"responses": map[string]any{"200": map[string]any{"description": "Dépôt", "content": map[string]any{"application/json": map[string]any{"schema": map[string]any{"$ref": "#/components/schemas/Deposit"}}}}, "404": map[string]any{"description": "Introuvable"}},
+				"responses":  map[string]any{"200": map[string]any{"description": "Dépôt", "content": map[string]any{"application/json": map[string]any{"schema": map[string]any{"$ref": "#/components/schemas/Deposit"}}}}, "404": map[string]any{"description": "Introuvable"}},
 			},
 		},
 
@@ -1259,13 +1258,13 @@ func buildOpenAPISpec() map[string]any {
 			"get": map[string]any{
 				"tags": []string{"Administrateurs (super_admin)"}, "summary": "Détail d'un admin", "security": bearerSecurityReq,
 				"parameters": []map[string]any{{"name": "id", "in": "path", "required": true, "schema": map[string]any{"type": "integer"}}},
-				"responses": map[string]any{"200": map[string]any{"description": "Admin", "content": map[string]any{"application/json": map[string]any{"schema": map[string]any{"$ref": "#/components/schemas/User"}}}}, "404": map[string]any{"description": "Introuvable"}},
+				"responses":  map[string]any{"200": map[string]any{"description": "Admin", "content": map[string]any{"application/json": map[string]any{"schema": map[string]any{"$ref": "#/components/schemas/User"}}}}, "404": map[string]any{"description": "Introuvable"}},
 			},
 			"put": map[string]any{
 				"tags": []string{"Administrateurs (super_admin)"}, "summary": "Modifier un administrateur", "security": bearerSecurityReq,
-				"parameters": []map[string]any{{"name": "id", "in": "path", "required": true, "schema": map[string]any{"type": "integer"}}},
+				"parameters":  []map[string]any{{"name": "id", "in": "path", "required": true, "schema": map[string]any{"type": "integer"}}},
 				"requestBody": map[string]any{"required": true, "content": map[string]any{"application/json": map[string]any{"schema": map[string]any{"type": "object", "properties": map[string]any{"first_name": map[string]any{"type": "string"}, "last_name": map[string]any{"type": "string"}, "password": map[string]any{"type": "string", "minLength": 8}, "role": map[string]any{"type": "string", "enum": []string{"admin", "super_admin"}}}}}}},
-				"responses": map[string]any{"200": map[string]any{"description": "Admin mis à jour"}, "404": map[string]any{"description": "Introuvable"}},
+				"responses":   map[string]any{"200": map[string]any{"description": "Admin mis à jour"}, "404": map[string]any{"description": "Introuvable"}},
 			},
 			"delete": map[string]any{
 				"tags":        []string{"Administrateurs (super_admin)"},
@@ -1313,15 +1312,15 @@ func buildOpenAPISpec() map[string]any {
 				"bearerAuth": bearerAuth,
 			},
 			"schemas": map[string]any{
-				"User":           userSchema,
+				"User":            userSchema,
 				"ProviderProfile": providerProfileSchema,
-				"Category":       categorySchema,
-				"Prestation":     prestationSchema,
-				"Event":          eventSchema,
-				"Deposit":        depositSchema,
-				"AuditLog":       auditLogSchema,
-				"PaginationMeta": paginationMeta,
-				"Error":          errorSchema,
+				"Category":        categorySchema,
+				"Prestation":      prestationSchema,
+				"Event":           eventSchema,
+				"Deposit":         depositSchema,
+				"AuditLog":        auditLogSchema,
+				"PaginationMeta":  paginationMeta,
+				"Error":           errorSchema,
 			},
 		},
 	}

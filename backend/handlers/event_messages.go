@@ -21,7 +21,6 @@ type EventMessageHandler struct {
 	Audit *services.AuditService
 }
 
-// checkAccess returns true if the user is the event organizer or a registered participant.
 func (h *EventMessageHandler) checkAccess(user *models.User, eventID uint) bool {
 	var event models.Event
 	if err := h.DB.Where("id = ? AND deleted_at IS NULL", eventID).First(&event).Error; err != nil {
@@ -35,7 +34,6 @@ func (h *EventMessageHandler) checkAccess(user *models.User, eventID uint) bool 
 	return err == nil
 }
 
-// Index handles GET /api/v1/events/:id/messages
 func (h *EventMessageHandler) Index(c *gin.Context) {
 	user := middleware.GetAuthUser(c)
 
@@ -101,7 +99,6 @@ func (h *EventMessageHandler) Index(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": data})
 }
 
-// Store handles POST /api/v1/events/:id/messages
 func (h *EventMessageHandler) Store(c *gin.Context) {
 	user := middleware.GetAuthUser(c)
 
@@ -174,7 +171,6 @@ func (h *EventMessageHandler) Store(c *gin.Context) {
 	})
 }
 
-// UploadImage handles POST /api/v1/events/:id/messages/image
 func (h *EventMessageHandler) UploadImage(c *gin.Context) {
 	user := middleware.GetAuthUser(c)
 
@@ -201,7 +197,7 @@ func (h *EventMessageHandler) UploadImage(c *gin.Context) {
 		return
 	}
 
-	const maxSize = 5 << 20 // 5 MB
+	const maxSize = 5 << 20
 	if file.Size > maxSize {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"message": "L'image ne doit pas dépasser 5 Mo."})
 		return

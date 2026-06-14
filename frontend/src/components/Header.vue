@@ -6,12 +6,10 @@
       : 'bg-white border-[#e5e7eb]'
   ]">
 
-    <!-- Page title -->
     <h1 :class="['text-sm lg:text-base font-semibold truncate', theme.isDark ? 'text-[#f1f5f9]' : 'text-gray-900']">
       {{ title }}
     </h1>
 
-    <!-- Search bar -->
     <div class="hidden md:flex items-center flex-1 max-w-md mx-8">
       <div class="relative w-full">
         <MagnifyingGlassIcon :class="['absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4', theme.isDark ? 'text-[#475569]' : 'text-gray-400']" />
@@ -28,10 +26,8 @@
       </div>
     </div>
 
-    <!-- Right actions -->
     <div class="flex items-center gap-2 md:gap-3">
 
-      <!-- Dark mode toggle -->
       <button
         @click="theme.toggle()"
         :class="[
@@ -46,12 +42,10 @@
         <MoonIcon v-else class="w-5 h-5" />
       </button>
 
-      <!-- Notifications -->
       <NotificationsDropdown variant="admin" :is-dark="theme.isDark" />
 
       <div :class="['h-6 w-px hidden sm:block', theme.isDark ? 'bg-[#334155]' : 'bg-[#e5e7eb]']"></div>
 
-      <!-- User -->
       <div class="flex items-center gap-2.5">
         <div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0" style="background-color:#001d32;">
           {{ initials }}
@@ -62,7 +56,6 @@
         </div>
       </div>
 
-      <!-- Logout -->
       <button
         @click="handleLogout"
         :disabled="loading"

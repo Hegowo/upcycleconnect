@@ -19,9 +19,6 @@ type ReservationMessageHandler struct {
 	Notifications *services.NotificationService
 }
 
-// access loads the reservation + its prestation and checks that the current user
-// is either the client (reservation owner) or the provider (prestation owner).
-// Returns the reservation, the prestation, and whether the caller is the provider.
 func (h *ReservationMessageHandler) access(c *gin.Context) (*models.Reservation, *models.Prestation, bool, bool) {
 	user := middleware.GetAuthUser(c)
 	if user == nil {
@@ -52,7 +49,6 @@ func (h *ReservationMessageHandler) access(c *gin.Context) (*models.Reservation,
 	return &reservation, &prestation, isProvider, true
 }
 
-// Index returns the messages of a reservation, oldest first.
 func (h *ReservationMessageHandler) Index(c *gin.Context) {
 	reservation, _, _, ok := h.access(c)
 	if !ok {
@@ -71,7 +67,6 @@ func (h *ReservationMessageHandler) Index(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": out})
 }
 
-// Store posts a new message and notifies the other party.
 func (h *ReservationMessageHandler) Store(c *gin.Context) {
 	user := middleware.GetAuthUser(c)
 	reservation, prestation, isProvider, ok := h.access(c)
@@ -100,7 +95,6 @@ func (h *ReservationMessageHandler) Store(c *gin.Context) {
 	}
 	msg.Sender = user
 
-	// Notify the other party.
 	if h.Notifications != nil {
 		var recipient uint
 		if isProvider {

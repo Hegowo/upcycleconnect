@@ -11,7 +11,6 @@
         <p class="text-[#40617f] text-sm mt-1">Choisissez un plan pour accéder aux fonctionnalités pro d'UpcycleConnect.</p>
       </div>
 
-      <!-- Current subscription banner -->
       <div v-if="subscription" class="bg-white rounded-2xl border border-[#edf4ff] p-5 mb-8 flex items-center justify-between gap-4 flex-wrap">
         <div class="flex items-center gap-4">
           <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background: linear-gradient(135deg,#006d35,#1b8848);">
@@ -35,7 +34,6 @@
         <p class="text-green-800 text-sm font-medium">Abonnement activé avec succès ! Merci pour votre confiance.</p>
       </div>
 
-      <!-- Plans -->
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <div
           v-for="plan in plans"

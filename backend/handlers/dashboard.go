@@ -15,10 +15,6 @@ type DashboardHandler struct {
 	DB *gorm.DB
 }
 
-// Trends returns the number of end-user sign-ups per month for a given year
-// (defaults to the current year) as a 12-length array (Jan..Dec). Used by the
-// "Monthly trends" dashboard widget. Staff accounts (those with a role) are
-// excluded, to match the "Members" metric.
 func (h *DashboardHandler) Trends(c *gin.Context) {
 	year := time.Now().Year()
 	if y := c.Query("year"); y != "" {

@@ -1,14 +1,12 @@
 <template>
   <div class="bg-[#f7f9ff] min-h-screen pb-16">
 
-    <!-- Loading -->
     <div v-if="loading" class="flex items-center justify-center py-40">
       <div class="w-10 h-10 border-4 border-[#006d35] border-t-transparent rounded-full animate-spin" />
     </div>
 
     <template v-else>
 
-      <!-- Pending / no profile state -->
       <div v-if="!profile" class="max-w-2xl mx-auto px-6 py-20 text-center">
         <BuildingStorefrontIcon class="w-16 h-16 text-[#006d35]/30 mx-auto mb-4" />
         <h1 class="font-jakarta font-extrabold text-[#001d32] text-2xl mb-2">Espace professionnel</h1>
@@ -23,11 +21,10 @@
       </div>
 
       <template v-else>
-        <!-- Header -->
+
         <section class="bg-[#edf4ff] px-6 py-10 relative overflow-hidden">
           <div class="max-w-5xl mx-auto flex items-start gap-8 flex-wrap">
 
-            <!-- Avatar / logo -->
             <div class="bg-white rounded-[24px] p-3 w-28 h-28 flex items-center justify-center shrink-0 shadow-lg">
               <img v-if="userAuth.user?.avatar_url" :src="userAuth.user.avatar_url" class="w-full h-full object-cover rounded-[20px]" />
               <BuildingStorefrontIcon v-else class="w-14 h-14 text-[#006d35]/40" />
@@ -50,7 +47,6 @@
               <p v-if="userAuth.fullName" class="text-[#40617f] text-sm mb-3">{{ userAuth.fullName }}</p>
               <p v-if="profile.description" class="text-[#001d32] text-sm leading-relaxed max-w-xl mb-4">{{ profile.description }}</p>
 
-              <!-- Action buttons -->
               <div class="flex gap-2 flex-wrap">
                 <RouterLink to="/profil/pro/dashboard"
                   class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-white text-sm font-bold hover:opacity-90 transition"
@@ -84,7 +80,6 @@
               </div>
             </div>
 
-            <!-- Stats -->
             <div class="flex flex-col gap-3 shrink-0 w-52">
               <div class="bg-white rounded-xl p-4 flex items-center gap-3 shadow-sm">
                 <div class="w-10 h-10 rounded-xl bg-[#d1fae5] flex items-center justify-center">
@@ -108,10 +103,8 @@
           </div>
         </section>
 
-        <!-- Body -->
         <div class="max-w-5xl mx-auto px-6 py-10 grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-          <!-- Profil card (modifiable) -->
           <div class="lg:col-span-1 bg-white rounded-[24px] border border-[#edf4ff] p-6 flex flex-col gap-5">
             <div class="flex items-center justify-between">
               <h2 class="font-jakarta font-bold text-[#001d32] text-lg">Informations</h2>
@@ -145,7 +138,6 @@
               </dl>
             </template>
 
-            <!-- Edit form -->
             <form v-else @submit.prevent="saveProfile" class="space-y-3">
               <div>
                 <label class="block text-xs font-semibold text-[#40617f] uppercase mb-1">Nom de l'entreprise *</label>
@@ -172,7 +164,6 @@
             </form>
           </div>
 
-          <!-- Projects -->
           <div class="lg:col-span-2 flex flex-col gap-6">
             <div class="bg-white rounded-[24px] border border-[#edf4ff] p-6">
               <div class="flex items-center justify-between mb-5">
@@ -208,7 +199,6 @@
               </div>
             </div>
 
-            <!-- Prestations -->
             <div class="bg-white rounded-[24px] border border-[#edf4ff] p-6">
               <div class="flex items-center justify-between mb-5">
                 <h2 class="font-jakarta font-bold text-[#001d32] text-xl">Mes prestations</h2>
@@ -237,7 +227,6 @@
       </template>
     </template>
 
-    <!-- Interactive onboarding wizard — shown the first time an approved pro lands here. -->
     <ProOnboardingWizard
       :show="showOnboarding"
       :company-name="profile?.company_name || ''"
@@ -281,7 +270,7 @@ const showOnboarding = ref(false)
 
 function onOnboardingDone() {
   showOnboarding.value = false
-  loadData() // reload to show the new prestation/description on the page
+  loadData()
 }
 
 const editForm = ref({ company_name: '', description: '', website: '' })
@@ -322,7 +311,7 @@ async function loadData() {
         description:  profile.value.description  || '',
         website:      profile.value.website       || '',
       }
-      // Trigger interactive onboarding the first time an approved pro lands here.
+
       if (profile.value.status === 'approved' && profile.value.is_onboarded === false) {
         showOnboarding.value = true
       }

@@ -125,7 +125,6 @@
       </div>
     </section>
 
-    <!-- Campagnes sponsorisées (projets/artisans mis en avant) -->
     <SponsoredCampaigns wrapper-class="py-12 sm:py-16 bg-[#f7f9ff]" />
 
     <section class="py-12 sm:py-20 px-4 sm:px-8">

@@ -21,10 +21,6 @@ import (
 	"gorm.io/gorm"
 )
 
-// saveKbisFile validates and writes a Kbis upload to /uploads/kbis, returning the
-// stored path. Shared by the authenticated UploadKbis endpoint and by registration
-// (where the provider isn't active yet and can't authenticate). Accepts PDF/JPG/PNG
-// up to 10 MB and names the file after the user id so a re-upload replaces it.
 func saveKbisFile(header *multipart.FileHeader, src multipart.File, userID uint) (string, error) {
 	ext := filepath.Ext(header.Filename)
 	allowed := map[string]bool{".pdf": true, ".jpg": true, ".jpeg": true, ".png": true}
@@ -377,21 +373,19 @@ func (h *UserProviderHandler) SubmitPrestation(c *gin.Context) {
 	}
 
 	old := map[string]string{"status": p.Status}
-	// Annonces require validation by the administrative service (per spec p.5):
-	// submission moves the prestation to "pending", an admin then publishes it.
+
 	h.DB.Model(&p).Update("status", "pending")
 	h.DB.Preload("Category").First(&p, p.ID)
 
 	h.Audit.Log(c, "provider.prestation_submitted", "Prestation", &p.ID, old, map[string]string{"status": "pending"})
 
 	if h.Notifications != nil {
-		// Notify admins that an annonce awaits validation.
 		h.Notifications.NotifyAdmins("prestation.pending_validation",
 			"Annonce à valider",
 			fmt.Sprintf("%s a soumis l'annonce « %s » pour validation.",
 				user.FirstName+" "+user.LastName, p.Title),
 			"/admin/prestations")
-		// Confirm reception to the provider.
+
 		h.Notifications.MustNotify(user.ID, "prestation.submitted",
 			"Annonce soumise",
 			"Votre prestation « "+p.Title+" » a été soumise et sera examinée par un administrateur.",
@@ -426,9 +420,6 @@ func (h *UserProviderHandler) DestroyPrestation(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
-// UploadKbis accepts a multipart PDF or image file as the provider's official Kbis document.
-// Replaces any previously uploaded file. The file is stored in /uploads/kbis/ and is never
-// deleted — admins can always retrieve it even after the provider is approved.
 func (h *UserProviderHandler) UploadKbis(c *gin.Context) {
 	user := middleware.GetAuthUser(c)
 	if user == nil {
@@ -472,7 +463,6 @@ func (h *UserProviderHandler) UploadKbis(c *gin.Context) {
 	})
 }
 
-// DownloadKbis streams the Kbis file to the admin. Only admins can access this route.
 func (h *UserProviderHandler) DownloadKbis(c *gin.Context) {
 	providerID, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
@@ -480,7 +470,6 @@ func (h *UserProviderHandler) DownloadKbis(c *gin.Context) {
 		return
 	}
 
-	// Load the provider's profile
 	var profile models.ProviderProfile
 	if err := h.DB.Where("user_id = ?", providerID).First(&profile).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"message": "Profil prestataire introuvable"})
@@ -515,8 +504,6 @@ func (h *UserProviderHandler) DownloadKbis(c *gin.Context) {
 	c.File(path)
 }
 
-// CompleteOnboarding marks the provider's onboarding wizard as completed.
-// Called by the frontend when the pro finishes the interactive setup on /profil/pro.
 func (h *UserProviderHandler) CompleteOnboarding(c *gin.Context) {
 	user := middleware.GetAuthUser(c)
 	if user == nil {
@@ -542,7 +529,6 @@ func (h *UserProviderHandler) CompleteOnboarding(c *gin.Context) {
 	c.JSON(http.StatusOK, models.ToProviderProfileResponse(&profile))
 }
 
-// ownedPrestation loads a prestation and verifies the caller owns it.
 func (h *UserProviderHandler) ownedPrestation(c *gin.Context) (*models.Prestation, bool) {
 	user := middleware.GetAuthUser(c)
 	if user == nil {
@@ -561,7 +547,6 @@ func (h *UserProviderHandler) ownedPrestation(c *gin.Context) (*models.Prestatio
 	return &p, true
 }
 
-// ShowPrestation returns a single prestation owned by the provider, with images.
 func (h *UserProviderHandler) ShowPrestation(c *gin.Context) {
 	p, ok := h.ownedPrestation(c)
 	if !ok {
@@ -571,7 +556,6 @@ func (h *UserProviderHandler) ShowPrestation(c *gin.Context) {
 	c.JSON(http.StatusOK, models.ToPrestationResponse(p))
 }
 
-// ListParticipants returns the clients who reserved a given prestation.
 func (h *UserProviderHandler) ListParticipants(c *gin.Context) {
 	p, ok := h.ownedPrestation(c)
 	if !ok {
@@ -608,7 +592,6 @@ func (h *UserProviderHandler) ListParticipants(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": out})
 }
 
-// UploadPrestationImage adds one gallery image to a prestation.
 func (h *UserProviderHandler) UploadPrestationImage(c *gin.Context) {
 	p, ok := h.ownedPrestation(c)
 	if !ok {
@@ -657,7 +640,6 @@ func (h *UserProviderHandler) UploadPrestationImage(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"id": img.ID, "url": img.URL, "order": img.Position})
 }
 
-// DeletePrestationImage removes one image from a prestation.
 func (h *UserProviderHandler) DeletePrestationImage(c *gin.Context) {
 	p, ok := h.ownedPrestation(c)
 	if !ok {

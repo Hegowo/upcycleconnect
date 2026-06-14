@@ -28,7 +28,7 @@
 
       <div v-else class="space-y-6">
         <div v-for="p in projects" :key="p.id" class="bg-white rounded-[24px] border border-[#edf4ff] overflow-hidden">
-          <!-- Project header -->
+
           <div class="p-5 flex items-start justify-between gap-4 flex-wrap border-b border-[#f1f5f9]">
             <div class="flex items-start gap-4 flex-1 min-w-0">
               <div v-if="p.cover_image" class="w-16 h-16 rounded-xl overflow-hidden shrink-0">
@@ -57,7 +57,6 @@
             </div>
           </div>
 
-          <!-- Steps timeline -->
           <div v-if="p.steps && p.steps.length" class="p-5">
             <p class="text-xs font-semibold uppercase tracking-wider text-[#40617f] mb-3">Étapes de transformation</p>
             <div class="space-y-3">
@@ -90,7 +89,6 @@
         </div>
       </div>
 
-      <!-- Project form modal -->
       <Teleport to="body">
         <div v-if="showProjectForm" class="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="closeProjectForm" />
@@ -132,7 +130,6 @@
           </div>
         </div>
 
-        <!-- Step form modal -->
         <div v-if="showStepForm" class="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="closeStepForm" />
           <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] flex flex-col overflow-hidden">
@@ -192,7 +189,6 @@ async function fetchProjects() {
   finally { loading.value = false }
 }
 
-// --- Project ---
 function openProjectForm(p) {
   projectFormError.value = ''
   projectForm.value = p ? {
@@ -220,7 +216,6 @@ async function deleteProject(p) {
   await fetchProjects()
 }
 
-// --- Steps ---
 function addStep(p) {
   currentProjectId = p.id
   stepForm.value = { ...emptyStep(), step_order: (p.steps?.length || 0) }

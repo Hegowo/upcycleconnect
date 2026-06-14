@@ -18,7 +18,7 @@
     </div>
 
     <template v-else-if="user">
-      <!-- Profil card -->
+
       <div class="card p-8">
         <div class="flex items-start justify-between mb-6">
           <div class="flex items-center gap-4">
@@ -63,7 +63,6 @@
           </div>
         </dl>
 
-        <!-- Actions ban/activate -->
         <div class="mt-6 flex gap-3 pt-4 border-t border-gray-100">
           <button
             v-if="user.status !== 'banned'"
@@ -84,7 +83,6 @@
         </div>
       </div>
 
-      <!-- Modifier l'email -->
       <div class="card p-6 space-y-4">
         <div class="flex items-center gap-2 mb-1">
           <EnvelopeIcon class="w-4 h-4 text-[#006d35]" />
@@ -116,12 +114,11 @@
         </Transition>
       </div>
 
-      <!-- Récupération de mot de passe + Export PDF -->
       <div class="card p-6 space-y-4">
         <h3 class="font-semibold text-gray-800 text-sm mb-2">Actions administrateur</h3>
 
         <div class="flex flex-col sm:flex-row gap-3">
-          <!-- Send password reset -->
+
           <button
             @click="doSendReset"
             :disabled="resetLoading"
@@ -132,7 +129,6 @@
             Envoyer un email de récupération
           </button>
 
-          <!-- Export PDF -->
           <button
             @click="doExportPdf"
             :disabled="exportLoading"
@@ -185,18 +181,15 @@ const user    = ref(null)
 const loading = ref(true)
 const confirm = reactive({ show: false, action: '', loading: false })
 
-// Email edit
 const newEmail     = ref('')
 const emailLoading = ref(false)
 const emailSuccess = ref('')
 const emailError   = ref('')
 
-// Password reset
 const resetLoading = ref(false)
 const resetSuccess = ref('')
 const resetError   = ref('')
 
-// Export
 const exportLoading = ref(false)
 
 async function fetchUser() {

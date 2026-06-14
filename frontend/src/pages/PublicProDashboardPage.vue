@@ -21,7 +21,7 @@
       </div>
 
       <template v-else-if="data">
-        <!-- BASIC (free, always shown) -->
+
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <div class="bg-white rounded-2xl border border-[#edf4ff] p-5">
             <ClipboardDocumentListIcon class="w-6 h-6 text-[#006d35] mb-2" />
@@ -45,7 +45,6 @@
           </div>
         </div>
 
-        <!-- ADVANCED (any paid plan) -->
         <div class="relative mb-8">
           <div v-if="!data.advanced" class="absolute inset-0 z-10 rounded-[24px] backdrop-blur-sm bg-white/60 flex items-center justify-center">
             <PaywallCard
@@ -56,7 +55,7 @@
           </div>
           <div :class="!data.advanced ? 'pointer-events-none select-none opacity-60' : ''">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <!-- Revenue chart -->
+
               <div class="bg-white rounded-[24px] border border-[#edf4ff] p-6">
                 <h2 class="font-jakarta font-bold text-[#001d32] text-lg mb-4">Chiffre d'affaires (6 mois)</h2>
                 <div v-if="advancedMonthly.length" class="flex items-end gap-2 h-40">
@@ -73,7 +72,6 @@
                 </div>
               </div>
 
-              <!-- Material stats -->
               <div class="bg-white rounded-[24px] border border-[#edf4ff] p-6">
                 <h2 class="font-jakarta font-bold text-[#001d32] text-lg mb-4">Matériaux disponibles</h2>
                 <div v-if="advancedMaterials.length" class="space-y-3">
@@ -92,7 +90,6 @@
           </div>
         </div>
 
-        <!-- PREMIUM (premium plan only) -->
         <div class="relative">
           <div v-if="!data.premium" class="absolute inset-0 z-10 rounded-[24px] backdrop-blur-sm bg-white/60 flex items-center justify-center">
             <PaywallCard
@@ -103,7 +100,7 @@
           </div>
           <div :class="!data.premium ? 'pointer-events-none select-none opacity-60' : ''">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <!-- Eco impact -->
+
               <div class="bg-gradient-to-br from-[#006d35] to-[#1b8848] rounded-[24px] p-6 text-white">
                 <h2 class="font-jakarta font-bold text-lg mb-4 flex items-center gap-2">
                   <GlobeAltIcon class="w-5 h-5" /> Impact écologique
@@ -124,7 +121,6 @@
                 </div>
               </div>
 
-              <!-- Collection alerts -->
               <div class="bg-white rounded-[24px] border border-[#edf4ff] p-6">
                 <h2 class="font-jakarta font-bold text-[#001d32] text-lg mb-4 flex items-center gap-2">
                   <BellAlertIcon class="w-5 h-5 text-[#006d35]" /> Alertes collecte
@@ -157,7 +153,6 @@ import {
 } from '@heroicons/vue/24/outline'
 import { userApi } from '@/services/publicApi'
 
-// Inline paywall card component
 const PaywallCard = {
   props: ['title', 'desc', 'tier'],
   setup(props) {

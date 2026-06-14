@@ -15,7 +15,6 @@
       </button>
     </div>
 
-    <!-- Toolbar: search + filters + stats -->
     <div class="card p-4 flex flex-wrap items-center gap-3">
       <div class="relative flex-1 min-w-[200px]">
         <MagnifyingGlassIcon class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#94a3b8]" />
@@ -35,7 +34,6 @@
       </div>
     </div>
 
-    <!-- Stats line -->
     <div class="flex items-center gap-4 text-xs text-[#64748b] px-1">
       <span><strong class="text-[#001d32]">{{ filtered.length }}</strong> résultat(s)</span>
       <span><strong class="text-[#16a34a]">{{ activeCount }}</strong> actifs</span>
@@ -52,7 +50,6 @@
       <p class="text-sm mt-1">Aucun résultat pour ces filtres</p>
     </div>
 
-    <!-- Table -->
     <div v-else class="card overflow-hidden">
       <table class="w-full text-sm">
         <thead class="bg-[#f8fafc] text-[#64748b] text-xs uppercase">
@@ -110,7 +107,6 @@
         </tbody>
       </table>
 
-      <!-- Pagination -->
       <div v-if="lastPage > 1" class="flex items-center justify-between px-4 py-3 border-t border-[#f1f5f9]">
         <button @click="page--" :disabled="page <= 1" class="text-sm text-[#40617f] disabled:opacity-40 hover:text-[#006d35]">← Précédent</button>
         <span class="text-xs text-[#94a3b8]">Page {{ page }} / {{ lastPage }} · {{ filtered.length }} points</span>
@@ -118,7 +114,6 @@
       </div>
     </div>
 
-    <!-- Modal create/edit -->
     <Teleport to="body">
       <Transition name="modal-fade">
         <div v-if="showModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#001d32]/60" @click.self="closeModal">
@@ -207,7 +202,6 @@
       </Transition>
     </Teleport>
 
-    <!-- Delete confirm -->
     <Teleport to="body">
       <Transition name="modal-fade">
         <div v-if="deleteTarget" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#001d32]/60" @click.self="deleteTarget = null">
@@ -225,7 +219,6 @@
       </Transition>
     </Teleport>
 
-    <!-- Out-of-service modal -->
     <Teleport to="body">
       <Transition name="modal-fade">
         <div v-if="oosTarget" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#001d32]/60" @click.self="oosTarget = null">
@@ -278,9 +271,8 @@ let addressTimer = null
 
 const form = ref(emptyForm())
 
-// ── Search / filter / pagination ──
 const search = ref('')
-const statusFilter = ref('')   // '' | 'active' | 'inactive'
+const statusFilter = ref('')
 const deptFilter = ref('')
 const page = ref(1)
 const perPage = 20
@@ -345,7 +337,6 @@ async function toggleActive(pt) {
   pt.is_active = !pt.is_active
 }
 
-// ── Out of service ──
 const oosTarget = ref(null)
 const oosUntil = ref('')
 const todayStr = new Date().toISOString().slice(0, 10)

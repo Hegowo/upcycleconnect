@@ -18,19 +18,19 @@ type DepositRequest struct {
 	ValidatedBy       *uint      `gorm:"index" json:"validated_by"`
 	ValidatedAt       *time.Time `json:"validated_at"`
 	QRCode            *string    `gorm:"size:100" json:"qr_code"`
-	// SaleType: "don" (gratuit) or "vente" (payant, prix dans PriceCents).
-	SaleType          string     `gorm:"size:10;default:don" json:"sale_type"`
-	PriceCents        int64      `gorm:"not null;default:0" json:"price_cents"`
-	// Set when a professional buys/claims the deposit on the marketplace.
-	PurchasedBy       *uint      `gorm:"index" json:"purchased_by"`
-	PurchasedAt       *time.Time `json:"purchased_at"`
-	CollectedAt       *time.Time `json:"collected_at"`
-	CollectedBy       *uint      `gorm:"index" json:"collected_by"`
-	Photo1            *string    `gorm:"type:mediumtext" json:"photo1"`
-	Photo2            *string    `gorm:"type:mediumtext" json:"photo2"`
-	Photo3            *string    `gorm:"type:mediumtext" json:"photo3"`
-	CreatedAt         time.Time  `json:"created_at"`
-	UpdatedAt         time.Time  `json:"updated_at"`
+
+	SaleType   string `gorm:"size:10;default:don" json:"sale_type"`
+	PriceCents int64  `gorm:"not null;default:0" json:"price_cents"`
+
+	PurchasedBy *uint      `gorm:"index" json:"purchased_by"`
+	PurchasedAt *time.Time `json:"purchased_at"`
+	CollectedAt *time.Time `json:"collected_at"`
+	CollectedBy *uint      `gorm:"index" json:"collected_by"`
+	Photo1      *string    `gorm:"type:mediumtext" json:"photo1"`
+	Photo2      *string    `gorm:"type:mediumtext" json:"photo2"`
+	Photo3      *string    `gorm:"type:mediumtext" json:"photo3"`
+	CreatedAt   time.Time  `json:"created_at"`
+	UpdatedAt   time.Time  `json:"updated_at"`
 
 	User            *User               `gorm:"foreignKey:UserID" json:"-"`
 	Category        *PrestationCategory `gorm:"foreignKey:CategoryID" json:"-"`
@@ -42,30 +42,30 @@ func (DepositRequest) TableName() string {
 }
 
 type DepositRequestResponse struct {
-	ID                uint                     `json:"id"`
-	Title             string                   `json:"title"`
-	Description       string                   `json:"description"`
-	Condition         string                   `json:"condition"`
-	History           *string                  `json:"history"`
-	EstimatedWeight   *float64                 `json:"estimated_weight"`
-	CarbonSavings     *float64                 `json:"carbon_savings"`
-	Status            string                   `json:"status"`
-	SaleType          string                   `json:"sale_type"`
-	PriceCents        int64                    `json:"price_cents"`
-	PurchasedBy       *uint                    `json:"purchased_by"`
-	IsFavorited       bool                     `json:"is_favorited"`
-	ValidationNote    *string                  `json:"validation_note"`
-	QRCode            *string                  `json:"qr_code"`
-	CollectedAt       *string                  `json:"collected_at"`
-	CollectedBy       *uint                    `json:"collected_by"`
-	Photo1            *string                  `json:"photo1"`
-	Photo2            *string                  `json:"photo2"`
-	Photo3            *string                  `json:"photo3"`
-	User              *UserResponse            `json:"user"`
-	Category          *CategoryResponse        `json:"category"`
-	CollectionPoint   *CollectionPointResponse `json:"collection_point"`
-	CreatedAt         string                   `json:"created_at"`
-	ValidatedAt       *string                  `json:"validated_at"`
+	ID              uint                     `json:"id"`
+	Title           string                   `json:"title"`
+	Description     string                   `json:"description"`
+	Condition       string                   `json:"condition"`
+	History         *string                  `json:"history"`
+	EstimatedWeight *float64                 `json:"estimated_weight"`
+	CarbonSavings   *float64                 `json:"carbon_savings"`
+	Status          string                   `json:"status"`
+	SaleType        string                   `json:"sale_type"`
+	PriceCents      int64                    `json:"price_cents"`
+	PurchasedBy     *uint                    `json:"purchased_by"`
+	IsFavorited     bool                     `json:"is_favorited"`
+	ValidationNote  *string                  `json:"validation_note"`
+	QRCode          *string                  `json:"qr_code"`
+	CollectedAt     *string                  `json:"collected_at"`
+	CollectedBy     *uint                    `json:"collected_by"`
+	Photo1          *string                  `json:"photo1"`
+	Photo2          *string                  `json:"photo2"`
+	Photo3          *string                  `json:"photo3"`
+	User            *UserResponse            `json:"user"`
+	Category        *CategoryResponse        `json:"category"`
+	CollectionPoint *CollectionPointResponse `json:"collection_point"`
+	CreatedAt       string                   `json:"created_at"`
+	ValidatedAt     *string                  `json:"validated_at"`
 }
 
 func ToDepositResponse(d *DepositRequest) DepositRequestResponse {
@@ -85,7 +85,9 @@ func ToDepositResponse(d *DepositRequest) DepositRequestResponse {
 		cp = &r
 	}
 	fmtTime := func(t *time.Time) *string {
-		if t == nil { return nil }
+		if t == nil {
+			return nil
+		}
 		s := t.UTC().Format("2006-01-02T15:04:05.000000Z")
 		return &s
 	}

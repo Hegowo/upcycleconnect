@@ -170,7 +170,6 @@
         </div>
       </div>
 
-      <!-- Push notifications -->
       <div class="bg-white rounded-2xl p-6 space-y-3">
         <div class="flex items-start justify-between gap-4">
           <div class="flex-1">
@@ -199,7 +198,6 @@
         </p>
       </div>
 
-      <!-- Passkeys -->
       <div class="bg-white rounded-2xl p-6 space-y-4">
         <div class="flex items-start justify-between gap-4">
           <div>
@@ -267,10 +265,9 @@ const { t } = useI18n()
 const router   = useRouter()
 const userAuth = useUserAuthStore()
 
-// Push notifications
 const pushLoading = ref(false)
 const pushError   = ref('')
-const pushStatus  = ref('default') // default | granted | denied
+const pushStatus  = ref('default')
 
 function refreshPushStatus() {
   if (typeof Notification === 'undefined') return
@@ -518,8 +515,6 @@ async function emailVerifyNew() {
     emailLoading.value = false
   }
 }
-
-// ─── Passkeys ─────────────────────────────────────────────────────────────────
 
 const passkeys      = ref([])
 const addingPasskey = ref(false)

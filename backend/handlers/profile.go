@@ -123,12 +123,11 @@ func (h *ProfileHandler) Stats(c *gin.Context) {
 		})
 	}
 
-	// Events where this user is the organizer (published only)
 	var organizedEvents []models.Event
 	h.DB.Where("created_by = ? AND deleted_at IS NULL AND status = 'published'", user.ID).Find(&organizedEvents)
 	for _, e := range organizedEvents {
 		if registeredEventIDs[e.ID] {
-			continue // already in list as registrant
+			continue
 		}
 		regSummaries = append(regSummaries, regSummary{
 			ID:        e.ID,
@@ -396,7 +395,7 @@ func (h *ProfileHandler) RegisterForEvent(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"message": "Événement introuvable."})
 		return
 	}
-	// An organizer cannot register for their own event.
+
 	if event.CreatedBy != nil && *event.CreatedBy == user.ID {
 		c.JSON(http.StatusForbidden, gin.H{"message": "Vous ne pouvez pas vous inscrire à votre propre événement."})
 		return

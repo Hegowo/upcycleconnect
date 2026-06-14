@@ -97,7 +97,6 @@
                     {{ t('public.layout.menuMyProfile') }}
                   </RouterLink>
 
-                  <!-- Depot + factures uniquement pour les particuliers -->
                   <template v-if="!userAuth.isProvider">
                     <RouterLink
                       to="/depot"
@@ -300,8 +299,6 @@ const searchRef = ref(null)
 const showOnboarding = ref(false)
 
 onMounted(() => {
-  // init() is already called in main.js before mount — data is ready.
-  // We only check for the onboarding overlay here.
   if (userAuth.isLoggedIn
       && userAuth.user
       && !userAuth.user.onboarding_completed_at
@@ -313,8 +310,6 @@ onMounted(() => {
 
 function closeMenu() { profileMenuOpen.value = false }
 
-// If the avatar file is missing (e.g. deleted server-side), clear the URL
-// locally so the initials fallback shows instead of a broken image icon.
 function onAvatarError() {
   if (userAuth.user) userAuth.user.avatar_url = null
 }

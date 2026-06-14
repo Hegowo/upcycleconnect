@@ -22,9 +22,9 @@ export const useUserAuthStore = defineStore('userAuth', () => {
     if (!user.value) return ''
     return ((user.value.first_name?.[0] || '') + (user.value.last_name?.[0] || '')).toUpperCase()
   })
-  // True when the user has a provider profile (any status).
+
   const isProvider  = computed(() => !!user.value?.provider_profile)
-  // True when the provider profile is approved by an admin.
+
   const isApprovedProvider = computed(() =>
     user.value?.provider_profile?.status === 'approved'
   )
@@ -33,8 +33,6 @@ export const useUserAuthStore = defineStore('userAuth', () => {
   )
 
   async function register(payload) {
-    // Provider sign-ups pass a FormData (so the Kbis file rides along in the same
-    // request); individuals pass a plain object sent as JSON.
     if (payload instanceof FormData) {
       const res = await fetch(`${BASE}/auth/register`, {
         method: 'POST',
