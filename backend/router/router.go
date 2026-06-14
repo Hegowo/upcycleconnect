@@ -268,6 +268,8 @@ func Setup(db *gorm.DB, cfg *config.Config) *gin.Engine {
 			protected.POST("/notifications/read-all", notificationHandler.MarkAllRead)
 			protected.GET("/notifications/sent", adminNotifHandler.SentList)
 			protected.POST("/notifications/broadcast", adminNotifHandler.Broadcast)
+			protected.GET("/notifications/recipients", adminNotifHandler.RecipientSearch)
+			protected.GET("/notifications/link-targets", adminNotifHandler.LinkTargets)
 
 			protected.GET("/docs/spec", swaggerHandler.Spec)
 

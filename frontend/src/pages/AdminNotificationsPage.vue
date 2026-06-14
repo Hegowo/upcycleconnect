@@ -68,12 +68,35 @@
           <div class="space-y-3">
             <div>
               <label class="block text-xs font-semibold text-[#40617f] uppercase mb-1">Audience</label>
-              <select v-model="bcast.audience" class="w-full px-3 py-2.5 bg-[#f8fafc] border border-[#e5e7eb] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#006d35]/30">
+              <select v-model="bcast.audience" @change="onAudienceChange" class="w-full px-3 py-2.5 bg-[#f8fafc] border border-[#e5e7eb] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#006d35]/30">
                 <option value="all">Tous les utilisateurs</option>
                 <option value="particuliers">Particuliers</option>
                 <option value="pros">Professionnels / artisans</option>
+                <option value="user">Un utilisateur précis</option>
               </select>
             </div>
+
+            <div v-if="bcast.audience === 'user'">
+              <label class="block text-xs font-semibold text-[#40617f] uppercase mb-1">Destinataire</label>
+              <div v-if="selectedUser" class="flex items-center justify-between gap-2 px-3 py-2 bg-[#f8fafc] border border-[#e5e7eb] rounded-xl">
+                <div class="min-w-0">
+                  <p class="text-sm font-medium text-[#001d32] truncate">{{ selectedUser.name }}<span v-if="selectedUser.company" class="text-gray-400"> · {{ selectedUser.company }}</span></p>
+                  <p class="text-xs text-gray-400 truncate">{{ selectedUser.email }}</p>
+                </div>
+                <button @click="clearUser" class="text-xs font-semibold text-[#006d35] shrink-0">Changer</button>
+              </div>
+              <div v-else class="relative">
+                <input v-model="userQuery" @input="searchUsers" type="text" placeholder="Email, nom, prénom ou société…" class="w-full px-3 py-2.5 bg-[#f8fafc] border border-[#e5e7eb] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#006d35]/30" />
+                <div v-if="userResults.length" class="absolute z-10 left-0 right-0 mt-1 bg-white border border-[#e5e7eb] rounded-xl shadow-lg max-h-52 overflow-y-auto">
+                  <button v-for="u in userResults" :key="u.id" @click="pickUser(u)" class="w-full text-left px-3 py-2 hover:bg-[#f0fdf4] transition">
+                    <p class="text-sm text-[#001d32] truncate">{{ u.name }}<span v-if="u.company" class="text-gray-400"> · {{ u.company }}</span></p>
+                    <p class="text-xs text-gray-400 truncate">{{ u.email }}</p>
+                  </button>
+                </div>
+                <p v-else-if="userQuery.length >= 2 && !userSearching" class="text-xs text-gray-400 mt-1">Aucun utilisateur trouvé.</p>
+              </div>
+            </div>
+
             <div>
               <label class="block text-xs font-semibold text-[#40617f] uppercase mb-1">Titre</label>
               <input v-model="bcast.title" type="text" class="w-full px-3 py-2.5 bg-[#f8fafc] border border-[#e5e7eb] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#006d35]/30" />
@@ -82,10 +105,41 @@
               <label class="block text-xs font-semibold text-[#40617f] uppercase mb-1">Message</label>
               <textarea v-model="bcast.body" rows="3" class="w-full px-3 py-2.5 bg-[#f8fafc] border border-[#e5e7eb] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#006d35]/30 resize-none" />
             </div>
+
             <div>
-              <label class="block text-xs font-semibold text-[#40617f] uppercase mb-1">Lien (optionnel)</label>
-              <input v-model="bcast.link" type="text" placeholder="/prestations" class="w-full px-3 py-2.5 bg-[#f8fafc] border border-[#e5e7eb] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#006d35]/30" />
+              <label class="block text-xs font-semibold text-[#40617f] uppercase mb-1">Destination au clic</label>
+              <select v-model="linkMode" @change="onLinkModeChange" class="w-full px-3 py-2.5 bg-[#f8fafc] border border-[#e5e7eb] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#006d35]/30">
+                <option value="none">Aucune (pas de lien)</option>
+                <option value="/">Accueil</option>
+                <option value="/prestations">Liste des prestations</option>
+                <option value="prestation">Une prestation précise…</option>
+                <option value="/evenements">Liste des événements</option>
+                <option value="event">Un événement précis…</option>
+                <option value="/communaute">Communauté / Forum</option>
+                <option value="/depot">Déposer un objet</option>
+                <option value="/profil">Profil utilisateur</option>
+                <option value="custom">URL personnalisée…</option>
+              </select>
             </div>
+
+            <div v-if="linkMode === 'prestation' || linkMode === 'event'">
+              <div v-if="selectedItem" class="flex items-center justify-between gap-2 px-3 py-2 bg-[#f8fafc] border border-[#e5e7eb] rounded-xl">
+                <p class="text-sm text-[#001d32] truncate">{{ selectedItem.label }}</p>
+                <button @click="selectedItem = null" class="text-xs font-semibold text-[#006d35] shrink-0">Changer</button>
+              </div>
+              <div v-else class="relative">
+                <input v-model="itemQuery" @input="searchItems" type="text" :placeholder="linkMode === 'prestation' ? 'Rechercher une prestation…' : 'Rechercher un événement…'" class="w-full px-3 py-2.5 bg-[#f8fafc] border border-[#e5e7eb] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#006d35]/30" />
+                <div v-if="itemResults.length" class="absolute z-10 left-0 right-0 mt-1 bg-white border border-[#e5e7eb] rounded-xl shadow-lg max-h-52 overflow-y-auto">
+                  <button v-for="(it, i) in itemResults" :key="i" @click="pickItem(it)" class="block w-full text-left px-3 py-2 text-sm text-[#001d32] hover:bg-[#f0fdf4] transition truncate">{{ it.label }}</button>
+                </div>
+                <p v-else-if="itemQuery.length >= 1 && !itemSearching" class="text-xs text-gray-400 mt-1">Aucun résultat.</p>
+              </div>
+            </div>
+
+            <div v-if="linkMode === 'custom'">
+              <input v-model="customLink" type="text" placeholder="/prestations/12" class="w-full px-3 py-2.5 bg-[#f8fafc] border border-[#e5e7eb] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#006d35]/30" />
+            </div>
+
             <p v-if="bcastMsg" :class="bcastError ? 'text-red-600' : 'text-green-600'" class="text-sm">{{ bcastMsg }}</p>
           </div>
           <div class="flex justify-end gap-3 mt-5">
@@ -144,22 +198,91 @@ const showBroadcast = ref(false)
 const sending = ref(false)
 const bcastMsg = ref('')
 const bcastError = ref(false)
-const bcast = ref({ audience: 'all', title: '', body: '', link: '' })
+const bcast = ref({ audience: 'all', title: '', body: '' })
+
+// ---- Single-user recipient picker ----
+const selectedUser = ref(null)
+const userQuery = ref('')
+const userResults = ref([])
+const userSearching = ref(false)
+let userTimer = null
+function searchUsers() {
+  clearTimeout(userTimer)
+  const q = userQuery.value.trim()
+  if (q.length < 2) { userResults.value = []; return }
+  userSearching.value = true
+  userTimer = setTimeout(async () => {
+    try {
+      const res = await fetch(`${BASE}/notifications/recipients?q=${encodeURIComponent(q)}`, { headers: authHeaders() })
+      const j = await res.json()
+      userResults.value = j.data || []
+    } catch { userResults.value = [] } finally { userSearching.value = false }
+  }, 300)
+}
+function pickUser(u) { selectedUser.value = u; userResults.value = []; userQuery.value = '' }
+function clearUser() { selectedUser.value = null }
+function onAudienceChange() { if (bcast.value.audience !== 'user') clearUser() }
+
+// ---- Destination (deep-link) picker ----
+const linkMode = ref('none')            // 'none' | path | 'prestation' | 'event' | 'custom'
+const customLink = ref('')
+const selectedItem = ref(null)          // { label, path }
+const itemQuery = ref('')
+const itemResults = ref([])
+const itemSearching = ref(false)
+let itemTimer = null
+function onLinkModeChange() { selectedItem.value = null; itemResults.value = []; itemQuery.value = '' }
+function searchItems() {
+  clearTimeout(itemTimer)
+  const q = itemQuery.value.trim()
+  itemSearching.value = true
+  itemTimer = setTimeout(async () => {
+    try {
+      const res = await fetch(`${BASE}/notifications/link-targets?type=${linkMode.value}&q=${encodeURIComponent(q)}`, { headers: authHeaders() })
+      const j = await res.json()
+      itemResults.value = j.data || []
+    } catch { itemResults.value = [] } finally { itemSearching.value = false }
+  }, 300)
+}
+function pickItem(it) { selectedItem.value = it; itemResults.value = []; itemQuery.value = '' }
+function resolveLink() {
+  if (linkMode.value === 'none') return ''
+  if (linkMode.value === 'custom') return customLink.value.trim()
+  if (linkMode.value === 'prestation' || linkMode.value === 'event') return selectedItem.value?.path || ''
+  return linkMode.value // a fixed path like '/prestations'
+}
+
+function resetBroadcast() {
+  bcast.value = { audience: 'all', title: '', body: '' }
+  selectedUser.value = null; userQuery.value = ''; userResults.value = []
+  linkMode.value = 'none'; customLink.value = ''; selectedItem.value = null; itemQuery.value = ''; itemResults.value = []
+  bcastMsg.value = ''
+}
+
 async function sendBroadcast() {
   if (!bcast.value.title || !bcast.value.body) { bcastMsg.value = 'Titre et message requis'; bcastError.value = true; return }
+  if (bcast.value.audience === 'user' && !selectedUser.value) { bcastMsg.value = 'Choisis un destinataire'; bcastError.value = true; return }
+  if ((linkMode.value === 'prestation' || linkMode.value === 'event') && !selectedItem.value) { bcastMsg.value = 'Choisis la cible du lien'; bcastError.value = true; return }
   sending.value = true
   bcastMsg.value = ''
   try {
+    const payload = {
+      audience: bcast.value.audience,
+      title: bcast.value.title,
+      body: bcast.value.body,
+      link: resolveLink(),
+      user_id: bcast.value.audience === 'user' ? selectedUser.value?.id : null,
+    }
     const res = await fetch(`${BASE}/notifications/broadcast`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...authHeaders() },
-      body: JSON.stringify(bcast.value),
+      body: JSON.stringify(payload),
     })
     const j = await res.json()
     if (!res.ok) throw new Error(j.message || 'Erreur')
     bcastError.value = false
     bcastMsg.value = `Envoyé à ${j.sent} destinataire(s).`
-    setTimeout(() => { showBroadcast.value = false; bcast.value = { audience: 'all', title: '', body: '', link: '' }; bcastMsg.value = ''; fetchSent(1) }, 1200)
+    setTimeout(() => { showBroadcast.value = false; resetBroadcast(); fetchSent(1) }, 1200)
   } catch (e) { bcastError.value = true; bcastMsg.value = e.message } finally { sending.value = false }
 }
 
