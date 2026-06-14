@@ -185,9 +185,9 @@
               </td>
               <td class="px-6 py-4 text-right" @click.stop>
                 <div class="flex justify-end gap-1.5">
-                  <button class="p-1.5 rounded-lg text-gray-400 hover:text-[#40617f] hover:bg-blue-50 transition" :title="t('common.edit')">
+                  <RouterLink :to="`/admin/providers/${p.id}`" class="p-1.5 rounded-lg text-gray-400 hover:text-[#40617f] hover:bg-blue-50 transition inline-flex" :title="t('common.edit')">
                     <PencilIcon class="w-4 h-4" />
-                  </button>
+                  </RouterLink>
                   <button
                     v-if="(p.profile?.status || p.status) !== 'approved'"
                     @click="changeStatus(p, 'approved')"

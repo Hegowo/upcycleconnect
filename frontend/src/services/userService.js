@@ -61,6 +61,13 @@ export const providerService = {
     const { data } = await api.put(`/providers/${id}/status`, { status })
     return data
   },
+
+  // Fetches the Kbis through the authenticated admin axios instance (the endpoint
+  // requires a bearer token, so a plain <a href> navigation returns 401).
+  async downloadKbis(id) {
+    const response = await api.get(`/providers/${id}/kbis`, { responseType: 'blob' })
+    return response.data
+  },
 }
 
 export const adminUserService = {

@@ -55,16 +55,14 @@
           <div class="col-span-2">
             <dt class="text-xs text-gray-400 uppercase font-medium mb-2">Document officiel (Kbis)</dt>
             <dd>
-              <a
+              <button
                 v-if="provider.profile?.has_kbis"
-                :href="`/api/admin/v1/providers/${provider.id}/kbis`"
-                target="_blank"
-                rel="noopener"
+                @click="consultKbis"
                 class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-[#006d35] text-[#006d35] text-sm font-semibold hover:bg-[#f0fdf4] transition"
               >
                 <DocumentArrowDownIcon class="w-4 h-4" />
                 Consulter le Kbis
-              </a>
+              </button>
               <span v-else class="inline-flex items-center gap-1.5 text-amber-600 text-sm">
                 <ExclamationTriangleIcon class="w-4 h-4" />
                 Aucun Kbis déposé
@@ -119,6 +117,17 @@ async function fetchProvider() {
     router.push('/admin/providers')
   } finally {
     loading.value = false
+  }
+}
+
+async function consultKbis() {
+  try {
+    const blob = await providerService.downloadKbis(provider.value.id)
+    const url = URL.createObjectURL(blob)
+    window.open(url, '_blank', 'noopener')
+    setTimeout(() => URL.revokeObjectURL(url), 60000)
+  } catch {
+    toast.showError('Impossible de charger le Kbis.')
   }
 }
 
