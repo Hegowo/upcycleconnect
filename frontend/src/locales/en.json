@@ -674,7 +674,8 @@
       "priceMissing": "—",
       "labelQuote": "Pricing",
       "labelHourly": "Hourly rate",
-      "labelFixed": "Price"
+      "labelFixed": "Price",
+      "ownPrestation": "This is your own listing — you can't book it."
     },
     "events": {
       "heroTitlePart1": "Our Events",

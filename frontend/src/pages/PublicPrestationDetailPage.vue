@@ -48,7 +48,7 @@
               </p>
             </div>
 
-            <div class="flex flex-col gap-3 w-full sm:w-auto">
+            <div v-if="!isOwnPrestation" class="flex flex-col gap-3 w-full sm:w-auto">
               <textarea
                 v-model="notes"
                 :placeholder="t('public.prestationDetail.notesPlaceholder')"
@@ -65,6 +65,9 @@
                 <span v-else-if="prestation.price_type === 'quote'">{{ t('public.prestationDetail.ctaQuote') }}</span>
                 <span v-else>{{ t('public.prestationDetail.ctaReserve') }}</span>
               </button>
+            </div>
+            <div v-else class="px-5 py-3 rounded-xl bg-white border border-[#cee5ff] text-[#40617f] text-sm font-medium text-center">
+              {{ t('public.prestationDetail.ownPrestation') }}
             </div>
           </div>
 
@@ -110,6 +113,11 @@ const reserving = ref(false)
 const feedback = ref('')
 const reserveError = ref('')
 const showContractModal = ref(false)
+
+// A provider can't reserve / request a quote on their own prestation.
+const isOwnPrestation = computed(() =>
+  !!(prestation.value?.provider?.id && userAuth.user && prestation.value.provider.id === userAuth.user.id)
+)
 
 const priceValue = computed(() => {
   const p = prestation.value

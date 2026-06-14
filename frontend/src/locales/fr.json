@@ -674,7 +674,8 @@
       "priceMissing": "—",
       "labelQuote": "Tarification",
       "labelHourly": "Tarif horaire",
-      "labelFixed": "Tarif"
+      "labelFixed": "Tarif",
+      "ownPrestation": "C'est votre prestation — vous ne pouvez pas la réserver."
     },
     "events": {
       "heroTitlePart1": "Nos Événements",

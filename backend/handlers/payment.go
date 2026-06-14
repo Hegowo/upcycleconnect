@@ -57,6 +57,12 @@ func (h *PaymentHandler) Reserve(c *gin.Context) {
 		return
 	}
 
+	// A provider cannot reserve or request a quote on their own prestation.
+	if prestation.ProviderID != nil && *prestation.ProviderID == user.ID {
+		c.JSON(http.StatusForbidden, gin.H{"message": "Vous ne pouvez pas réserver votre propre prestation."})
+		return
+	}
+
 	var req reserveRequest
 	_ = c.ShouldBindJSON(&req)
 
@@ -346,7 +352,7 @@ func (h *PaymentHandler) handleQuoteRequest(c *gin.Context, user *models.User, p
 		h.Notifications.MustNotify(*prestation.ProviderID, "quote.requested",
 			"Nouvelle demande de devis",
 			fmt.Sprintf("%s a demandé un devis pour « %s ».", user.FirstName+" "+user.LastName, prestation.Title),
-			"")
+			fmt.Sprintf("/profil/reservations/%d", reservation.ID))
 	}
 
 	c.JSON(http.StatusOK, gin.H{
@@ -768,15 +774,19 @@ func (h *PaymentHandler) ShowReservation(c *gin.Context) {
 	}
 
 	var reservation models.Reservation
+	// Accessible to the customer who made it OR the provider who owns the prestation
+	// (so the provider can open a reservation / quote-request notification).
 	if err := h.DB.
 		Preload("Prestation").
 		Preload("Prestation.Category").
 		Preload("Prestation.Provider").
-		Where("id = ? AND user_id = ?", id, user.ID).
+		Joins("JOIN prestations ON prestations.id = reservations.prestation_id").
+		Where("reservations.id = ? AND (reservations.user_id = ? OR prestations.provider_id = ?)", id, user.ID, user.ID).
 		First(&reservation).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"message": "Réservation introuvable"})
 		return
 	}
+	isProviderView := reservation.UserID != user.ID
 
 	resp := models.ToReservationResponse(&reservation)
 
@@ -786,15 +796,17 @@ func (h *PaymentHandler) ShowReservation(c *gin.Context) {
 		First(&invoice).Error; err == nil {
 		inv := models.ToInvoiceResponse(&invoice)
 		c.JSON(http.StatusOK, gin.H{
-			"reservation": resp,
-			"invoice":     inv,
+			"reservation":      resp,
+			"invoice":          inv,
+			"is_provider_view": isProviderView,
 		})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"reservation": resp,
-		"invoice":     nil,
+		"reservation":      resp,
+		"invoice":          nil,
+		"is_provider_view": isProviderView,
 	})
 }
 
