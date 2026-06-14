@@ -278,6 +278,24 @@ html.dark .fixed.inset-0.z-50 .btn-secondary  {
   border-color: #334155 !important;
   color: #94a3b8 !important;
 }
+/* Teleported modals (broadcast notification, etc.) — form controls + brand text */
+html.dark .fixed.inset-0.z-50 input:not([type="checkbox"]):not([type="radio"]),
+html.dark .fixed.inset-0.z-50 select,
+html.dark .fixed.inset-0.z-50 textarea {
+  background-color: #0f172a !important;
+  border-color: #334155 !important;
+  color: #f1f5f9 !important;
+}
+html.dark .fixed.inset-0.z-50 input::placeholder,
+html.dark .fixed.inset-0.z-50 textarea::placeholder { color: #64748b !important; }
+html.dark .fixed.inset-0.z-50 select option { background-color: #1e293b; color: #f1f5f9; }
+html.dark .fixed.inset-0.z-50 label                 { color: #cbd5e1 !important; }
+html.dark .fixed.inset-0.z-50 .bg-\[\#f8fafc\]      { background-color: #0f172a !important; }
+html.dark .fixed.inset-0.z-50 .text-\[\#001d32\]    { color: #f1f5f9 !important; }
+html.dark .fixed.inset-0.z-50 .text-\[\#40617f\]    { color: #94a3b8 !important; }
+html.dark .fixed.inset-0.z-50 .text-\[\#374151\]    { color: #cbd5e1 !important; }
+html.dark .fixed.inset-0.z-50 .border-\[\#e5e7eb\],
+html.dark .fixed.inset-0.z-50 .border-\[\#f1f5f9\]  { border-color: #334155 !important; }
 
 /* Select option legibility */
 .admin-dark select option { background-color: #1e293b; color: #f1f5f9; }
