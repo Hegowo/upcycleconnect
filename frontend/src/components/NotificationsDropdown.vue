@@ -153,7 +153,15 @@ async function onItemClick(n) {
   }
   if (n.link) {
     open.value = false
-    router.push(n.link)
+    const link = String(n.link).trim()
+    // External / absolute links (http(s)://, //, mailto:, tel:) must open as-is,
+    // not be pushed through vue-router (which would treat them as a relative path
+    // and append them to the current URL, e.g. /admin/https://…).
+    if (/^(https?:)?\/\//i.test(link) || link.startsWith('mailto:') || link.startsWith('tel:')) {
+      window.open(link, '_blank', 'noopener')
+    } else {
+      router.push(link.startsWith('/') ? link : `/${link}`)
+    }
   }
 }
 
